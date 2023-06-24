@@ -29,24 +29,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "Leysco100\\Gpm\\": "src"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Leysco100\\Gpm\\Tests\\": "tests"
-    }
-  },
-  "extra": {
-    "laravel": {
-      "providers": [
-        "Leysco100\\Gpm\\GpmServiceProvider"
-      ]
-    }
-  },
-  "config": {
-    "allow-plugins": {
-      "pestphp/pest-plugin": true
+      "Leysco100\\Gpm\\": ""
     }
   }
 }
