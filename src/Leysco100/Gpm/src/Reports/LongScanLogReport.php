@@ -1,9 +1,10 @@
 <?php
 
-namespace Leysco\Gpm\Reports;
+namespace Leysco100\Gpm\Reports;
 
 
-use Leysco\Gpm\Services\ReportsService;
+
+use Leysco100\Gpm\Services\ReportsService;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\FromCollection;

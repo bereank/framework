@@ -1,6 +1,6 @@
 <?php
 
-namespace Leysco\Gpm\Reports;
+namespace Leysco100\Gpm\Reports;
 
 use Carbon\Carbon;
 use Leysco\LS100SharedPackage\Models\Domains\Marketing\Models\GMS1;

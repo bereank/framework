@@ -1,17 +1,17 @@
 <?php
 
-namespace Leysco\Gpm\Console;
+namespace Leysco100\Gpm\Console;
 
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
-
 use Maatwebsite\Excel\Facades\Excel;
-use Leysco\Gpm\Mail\GPMExportLogsMail;
-use Leysco\Gpm\Reports\LongScanLogReport;
-use Leysco\Gpm\Reports\LongReports\LongDoesNotExist;
-use Leysco\Gpm\Reports\LongReports\LongDocumentReport;
-use Leysco\Gpm\Reports\LongReports\LongDublicateScanLogs;
+use Leysco100\Gpm\Mail\GPMExportLogsMail;
+use Leysco100\Gpm\Reports\LongScanLogReport;
+use Leysco100\Gpm\Reports\LongReports\LongDoesNotExist;
+use Leysco100\Gpm\Reports\LongReports\LongDocumentReport;
+use Leysco100\Gpm\Reports\LongReports\LongDublicateScanLogs;
+
 
 
 class ScanReportCommand extends Command

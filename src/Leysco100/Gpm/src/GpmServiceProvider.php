@@ -1,18 +1,13 @@
 <?php
 
-namespace Leysco\GatePassManagementModule;
+namespace Leysco100\Gpm;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Leysco\GatePassManagementModule\Console\GPMInstallCommand;
-use Leysco\GatePassManagementModule\Console\MobileMenuCommand;
-use Leysco\GatePassManagementModule\Console\DailyReportCommand;
-use Leysco\GatePassManagementModule\Console\InsertFormFieldTypes;
-use Leysco\GatePassManagementModule\Console\LeyscoDailyReportsCommand;
-use Leysco\GatePassManagementModule\Console\GatePassManagementTestCommand;
-use Leysco\GatePassManagementModule\Console\ScanReportCommand;
 
-class GPMModuleServiceProvider extends ServiceProvider
+
+
+class GpmServiceProvider extends ServiceProvider
 {
     public function register()
     {

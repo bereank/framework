@@ -1,15 +1,16 @@
 <?php
 
-namespace Leysco\Gpm\Jobs;
+namespace Leysco100\Gpm\Jobs;
 
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
-use Leysco\Gpm\Mail\GPMNotificationMail;
+
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Leysco100\Gpm\Mail\GPMNotificationMail;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 
 

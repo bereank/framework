@@ -1,16 +1,18 @@
 <?php
 
-namespace Leysco\Gpm\Console;
+namespace Leysco100\Gpm\Console;
 
-use Illuminate\Support\Carbon;
+
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
-use Leysco\Gpm\Reports\DoesNotExist;
 use Maatwebsite\Excel\Facades\Excel;
-use Leysco\Gpm\Reports\ScanLogReport;
-use Leysco\Gpm\Reports\DocumentReport;
-use Leysco\Gpm\Mail\GPMDailyReportMail;
-use Leysco\Gpm\Reports\DublicateScanLogs;
+use Leysco100\Gpm\Reports\DoesNotExist;
+use Leysco100\Gpm\Reports\ScanLogReport;
+use Leysco100\Gpm\Reports\DocumentReport;
+use Leysco100\Gpm\Mail\GPMDailyReportMail;
+use Leysco100\Gpm\Reports\DublicateScanLogs;
+
+
 
 
 class LeyscoDailyReportsCommand extends Command

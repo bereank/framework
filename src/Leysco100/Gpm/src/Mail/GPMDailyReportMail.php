@@ -1,6 +1,6 @@
 <?php
 
-namespace Leysco\Gpm\Mail;
+namespace Leysco100\Gpm\Mail;
 
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;

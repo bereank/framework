@@ -1,6 +1,6 @@
 <?php
 
-namespace Leysco\Gpm\Http\Controllers;
+namespace Leysco100\Gpm\Http\Controllers;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;

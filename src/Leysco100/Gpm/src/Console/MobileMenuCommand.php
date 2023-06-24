@@ -1,6 +1,6 @@
 <?php
 
-namespace Leysco\Gpm\Console;
+namespace Leysco100\Gpm\Console;
 
 
 

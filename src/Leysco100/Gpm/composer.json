@@ -1,5 +1,5 @@
 {
-  "name": "leyscoltd/gpm",
+  "name": "leysco100/gpm",
   "description": "The Leysco100 GPM Package",
   "type": "library",
   "license": "MIT",
@@ -29,18 +29,18 @@
   ],
   "autoload": {
     "psr-4": {
-      "Leysco\\Gpm\\": "src"
+      "Leysco100\\Gpm\\": "src"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Leysco\\Gpm\\Tests\\": "tests"
+      "Leysco100\\Gpm\\Tests\\": "tests"
     }
   },
   "extra": {
     "laravel": {
       "providers": [
-        "Leysco\\Gpm\\GpmServiceProvider"
+        "Leysco100\\Gpm\\GpmServiceProvider"
       ]
     }
   },

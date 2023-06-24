@@ -1,6 +1,6 @@
 <?php
 
-namespace Leysco\GatePassManagementModule\Console;
+namespace Leysco100\Gpm\Console;
 
 use Illuminate\Console\Command;
 

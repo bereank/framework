@@ -1,6 +1,6 @@
 <?php
 
-namespace Leysco\Gpm\Services;
+namespace Leysco100\Gpm\Services;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
