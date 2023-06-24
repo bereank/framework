@@ -1,0 +1,32 @@
+{
+  "name": "leysco100/shared",
+  "description": "The Leysco100 Shared Package",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Berean Kibet",
+      "email": "bereankibet@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Leysco100\\Shared\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Leysco100\\Shared\\Tests\\": "tests"
+    }
+  },
+  "scripts": {
+    "test": "vendor/bin/pest"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Leysco100\\Shared\\SharedServiceProvider"
+      ]
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "leyscoltd/framework",
+  "description": "The Leysco Framework",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Berean Kibet",
+      "email": "bereankibet@gmail.com"
+    }
+  ],
+  "require": {
+   
+  },
+  "require-dev": {
+    "orchestra/testbench": "^7.6",
+    "pestphp/pest": "^1.21",
+    "phpunit/phpunit": "^9.5",
+    "pestphp/pest-plugin-laravel": "^1.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "Leysco100\\": "src/Leysco100/"
+    }
+  },
+
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  }
+}
