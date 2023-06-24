@@ -3,7 +3,8 @@
 namespace Leysco100\Gpm\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
+use Leysco100\Gpm\Http\Controllers\Controller;
+
 
 class AfricasTalkingGatewayException extends \Exception
 {

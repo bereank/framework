@@ -6,13 +6,14 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Leysco100\Gpm\Mail\GPMScanLogs;
-use App\Http\Controllers\Controller;
+
 
 use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
 use Leysco100\Gpm\Mail\GPMSapDocuments;
 use Leysco100\Gpm\Reports\ExportScanLog;
 use Leysco100\Gpm\Reports\ExportSapDocuments;
+use Leysco100\Gpm\Http\Controllers\Controller;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\Marketing\Models\OGMS;
 use Leysco100\Shared\Models\Administration\Models\OADM;

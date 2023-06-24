@@ -3,12 +3,15 @@
 namespace Leysco100\Gpm\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
+
 use Illuminate\Support\Facades\Auth;
-use Leysco\GatePassManagementModule\Models\MobileNavBar;
-use Leysco\LS100SharedPackage\Services\ApiResponseService;
-use Leysco\LS100SharedPackage\Models\Domains\Marketing\Models\GPMGate;
-use Leysco\LS100SharedPackage\Models\Domains\Administration\Models\OADM;
+use Leysco100\Shared\Models\MobileNavBar;
+use Leysco100\Gpm\Http\Controllers\Controller;
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\Marketing\Models\GPMGate;
+use Leysco100\Shared\Models\Administration\Models\OADM;
+
+
 
 class AppSettingsController extends Controller
 {

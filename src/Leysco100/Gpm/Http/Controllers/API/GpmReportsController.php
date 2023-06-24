@@ -7,7 +7,8 @@ use Illuminate\Support\Carbon;
 
 use Leysco\Gpm\Services\ReportsService;
 use Illuminate\Support\Facades\Validator;
-use Leysco\Gpm\Http\Controllers\Controller;
+
+use Leysco100\Gpm\Http\Controllers\Controller;
 use Leysco100\Shared\Services\ApiResponseService;
 
 
