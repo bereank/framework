@@ -53,7 +53,7 @@ Route::apiResources(['form_fields' => GPMFormFieldsController::class]);
 Route::get('field_types', [GPMFormFieldsController::class, 'getFieldTypes']);
 Route::get('get_mobile_nav', [GPMFormFieldsController::class, 'getMobileNav']);
 Route::put('update_mobile_nav', [GPMFormFieldsController::class, 'updateMobileNav']);
-Route::apiResources(['fields_template' => FieldsTemplateController::class]);
+
 
 Route::get('gpm_reports', [GPMReports::class, 'getScanLogsByDate']);
 
