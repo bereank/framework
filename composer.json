@@ -20,8 +20,8 @@
   },
   "autoload": {
     "psr-4": {
-      "Leysco100\\Shared": "src/Leysco100/Shared",
-      "Leysco100\\Gpm": "src/Leysco100/Gpm"
+      "Leysco100\\Shared\\": "src/Leysco100/Shared",
+      "Leysco100\\Gpm\\": "src/Leysco100/Gpm"
     }
   },
 
