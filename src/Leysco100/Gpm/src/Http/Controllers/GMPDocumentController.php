@@ -4,13 +4,19 @@ namespace Leysco\Gpm\Http\Controllers;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Leysco\Gpm\Mail\GPMScanLogs;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
-use Maatwebsite\Excel\Facades\Excel;
+use Leysco\Gpm\Mail\GPMSapDocuments;
 
-use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
+use Leysco\Gpm\Reports\ExportScanLog;
+use Leysco\Gpm\Reports\ExportSapDocuments;
+use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\Marketing\Models\OGMS;
+use Leysco100\Shared\Models\Administration\Models\OADM;
+
 
 
 class GMPDocumentController extends Controller

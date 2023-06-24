@@ -1,9 +1,10 @@
 <?php
 
-namespace Leysco\GatePassManagementModule\Console;
+namespace Leysco\Gpm\Console;
 
 use Illuminate\Console\Command;
-use Leysco\GatePassManagementModule\Models\OGMS;
+use App\Domains\FormSetting\Models\FM100;
+
 
 class GatePassManagementTestCommand extends Command
 {
@@ -121,7 +122,7 @@ class GatePassManagementTestCommand extends Command
             }
         }
 
-        dd(OGMS::take(1)->get());
+     
         $this->info('Gate Management System Working....');
     }
 

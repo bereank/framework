@@ -4,20 +4,18 @@ namespace Leysco\Gpm\Http\Controllers;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Leysco\Gpm\Jobs\SendEmailJob;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
-use Leysco\GatePassManagementModule\Models\FormField;
-use Leysco\GatePassManagementModule\Jobs\SendEmailJob;
-use Leysco\LS100SharedPackage\Services\ApiResponseService;
-use Leysco\GatePassManagementModule\Mail\GPMNotificationMail;
-use Leysco\LS100SharedPackage\Models\Domains\Marketing\Models\GMS1;
-use Leysco\LS100SharedPackage\Models\Domains\Marketing\Models\GMS2;
-use Leysco\LS100SharedPackage\Models\Domains\Marketing\Models\OGMS;
+use Leysco100\Shared\Models\FormField;
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\Marketing\Models\GMS1;
+use Leysco100\Shared\Models\Marketing\Models\OGMS;
+use Leysco100\Shared\Models\Administration\Models\GMS2;
+use Leysco100\Shared\Models\Administration\Models\OADM;
 
-use Leysco\LS100SharedPackage\Models\Domains\Administration\Models\OADM;
 
 class GPMMobileAPPApiController extends Controller
 {

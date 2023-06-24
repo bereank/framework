@@ -3,15 +3,16 @@
 namespace Leysco\Gpm\Http\Controllers;
 
 
-use Illuminate\Support\Str;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Auth;
-use Leysco\LS100SharedPackage\Services\ApiResponseService;
-use Leysco\GatePassManagementModule\Models\OtpVerification;
-use Leysco\GatePassManagementModule\Http\Controllers\AfricasTalkingApi;
+use Leysco100\Shared\Models\OtpVerification;
+use Leysco100\Shared\Services\ApiResponseService;
+
+
 
 class OtpVerificationController extends Controller
 {

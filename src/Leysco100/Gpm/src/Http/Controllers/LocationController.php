@@ -2,11 +2,12 @@
 
 namespace Leysco\Gpm\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Leysco\LS100SharedPackage\Models\Domains\InventoryAndProduction\Models\OLCT;
 use Illuminate\Http\Request;
 
+use App\Http\Controllers\Controller;
+
 use Leysco\LS100SharedPackage\Services\ApiResponseService;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OLCT;
 
 class LocationController extends Controller
 {

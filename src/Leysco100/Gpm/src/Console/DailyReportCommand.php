@@ -1,18 +1,18 @@
 <?php
 
-namespace Leysco\GatePassManagementModule\Console;
+namespace Leysco\Gpm\Console;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
+use Leysco\Gpm\Reports\DoesNotExist;
 use Maatwebsite\Excel\Facades\Excel;
-use Leysco\GatePassManagementModule\Models\OGMS;
-use Leysco\GatePassManagementModule\Reports\DoesNotExist;
-use Leysco\GatePassManagementModule\Reports\ScanLogReport;
-use Leysco\GatePassManagementModule\Reports\DocumentReport;
-use Leysco\GatePassManagementModule\Mail\GPMDailyReportMail;
-use Leysco\GatePassManagementModule\Reports\DublicateScanLogs;
-use Leysco\LS100SharedPackage\Models\Domains\Administration\Models\OADM;
+use Leysco\Gpm\Reports\ScanLogReport;
+use Leysco\Gpm\Reports\DocumentReport;
+use Leysco\Gpm\Mail\GPMDailyReportMail;
+use Leysco\Gpm\Reports\DublicateScanLogs;
+use Leysco100\Shared\Models\Administration\Models\OADM;
+
 
 class DailyReportCommand extends Command
 {

@@ -3,8 +3,7 @@
 namespace Leysco\GatePassManagementModule\Console;
 
 use Illuminate\Console\Command;
-use Leysco\LS100SharedPackage\Models\Domains\FormSetting\Models\FM100;
-use Leysco\LS100SharedPackage\Models\Domains\Shared\Models\LS100Module;
+
 
 class GPMInstallCommand extends Command
 {

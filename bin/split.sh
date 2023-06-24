@@ -20,7 +20,7 @@ function remote()
 git pull origin $CURRENT_BRANCH
 
 remote shared git@github.com:leysco100/shared.git
-
+remote gpm git@github.com:leysco100/gpm.git
 
 split 'src/Leysco100/Shared' shared
-
+split 'src/Leysco100/Gpm' gpm

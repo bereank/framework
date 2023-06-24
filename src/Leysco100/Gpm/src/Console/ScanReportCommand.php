@@ -1,16 +1,18 @@
 <?php
 
-namespace Leysco\GatePassManagementModule\Console;
+namespace Leysco\Gpm\Console;
 
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
+
 use Maatwebsite\Excel\Facades\Excel;
-use Leysco\GatePassManagementModule\Mail\GPMExportLogsMail;
-use Leysco\GatePassManagementModule\Reports\LongReports\LongDoesNotExist;
-use Leysco\GatePassManagementModule\Reports\LongReports\LongScanLogReport;
-use Leysco\GatePassManagementModule\Reports\LongReports\LongDocumentReport;
-use Leysco\GatePassManagementModule\Reports\LongReports\LongDublicateScanLogs;
-use Carbon\Carbon;
+use Leysco\Gpm\Mail\GPMExportLogsMail;
+use Leysco\Gpm\Reports\LongScanLogReport;
+use Leysco\Gpm\Reports\LongReports\LongDoesNotExist;
+use Leysco\Gpm\Reports\LongReports\LongDocumentReport;
+use Leysco\Gpm\Reports\LongReports\LongDublicateScanLogs;
+
 
 class ScanReportCommand extends Command
 {

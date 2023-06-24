@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 
 use App\Services\AuthorizationService;
 use Leysco100\Shared\Models\Shared\Models\APDI;
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\Marketing\Models\GPMGate;
 
 
 class GateController extends Controller

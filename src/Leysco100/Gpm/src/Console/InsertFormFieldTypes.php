@@ -1,11 +1,11 @@
 <?php
 
-namespace Leysco\GatePassManagementModule\Console;
+namespace Leysco\Gpm\Console;
 
 
 
 use Illuminate\Console\Command;
-use Leysco\GatePassManagementModule\Models\FormFieldType;
+
 
 
 

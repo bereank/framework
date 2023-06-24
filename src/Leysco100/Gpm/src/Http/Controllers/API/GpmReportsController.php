@@ -1,13 +1,15 @@
 <?php
 
-namespace Leysco\GatePassManagementModule\Http\Controllers\API;
+namespace Leysco\Gpm\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use App\Http\Controllers\Controller;
+
+use Leysco\Gpm\Services\ReportsService;
 use Illuminate\Support\Facades\Validator;
-use Leysco\LS100SharedPackage\Services\ApiResponseService;
-use Leysco\GatePassManagementModule\Services\ReportsService;
+use Leysco\Gpm\Http\Controllers\Controller;
+use Leysco100\Shared\Services\ApiResponseService;
+
 
 
 class  GpmReportsController extends Controller

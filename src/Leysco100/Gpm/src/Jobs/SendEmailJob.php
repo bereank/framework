@@ -1,16 +1,17 @@
 <?php
 
-namespace Leysco\GatePassManagementModule\Jobs;
+namespace Leysco\Gpm\Jobs;
 
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
+use Leysco\Gpm\Mail\GPMNotificationMail;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
-use Leysco\GatePassManagementModule\Mail\GPMNotificationMail;
+
 
 class SendEmailJob implements ShouldQueue
 {

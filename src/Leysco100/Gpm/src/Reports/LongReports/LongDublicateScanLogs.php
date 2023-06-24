@@ -1,16 +1,16 @@
 <?php
 
-namespace Leysco\GatePassManagementModule\Reports\LongReports;
+namespace Leysco\Gpm\Reports\LongReports;
 
 
 
 use Carbon\Carbon;
+use Leysco\Gpm\Services\ReportsService;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Leysco\GatePassManagementModule\Services\ReportsService;
-use Leysco\LS100SharedPackage\Models\Domains\Marketing\Models\GMS1;
+
 
 class LongDublicateScanLogs implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize
 {

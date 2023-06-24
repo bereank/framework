@@ -1,6 +1,6 @@
 <?php
 
-namespace Leysco\GatePassManagementModule\Models;
+namespace Leysco100\Shared\Models;
 
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Database\Eloquent\Model;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\Administration\Models;
+namespace Leysco100\Shared\Models\Administration\Models;
 
 use App\Domains\Marketing\Models\OPLN;
 use Illuminate\Database\Eloquent\Model;

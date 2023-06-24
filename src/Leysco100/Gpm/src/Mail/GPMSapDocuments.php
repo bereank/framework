@@ -2,13 +2,11 @@
 
 namespace Leysco\Gpm\Mail;
 
-use Carbon\Carbon;
+
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
-use PhpOffice\PhpSpreadsheet\IOFactory;
-use Leysco\LS100SharedPackage\Models\Domains\Marketing\Models\GMS1;
 use Leysco\LS100SharedPackage\Models\Domains\Marketing\Models\OGMS;
 
 class GPMSapDocuments extends Mailable
