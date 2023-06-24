@@ -11,7 +11,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "Leysco100\\Shared\\": "src"
+      "Leysco100\\Shared\\": ""
     }
   },
   "autoload-dev": {
@@ -21,12 +21,5 @@
   },
   "scripts": {
     "test": "vendor/bin/pest"
-  },
-  "extra": {
-    "laravel": {
-      "providers": [
-        "Leysco100\\Shared\\SharedServiceProvider"
-      ]
-    }
   }
 }

@@ -1,10 +1,9 @@
 <?php
 
-namespace Leysco100\Shared;
+namespace Leysco100\Shared\Console\Setup;
 
 use Illuminate\Console\Command;
-use Leysco\LS100SharedPackage\Models\Domains\Shared\Models\APDI;
-use Leysco\LS100SharedPackage\Models\Domains\Shared\Models\PDI1;
+
 
 class InstallSharedPackageCommand extends Command
 {

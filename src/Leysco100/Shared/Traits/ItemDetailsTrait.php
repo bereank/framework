@@ -1,5 +1,5 @@
 <?php
-namespace Leysco100\Shared;
+namespace Leysco100\Shared\Traits;
 
 trait ItemDetailsTrait {
 
