@@ -1,0 +1,52 @@
+{
+  "name": "leyscoltd/gpm",
+  "description": "The Leysco100 GPM Package",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Berean Kibet",
+      "email": "bereankibet@gmail.com"
+    }
+  ],
+  "require": {
+    "leyscoltd/ls100-shared-package": "dev-main",
+    "psr/simple-cache": "2.0",
+    "maatwebsite/excel": "^3.1",
+    "laravel-notification-channels/africastalking": "^4.0"
+  },
+  "require-dev": {
+    "orchestra/testbench": "^7.6",
+    "pestphp/pest": "^1.21",
+    "phpunit/phpunit": "^9.5",
+    "pestphp/pest-plugin-laravel": "^1.2"
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "git@github.com:leysco100/shared.git"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Leysco\\Gpm\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Leysco\\Gpm\\Tests\\": "tests"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Leysco\\Gpm\\GpmServiceProvider"
+      ]
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  }
+}

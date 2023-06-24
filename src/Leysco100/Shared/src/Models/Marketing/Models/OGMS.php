@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\Marketing\Models;
+namespace Leysco100\Shared\Models\Marketing\Models;
 
 use App\Domains\Shared\Models\APDI;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

@@ -9,8 +9,15 @@
     }
   ],
   "require": {
-   
+    "leysco100/shared": "dev-main"
   },
+
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "git@github.com:leysco100/shared.git"
+    }
+  ],
   "require-dev": {
     "orchestra/testbench": "^7.6",
     "pestphp/pest": "^1.21",

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\Marketing\Models;
+namespace Leysco100\Shared\Models\Marketing\Models;
 
 use App\Domains\Administration\Models\User;
 use App\Domains\Shared\Models\APDI;

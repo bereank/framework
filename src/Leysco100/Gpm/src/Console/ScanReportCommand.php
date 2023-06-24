@@ -1,0 +1,39 @@
+<?php
+
+namespace Leysco\GatePassManagementModule\Console;
+
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Mail;
+use Maatwebsite\Excel\Facades\Excel;
+use Leysco\GatePassManagementModule\Mail\GPMExportLogsMail;
+use Leysco\GatePassManagementModule\Reports\LongReports\LongDoesNotExist;
+use Leysco\GatePassManagementModule\Reports\LongReports\LongScanLogReport;
+use Leysco\GatePassManagementModule\Reports\LongReports\LongDocumentReport;
+use Leysco\GatePassManagementModule\Reports\LongReports\LongDublicateScanLogs;
+use Carbon\Carbon;
+
+class ScanReportCommand extends Command
+{
+    protected $signature = 'gpm:send-leysco-gpm-report {emails} {from_date} {to_date}';
+
+    protected $description = 'Send Report';
+
+    public function handle()
+    {
+
+
+
+        $from_date = Carbon::parse($this->argument('from_date'))->startOfDay();
+        $to_date = Carbon::parse($this->argument('to_date'))->endOfDay();
+
+
+        Excel::store(new LongScanLogReport($from_date, $to_date), 'ScanReport.xlsx');
+        Excel::store(new LongDocumentReport($from_date, $to_date), 'DocumentReport.xlsx');
+        Excel::store(new LongDublicateScanLogs($from_date, $to_date), 'DuplicateReport.xlsx');
+        Excel::store(new LongDoesNotExist($from_date, $to_date), 'DoesNotExist.xlsx');
+
+        $emails = explode(',', $this->argument('emails'));
+
+        Mail::to($emails)->send(new GPMExportLogsMail($from_date, $to_date));
+    }
+}

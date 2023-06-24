@@ -1,0 +1,60 @@
+[
+  {
+    "icon": "mdi-dump-truck",
+    "icon-alt": "mdi-chevron-down",
+    "Label": "Gate Pass Mgt",
+    "model": true,
+    "Visible": "Y",
+    "children": [
+      {
+        "icon": "mdi-con",
+        "Label": "Documents",
+        "link": "/gpm-documents",
+        "Visible": "Y",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Scan Logs",
+        "link": "/gpm-scan-logs",
+        "Visible": "Y",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Users",
+        "link": "/gpm/users",
+        "Visible": "Y",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Gates",
+        "link": "/gpm/gates",
+        "Visible": "Y",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Settings",
+        "link": "/gpm/settings",
+        "Visible": "Y",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Reports",
+        "link": "/gpm/reports",
+        "Visible": "Y",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Form Fields",
+        "link": "/gpm/form-fields",
+        "Visible": "Y",
+        "children": []
+      }
+    ]
+  }
+]

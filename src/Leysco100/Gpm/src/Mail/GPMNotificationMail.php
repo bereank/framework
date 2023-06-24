@@ -1,0 +1,60 @@
+<?php
+
+namespace Leysco\Gpm\Mail;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Mail\Mailable;
+use Illuminate\Queue\SerializesModels;
+use Leysco\LS100SharedPackage\Models\Domains\Administration\Models\OADM;
+use Leysco\LS100SharedPackage\Models\Domains\Marketing\Models\GMS1;
+use Leysco\LS100SharedPackage\Models\Domains\Marketing\Models\GPMGate;
+
+class GPMNotificationMail extends Mailable
+{
+    use Queueable;
+    use SerializesModels;
+    public $scanLogID;
+    /**
+     * Create a new message instance.
+     *
+     * @return void
+     */
+    public function __construct($scanLogID)
+    {
+        $this->scanLogID = $scanLogID;
+    }
+
+    /**
+     * Build the message.
+     *
+     * @return $this
+     */
+    public function build()
+    {
+
+
+        $data = OADM::where('id', 1)->first();
+        $documentData = GMS1::with('objecttype')->where('id', $this->scanLogID)->first();
+        $gpmGate = GPMGate::where('id', $documentData->GateID)->first();
+
+        $error = "Scann Successfully";
+        if (!$documentData) {
+            return;
+        }
+        if ($documentData->Status == 1) {
+            $error = "The document does not exist in our database";
+        }
+        if ($documentData->Status == 2) {
+            $error = "Duplicate Scan";
+        }
+        $gpmGateName =   $gpmGate->Name ?? "N/A";
+
+        $subject = "GPM SCAN LOG : GATE  " .  $gpmGateName;
+
+
+        return $this->subject($subject)
+            ->markdown('gatepassmanagement::ErrorNotification')
+            ->with('documentData', $documentData)
+            ->with('error', $error);
+    }
+}
