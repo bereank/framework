@@ -50,17 +50,21 @@ class ApiResponseService
 
     /**
      *  Failure API Response
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function apiFailedResponseService($message)
+    public function apiFailedResponseService($message,$data = null)
     {
-        return response()
-            ->json([
-                'ResultState' => false,
-                'ResultCode' => 1500,
-                'ValidationError' => "Details error",
-                'ResultDesc' => $message,
-            ], 200);
+        $response = [
+            'ResultState' => false,
+            'ResultCode' => 1500,
+            'ValidationError' => "Details error",
+            'ResultDesc' => $message,
+        ];
+        if ($data != null){
+            $response["ResultData"] = $data;
+        }
+
+        return response()->json($response, 200);
     }
 
     /**
@@ -77,4 +81,19 @@ class ApiResponseService
             ], 500);
     }
 
+    /**
+     *  Failure API Response
+     * @return \Illuminate\Http\Response
+     */
+    public function apiIntegratorFailedResponseService(string $message, int $ErrorCode = null, string $ErrorDesc = null)
+    {
+        return response()
+            ->json([
+                'ResultState' => false,
+                'ResultCode' => 1500,
+                'ResultDesc' => $message,
+                'ErrorCode' => $ErrorCode,
+                'ErrorDesc' => $ErrorDesc,
+            ], 200);
+    }
 }

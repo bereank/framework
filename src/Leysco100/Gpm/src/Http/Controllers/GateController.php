@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 use App\Services\AuthorizationService;
+use Leysco100\Shared\Models\Shared\Models\APDI;
 
 
 class GateController extends Controller
