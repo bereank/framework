@@ -1,7 +1,8 @@
 <?php
 
-use Leysco100\Gpm\GPMReports;
+
 use Illuminate\Support\Facades\Route;
+use Leysco100\Gpm\Http\Controllers\GPMReports;
 use Leysco100\Gpm\Http\Controllers\GPMController;
 use Leysco100\Gpm\Http\Controllers\GateController;
 use Leysco100\Gpm\Http\Controllers\LocationController;

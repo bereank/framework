@@ -4,12 +4,13 @@ namespace Leysco100\Gpm\Http\Controllers;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
+
+use Leysco100\Gpm\Http\Controllers\Controller;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\Marketing\Models\GMS1;
 use Leysco100\Shared\Models\Administration\Models\GMS2;
-use Illuminate\Support\Facades\Request as FacadesRequest;
+
 
 
 class GPMReports extends Controller
