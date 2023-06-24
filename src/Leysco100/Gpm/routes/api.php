@@ -1,18 +1,15 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Leysco\GatePassManagementModule\Http\Controllers\TestApi;
-use Leysco\GatePassManagementModule\Http\Controllers\GPMReports;
-use Leysco\GatePassManagementModule\Http\Controllers\GPMController;
-use Leysco\GatePassManagementModule\Http\Controllers\GateController;
-use Leysco\GatePassManagementModule\Http\Controllers\LocationController;
-use Leysco\GatePassManagementModule\Http\Controllers\AppSettingsController;
-use Leysco\GatePassManagementModule\Http\Controllers\GMPDocumentController;
-use Leysco\GatePassManagementModule\Http\Controllers\GPMFormFieldsController;
-use Leysco\GatePassManagementModule\Http\Controllers\API\GpmReportsController;
-use Leysco\GatePassManagementModule\Http\Controllers\GPMMobileAPPApiController;
-use Leysco\GatePassManagementModule\Http\Controllers\OtpVerificationController;
-use Leysco\GatePassManagementModule\Http\Controllers\API\FieldsTemplateController;
+use Leysco100\Gpm\Http\Controllers\GPMController;
+use Leysco100\Gpm\Http\Controllers\GateController;
+use Leysco100\Gpm\Http\Controllers\LocationController;
+use Leysco100\Gpm\Http\Controllers\AppSettingsController;
+use Leysco100\Gpm\Http\Controllers\GMPDocumentController;
+use Leysco100\Gpm\Http\Controllers\GPMFormFieldsController;
+use Leysco100\Gpm\Http\Controllers\GPMMobileAPPApiController;
+use Leysco100\Gpm\Http\Controllers\OtpVerificationController;
+
 
 /*
 |--------------------------------------------------------------------------
