@@ -8,16 +8,10 @@
       "email": "bereankibet@gmail.com"
     }
   ],
-  "require": {
-    "leysco100/shared": "dev-main"
+  "replace": {
+    "leysco100/shared": "self.version",
+    "leysco100/gpm": "self.version"
   },
-
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "git@github.com:leysco100/shared.git"
-    }
-  ],
   "require-dev": {
     "orchestra/testbench": "^7.6",
     "pestphp/pest": "^1.21",
