@@ -10,7 +10,7 @@
     }
   ],
   "require": {
-    "leyscoltd/ls100-shared-package": "dev-main",
+    "leysco100/shared": "dev-main",
     "psr/simple-cache": "2.0",
     "maatwebsite/excel": "^3.1",
     "laravel-notification-channels/africastalking": "^4.0"
