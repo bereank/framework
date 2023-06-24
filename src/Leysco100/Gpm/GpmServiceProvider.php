@@ -18,7 +18,7 @@ class GpmServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        $this->mergeConfigFrom(__DIR__ . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "config.php", 'gate-pass-management-module');
+        $this->mergeConfigFrom(__DIR__ . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "config.php", 'gpm');
     }
 
     public function boot()
@@ -26,7 +26,7 @@ class GpmServiceProvider extends ServiceProvider
         // Register the command if we are using the application via the CLI
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "config.php" => config_path('gate-pass-management-module.php'),
+                __DIR__ . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "config.php" => config_path('ggpm.php'),
             ], 'config');
 
             $this->commands([
@@ -38,11 +38,9 @@ class GpmServiceProvider extends ServiceProvider
                 MobileMenuCommand::class,
                 ScanReportCommand::class
             ]);
-            $this->publishes([
-                __DIR__ . '/../database/migrations/tenant' => database_path('migrations/tenant'),
-            ], 'migrations');
+         
         }
-        $this->registerRoutes();
+    
 
         /**
          * Load Migrations And Views
@@ -51,18 +49,5 @@ class GpmServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'gatepassmanagement');
     }
 
-    protected function registerRoutes()
-    {
-        Route::group($this->routeConfiguration(), function () {
-            $this->loadRoutesFrom(__DIR__ . DIRECTORY_SEPARATOR . "routes" . DIRECTORY_SEPARATOR . "api.php");
-        });
-    }
 
-    protected function routeConfiguration()
-    {
-        return [
-            'prefix' => config('gate-pass-management-module.prefix'),
-            'middleware' => config('gate-pass-management-module.middleware'),
-        ];
-    }
 }
