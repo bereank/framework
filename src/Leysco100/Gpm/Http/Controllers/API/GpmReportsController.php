@@ -1,6 +1,6 @@
 <?php
 
-namespace Leysco\Gpm\Http\Controllers\API;
+namespace Leysco100\Gpm\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
