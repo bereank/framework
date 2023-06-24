@@ -8,6 +8,11 @@ use Illuminate\Support\Facades\Mail;
 
 use Maatwebsite\Excel\Facades\Excel;
 
+use Leysco100\Gpm\Reports\DoesNotExist;
+use Leysco100\Gpm\Reports\ScanLogReport;
+use Leysco100\Gpm\Reports\DocumentReport;
+use Leysco100\Gpm\Mail\GPMDailyReportMail;
+use Leysco100\Gpm\Reports\DublicateScanLogs;
 use Leysco100\Shared\Models\Administration\Models\OADM;
 
 

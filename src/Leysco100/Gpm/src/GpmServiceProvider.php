@@ -4,6 +4,13 @@ namespace Leysco100\Gpm;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Leysco100\Gpm\Console\GPMInstallCommand;
+use Leysco100\Gpm\Console\MobileMenuCommand;
+use Leysco100\Gpm\Console\ScanReportCommand;
+use Leysco100\Gpm\Console\DailyReportCommand;
+use Leysco100\Gpm\Console\InsertFormFieldTypes;
+use Leysco100\Gpm\Console\LeyscoDailyReportsCommand;
+use Leysco100\Gpm\Console\GatePassManagementTestCommand;
 
 
 
