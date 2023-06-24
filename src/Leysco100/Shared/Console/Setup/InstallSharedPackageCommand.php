@@ -3,6 +3,8 @@
 namespace Leysco100\Shared\Console\Setup;
 
 use Illuminate\Console\Command;
+use Leysco100\Shared\Models\Shared\Models\APDI;
+use Leysco100\Shared\Models\Shared\Models\PDI1;
 
 
 class InstallSharedPackageCommand extends Command
