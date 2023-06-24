@@ -1,6 +1,6 @@
 <?php
 
-namespace Leysco100\Shared;
+namespace Leysco100\Shared\Services;
 
 /**
  * Service for Marke

@@ -13,13 +13,5 @@
     "psr-4": {
       "Leysco100\\Shared\\": ""
     }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Leysco100\\Shared\\Tests\\": "tests"
-    }
-  },
-  "scripts": {
-    "test": "vendor/bin/pest"
   }
 }

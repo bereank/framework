@@ -1,8 +1,6 @@
 <?php
 namespace Leysco100\Shared\Traits;
 
-use App\Domains\Administration\Models\TaxGroup;
-
 
 
 trait TaxGroupTrait
