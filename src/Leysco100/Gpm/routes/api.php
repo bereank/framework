@@ -8,8 +8,8 @@ use Leysco100\Gpm\Http\Controllers\GateController;
 use Leysco100\Gpm\Http\Controllers\LocationController;
 use Leysco100\Gpm\Http\Controllers\AppSettingsController;
 use Leysco100\Gpm\Http\Controllers\GMPDocumentController;
-use Leysco\Gpm\Http\Controllers\API\GpmReportsController;
 use Leysco100\Gpm\Http\Controllers\GPMFormFieldsController;
+use Leysco100\Gpm\Http\Controllers\API\GpmReportsController;
 use Leysco100\Gpm\Http\Controllers\GPMMobileAPPApiController;
 use Leysco100\Gpm\Http\Controllers\OtpVerificationController;
 
@@ -72,10 +72,3 @@ Route::get('scanLogsReport', [GpmReportsController::class, 'ScanLogReport']);
 Route::get('duplicateLogsReport', [GpmReportsController::class, 'DuplicateScanLogs']);
 Route::get('documentReport', [GpmReportsController::class, 'DocumentReport']);
 Route::get('doesNotExistReport', [GpmReportsController::class, 'DoesNotExistReport']);
-
-/*
-|--------------------------------------------------------------------------
-| GATE PASS BACKUP PROCESS
-|--------------------------------------------------------------------------
-|
- */
