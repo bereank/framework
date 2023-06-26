@@ -45,8 +45,8 @@ class GpmServiceProvider extends ServiceProvider
         /**
          * Load Migrations And Views
          */
-        //    $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
-        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'gatepassmanagement');
+        $this->loadMigrationsFrom(__DIR__ . '/database/migrations/tenant');
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'gpm');
     }
 
 

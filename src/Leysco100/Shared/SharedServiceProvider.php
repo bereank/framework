@@ -15,6 +15,12 @@ class SharedServiceProvider extends ServiceProvider
     public function boot()
     {
 
+
+        
+        /**
+         * Load Migrations And Views
+         */
+        $this->loadMigrationsFrom(__DIR__ . '/database/migrations/tenant');
    
     }
 }
