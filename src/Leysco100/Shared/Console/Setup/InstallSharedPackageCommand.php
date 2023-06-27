@@ -14,7 +14,7 @@ class InstallSharedPackageCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'command:initial_setup';
+    protected $signature = 'leysco100:shared:initial_setup';
 
     /**
      * The console command description.
