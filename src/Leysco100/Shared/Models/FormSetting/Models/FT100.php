@@ -1,7 +1,6 @@
 <?php
 
-namespace App\Domains\FormSetting\Models;
-
+namespace Leysco100\Shared\Models\FormSetting\Models;
 use Illuminate\Database\Eloquent\Model;
 
 class FT100 extends Model
