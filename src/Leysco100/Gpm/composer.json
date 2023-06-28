@@ -23,8 +23,8 @@
   },
   "repositories": [
     {
-      "type": "path",
-      "url": "../packages/framework/src/Leysco100/Shared"
+      "type": "vcs",
+      "url": "git@github.com:leysco100/shared.git"
   }
   ],
   "autoload": {
