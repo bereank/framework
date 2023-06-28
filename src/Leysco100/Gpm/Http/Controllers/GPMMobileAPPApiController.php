@@ -7,10 +7,11 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\Controller;
+
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Gpm\Jobs\SendEmailJob;
 use Leysco100\Shared\Models\FormField;
+use Leysco100\Gpm\Http\Controllers\Controller;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\Marketing\Models\GMS1;
 use Leysco100\Shared\Models\Marketing\Models\OGMS;

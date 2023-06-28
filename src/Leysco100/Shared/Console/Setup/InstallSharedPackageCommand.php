@@ -3,6 +3,7 @@
 namespace Leysco100\Shared\Console\Setup;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Artisan;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Models\Shared\Models\PDI1;
 
@@ -47,6 +48,10 @@ class InstallSharedPackageCommand extends Command
             ]);
 
         }
+
+
+        $this->info("Creating Default User");
+        Artisan::call('leysco100:shared:create-default-user');
 
     }
 }

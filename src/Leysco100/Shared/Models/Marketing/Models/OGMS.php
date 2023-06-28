@@ -5,10 +5,11 @@ namespace Leysco100\Shared\Models\Marketing\Models;
 use App\Domains\Shared\Models\APDI;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OGMS extends Model
 {
-    use HasFactory;
+    use HasFactory,UsesTenantConnection;
 
     protected $guarded = ['id'];
     protected $table = 'o_g_m_s';

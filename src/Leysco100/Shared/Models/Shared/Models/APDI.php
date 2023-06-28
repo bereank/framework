@@ -3,9 +3,12 @@
 namespace Leysco100\Shared\Models\Shared\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class APDI extends Model
 {
+
+    use UsesTenantConnection;
     protected $guarded = ['id'];
     protected $table = 'a_p_d_i_s';
 

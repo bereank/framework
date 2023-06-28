@@ -9,9 +9,9 @@ use Leysco100\Shared\Models\FormSetting\Models\FM100;
 
 class GPMInstallCommand extends Command
 {
-    protected $signature = 'gpm:install';
+    protected $signature = 'leysco100:gpm:install';
 
-    protected $description = 'Installing GPM Data';
+    protected $description = 'Installing GPM Package';
 
     public function handle()
     {

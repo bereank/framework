@@ -6,10 +6,11 @@ namespace Leysco100\Gpm\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Controller;
+
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Shared\Models\OtpVerification;
+use Leysco100\Gpm\Http\Controllers\Controller;
 use Leysco100\Shared\Services\ApiResponseService;
 
 

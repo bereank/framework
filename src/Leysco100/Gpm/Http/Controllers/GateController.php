@@ -3,9 +3,8 @@
 namespace Leysco100\Gpm\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 
-use App\Services\AuthorizationService;
+use Leysco100\Gpm\Http\Controllers\Controller;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\Marketing\Models\GPMGate;
@@ -24,7 +23,7 @@ class GateController extends Controller
         $TargetTables = APDI::with('pdi1')
             ->where('ObjectID', $ObjType)
             ->first();
-        (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'read');
+        
         try {
             $data = GPMGate::get();
             return (new ApiResponseService())->apiSuccessResponseService($data);
@@ -42,7 +41,7 @@ class GateController extends Controller
         $TargetTables = APDI::with('pdi1')
             ->where('ObjectID', $ObjType)
             ->first();
-        (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'write');
+      
         try {
             $data = GPMGate::create([
                 'location_id' => 1,
@@ -84,7 +83,7 @@ class GateController extends Controller
         $TargetTables = APDI::with('pdi1')
             ->where('ObjectID', $ObjType)
             ->first();
-        (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'update');
+      
         try {
             $gate = GPMGate::findOrFail($id);
             $gate->update([

@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Domains\Administration\Models;
+namespace Leysco100\Shared\Models\Administration\Models;
 
-use App\Domains\BusinessPartner\Models\OBPL;
-use App\Domains\InventoryAndProduction\Models\OWHS;
+
 use Illuminate\Database\Eloquent\Model;
 
 class OUDG extends Model

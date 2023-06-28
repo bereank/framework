@@ -5,11 +5,14 @@ namespace Leysco100\Shared\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
-use Leysco\GatePassManagementModule\Models\FormFieldType;
-use Leysco\GatePassManagementModule\Models\FormFieldValue;
+use Leysco100\Shared\Models\FormFieldType;
+use Leysco100\Shared\Models\FormFieldValue;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class FormField extends Model
 {
+
+    use UsesTenantConnection;
     protected $guarded = [];
 
     protected $table = "form_fields";

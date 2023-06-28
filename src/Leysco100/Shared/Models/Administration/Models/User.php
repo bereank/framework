@@ -1,15 +1,18 @@
 <?php
 
-namespace App\Domains\Administration\Models;
+namespace Leysco100\Shared\Models\Administration\Models;
 
-use App\Domains\BusinessPartner\Models\OBPL;
-use App\Domains\FormSetting\Models\FM100;
-use App\Domains\HumanResourse\Models\OHEM;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Notifications\Notifiable;
+
+
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Leysco100\Shared\Models\Marketing\Models\GPMGate;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Leysco100\Shared\Models\Administration\Models\OUDG;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class User extends Authenticatable
 {
@@ -17,6 +20,7 @@ class User extends Authenticatable
     use Notifiable;
     use SoftDeletes;
     use HasRoles;
+    use UsesTenantConnection;
 
     /**
      * The attributes that are mass assignable.
@@ -62,6 +66,12 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+
+    public function gates()
+    {
+        return $this->belongsTo(GPMGate::class, 'gate_id');
+    }
+
     public function ordr()
     {
         return $this->hasMany(ORDR::class, 'UserSign');
@@ -93,11 +103,5 @@ class User extends Authenticatable
         return $this->belongsTo(OHEM::class, 'owner', 'empID');
     }
 
-    /**
-     * Override the mail body for reset password notification mail.
-     */
-    public function sendPasswordResetNotification($token)
-    {
-        $this->notify(new \App\Notifications\MailResetPasswordNotification($token));
-    }
+  
 }

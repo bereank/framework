@@ -2,14 +2,15 @@
 
 namespace Leysco100\Shared\Models\Marketing\Models;
 
-use App\Domains\Administration\Models\User;
 use App\Domains\Shared\Models\APDI;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Domains\Administration\Models\User;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class GMS1 extends Model
 {
-    use HasFactory;
+    use HasFactory,UsesTenantConnection;
 
     protected $guarded = ['id'];
     protected $table = 'g_m_s1_s';

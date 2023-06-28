@@ -29,5 +29,8 @@
     "allow-plugins": {
       "pestphp/pest-plugin": true
     }
+  },
+  "require": {
+    "spatie/laravel-multitenancy": "3.0"
   }
 }
