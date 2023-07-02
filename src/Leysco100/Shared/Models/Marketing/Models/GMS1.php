@@ -2,10 +2,12 @@
 
 namespace Leysco100\Shared\Models\Marketing\Models;
 
-use App\Domains\Shared\Models\APDI;
+
 use Illuminate\Database\Eloquent\Model;
-use App\Domains\Administration\Models\User;
+
+use Leysco100\Shared\Models\Shared\Models\APDI;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Leysco100\Shared\Models\Administration\Models\User;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class GMS1 extends Model
