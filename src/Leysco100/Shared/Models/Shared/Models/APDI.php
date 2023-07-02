@@ -3,6 +3,7 @@
 namespace Leysco100\Shared\Models\Shared\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\Shared\Models\PDI1;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class APDI extends Model

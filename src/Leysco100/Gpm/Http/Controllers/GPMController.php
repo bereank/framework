@@ -4,6 +4,7 @@ namespace Leysco100\Gpm\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Log;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\Marketing\Models\GMS1;
@@ -51,6 +52,7 @@ class GPMController extends Controller
                 ->paginate($perPage, ['*'], 'page', $page);
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
+            Log::info($th);
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
