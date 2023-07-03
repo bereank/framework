@@ -544,6 +544,12 @@ class CreateOADMSTable extends Migration
             $table->integer('SPAOffline')->default(0);
             $table->integer('useLocalSearch')->default(0)->comment("0=No, 1=Yes");
             $table->string('localUrl')->nullable();
+
+            $table->string('ExtBucketAccessID')->nullable();
+            $table->string('ExtBucketSecretKey')->nullable();
+            $table->string('ExtBucketSecretKey')->nullable();
+            $table->string('ExtBucket')->nullable();
+            $table->string('ExtBucketRegion')->nullable();
             $table->timestamps();
         });
     }

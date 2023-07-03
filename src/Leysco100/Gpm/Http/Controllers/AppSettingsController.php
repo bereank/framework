@@ -85,6 +85,7 @@ class AppSettingsController extends Controller
 
         try {
             $extBuckt = OADM::findOrFail(1);
+            return $extBuckt;
             $extBuckt->ExtBucketAccessID = $validatedData['ExtBucketAccessID'];
             $extBuckt->ExtBucketSecretKey = $validatedData['ExtBucketSecretKey'];
             $extBuckt->ExtBucketDestDir = $validatedData['ExtBucketDestDir'];
