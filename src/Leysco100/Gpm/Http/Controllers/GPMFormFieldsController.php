@@ -65,7 +65,7 @@ class GPMFormFieldsController extends Controller
                 'indexno' => 'required|integer',
                 'title' => 'required|string|max:255',
                 'type_id' => 'required|max:255',
-                'mandatory' => 'nullable|string',
+                'mandatory' => 'nullable|boolean',
                 'status' => 'boolean',
                 'drop_down_values' => 'nullable|array',
                 'drop_down_values.*.Value' => 'nullable|string|max:255',
