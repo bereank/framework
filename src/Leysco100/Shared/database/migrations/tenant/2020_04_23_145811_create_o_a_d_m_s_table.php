@@ -547,7 +547,7 @@ class CreateOADMSTable extends Migration
 
             $table->string('ExtBucketAccessID')->nullable();
             $table->string('ExtBucketSecretKey')->nullable();
-            $table->string('ExtBucketSecretKey')->nullable();
+            $table->string('ExtBucketDestDir')->nullable();
             $table->string('ExtBucket')->nullable();
             $table->string('ExtBucketRegion')->nullable();
             $table->timestamps();
