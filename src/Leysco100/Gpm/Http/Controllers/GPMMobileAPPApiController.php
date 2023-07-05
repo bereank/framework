@@ -14,8 +14,8 @@ use Leysco100\Shared\Models\FormField;
 use Leysco100\Gpm\Http\Controllers\Controller;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\Marketing\Models\GMS1;
+use Leysco100\Shared\Models\Marketing\Models\GMS2;
 use Leysco100\Shared\Models\Marketing\Models\OGMS;
-use Leysco100\Shared\Models\Administration\Models\GMS2;
 use Leysco100\Shared\Models\Administration\Models\OADM;
 
 
