@@ -31,6 +31,7 @@
     }
   },
   "require": {
-    "spatie/laravel-multitenancy": "3.0"
+    "spatie/laravel-multitenancy": "3.0",
+    "maatwebsite/excel": "^3.1"
   }
 }

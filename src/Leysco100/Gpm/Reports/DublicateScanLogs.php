@@ -2,13 +2,14 @@
 
 namespace Leysco100\Gpm\Reports;
 
-use Carbon\Carbon;
-use Leysco\LS100SharedPackage\Models\Domains\Marketing\Models\GMS1;
+
+use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Leysco\LS100SharedPackage\Services\ApiResponseService;
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\Marketing\Models\GMS1;
+
 
 class DublicateScanLogs implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize
 {

@@ -8,13 +8,14 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 
+use Spatie\Multitenancy\Jobs\TenantAware;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Leysco100\Gpm\Mail\GPMNotificationMail;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 
 
-class SendEmailJob implements ShouldQueue
+class SendEmailJob implements ShouldQueue,TenantAware
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
     protected $emails;
