@@ -12,6 +12,10 @@ use Leysco100\Gpm\Http\Controllers\GPMFormFieldsController;
 use Leysco100\Gpm\Http\Controllers\API\GpmReportsController;
 use Leysco100\Gpm\Http\Controllers\GPMMobileAPPApiController;
 use Leysco100\Gpm\Http\Controllers\OtpVerificationController;
+use Leysco100\Gpm\Http\Controllers\API\FieldsTemplateController;
+use Leysco100\Gpm\Http\Controllers\API\GPMBackUpModeApiController;
+use Leysco100\Gpm\Http\Controllers\API\BackupModeProcessController;
+
 
 
 /*
@@ -72,3 +76,21 @@ Route::get('scanLogsReport', [GpmReportsController::class, 'ScanLogReport']);
 Route::get('duplicateLogsReport', [GpmReportsController::class, 'DuplicateScanLogs']);
 Route::get('documentReport', [GpmReportsController::class, 'DocumentReport']);
 Route::get('doesNotExistReport', [GpmReportsController::class, 'DoesNotExistReport']);
+
+
+
+/*
+|--------------------------------------------------------------------------
+| GATE PASS BACKUP PROCESS
+|--------------------------------------------------------------------------
+|
+ */
+//Route::get('fields_templates', [FieldsTemplateController::class, 'index']);
+Route::apiResources(['back_up_mode' => BackupModeProcessController::class]);
+Route::apiResources(['back_up_mode/gpm_documents' => GPMBackUpModeApiController::class]);
+Route::get('bcp_doc_report', [GpmReportsController::class, 'BCPDocReport']);
+
+Route::get('/bcm/app-form-fields', [GPMBackUpModeApiController::class, 'mobileAppFields']);
+Route::apiResources(['bcm/gpm_documents' => GPMBackUpModeApiController::class]);
+
+Route::put('back_up_mode/mark-not-released/{id}', [GPMBackUpModeApiController::class, 'doNotReleaseGoods']);

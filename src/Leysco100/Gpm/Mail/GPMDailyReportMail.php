@@ -6,10 +6,12 @@ use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Spatie\Multitenancy\Models\Tenant;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use Leysco\LS100SharedPackage\Models\Domains\Marketing\Models\GMS1;
-use Leysco\LS100SharedPackage\Models\Domains\Marketing\Models\OGMS;
+use Leysco100\Shared\Models\Marketing\Models\GMS1;
+use Leysco100\Shared\Models\Marketing\Models\OGMS;
+
 
 class GPMDailyReportMail extends Mailable
 {
@@ -79,9 +81,9 @@ class GPMDailyReportMail extends Mailable
                         'totalSuccessfulReleased' => $totalSuccessfulReleased,
                         'totalFlagged' => $totalFlagged
                 ];
-                //     $this->date = Carbon::now()->format('j-F-Y');
-                return $this->subject($this->date  . ' - ' . "  GPM Report")
-                        ->markdown('gatepassmanagement::ReportNotification')
+          
+                return $this->subject(Tenant::current()->name .' :: ' .$this->date  . ' - ' . "  GPM Report")
+                        ->markdown('gpm::ReportNotification')
                         ->with('date', $this->date)
                         ->attach($url)
                         ->attach($url_2)

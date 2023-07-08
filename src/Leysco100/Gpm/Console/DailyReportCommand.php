@@ -21,23 +21,23 @@ use Leysco100\Shared\Models\Administration\Models\OADM;
 class DailyReportCommand extends Command
 {
     use TenantAware;
-    protected $signature = 'gpm:send-report';
+    protected $signature = 'gpm:send-report {--tenant=*}';
 
     protected $description = 'Send Report';
 
     public function handle()
     {
 
-         return $this->line('The tenant is '. Tenant::current()->name);
-        // $date =  Carbon::now()->subDays(1)->format('Y-m-d');
+      
+        $date =  Carbon::now()->subDays(1)->format('Y-m-d');
 
-        // Excel::store(new ScanLogReport($date), 'ScanReport.xlsx');
-        // Excel::store(new DublicateScanLogs($date), 'DuplicateReport.xlsx');
-        // Excel::store(new DoesNotExist($date), 'DoesNotExist.xlsx');
-        // Excel::store(new DocumentReport($date), 'DocumentReport.xlsx');
-        // $emailString = OADM::where('id', 1)->value("NotifEmail");
-        // $emails = explode(';', $emailString);
+        Excel::store(new ScanLogReport($date), 'ScanReport.xlsx');
+        Excel::store(new DublicateScanLogs($date), 'DuplicateReport.xlsx');
+        Excel::store(new DoesNotExist($date), 'DoesNotExist.xlsx');
+        Excel::store(new DocumentReport($date), 'DocumentReport.xlsx');
+        $emailString = OADM::where('id', 1)->value("NotifEmail");
+        $emails = explode(';', $emailString);
 
-        // Mail::to($emails)->send(new GPMDailyReportMail($date));
+        Mail::to($emails)->send(new GPMDailyReportMail($date));
     }
 }

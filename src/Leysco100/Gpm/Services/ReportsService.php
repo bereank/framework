@@ -4,12 +4,12 @@ namespace Leysco100\Gpm\Services;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Controller;
+
 use Leysco100\Shared\Models\Marketing\Models\GMS1;
 use Leysco100\Shared\Models\Marketing\Models\OGMS;
 
 
-class  ReportsService extends Controller
+class  ReportsService 
 {
     public function scanLogReport($startdate, $endate,  $paginate = false, $perPage = 10)
     {

@@ -9,6 +9,7 @@ use Leysco100\Gpm\Console\MobileMenuCommand;
 use Leysco100\Gpm\Console\ScanReportCommand;
 use Leysco100\Gpm\Console\DailyReportCommand;
 use Leysco100\Gpm\Console\InsertFormFieldTypes;
+use Leysco100\Gpm\Console\SyncedLaterDocsCommand;
 use Leysco100\Gpm\Console\LeyscoDailyReportsCommand;
 use Leysco100\Gpm\Console\GatePassManagementTestCommand;
 
@@ -23,20 +24,20 @@ class GpmServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        // Register the command if we are using the application via the CLI
+  
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__ . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "config.php" => config_path('gpm.php'),
             ], 'config');
 
             $this->commands([
-                GatePassManagementTestCommand::class,
                 GPMInstallCommand::class,
                 DailyReportCommand::class,
                 LeyscoDailyReportsCommand::class,
                 InsertFormFieldTypes::class,
                 MobileMenuCommand::class,
-                ScanReportCommand::class
+                ScanReportCommand::class,
+                SyncedLaterDocsCommand::class
             ]);
          
         }
@@ -46,7 +47,7 @@ class GpmServiceProvider extends ServiceProvider
          * Load Migrations And Views
          */
         $this->loadMigrationsFrom(__DIR__ . '/database/migrations/tenant');
-        // $this->loadViewsFrom(__DIR__ . '/../resources/views', 'gpm');
+        $this->loadViewsFrom(__DIR__ . '/resources/views', 'gpm');
 
         $this->registerRoutes();
         

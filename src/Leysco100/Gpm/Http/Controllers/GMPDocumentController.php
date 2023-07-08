@@ -10,13 +10,15 @@ use Leysco100\Gpm\Mail\GPMScanLogs;
 
 use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
+use Leysco100\Gpm\Jobs\ExtDocsSyncJob;
 use Leysco100\Gpm\Mail\GPMSapDocuments;
 use Leysco100\Gpm\Reports\ExportScanLog;
 use Leysco100\Gpm\Reports\ExportSapDocuments;
 use Leysco100\Gpm\Http\Controllers\Controller;
 use Leysco100\Shared\Services\ApiResponseService;
-use Leysco100\Shared\Models\Marketing\Models\OGMS;
+
 use Leysco100\Shared\Models\Administration\Models\OADM;
+
 
 
 
@@ -28,37 +30,10 @@ class GMPDocumentController extends Controller
      */
     public function __invoke(Request $request)
     {
-        $data = $request['data'];
+     
+        dispatch(new ExtDocsSyncJob($request['data']));
 
 
-        Log::info("TOTAL POSTED: " . count($data));
-
-        foreach ($data as $key => $value) {
-
-
-            if (!$value['LineDetails']) {
-                // Log::info("WITHOUT LINE DETAILS");
-                // Log::info($value);
-                continue;
-            }
-
-
-            $data =  OGMS::firstOrCreate(
-                [
-                    'ObjType' => $value['ObjType'],
-                    'ExtRef' => $value['ExtRef'],
-                    'BaseEntry' => $value['BaseEntry'],
-                    'BaseType' => $value['BaseType'],
-                ],
-                [
-                    'ExtRefDocNum' => $value['ExtRefDocNum'],
-                    'DocDate' => $value['DocDate'],
-                    'GenerationDateTime' => Carbon::parse($value['GenerationDateTime'])->format('Y-m-d H:i:s'),
-                    'DocTotal' => $value['DocTotal'],
-                    'LineDetails' => $value['LineDetails'],
-                ]
-            );
-        }
     }
 
     public function export_scan_logs(){
