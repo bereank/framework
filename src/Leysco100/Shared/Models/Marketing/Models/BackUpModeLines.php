@@ -8,11 +8,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Leysco100\Shared\Models\Marketing\Models\GPMGate;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Leysco100\Shared\Models\Marketing\Models\BackUpModeSetup;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 
 class BackUpModeLines extends Model
 {
-    use HasFactory;
+    use HasFactory,UsesTenantConnection;
 
     protected $guarded = [];
     protected $appends = array('status', 'release');
