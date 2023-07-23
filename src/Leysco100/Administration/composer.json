@@ -1,0 +1,32 @@
+{
+  "name": "leysco100/administration",
+  "description": "The Leysco100 Administration Package",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Berean Kibet",
+      "email": "bereankibet@gmail.com"
+    }
+  ],
+  "require": {
+    "leysco100/shared": "dev-main"
+  },
+  "require-dev": {
+    "orchestra/testbench": "^7.6",
+    "pestphp/pest": "^1.21",
+    "phpunit/phpunit": "^9.5",
+    "pestphp/pest-plugin-laravel": "^1.2"
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "git@github.com:leysco100/shared.git"
+  }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Leysco100\\Administration\\": ""
+    }
+  }
+}
