@@ -61,10 +61,7 @@ Route::get('field_types', [GPMFormFieldsController::class, 'getFieldTypes']);
 Route::get('get_mobile_nav', [GPMFormFieldsController::class, 'getMobileNav']);
 Route::put('update_mobile_nav', [GPMFormFieldsController::class, 'updateMobileNav']);
 
-
 Route::get('gpm_reports', [GPMReports::class, 'getScanLogsByDate']);
-
-
 
 /*
 |--------------------------------------------------------------------------
@@ -78,19 +75,13 @@ Route::get('documentReport', [GpmReportsController::class, 'DocumentReport']);
 Route::get('doesNotExistReport', [GpmReportsController::class, 'DoesNotExistReport']);
 
 
-
 /*
 |--------------------------------------------------------------------------
 | GATE PASS BACKUP PROCESS
 |--------------------------------------------------------------------------
 |
  */
-//Route::get('fields_templates', [FieldsTemplateController::class, 'index']);
+Route::get('bcp_doc_report', [GpmReportsController::class, 'BCPDocReport']);
+Route::resource('bcm_settings', BackupModeSettingsController::class);
 Route::apiResources(['back_up_mode' => BackupModeProcessController::class]);
 Route::apiResources(['back_up_mode/gpm_documents' => GPMBackUpModeApiController::class]);
-Route::get('bcp_doc_report', [GpmReportsController::class, 'BCPDocReport']);
-
-Route::get('/bcm/app-form-fields', [GPMBackUpModeApiController::class, 'mobileAppFields']);
-Route::apiResources(['bcm/gpm_documents' => GPMBackUpModeApiController::class]);
-
-Route::put('back_up_mode/mark-not-released/{id}', [GPMBackUpModeApiController::class, 'doNotReleaseGoods']);

@@ -1,27 +1,29 @@
 <?php
 
-namespace Leysco100\Gpm\Http\Controllers;
+namespace Leysco\GatePassManagementModule\Http\Controllers;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Gpm\Jobs\SendEmailJob;
-use Leysco100\Shared\Models\FormField;
+use Leysco100\Gpm\Mail\GPMNotificationMail;
+use Leysco100\Gpm\Services\BackupModeService;
+use Leysco100\Gpm\Services\FormFieldsService;
 use Leysco100\Gpm\Http\Controllers\Controller;
+use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\Marketing\Models\GMS1;
 use Leysco100\Shared\Models\Marketing\Models\GMS2;
 use Leysco100\Shared\Models\Marketing\Models\OGMS;
 use Leysco100\Shared\Models\Administration\Models\OADM;
+use Leysco100\Shared\Models\Marketing\Models\BackUpModeLines;
+use Leysco100\Shared\Models\Marketing\Models\BackUpModeSetup;
 
 
 class GPMMobileAPPApiController extends Controller
 {
-
     /** GET ALL DOCUMENTS */
     public function index()
     {
@@ -53,10 +55,10 @@ class GPMMobileAPPApiController extends Controller
 
     public function store(Request $request)
     {
-
         $request->validate([
             'DocNum' => 'required',
         ]);
+
 
         $user = Auth::user();
         $emailString = OADM::where('id', 1)->value("NotifEmail");
@@ -72,6 +74,7 @@ class GPMMobileAPPApiController extends Controller
                         [
                             'message' => "The given data was invalid",
                             'resultCode' => 1500,
+                            'BackUpMode' => 0,
                             'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
                             'errors' => [
                                 'record' => 'Discrepancy Noted- Don’t Release Goods',
@@ -83,6 +86,9 @@ class GPMMobileAPPApiController extends Controller
             $originSystem = $fullDocNum[0];
             $ObjTypeString = $fullDocNum[1];
             $DocNum = $fullDocNum[2];
+            // $Obj = APDI::where('ObjAcronym', $ObjTypeString)->select('ObjectID')->first();
+
+            // $ObjType = $Obj->ObjectID;
 
             if ($ObjTypeString == "AR") {
                 $ObjType = 13;
@@ -117,6 +123,7 @@ class GPMMobileAPPApiController extends Controller
             ];
             $newRecord = new GMS1($scanLogData);
             $newRecord->save();
+            $this->postScanLogDetails($request['fields'], $newRecord->id);
 
             DB::commit();
         } catch (\Throwable $th) {
@@ -128,6 +135,7 @@ class GPMMobileAPPApiController extends Controller
                     [
                         'message' => "The given data was invalid",
                         'resultCode' => 1500,
+                        'BackUpMode' => 0,
                         'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
                         'errors' => [
                             'record' => 'Discrepancy Noted- Don’t Release Goods',
@@ -136,10 +144,6 @@ class GPMMobileAPPApiController extends Controller
                     200
                 );
         }
-
-
-
-
         /**
          * Verify if the item Exist in
          */
@@ -169,30 +173,125 @@ class GPMMobileAPPApiController extends Controller
             })
             ->first();
 
-        //Document Doest Not Exist
-        if (!$record) {
-            $newRecord->update([
-                'Status' => 1,
-            ]);
+        $isBackupMode = false;
 
-            dispatch(new SendEmailJob($emails, $newRecord->id));
-            // Mail::to($emails)->send(new GPMNotificationMail($newRecord->id));
-
+        if (BackUpModeLines::where('DocNum', $fullDocNum[2])->where('ObjType', $ObjType)->where('ReleaseStatus', 1)->exists()) {
             return response()
                 ->json(
                     [
-                        'message' => "Document Doest Not Exist",
+                        'message' => "Document Already Released Under backup mode",
                         'resultCode' => 1500,
-                        'ScanLogId' => $newRecord->id,
+                        'BackUpMode' => 1,
+                        'type' =>  'duplicate',
                         'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
                         'errors' => [
                             'record' => 'Discrepancy Noted- Don’t Release Goods',
+
                         ],
                     ],
                     200
                 );
         }
+        //Document Doest Not Exist
+        if (!$record) {
 
+            $newRecord->update([
+                'Status' => 1,
+            ]);
+
+            // Check if backup mode is on
+            $isBackupMode = (new BackupModeService())->isBackupMode();
+
+            if (!$isBackupMode) {
+                dispatch(new SendEmailJob($emails, $newRecord->id));
+                return response()
+                    ->json(
+                        [
+                            'message' => "Document Doest Not Exist",
+                            'resultCode' => 1500,
+                            'BackUpMode' => 0,
+                            'type' => 'notfound',
+                            'ScanLogId' => $newRecord->id,
+                            'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
+                            'errors' => [
+                                'record' => 'Discrepancy Noted- Don’t Release Goods',
+                            ],
+                        ],
+                        200
+                    );
+            }
+
+            if ($isBackupMode) {
+                $requiredFields = (new FormFieldsService())->getFormFields(1);
+                $fieldsrequired =   array_column(collect($requiredFields)->toArray(), 'key');
+                $submitted =   array_column($request['fields'], 'key');
+
+                if (count($requiredFields) > count($request['fields'])) {
+                    return response()->json([
+                        'message' => 'missing required fields',
+                        'resultCode' => 1500,
+                        "resultDesc" => array_diff($fieldsrequired,  $submitted)
+                    ]);
+                }
+                $scanTime = GMS1::where('DocNum', $request['DocNum'])->count();
+                if ($scanTime >= 3) {
+                    dispatch(new SendEmailJob($emails, $newRecord->id));
+                }
+
+                if (BackUpModeLines::where('DocNum', $fullDocNum[2])->where('ObjType', $ObjType)->where('ReleaseStatus', 1)->exists()) {
+                    return response()
+                        ->json(
+                            [
+                                'message' => "Document Already Released Under backup mode",
+                                'resultCode' => 1500,
+                                'BackUpMode' => 1,
+                                'type' =>  'duplicate',
+                                'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
+                                'errors' => [
+                                    'record' => 'Discrepancy Noted- Don’t Release Goods',
+
+                                ],
+                            ],
+                            200
+                        );
+                } else {
+                    $backupmodeHeader = BackUpModeSetup::where('id', $isBackupMode->id)->first();
+                    $lineData = BackUpModeLines::updateOrCreate(
+                        [
+                            'DocNum' => $fullDocNum[2],
+                            'ObjType' => $ObjType,
+                        ],
+                        [
+                            "BaseType" => 240,
+                            "BaseEntry" => $newRecord->id,
+                            'DocOrigin' => $fullDocNum[0],
+                            "DocEntry" => $backupmodeHeader->id,
+                            "DocDate" => Carbon::now(),
+                            'UserSign' => $user->id,
+                        ]
+                    );
+                    $lineData->save();
+                    return response()
+                        ->json(
+                            [
+                                'message' => "Operation Successful",
+                                'resultCode' => 1500,
+                                'BackUpMode' => 1,
+                                'type' => 'notfound',
+                                'ScanLogId' => $newRecord->id,
+                                'resultDesc' => 'Back up mode on: Kindly confirm the Document',
+                                'errors' => [
+                                    "DocumentDetails" => $lineData,
+                                ],
+                                // 'errors' => [
+                                //     'record' => "Ok: Back up mode on",
+                                // ],
+                            ],
+                            200
+                        );
+                }
+            }
+        }
 
 
         if ($record->BaseType && $record->BaseEntry) {
@@ -225,6 +324,8 @@ class GPMMobileAPPApiController extends Controller
                             [
                                 'message' => "There exist scanned base document",
                                 'resultCode' => 1500,
+                                'BackUpMode' => 0,
+                                'type' =>  'duplicate',
                                 'ScanLogId' => $newRecord->id,
                                 'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
                                 'errors' => [
@@ -236,6 +337,8 @@ class GPMMobileAPPApiController extends Controller
                 }
             }
         }
+
+
 
         /**
          * status reference
@@ -257,6 +360,8 @@ class GPMMobileAPPApiController extends Controller
                     [
                         'message' => "Duplicate Scan",
                         'resultCode' => 1500,
+                        'BackUpMode' => 0,
+                        'type' => 'duplicate',
                         'ScanLogId' => $newRecord->id,
                         'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
                         'errors' => [
@@ -323,65 +428,113 @@ class GPMMobileAPPApiController extends Controller
                     'message' => "Operation Successful",
                     'resultCode' => 1200,
                     'ScanLogId' => $newRecord->id,
-                    'resultDesc' => 'Kindly confirm the Documen',
+                    'resultDesc' => 'Kindly confirm the Document',
+                    'BackUpMode' => 0,
                     'errors' => [
-                        'record' => "",
                         "DocumentDetails" => $singleDocument,
                     ],
+
+                    'details' => [
+                        'record' =>  $singleDocument,
+                    ],
+
                 ],
                 200
             );
     }
 
-    public function update($id)
+    public function update(Request $request, $id)
     {
 
         try {
-            $data = OGMS::findOrFail($id);
+            if ($request['BackUpMode']) {
+                $data = BackUpModeLines::where('DocEntry', $id)->firstOrFail();
+                if ($data->ReleaseStatus == 1) {
+                    return response()
+                        ->json(
+                            [
+                                'message' => "The given data was invalid",
+                                'resultCode' => 1500,
+                                'BackUpMode' => 1,
+                                'resultDesc' => 'Discrepancy Noted- Document already released',
+                                'Details' => [
+                                    'record' => 'Discrepancy Noted- Document already released',
 
-            if ($data->Status == 3) {
+                                ],
+                                'errors' => [
+                                    'record' => 'Discrepancy Noted- Document already released',
+                                ],
+                            ],
+                            200
+                        );
+                }
+                GMS1::where('id', $data->DocEntry)
+                    ->update([
+                        'Released' => 1,
+                    ]);
+                BackUpModeLines::where("DocEntry", $id)
+                    ->update([
+                        'ReleaseStatus' => 1,
+                    ]);
 
                 return response()
                     ->json(
                         [
-                            'message' => "The given data was invalid",
-                            'resultCode' => 1500,
-                            'resultDesc' => 'Discrepancy Noted- Document already released',
+                            'message' => "Customer Can Exit with goods",
+                            'resultCode' => 1200,
+                            'BackUpMode' => 1,
+                            'resultDesc' => 'Customer Can Exit with goods',
+                            'Success' => [
+                                "DocumentDetails" => $data,
+                            ],
                             'errors' => [
-                                'record' => 'Discrepancy Noted- Document already released',
+                                'record' => "",
+                                "DocumentDetails" => $data,
+                            ],
+                        ],
+                        200
+                    );
+            } else {
+                $data = OGMS::findOrFail($id);
+                if ($data->Status == 3) {
+                    return response()
+                        ->json(
+                            [
+                                'message' => "The given data was invalid",
+                                'resultCode' => 1500,
+                                'resultDesc' => 'Discrepancy Noted- Document already released',
+                                'errors' => [
+                                    'record' => 'Discrepancy Noted- Document already released',
+                                ],
+                            ],
+                            200
+                        );
+                }
+                OGMS::where('ObjType', $data->ObjType)
+                    ->where('ExtRefDocNum', $data->ExtRefDocNum)
+                    ->update([
+                        'Status' => 3,
+                    ]);
+
+                GMS1::where('id', $data->ScanLogID)
+                    ->update([
+                        'Released' => 1,
+                    ]);
+
+                return response()
+                    ->json(
+                        [
+                            'message' => "Customer Can Exit with goods",
+                            'resultCode' => 1200,
+                            'resultDesc' => 'Customer Can Exit with goods',
+                            'errors' => [
+                                'record' => "",
+                                "DocumentDetails" => $data,
                             ],
                         ],
                         200
                     );
             }
-
-
-
-
-            OGMS::where('ObjType', $data->ObjType)
-                ->where('ExtRefDocNum', $data->ExtRefDocNum)
-                ->update([
-                    'Status' => 3,
-                ]);
-
-            GMS1::where('id', $data->ScanLogID)
-                ->update([
-                    'Released' => 1,
-                ]);
-
-            return response()
-                ->json(
-                    [
-                        'message' => "Customer Can Exit with goods",
-                        'resultCode' => 1200,
-                        'resultDesc' => 'Customer Can Exit with goods',
-                        'errors' => [
-                            'record' => "",
-                            "DocumentDetails" => $data,
-                        ],
-                    ],
-                    200
-                );
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
@@ -407,195 +560,8 @@ class GPMMobileAPPApiController extends Controller
 
     public function mobileAppFields()
     {
-
-        //         $data = [
-        //
-        //             [
-        //                 "key" => "Name",
-        //                 "indexno" => "2",
-        //                 "title" => "Enter Customer Name/Weka Jina La Mteja",
-        //                 "type" => "Text",
-        //                 "Mandatory" => "Y",
-        //             ],
-        ////             [
-        ////                 "key" => "phone",
-        ////                 "indexno" => "2",
-        ////                 "title" => "Enter Customer Phone/Weka nambari ya simu ya Mteja",
-        ////                 "type" => "Phone",
-        ////                 "Mandatory" => "Y",
-        ////             ],
-        //
-        //             [
-        //                 "key" => "FormOfIdentity",
-        //                 "indexno" => "1",
-        //                 "title" => "Enter Form Of Identity/Weka Aina ya Kitambulisho",
-        //                 "type" => "Dropdown",
-        //                 "Mandatory" => "Y",
-        //                 "values" => [
-        //                     [
-        //                         "id" => 1,
-        //                         "Name" => "National Id",
-        //                     ],
-        //                     [
-        //                         "id" => 2,
-        //                         "Name" => "Driving Licence",
-        //                     ],
-        //                     [
-        //                         "id" => 3,
-        //                         "Name" => "Passport",
-        //                     ],
-        //                 ],
-        //             ],
-        //             [
-        //                 "key" => "IdentityNo",
-        //                 "indexno" => "3",
-        //                 "title" => "Enter Customer Identity No/Weka Namba ya Kitambulisho ya Mteja",
-        //                 "type" => "Text",
-        //                 "Mandatory" => "Y",
-        //             ],
-        //             [
-        //                 "key" => "IdentityDocumentPhotoOne",
-        //                 "indexno" => "4",
-        //                 "title" => "Take a Picture Of The Identity Document (Photo 1)/Chukua Picha ya Kitambulisho",
-        //                 "type" => "Photo",
-        //                 "Mandatory" => "Y",
-        //             ],
-        //             [
-        //                 "key" => "IdentityDocumentPhotoTwo",
-        //                 "indexno" => "5",
-        //                 "title" => "Take a Picture Of The Identity Document (Photo 2)/Chukua Picha ya Kitambulisho",
-        //                 "type" => "Photo",
-        //                 "Mandatory" => "N",
-        //             ],
-        //             [
-        //                 "key" => "CustomerPhoto",
-        //                 "indexno" => "9",
-        //                 "title" => "Take Customer Photo/Chukua Picha ya Mteja",
-        //                 "type" => "Photo",
-        //                 "Mandatory" => "Y",
-        //             ],
-        //             [
-        //                 "key" => "DocumenPhoto",
-        //                 "indexno" => "6",
-        //                 "title" => "Take a Picture of Exit Document/Chukua Picha ya Delivery Note",
-        //                 "type" => "Photo",
-        //                 "Mandatory" => "Y",
-        //             ],
-        //             [
-        //                 "key" => "VehicleRegistrationPlate",
-        //                 "indexno" => "7",
-        //                 "title" => "Vehicle Registration Plate/Chukua Picha ya Plate Namba",
-        //                 "type" => "Photo",
-        //                 "Mandatory" => "Y",
-        //             ],
-        //             [
-        //                 "key" => "QRCode",
-        //                 "indexno" => "8",
-        //                 "title" => "Scan the QR Code/Scan na Kutuma",
-        //                 "type" => "QRCode",
-        //                 "Mandatory" => "Y",
-        //             ],
-        //         ];
-
-
-        // $data = [
-        //     [
-        //         "key" => "Name",
-        //         "indexno" => "2",
-        //         "title" => "Enter Customer Name",
-        //         "type" => "Text",
-        //         "Mandatory" => "Y",
-        //     ],
-        //     [
-        //         "key" => "FormOfIdentity",
-        //         "indexno" => "1",
-        //         "title" => "Enter Form Of Identity",
-        //         "type" => "Dropdown",
-        //         "Mandatory" => "Y",
-        //         "values" => [
-        //             [
-        //                 "id" => 1,
-        //                 "Name" => "National Id",
-        //             ],
-        //             [
-        //                 "id" => 2,
-        //                 "Name" => "Driving Licence",
-        //             ],
-        //             [
-        //                 "id" => 3,
-        //                 "Name" => "Passport",
-        //             ],
-        //         ],
-        //     ],
-        //     [
-        //         "key" => "IdentityNo",
-        //         "indexno" => "3",
-        //         "title" => "Enter Customer Identity No",
-        //         "type" => "Text",
-        //         "Mandatory" => "Y",
-        //     ],
-        //     [
-        //         "key" => "DeliveryPhoto",
-        //         "indexno" => "6",
-        //         "title" => "Take a Picture of Delivery",
-        //         "type" => "Photo",
-        //         "Mandatory" => "Y",
-        //     ],
-        //     [
-        //         "key" => "InvoicePhoto",
-        //         "indexno" => "6",
-        //         "title" => "Take a Picture of Invoice",
-        //         "type" => "Photo",
-        //         "Mandatory" => "Y",
-        //     ],
-        //     [
-        //         "key" => "QRCode",
-        //         "indexno" => "8",
-        //         "title" => "Scan the QR Code/Scan na Kutuma",
-        //         "type" => "QRCode",
-        //         "Mandatory" => "Y",
-        //     ],
-        // ];
-
-
-        // $data = [
-        //     [
-        //         "key" => "QRCode",
-        //         "indexno" => "8",
-        //         "title" => "Scan the QR Code/Scan na Kutuma",
-        //         "type" => "QRCode",
-        //         "Mandatory" => "Y",
-        //     ],
-        // ];
-        // return response([
-        //     'formFields' => $data,
-        // ]);
-
-        $formFields = FormField::with(['type', 'dropDownValues'])->where('status', 1)->get();
-        $data = [];
-        foreach ($formFields as $formField) {
-            $values = [];
-            $field = [
-                "key" => $formField->key,
-                "indexno" => $formField->indexno,
-                "title" => $formField->title,
-                "type" => $formField->type->Name,
-                "Mandatory" => $formField->mandatory,
-            ];
-
-            if (count($formField['dropDownValues']) > 0) {
-                foreach ($formField['dropDownValues'] as $value) {
-                    $values[] = [
-                        'id' => $value['id'],
-                        'Name' => $value['Value'],
-                    ];
-                }
-                $field['values'] = $values;
-            }
-            $data[] = $field;
-        }
-
-        return response(['formFields' => $data]);
+        $resp = (new FormFieldsService())->getFormFields();
+        return response(['formFields' => $resp]);
     }
 
     /**
@@ -620,18 +586,45 @@ class GPMMobileAPPApiController extends Controller
         try {
             $data = OGMS::findOrFail($id);
 
-            $data = OGMS::findOrFail($id);
 
             $data->update([
                 "Comment" => $request['Comment'],
                 'Status' => 2,
             ]);
+            if ($request['BackUpMode'] == 1) {
+                $data = BackUpModeLines::where('BaseEntry', $id)->firstOrFail();
+                $data->where('id', $id)
+                    ->update([
+                        'ReleaseStatus' => 2,
+                        "Comment" => $request['Comment'],
+                    ]);
+                return response()
+                    ->json(
+                        [
+                            'message' => "The given data was invalid",
+                            'resultCode' => 1500,
+                            'BackUpMode' => 1,
+                            'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
+                            'Details' => [
+                                'record' => 'Discrepancy Noted- Don’t Release Goods',
+                            ],
+                            'errors' => [
+                                'record' => 'Discrepancy Noted- Don’t Release Goods',
+                            ],
+                        ],
+                        200
+                    );
+            }
             return response()
                 ->json(
                     [
                         'message' => "The given data was invalid",
                         'resultCode' => 1500,
+                        'BackUpMode' => 0,
                         'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
+                        'Details' => [
+                            'record' => 'Discrepancy Noted- Don’t Release Goods',
+                        ],
                         'errors' => [
                             'record' => 'Discrepancy Noted- Don’t Release Goods',
                         ],
@@ -642,7 +635,29 @@ class GPMMobileAPPApiController extends Controller
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
+    public function postScanLogDetails($attachments, $scanLogID)
+    {
+        try {
+            //  $scanLog = OGMS::findOrFail($request['ScanLogId']);
 
+            //$attachments = $request['attachments'];
+            DB::beginTransaction();
+            foreach ($attachments as $key => $val) {
+                GMS2::firstOrCreate([
+                    'DocEntry' => $scanLogID,
+                    'Type' => $val['type'],
+                    'Name' => $val['title'],
+                    'Content' => $val['content'] ?? 0,
+                ]);
+            }
+
+            DB::commit();
+            //return (new ApiResponseService())->apiSuccessResponseService("Uploaded Successfully");
+        } catch (\Throwable $th) {
+
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+        }
+    }
     public function saveScanLogDetails(Request $request)
     {
         try {
