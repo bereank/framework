@@ -70,7 +70,7 @@ class GPMScanLogs extends Mailable
 //        ];
         //     $date = Carbon::now()->format('j-F-Y');
         return $this->subject($date  . ' - ' . "  GPM Scan Log Report")
-            ->markdown('gatepassmanagement::ScanLogNotification')
+            ->markdown('gpm::ScanLogNotification')
             ->with('date', $date)
             ->attach($url);
 //            ->with('summaryReport', $summaryReport);

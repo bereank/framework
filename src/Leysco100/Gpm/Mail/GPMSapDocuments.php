@@ -3,11 +3,14 @@
 namespace Leysco100\Gpm\Mail;
 
 
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
-use Leysco\LS100SharedPackage\Models\Domains\Marketing\Models\OGMS;
+use Leysco100\Shared\Models\Marketing\Models\GMS1;
+use Leysco100\Shared\Models\Marketing\Models\OGMS;
+
 
 class GPMSapDocuments extends Mailable
 {
@@ -71,7 +74,7 @@ class GPMSapDocuments extends Mailable
         ];
         //     $date = Carbon::now()->format('j-F-Y');
         return $this->subject(" GPM Scan Log Report")
-            ->markdown('gatepassmanagement::SapDocuments')
+            ->markdown('gpm::SapDocuments')
 //            ->with('date', $date)
             ->attach($url)
             ->with('summaryReport', $summaryReport);

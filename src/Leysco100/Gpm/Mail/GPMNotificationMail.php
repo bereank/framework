@@ -54,7 +54,7 @@ class GPMNotificationMail extends Mailable
 
 
         return $this->subject($subject)
-            ->markdown('gatepassmanagement::ErrorNotification')
+            ->markdown('gpm::ErrorNotification')
             ->with('documentData', $documentData)
             ->with('error', $error);
     }

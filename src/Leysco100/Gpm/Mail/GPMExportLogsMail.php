@@ -8,8 +8,9 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use Leysco\LS100SharedPackage\Models\Domains\Marketing\Models\GMS1;
-use Leysco\LS100SharedPackage\Models\Domains\Marketing\Models\OGMS;
+use Leysco100\Shared\Models\Marketing\Models\GMS1;
+use Leysco100\Shared\Models\Marketing\Models\OGMS;
+
 
 class GPMExportLogsMail extends Mailable
 {
