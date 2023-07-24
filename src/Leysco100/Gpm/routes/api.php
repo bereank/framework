@@ -15,6 +15,7 @@ use Leysco100\Gpm\Http\Controllers\OtpVerificationController;
 use Leysco100\Gpm\Http\Controllers\API\FieldsTemplateController;
 use Leysco100\Gpm\Http\Controllers\API\GPMBackUpModeApiController;
 use Leysco100\Gpm\Http\Controllers\API\BackupModeProcessController;
+use Leysco100\Gpm\Http\Controllers\API\BackupModeSettingsController;
 
 
 
