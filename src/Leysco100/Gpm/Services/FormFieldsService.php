@@ -12,18 +12,13 @@ class FormFieldsService
 
     public function getFormFields($mode = 0)
     {
-        if ($mode == 1) {
-            $isBackupMode = (new BackupModeService())->isBackupMode();
+        $isBackupMode = (new BackupModeService())->isBackupMode();
 
-            if ($isBackupMode) {
-                $template  = FormFieldsTemplate::where('id', $isBackupMode->FieldsTemplate)->first();
-            } else {
-                $template  = FormFieldsTemplate::where('DefaultTemplate', true)->first();
-            }
+        if ($isBackupMode) {
+            $template  = FormFieldsTemplate::where('id', $isBackupMode->FieldsTemplate)->first();
         } else {
             $template  = FormFieldsTemplate::where('DefaultTemplate', true)->first();
         }
-
 
 
         $form_fields = DB::connection('tenant')->table('form_fields_templates')
@@ -37,7 +32,7 @@ class FormFieldsService
             if ($field->type == "Dropdown") {
                 $values = DB::connection('tenant')->table('form_field_values')
                     ->where('field_id', '=', $field->id)
-                    ->select('id', 'Value')
+                    ->select('id', 'Value as Name')
                     ->get();
                 $field->values = $values;
             }
