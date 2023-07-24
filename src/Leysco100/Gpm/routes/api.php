@@ -56,13 +56,13 @@ Route::post('verify_otp', [OtpVerificationController::class, 'VerifyOTP']);
 Route::get('export-scan-logs', [GMPDocumentController::class, 'export_scan_logs']);
 Route::get('export-sap-documents', [GMPDocumentController::class, 'export_sap_documents']);
 //form fields
-Route::apiResources(['form_fields' => GPMFormFieldsController::class]);
+
 Route::get('field_types', [GPMFormFieldsController::class, 'getFieldTypes']);
 Route::get('get_mobile_nav', [GPMFormFieldsController::class, 'getMobileNav']);
 Route::put('update_mobile_nav', [GPMFormFieldsController::class, 'updateMobileNav']);
-
 Route::get('gpm_reports', [GPMReports::class, 'getScanLogsByDate']);
-
+Route::apiResources(['form_fields' => GPMFormFieldsController::class]);
+Route::apiResources(['fields_template' => FieldsTemplateController::class]);
 /*
 |--------------------------------------------------------------------------
 | Reports API's
