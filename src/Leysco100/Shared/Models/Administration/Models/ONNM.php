@@ -1,9 +1,12 @@
 <?php
 
-namespace App\Domains\Administration\Models;
+namespace Leysco100\Shared\Models\Administration\Models;
 
-use App\Domains\Shared\Models\APDI;
+
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\Shared\Models\APDI;
+use Leysco100\Shared\Models\Administration\Models\NNM1;
+use Leysco100\Shared\Models\Administration\Models\NNM2;
 
 class ONNM extends Model
 {

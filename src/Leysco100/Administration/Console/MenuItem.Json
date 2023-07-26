@@ -1,0 +1,456 @@
+[
+
+  {
+    "icon": "mdi-adobe",
+    "icon-alt": "mdi-chevron-down",
+    "Label": "Administration",
+    "model": true,
+    "Visible": "N",
+    "children": [
+      {
+        "icon": "mdi-con",
+        "Label": "Choose Company",
+        "link": "/choose-company",
+        "Visible": "N",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Rates and Indexes",
+        "link": "/rates-and-indexes",
+        "Visible": "N",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "System Initialization",
+        "model": true,
+        "Visible": "Y",
+        "children": [
+          {
+            "icon": "mdi-con",
+            "Label": "Company Details",
+            "link": "/company-details",
+            "Visible": "Y",
+            "children": []
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "General settings",
+            "link": "/system-initialization/general-settings",
+            "Visible": "Y",
+            "children": []
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Document settings",
+            "link": "/system-initialization/doc-settings",
+            "Visible": "N",
+            "children": []
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "General Authorization",
+            "link": "/general-authorization",
+            "Visible": "Y",
+            "children": []
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Document Numbering",
+            "link": "/document-numbering",
+            "Visible": "Y",
+            "children": []
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Document Approvals",
+            "link": "/document-approvals",
+            "Visible": "Y",
+            "children": []
+          }
+        ]
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Setup",
+        "model": true,
+        "Visible": "Y",
+        "children": [
+          {
+            "icon": "mdi-con",
+            "Label": "General",
+            "model": true,
+            "Visible": "Y",
+            "children": [
+              {
+                "icon": "mdi-con",
+                "Label": "Users",
+                "link": "/users",
+                "Visible": "Y",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "Departments",
+                "link": "/departments",
+                "Visible": "Y",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "User Groups",
+                "link": "/user-groups",
+                "Visible": "Y",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "Sales Employees",
+                "link": "/sales-employees",
+                "Visible": "Y",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "Employees",
+                "link": "/employees",
+                "Visible": "Y",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "Drivers",
+                "link": "/drivers",
+                "Visible": "Y",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "Territories",
+                "link": "/setup/territories",
+                "Visible": "Y",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "Commission Groups",
+                "link": "/commission-groups",
+                "Visible": "Y",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "User Defaults",
+                "link": "/setup/user-defaults",
+                "Visible": "Y",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "Branches",
+                "Visible": "Y",
+                "link": "/branches",
+                "children": []
+              },
+
+              {
+                "icon": "mdi-con",
+                "Label": "Locations",
+                "link": "/locations",
+                "Visible": "Y",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "Vehicles",
+                "link": "/vehicles",
+                "Visible": "Y",
+                "children": []
+              }
+            ]
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Financials",
+            "model": true,
+            "Visible": "Y",
+            "children": [
+              {
+                "icon": "mdi-con",
+                "Label": "Edit Chart of Accounts",
+                "link": "/edit-chart-of-accounts",
+                "Visible": "Y",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "G/L Account Determination",
+                "link": "/gl-account-determination",
+                "Visible": "Y",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "Currencies",
+                "link": "/currencies",
+                "Visible": "Y",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "Tax Groups",
+                "link": "/tax-groups",
+                "Visible": "Y",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "Withholding Tax",
+                "link": "/withholding-tax",
+                "Visible": "N",
+                "children": []
+              }
+            ]
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Business Partners",
+            "model": true,
+            "Visible": "Y",
+            "children": [
+              {
+                "icon": "mdi-con",
+                "Label": "Countries",
+                "link": "/business-partners/countries",
+                "Visible": "Y",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "Customer Groups",
+                "link": "/business-partners/customer-groups",
+                "Visible": "Y",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "Vendor Groups",
+                "link": "/business-partners/vendor-groups",
+                "Visible": "N",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "Properties",
+                "link": "/business-partners/properties",
+                "Visible": "Y",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "Payment Terms",
+                "link": "/business-partners/payment-terms",
+                "Visible": "Y",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "Branch Defatuls",
+                "link": "/branch-defaults",
+                "Visible": "Y",
+                "children": []
+              }
+            ]
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Banking",
+            "model": true,
+            "Visible": "Y",
+            "children": [
+              {
+                "icon": "mdi-con",
+                "Label": "Banks",
+                "link": "/banking/banks",
+                "Visible": "Y",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "House Bank Accounts",
+                "link": "/banking/house-bank-accounts",
+                "Visible": "Y",
+                "children": []
+              }
+            ]
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Inventory",
+            "model": true,
+            "Visible": "Y",
+            "children": [
+              {
+                "icon": "mdi-con",
+                "Label": "Item Groups",
+                "link": "/inventory/item-groups",
+                "Visible": "Y",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "Item Properties",
+                "link": "/inventory/item-properties",
+                "Visible": "Y",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "Warehouses",
+                "link": "/inventory/warehouses",
+                "Visible": "Y",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "Warehouse Types",
+                "link": "/inventory/warehouse-types",
+                "Visible": "Y",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "UoM",
+                "link": "/inventory/uom",
+                "Visible": "Y",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "UoM Groups",
+                "link": "/inventory/uom-groups",
+                "Visible": "Y",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "Manufacturers",
+                "link": "/inventory/manufacturers",
+                "Visible": "N",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "Shipping Types",
+                "link": "/inventory/shipping-types",
+                "Visible": "Y",
+                "children": []
+              },
+
+              {
+                "icon": "mdi-con",
+                "Label": "Item Defaults",
+                "link": "/inventory/item-defaults",
+                "Visible": "Y",
+                "children": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Data Imports / Exports",
+        "Visible": "N",
+        "children": [
+          {
+            "icon": "mdi-con",
+            "Label": "Import from excel",
+            "Visible": "Y",
+            "children": []
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Import from sales force",
+            "Visible": "Y",
+            "children": []
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Data Export",
+            "Visible": "Y",
+            "children": []
+          }
+        ]
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Utilities",
+        "Visible": "N",
+        "children": [
+          {
+            "icon": "mdi-con",
+            "Label": "Connected Clients",
+            "Visible": "Y",
+            "children": []
+          }
+        ]
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Approval Process",
+        "Visible": "N",
+        "children": [
+          {
+            "icon": "mdi-con",
+            "Label": "Approval Stages",
+            "link": "/approval-stages",
+            "Visible": "Y",
+            "children": []
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Approval Templates",
+            "link": "/approval-templates",
+            "Visible": "Y",
+            "children": []
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Approval Status Report",
+            "link": "/approval-status-report",
+            "Visible": "Y",
+            "children": []
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Approval Decision Report",
+            "link": "/approval-decision-report",
+            "Visible": "Y",
+            "children": []
+          }
+        ]
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "License",
+        "Visible": "N",
+        "children": [
+          {
+            "icon": "mdi-con",
+            "Label": "License Administration",
+            "Visible": "Y",
+            "children": []
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Create Surveys",
+            "Visible": "Y",
+            "children": []
+          }
+        ]
+      }
+    ]
+  }
+]

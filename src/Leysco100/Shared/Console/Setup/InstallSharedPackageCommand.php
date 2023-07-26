@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Models\Shared\Models\PDI1;
+use Spatie\Multitenancy\Commands\Concerns\TenantAware;
 
 
 class InstallSharedPackageCommand extends Command
@@ -15,7 +16,8 @@ class InstallSharedPackageCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'leysco100:shared:initial_setup';
+    use TenantAware;
+    protected $signature = 'leysco100:shared:initial_setup {--tenant=*}';
 
     /**
      * The console command description.

@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\General;
+namespace Leysco100\Administration\Http\Controllers\Setup\General;
 
-use App\Domains\Administration\Models\OUDP;
-use App\Domains\Shared\Services\ApiResponseService;
-use App\Http\Controllers\Controller;
+
+
 use Illuminate\Http\Request;
+use App\Domains\Administration\Models\OUDP;
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Administration\Http\Controllers\Controller;
 
 class DepartmentController extends Controller
 {

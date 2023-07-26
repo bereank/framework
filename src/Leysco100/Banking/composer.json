@@ -1,6 +1,6 @@
 {
-  "name": "leysco100/gpm",
-  "description": "The Leysco100 GPM Package",
+  "name": "leysco100/banking",
+  "description": "The Leysco100 Banking Package",
   "type": "library",
   "license": "MIT",
   "authors": [
@@ -10,10 +10,7 @@
     }
   ],
   "require": {
-    "leysco100/shared": "dev-main",
-    "psr/simple-cache": "2.0",
-    "maatwebsite/excel": "^3.1",
-    "laravel-notification-channels/africastalking": "^4.0"
+    "leysco100/shared": "dev-main"
   },
   "require-dev": {
     "orchestra/testbench": "^8.5"
@@ -26,7 +23,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "Leysco100\\Gpm\\": ""
+      "Leysco100\\Banking\\": ""
     }
   }
 }

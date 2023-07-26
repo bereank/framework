@@ -1,0 +1,21 @@
+[
+  
+    {
+        "FieldName": "CardCode",
+        "Label": "Customer Code",
+        "FieldType": "string",
+        "FieldTypeLength":100,
+        "IsNullable":false,
+        "IsPostable":true,
+        "FiedlDefaultValue":null
+    },
+    {
+        "FieldName": "CardName",
+        "Label": "Customer CardName",
+        "FieldType": "string",
+        "FieldTypeLength":100,
+        "IsNullable":false,
+        "IsPostable":true,
+        "FiedlDefaultValue":null
+    }
+]
