@@ -1,6 +1,6 @@
 <?php
 
-namespace Leysco100\Administration\Http\Controllers;
+namespace Leysco100\Shared\Http\Controllers;
 
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;

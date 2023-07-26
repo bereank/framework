@@ -1,6 +1,6 @@
 <?php
 
-namespace Leysco100\Gpm\Console;
+namespace Leysco100\Administration\Console;
 
 use Illuminate\Console\Command;
 use Leysco100\Shared\Models\FormSetting\Models\FM100;
@@ -8,13 +8,13 @@ use Spatie\Multitenancy\Commands\Concerns\TenantAware;
 
 
 
-class GPMInstallCommand extends Command
+class AdministrationInstallCommand extends Command
 {
 
     use TenantAware;
-    protected $signature = 'leysco100:gpm:install {--tenant=*}';
+    protected $signature = 'leysco100:administration:install {--tenant=*}';
 
-    protected $description = 'Installing GPM Package';
+    protected $description = 'Installing Administration Package';
 
     public function handle()
     {
@@ -25,6 +25,8 @@ class GPMInstallCommand extends Command
         $menuitems = json_decode($menuJsonString, true);
 
         foreach ($menuitems as $key => $item1) {
+
+         
             $menu1 = FM100::updateOrCreate([
                 'UserSign' => 1,
                 'Label' => $item1['Label'],
@@ -130,6 +132,9 @@ class GPMInstallCommand extends Command
         }
 
 
+        FM100::query()->update([
+            'Visible' => 'Y',
+        ]);
 
 
     }

@@ -2,9 +2,8 @@
 
 namespace Leysco100\Administration;
 
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Leysco100\Administration\Console\AdministrationInstallCommand;
+use Illuminate\Support\Facades\Route;
 
 class AdministrationServiceProvider extends ServiceProvider
 {
@@ -14,22 +13,18 @@ class AdministrationServiceProvider extends ServiceProvider
         // Register the command if we are using the application via the CLI
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "config.php" => config_path('administration.php'),
+                __DIR__ . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "config.php" => config_path('banking.php'),
             ], 'config');
-
-
-            $this->commands([
-                AdministrationInstallCommand::class
-            ]);
-         
         }
     }
 
     public function boot()
     {
-        // /**
-        //  * Load Migrations And Views
-        //  */
+
+        
+        /**
+         * Load Migrations And Views
+         */
         $this->loadMigrationsFrom(__DIR__ . '/database/migrations/tenant');
         $this->registerRoutes();
     }
@@ -44,8 +39,8 @@ class AdministrationServiceProvider extends ServiceProvider
     protected function routeConfiguration()
     {
         return [
-            'prefix' => config('administration.prefix'),
-            'middleware' => config('administration.middleware'),
+            'prefix' => config('gpm.prefix'),
+            'middleware' => config('gpm.middleware'),
         ];
     }
 }

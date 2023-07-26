@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Domains\Administration\Models;
+namespace Leysco100\Shared\Models\Administration\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\Administration\Models\NNM1;
 
 class NNM2 extends Model
 {

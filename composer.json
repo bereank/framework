@@ -13,25 +13,23 @@
     "leysco100/gpm": "self.version"
   },
   "require-dev": {
-    "orchestra/testbench": "^7.6",
-    "pestphp/pest": "^1.21",
-    "phpunit/phpunit": "^9.5",
-    "pestphp/pest-plugin-laravel": "^1.2"
+    "orchestra/testbench": "^8.5"
   },
   "autoload": {
     "psr-4": {
       "Leysco100\\Shared\\": "src/Leysco100/Shared",
+      "Leysco100\\Administration\\": "src/Leysco100/Administration",
+      "Leysco100\\Banking\\": "src/Leysco100/Banking",
       "Leysco100\\Gpm\\": "src/Leysco100/Gpm"
     }
   },
-
   "config": {
     "allow-plugins": {
       "pestphp/pest-plugin": true
     }
   },
   "require": {
-    "spatie/laravel-multitenancy": "3.0",
+    "spatie/laravel-multitenancy": "3.0.3",
     "maatwebsite/excel": "^3.1"
   }
 }

@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Leysco100\Shared\Console\Setup\CreateDefaultUserCommand;
 use Leysco100\Shared\Console\Setup\InstallSharedPackageCommand;
 
+use Illuminate\Support\Facades\Route;
 class SharedServiceProvider extends ServiceProvider
 {
     public function register()
@@ -29,12 +30,27 @@ class SharedServiceProvider extends ServiceProvider
     public function boot()
     {
 
-
-        
         /**
          * Load Migrations And Views
          */
         $this->loadMigrationsFrom(__DIR__ . '/database/migrations/tenant');
+        $this->registerRoutes();
    
+    }
+
+
+    protected function registerRoutes()
+    {
+        Route::group($this->routeConfiguration(), function () {
+            $this->loadRoutesFrom(__DIR__ . DIRECTORY_SEPARATOR . "routes" . DIRECTORY_SEPARATOR . "api.php");
+        });
+    }
+
+    protected function routeConfiguration()
+    {
+        return [
+            'prefix' => config('gpm.prefix'),
+            'middleware' => config('gpm.middleware'),
+        ];
     }
 }
