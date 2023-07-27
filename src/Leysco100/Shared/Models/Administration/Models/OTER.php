@@ -1,16 +1,21 @@
 <?php
 
-namespace App\Domains\Administration\Models;
+namespace Leysco100\Shared\Models\Administration\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OTER extends Model
 {
+
+
+    use UsesTenantConnection;
     protected $guarded = ['id'];
     protected $table = 'o_t_e_r_s';
 
 
+    
     public function children()
     {
         return $this->hasMany(OTER::class, 'parent');

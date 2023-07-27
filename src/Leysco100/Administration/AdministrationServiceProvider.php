@@ -8,7 +8,15 @@ use Leysco100\Administration\Console\AdministrationInstallCommand;
 
 class AdministrationServiceProvider extends ServiceProvider
 {
+
     public function register()
+    {
+        $this->mergeConfigFrom(__DIR__ . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "config.php", 'administration');
+    }
+
+
+
+    public function boot()
     {
 
         // Register the command if we are using the application via the CLI
@@ -21,12 +29,8 @@ class AdministrationServiceProvider extends ServiceProvider
             $this->commands([
                 AdministrationInstallCommand::class
             ]);
-         
         }
-    }
 
-    public function boot()
-    {
         // /**
         //  * Load Migrations And Views
         //  */

@@ -5,8 +5,8 @@ namespace Leysco100\Administration\Http\Controllers\Setup\General;
 
 
 use Illuminate\Http\Request;
-use App\Domains\Administration\Models\OUDP;
 use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\Administration\Models\OUDP;
 use Leysco100\Administration\Http\Controllers\Controller;
 
 class DepartmentController extends Controller
@@ -26,15 +26,6 @@ class DepartmentController extends Controller
         }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -73,16 +64,6 @@ class DepartmentController extends Controller
         }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -105,14 +86,4 @@ class DepartmentController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
 }

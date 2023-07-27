@@ -1,12 +1,16 @@
 <?php
-
-namespace App\Http\Controllers\API\Administration\Setup\General;
+namespace Leysco100\Administration\Http\Controllers\Setup\General;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
+
 use Illuminate\Support\Facades\Auth;
-use App\Domains\Administration\Models\ORLP;
-use Leysco\LS100SharedPackage\Services\ApiResponseService;
+
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\Administration\Models\ORLP;
+use Leysco100\Shared\Models\Administration\Models\OTER;
+use Leysco100\Shared\Models\Administration\Models\SLP1;
+use Leysco100\Administration\Http\Controllers\Controller;
+
 
 class DriverController extends Controller
 {
@@ -26,15 +30,7 @@ class DriverController extends Controller
         }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+ 
 
     /**
      * Store a newly created resource in storage.
@@ -63,16 +59,16 @@ class DriverController extends Controller
 
         $regions = $request['Regions'];
         $IsRegions = is_array($regions) ? 'Yes' : 'No';
-        if ($IsRegions == "Yes") {
-            foreach ($regions as $key => $value) {
-                $RegionDetails = [
-                    'ElpCode' => $employee->id,
-                    'Territory' => $value,
-                ];
-                $newRegion = new RSP1($RegionDetails);
-                $newRegion->save();
-            }
-        }
+        // if ($IsRegions == "Yes") {
+        //     foreach ($regions as $key => $value) {
+        //         $RegionDetails = [
+        //             'ElpCode' => $employee->id,
+        //             'Territory' => $value,
+        //         ];
+        //         $newRegion = new RSP1($RegionDetails);
+        //         $newRegion->save();
+        //     }
+        // }
 
         return (new ApiResponseService())->apiSuccessResponseService($employee);
     }
@@ -116,17 +112,7 @@ class DriverController extends Controller
         return $driver;
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
+   
     /**
      * Update the specified resource in storage.
      *
@@ -160,17 +146,7 @@ class DriverController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
-
+   
     public function getForRegion($TerritoryID)
     {
         $section = OTER::where('id', $TerritoryID)

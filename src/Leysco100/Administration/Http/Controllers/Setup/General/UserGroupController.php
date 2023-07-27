@@ -1,13 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\General;
+namespace Leysco100\Administration\Http\Controllers\Setup\General;
 
-use App\Domains\Shared\Models\APDI;
-use App\Domains\Shared\Services\ApiResponseService;
-use App\Http\Controllers\Controller;
+
+
+
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use Leysco100\Shared\Models\Shared\Models\APDI;
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\Administration\Models\User;
+use Leysco100\Administration\Http\Controllers\Controller;
+use Leysco100\Shared\Models\Administration\Models\UserGroup;
 
 class UserGroupController extends Controller
 {
@@ -19,22 +24,13 @@ class UserGroupController extends Controller
     public function index()
     {
         try {
-            $data = Role::get();
+            $data = UserGroup::get();
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -49,7 +45,7 @@ class UserGroupController extends Controller
         ]);
 
         try {
-            $role = Role::create([
+            $role = UserGroup::create([
                 'name' => $request['name'],
             ]);
             if ($request['users']) {
@@ -71,7 +67,7 @@ class UserGroupController extends Controller
      */
     public function show($id)
     {
-        $role = Role::where('id', $id)->first();
+        $role = UserGroup::where('id', $id)->first();
 
         if (!$role) {
             return "User Group doesnt exist";
@@ -109,16 +105,6 @@ class UserGroupController extends Controller
         return $role;
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.

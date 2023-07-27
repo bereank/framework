@@ -1,14 +1,16 @@
 <?php
 
-namespace App\Domains\Finance\Models;
+namespace Leysco100\Shared\Models\Finance\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantModel;
 
 class ChartOfAccount extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes,UsesTenantConnection;
     protected $guarded = ['id'];
     protected $table = 'chart_of_accounts';
     public function childrenAll()
@@ -42,14 +44,4 @@ class ChartOfAccount extends Model
 
         return $sections;
     }
-
-    // public function chartOfAccounts()
-    // {
-    //     return $this->hasMany(ChartOfAccount::class);
-    // }
-
-    // public function childrenChartOfAccount()
-    // {
-    //     return $this->hasMany(ChartOfAccount::class)->with('chartOfAccounts');
-    // }
 }

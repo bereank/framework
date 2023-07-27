@@ -1,10 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\Financials;
+namespace Leysco100\Administration\Http\Controllers\Setup\Financials;
 
-use App\Domains\Administration\Models\TaxGroup;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+
+
+
+use Leysco100\Administration\Http\Controllers\Controller;
+use Leysco100\Shared\Models\Administration\Models\TaxGroup;
 
 class TaxGroupController extends Controller
 {
@@ -26,15 +29,7 @@ class TaxGroupController extends Controller
         }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+  
 
     /**
      * Store a newly created resource in storage.
@@ -61,28 +56,7 @@ class TaxGroupController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
+  
     /**
      * Update the specified resource in storage.
      *
@@ -105,14 +79,5 @@ class TaxGroupController extends Controller
         TaxGroup::where('id', $id)->update($details);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
+
 }

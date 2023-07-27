@@ -1,15 +1,17 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\Financials;
+namespace Leysco100\Administration\Http\Controllers\Setup\Financials;
 
-use App\Domains\Finance\Models\ChartOfAccount;
-use App\Domains\Shared\Services\ApiResponseService;
-use App\Http\Controllers\Controller;
-use App\Imports\GLAccountImport;
 use Auth;
 use Illuminate\Http\Request;
+
+use App\Imports\GLAccountImport;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
+
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Administration\Http\Controllers\Controller;
+use Leysco100\Shared\Models\Finance\Models\ChartOfAccount;
 
 class ChartOfAccountController extends Controller
 {
@@ -53,15 +55,7 @@ class ChartOfAccountController extends Controller
             ->get();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+   
 
     /**
      * Store a newly created resource in storage.
@@ -123,29 +117,6 @@ class ChartOfAccountController extends Controller
             'data' => $data,
             'data1' => $AllData,
         ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
     }
 
     /**

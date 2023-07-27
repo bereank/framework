@@ -74,8 +74,6 @@ class CreateOUDGSTable extends Migration
             $table->string('CogsOcrCo3', 8)->nullable()->comment("COGS Distribution Rule Code3");
             $table->string('CogsOcrCo4', 8)->nullable()->comment("COGS Distribution Rule Code4");
             $table->string('CogsOcrCo5', 8)->nullable()->comment("COGS Distribution Rule Code5");
-            $table->integer('CompanyID')
-                ->references('id')->on('companies')->nullable();
             $table->timestamps();
         });
     }

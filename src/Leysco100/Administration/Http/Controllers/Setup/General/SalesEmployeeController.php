@@ -1,18 +1,16 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\General;
+namespace Leysco100\Administration\Http\Controllers\Setup\General;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\Domains\Marketing\Models\ORDR;
-use App\Domains\Administration\Models\OADM;
-use App\Domains\Administration\Models\OSLP;
-use App\Domains\Administration\Models\OTER;
-use App\Domains\Administration\Models\SLP1;
 use App\Domains\BusinessPartner\Models\OCLG;
-use App\Domains\BusinessPartner\Models\OCRD;
-use App\Domains\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\Administration\Models\OADM;
+use Leysco100\Shared\Models\Administration\Models\OSLP;
+use Leysco100\Shared\Models\Administration\Models\SLP1;
+use Leysco100\Administration\Http\Controllers\Controller;
+
 
 class SalesEmployeeController extends Controller
 {
@@ -24,22 +22,14 @@ class SalesEmployeeController extends Controller
     public function index()
     {
         try {
-            $data = OSLP::with('channel', 'tier')->get();
+            $data = OSLP::get();
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -128,16 +118,7 @@ class SalesEmployeeController extends Controller
         return $salesEmployee;
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
+
 
     /**
      * Update the specified resource in storage.
@@ -168,16 +149,6 @@ class SalesEmployeeController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
 
     public function getForRegion($TerritoryID)
     {

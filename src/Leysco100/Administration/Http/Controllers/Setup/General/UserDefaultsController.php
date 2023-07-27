@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\General;
+namespace Leysco100\Administration\Http\Controllers\Setup\General;
 
-use App\Domains\Administration\Models\OUDG;
-use App\Domains\Shared\Services\ApiResponseService;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\Administration\Models\OUDG;
+use Leysco100\Administration\Http\Controllers\Controller;
 
 class UserDefaultsController extends Controller
 {
@@ -24,15 +24,7 @@ class UserDefaultsController extends Controller
         }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -59,7 +51,7 @@ class UserDefaultsController extends Controller
             ]);
             return (new ApiResponseService())->apiSuccessResponseService("Created Successfully");
         } catch (\Throwable $th) {
-            DB::rollback();
+      
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
@@ -82,16 +74,7 @@ class UserDefaultsController extends Controller
         }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
+
 
     /**
      * Update the specified resource in storage.
@@ -122,16 +105,5 @@ class UserDefaultsController extends Controller
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
     }
 }

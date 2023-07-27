@@ -1,13 +1,16 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\General;
+namespace Leysco100\Administration\Http\Controllers\Setup\General;
 
 
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use App\Http\Controllers\Controller;
-use App\Domains\Administration\Models\Vehicle;
-use Leysco\LS100SharedPackage\Services\ApiResponseService;
+
+
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Administration\Http\Controllers\Controller;
+use Leysco100\Shared\Models\Administration\Models\Vehicle;
+
 
 class VehicleController extends Controller
 {
@@ -34,9 +37,11 @@ class VehicleController extends Controller
      */
     public function store(Request $request)
     {
+
+  
         try {
             $validatedData = $request->validate([
-                'RegistrationNO' => 'required|unique:vehicles',
+                'RegistrationNO' => 'required',
                 'Make' => 'nullable|string',
                 'Model' => 'nullable|string',
                 'Brand' => 'nullable|string',

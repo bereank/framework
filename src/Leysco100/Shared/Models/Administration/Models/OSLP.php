@@ -1,13 +1,18 @@
 <?php
 
-namespace App\Domains\Administration\Models;
 
-use App\Domains\BusinessPartner\Models\Channel;
-use App\Domains\BusinessPartner\Models\OCLG;
+namespace Leysco100\Shared\Models\Administration\Models;
+
+
 use Illuminate\Database\Eloquent\Model;
+use App\Domains\BusinessPartner\Models\OCLG;
+use Leysco100\Shared\Models\Administration\Models\Channel;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OSLP extends Model
 {
+
+    use UsesTenantConnection;
     protected $guarded = ['id'];
     protected $table = 'o_s_l_p_s';
 

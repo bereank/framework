@@ -1,12 +1,16 @@
 <?php
 
-namespace App\Domains\Administration\Models;
+namespace Leysco100\Shared\Models\Administration\Models;
 
-use App\Domains\BusinessPartner\Models\Channel;
+
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\Administration\Models\Tier;
+use Leysco100\Shared\Models\Administration\Models\Channel;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class ORLP extends Model
 {
+    use UsesTenantConnection;
     protected $guarded = ['id'];
     protected $table = 'o_r_l_p_s';
 

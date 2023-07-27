@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\General;
+namespace Leysco100\Administration\Http\Controllers\Setup\General;
 
-use App\Domains\Administration\Models\OSLP;
-use App\Domains\Administration\Models\OTER;
-use App\Domains\Administration\Models\SLP1;
-use App\Domains\BusinessPartner\Models\OCRD;
-use App\Domains\Shared\Services\ApiResponseService;
-use App\Http\Controllers\Controller;
+
 use Illuminate\Http\Request;
+use App\Domains\BusinessPartner\Models\OCRD;
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\Administration\Models\OSLP;
+use Leysco100\Shared\Models\Administration\Models\OTER;
+use Leysco100\Shared\Models\Administration\Models\SLP1;
+use Leysco100\Administration\Http\Controllers\Controller;
 
 class TerritoryController extends Controller
 {
@@ -30,15 +31,7 @@ class TerritoryController extends Controller
         }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+
 
     /**
      * Store a newly created resource in storage.
@@ -89,28 +82,6 @@ class TerritoryController extends Controller
         return $territory;
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
 
     /**
      * Remove the specified resource from storage.
