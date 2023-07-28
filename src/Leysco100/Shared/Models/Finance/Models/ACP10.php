@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Domains\Finance\Models;
+namespace Leysco100\Shared\Models\Finance\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\Finance\Models\ChartOfAccount;
 
 class ACP10 extends Model
 {

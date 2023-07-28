@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\Inventory;
+namespace Leysco100\Administration\Http\Controllers\Setup\Inventory;
 
-use App\Domains\Administration\Models\OUGP;
-use App\Domains\InventoryAndProduction\Models\UGP1;
-use App\Domains\Shared\Services\ApiResponseService;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use function Pest\Laravel\get;
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\Administration\Models\OUGP;
+use Leysco100\Administration\Http\Controllers\Controller;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\UGP1;
+
 
 class UoMGroupController extends Controller
 {
@@ -107,10 +107,10 @@ class UoMGroupController extends Controller
         try {
 
 
-           // DB::connection()->enableQueryLog();
-            $data = OUGP:://with('ouom', 'ugp1.uomentry', 'ugp1.baseuom.ouom')
+            // DB::connection()->enableQueryLog();
+            $data = OUGP:: //with('ouom', 'ugp1.uomentry', 'ugp1.baseuom.ouom')
 
-                 with( 'ouom:id,UomCode,UomName,ExtRef','ugp1:id,UgpEntry,UomEntry,ExtRef','ugp1.uomentry:id,UomCode,UomName,ExtRef')->where('id', $id)
+                with('ouom:id,UomCode,UomName,ExtRef', 'ugp1:id,UgpEntry,UomEntry,ExtRef', 'ugp1.uomentry:id,UomCode,UomName,ExtRef')->where('id', $id)
                 ->first();
 
 

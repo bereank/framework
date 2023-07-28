@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\Inventory;
+namespace Leysco100\Administration\Http\Controllers\Setup\Inventory;
 
-use App\Http\Controllers\Controller;
-use App\Models\Manufacture;
 use Illuminate\Http\Request;
+use Leysco100\Shared\Models\Manufacture;
+use Leysco100\Administration\Http\Controllers\Controller;
 
 class ManufactureController extends Controller
 {

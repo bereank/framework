@@ -1,10 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\Inventory;
+namespace Leysco100\Administration\Http\Controllers\Setup\Inventory;
 
-use App\Http\Controllers\Controller;
-use App\Models\ShippingType;
 use Illuminate\Http\Request;
+use Leysco100\Shared\Models\ShippingType;
+use Leysco100\Administration\Http\Controllers\Controller;
+
+
+
 
 class ShippingTypeController extends Controller
 {

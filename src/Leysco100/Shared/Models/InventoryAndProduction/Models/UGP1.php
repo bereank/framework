@@ -1,12 +1,16 @@
 <?php
 
-namespace App\Domains\InventoryAndProduction\Models;
+namespace Leysco100\Shared\Models\InventoryAndProduction\Models;
 
-use App\Domains\Administration\Models\OUGP;
+
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\Administration\Models\OUGP;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OUOM;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class UGP1 extends Model
 {
+    use UsesTenantConnection;
     protected $guarded = ['id'];
     protected $table = 'u_g_p1_s';
 

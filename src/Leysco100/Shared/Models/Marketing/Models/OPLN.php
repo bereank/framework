@@ -1,13 +1,16 @@
 <?php
 
-namespace App\Domains\Marketing\Models;
+namespace Leysco100\Shared\Models\Marketing\Models;
 
-use App\Domains\Administration\Models\Currency;
-use App\Domains\InventoryAndProduction\Models\ITM1;
+
 use Illuminate\Database\Eloquent\Model;
+use App\Domains\InventoryAndProduction\Models\ITM1;
+use Leysco100\Shared\Models\Administration\Models\Currency;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OPLN extends Model
 {
+    use UsesTenantConnection;
     //PRICE LIST
     protected $guarded = ['id'];
     protected $table = 'o_p_l_n_s';

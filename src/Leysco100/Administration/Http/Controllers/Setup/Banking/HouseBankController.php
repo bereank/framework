@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\Banking;
+namespace Leysco100\Administration\Http\Controllers\Setup\Banking;
 
 use Illuminate\Http\Request;
-use App\Domains\Banking\Models\DSC1;
-use App\Http\Controllers\Controller;
-use App\Domains\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\Banking\Models\DSC1;
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Administration\Http\Controllers\Controller;
 
 class HouseBankController extends Controller
 {

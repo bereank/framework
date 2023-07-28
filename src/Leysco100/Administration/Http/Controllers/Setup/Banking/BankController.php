@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\Banking;
+namespace Leysco100\Administration\Http\Controllers\Setup\Banking;
 
 use Illuminate\Http\Request;
-use App\Domains\Banking\Models\Bank;
-use App\Http\Controllers\Controller;
-use App\Services\AuthorizationService;
-use App\Domains\Shared\Services\ApiResponseService;
+
+use Leysco100\Shared\Models\Banking\Models\Bank;
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Administration\Http\Controllers\Controller;
+
 
 class BankController extends Controller
 {

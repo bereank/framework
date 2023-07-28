@@ -2,23 +2,37 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Leysco100\Administration\Http\Controllers\Setup\Banking\BankController;
+use Leysco100\Administration\Http\Controllers\Setup\Inventory\UoMController;
 use Leysco100\Administration\Http\Controllers\Setup\General\DriverController;
 use Leysco100\Administration\Http\Controllers\Setup\General\VehicleController;
 use Leysco100\Administration\Http\Controllers\Setup\General\EmployeeController;
+use Leysco100\Administration\Http\Controllers\Setup\Banking\HouseBankController;
 use Leysco100\Administration\Http\Controllers\Setup\General\TerritoryController;
 use Leysco100\Administration\Http\Controllers\Setup\General\UserGroupController;
 use Leysco100\Administration\Http\Controllers\Setup\General\DepartmentController;
+use Leysco100\Administration\Http\Controllers\Setup\Inventory\UoMGroupController;
+use Leysco100\Administration\Http\Controllers\Setup\Financials\CurrencyController;
 use Leysco100\Administration\Http\Controllers\Setup\Financials\TaxGroupController;
+use Leysco100\Administration\Http\Controllers\Setup\Inventory\ItemGroupController;
 use Leysco100\Administration\Http\Controllers\Setup\General\UserDefaultsController;
 use Leysco100\Administration\Http\Controllers\Setup\General\SalesEmployeeController;
+use Leysco100\Administration\Http\Controllers\Setup\Inventory\ItemDefaultController;
+use Leysco100\Administration\Http\Controllers\Setup\Inventory\ManufactureController;
+use Leysco100\Administration\Http\Controllers\Setup\Inventory\ItemPropertyController;
+use Leysco100\Administration\Http\Controllers\Setup\Inventory\ShippingTypeController;
+use Leysco100\Administration\Http\Controllers\Setup\BusinessPartners\BPGroupController;
+use Leysco100\Administration\Http\Controllers\Setup\BusinessPartners\CountryController;
 use Leysco100\Administration\Http\Controllers\Setup\Financials\ChartOfAccountController;
+use Leysco100\Administration\Http\Controllers\Setup\BusinessPartners\BPPropertiesController;
+use Leysco100\Administration\Http\Controllers\Setup\Financials\GLDetermination\GLAccountDeterminationController;
 
 
 
 
 
 
-// Route::get('activeGLaccounts', [ChartOfAccountController::class, 'fetchActiveAccounts']);
+Route::get('activeGLaccounts', [ChartOfAccountController::class, 'fetchActiveAccounts']);
 Route::get('taxgroups/{Type}', [TaxGroupController::class, 'TaxGroupType']);
 // Route::get('getOutletsForRegions', [TerritoryController::class, 'getOutlets']);
 // Route::get('employee/territory/{TerritoryID}', [SalesEmployeeController::class, 'getForRegion']);
@@ -62,7 +76,7 @@ Route::get('taxgroups/{Type}', [TaxGroupController::class, 'TaxGroupType']);
 // Route::apiResources(['permissions' => PermissionController::class]);
 // Route::apiResources(['users' => UserController::class]);
 // Route::apiResources(['administration' => SystemSettingsController::class]);
-// Route::apiResources(['gl_account_determination' => GLAccountDeterminationController::class]);
+Route::apiResources(['gl_account_determination' => GLAccountDeterminationController::class]);
 Route::apiResources(['usergroup' => UserGroupController::class]);
 Route::apiResources(['user_defaults' => UserDefaultsController::class]);
 Route::apiResources(['departments' => DepartmentController::class]);
@@ -71,24 +85,24 @@ Route::apiResources(['territories' => TerritoryController::class]);
 Route::apiResources(['employee' => SalesEmployeeController::class]);
 Route::apiResources(['employee-master-data' => EmployeeController::class]);
 Route::apiResources(['drivers' => DriverController::class]);
-// Route::apiResources(['itemgroup' => ItemGroupController::class]);
+Route::apiResources(['itemgroup' => ItemGroupController::class]);
 // Route::apiResources(['warehousetype' => WarehouseTypeConntroller::class]);
 // Route::apiResources(['warehouse' => WarehouseController::class]);
-// Route::apiResources(['shippingtype' => ShippingTypeController::class]);
-// Route::apiResources(['uomgroup' => UoMGroupController::class]);
-// Route::apiResources(['uom' => UoMController::class]);
-// Route::apiResources(['manufacture' => ManufactureController::class]);
-// Route::apiResources(['item-defaults' => ItemDefaultController::class]);
-// Route::apiResources(['itemsproperty' => ItemPropertyController::class]);
-// Route::apiResources(['currency' => CurrencyController::class]);
+Route::apiResources(['shippingtype' => ShippingTypeController::class]);
+Route::apiResources(['uomgroup' => UoMGroupController::class]);
+Route::apiResources(['uom' => UoMController::class]);
+Route::apiResources(['manufacture' => ManufactureController::class]);
+Route::apiResources(['item-defaults' => ItemDefaultController::class]);
+Route::apiResources(['itemsproperty' => ItemPropertyController::class]);
+Route::apiResources(['currency' => CurrencyController::class]);
 Route::apiResources(['chartofaccounts' => ChartOfAccountController::class]);
-// Route::apiResources(['taxgroup' => TaxGroupController::class]);
+Route::apiResources(['taxgroup' => TaxGroupController::class]);
 // Route::apiResources(['credit-card' => CreditCardController::class]);
-// Route::apiResources(['country' => CountryController::class]);
-// Route::apiResources(['bp_properties' => BPPropertiesController::class]);
+Route::apiResources(['country' => CountryController::class]);
+Route::apiResources(['bp_properties' => BPPropertiesController::class]);
 // Route::apiResources(['paymentterm' => PaymentTermsController::class]);
-// Route::apiResources(['bp_groups' => BPGroupController::class]);
-// Route::apiResources(['bank' => BankController::class]);
-// Route::apiResources(['house_bank' => HouseBankController::class]);
+Route::apiResources(['bp_groups' => BPGroupController::class]);
+Route::apiResources(['bank' => BankController::class]);
+Route::apiResources(['house_bank' => HouseBankController::class]);
 // Route::apiResources(['documentnumbering' => DocNumberingController::class]);
 Route::apiResources(['vehicles' => VehicleController::class]);

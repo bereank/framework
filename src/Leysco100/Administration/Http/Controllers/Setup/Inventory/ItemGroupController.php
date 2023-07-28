@@ -1,16 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\Inventory;
+namespace Leysco100\Administration\Http\Controllers\Setup\Inventory;
 
-use App\Domains\Finance\Models\ACP10;
-use App\Domains\Finance\Models\ChartOfAccount;
-use App\Domains\InventoryAndProduction\Models\OITB;
-use App\Domains\Shared\Services\ApiResponseService;
-use App\Http\Controllers\Controller;
-use App\Models\ITB1;
+
+
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Leysco100\Shared\Models\ITB1;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Leysco100\Shared\Models\Finance\Models\ACP10;
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Administration\Http\Controllers\Controller;
+use Leysco100\Shared\Models\Finance\Models\ChartOfAccount;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OITB;
 
 class ItemGroupController extends Controller
 {

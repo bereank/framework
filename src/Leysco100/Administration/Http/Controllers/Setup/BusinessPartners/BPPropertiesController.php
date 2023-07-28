@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\BusinessPartners;
+namespace Leysco100\Administration\Http\Controllers\Setup\BusinessPartners;
 
 use Illuminate\Http\Request;
 
-use App\Http\Controllers\Controller;
-use App\Domains\BusinessPartner\Models\CQG1;
-use App\Domains\BusinessPartner\Models\OCQG;
-use App\Domains\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\BusinessPartner\Models\CQG1;
+use Leysco100\Shared\Models\BusinessPartner\Models\OCQG;
+use Leysco100\Administration\Http\Controllers\Controller;
+
 
 class BPPropertiesController extends Controller
 {
@@ -59,9 +60,9 @@ class BPPropertiesController extends Controller
         try {
             $data = OCQG::create(
                 [
-                'GroupName' => $request['GroupName'],
-                'GroupCode' => $request['GroupCode'],
-            ]
+                    'GroupName' => $request['GroupName'],
+                    'GroupCode' => $request['GroupCode'],
+                ]
             );
             return (new ApiResponseService())
                 ->apiSuccessResponseService($data);
@@ -137,9 +138,9 @@ class BPPropertiesController extends Controller
         try {
             $data->update(
                 [
-                'GroupName' => $request['GroupName'],
-                'GroupCode' => $request['GroupCode'],
-            ]
+                    'GroupName' => $request['GroupName'],
+                    'GroupCode' => $request['GroupCode'],
+                ]
             );
             return (new ApiResponseService())
                 ->apiSuccessResponseService($data);
@@ -184,9 +185,9 @@ class BPPropertiesController extends Controller
         try {
             $data = CQG1::create(
                 [
-                'Name' => $request['Name'],
-                'GroupCode' => $request['GroupCode'],
-            ]
+                    'Name' => $request['Name'],
+                    'GroupCode' => $request['GroupCode'],
+                ]
             );
             return (new ApiResponseService())
                 ->apiSuccessResponseService($data);

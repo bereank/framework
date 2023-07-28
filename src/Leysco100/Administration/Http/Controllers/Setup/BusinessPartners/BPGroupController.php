@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\BusinessPartners;
+namespace Leysco100\Administration\Http\Controllers\Setup\BusinessPartners;
 
-use App\Domains\BusinessPartner\Models\OCRG;
-use App\Domains\Shared\Services\ApiResponseService;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\BusinessPartner\Models\OCRG;
+use Leysco100\Administration\Http\Controllers\Controller;
+
+
 
 class BPGroupController extends Controller
 {
@@ -51,13 +53,13 @@ class BPGroupController extends Controller
         try {
             $data = OCRG::create(
                 [
-                'GroupCode' => count(OCRG::get()) + 100,
-                'GroupName' => $request['GroupName'],
-                'GroupType' => $request['GroupType'] ? $request['GroupType'] : "C",
-                'PriceList' => $request['PriceList'],
-                'DiscRel' => $request['DiscRel'] ? $request['DiscRel'] : "L",
-                'EffecPrice' => $request['EffecPrice'] ? $request['EffecPrice'] : "D",
-            ]
+                    'GroupCode' => count(OCRG::get()) + 100,
+                    'GroupName' => $request['GroupName'],
+                    'GroupType' => $request['GroupType'] ? $request['GroupType'] : "C",
+                    'PriceList' => $request['PriceList'],
+                    'DiscRel' => $request['DiscRel'] ? $request['DiscRel'] : "L",
+                    'EffecPrice' => $request['EffecPrice'] ? $request['EffecPrice'] : "D",
+                ]
             );
             return (new ApiResponseService())
                 ->apiSuccessResponseService($data);

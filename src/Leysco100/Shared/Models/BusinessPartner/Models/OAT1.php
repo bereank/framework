@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\BusinessPartner\Models;
+namespace Leysco100\Shared\Models\BusinessPartner\Models;
 
 use App\Models\OOAT;
 use Illuminate\Database\Eloquent\Model;

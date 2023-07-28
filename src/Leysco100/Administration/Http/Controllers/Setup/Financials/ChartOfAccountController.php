@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use App\Imports\GLAccountImport;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
-
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Administration\Http\Controllers\Controller;
 use Leysco100\Shared\Models\Finance\Models\ChartOfAccount;
@@ -55,7 +54,7 @@ class ChartOfAccountController extends Controller
             ->get();
     }
 
-   
+
 
     /**
      * Store a newly created resource in storage.
@@ -110,7 +109,7 @@ class ChartOfAccountController extends Controller
         $AllData = ChartOfAccount::
             // whereNull('chart_of_account_id')
             where('Postable', 'N')
-        // ->with('childrenRecursive')
+            // ->with('childrenRecursive')
             ->get();
 
         return response()->json([
@@ -146,15 +145,21 @@ class ChartOfAccountController extends Controller
                 if ($ParentAccountCode != "") {
                     $chart_of_account_id = ChartOfAccount::where('AcctCode', $ParentAccountCode)->value('id');
                     $bene = ChartOfAccount::firstOrCreate(
-                        ['AcctCode' => $AccountCode,
-                            'AcctName' => $AccountName],
-                        ['Postable' => $Postable,
+                        [
+                            'AcctCode' => $AccountCode,
+                            'AcctName' => $AccountName
+                        ],
+                        [
+                            'Postable' => $Postable,
                             'Levels' => $AccountLevel,
-                            'chart_of_account_id' => $chart_of_account_id]
+                            'chart_of_account_id' => $chart_of_account_id
+                        ]
                     );
                 } else {
-                    $bene = ChartOfAccount::firstOrCreate(['AcctCode' => $AccountCode, 'AcctName' => $AccountName], ['Postable' => $Postable,
-                        'Levels' => $AccountLevel]);
+                    $bene = ChartOfAccount::firstOrCreate(['AcctCode' => $AccountCode, 'AcctName' => $AccountName], [
+                        'Postable' => $Postable,
+                        'Levels' => $AccountLevel
+                    ]);
                 }
             }
             return "Done";

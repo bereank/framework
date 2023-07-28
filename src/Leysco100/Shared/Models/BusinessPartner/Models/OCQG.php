@@ -1,11 +1,15 @@
 <?php
 
-namespace App\Domains\BusinessPartner\Models;
+namespace Leysco100\Shared\Models\BusinessPartner\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\BusinessPartner\Models\CQG1;
+use Leysco100\Shared\Models\BusinessPartner\Models\Employee;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OCQG extends Model
 {
+    use UsesTenantConnection;
     protected $guarded = ['id'];
     protected $table = 'o_c_q_g_s';
 

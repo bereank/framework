@@ -1,15 +1,16 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\Financials\GLDetermination;
+namespace Leysco100\Administration\Http\Controllers\Setup\Financials\GLDetermination;
 
-use App\Domains\Administration\Models\OADM;
-use App\Domains\Finance\Models\ACP10;
-use App\Domains\Finance\Models\ChartOfAccount;
-use App\Domains\Finance\Models\OACP;
-use App\Domains\Shared\Services\ApiResponseService;
-use App\Http\Controllers\Controller;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Leysco100\Shared\Models\Finance\Models\OACP;
+use Leysco100\Shared\Models\Finance\Models\ACP10;
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\Administration\Models\OADM;
+use Leysco100\Administration\Http\Controllers\Controller;
+use Leysco100\Shared\Models\Finance\Models\ChartOfAccount;
 
 class GLAccountDeterminationController extends Controller
 {

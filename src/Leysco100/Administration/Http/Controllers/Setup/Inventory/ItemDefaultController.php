@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\Inventory;
+namespace Leysco100\Administration\Http\Controllers\Setup\Inventory;
 
-use App\Domains\Administration\Models\OIDG;
-use App\Domains\Shared\Services\ApiResponseService;
-use App\Http\Controllers\Controller;
+
 use Illuminate\Http\Request;
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\Administration\Models\OIDG;
+use Leysco100\Administration\Http\Controllers\Controller;
 
 class ItemDefaultController extends Controller
 {

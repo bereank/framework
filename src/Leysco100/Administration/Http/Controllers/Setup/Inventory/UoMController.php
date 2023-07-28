@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\Inventory;
+namespace Leysco100\Administration\Http\Controllers\Setup\Inventory;
 
-use App\Domains\InventoryAndProduction\Models\OUOM;
-use App\Domains\Shared\Services\ApiResponseService;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Administration\Http\Controllers\Controller;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OUOM;
+
 
 class UoMController extends Controller
 {

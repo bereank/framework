@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\BusinessPartner\Models;
+namespace Leysco100\Shared\Models\BusinessPartner\Models;
 
 use App\Domains\InventoryAndProduction\Models\OLCT;
 use Illuminate\Database\Eloquent\Model;

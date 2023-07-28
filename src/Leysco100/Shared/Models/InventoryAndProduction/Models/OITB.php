@@ -1,12 +1,14 @@
 <?php
 
-namespace App\Domains\InventoryAndProduction\Models;
+namespace Leysco100\Shared\Models\InventoryAndProduction\Models;
 
-use App\Models\ITB1;
+use Leysco100\Shared\Models\ITB1;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OITB extends Model
 {
+    use UsesTenantConnection;
     //ITEM GROUPS
     protected $guarded = ['id'];
     protected $table = 'o_i_t_b_s';

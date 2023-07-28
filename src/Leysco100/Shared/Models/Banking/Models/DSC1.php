@@ -1,12 +1,14 @@
 <?php
 
-namespace App\Domains\Banking\Models;
+namespace Leysco100\Shared\Models\Banking\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Domains\Administration\Models\Country;
+use Leysco100\Shared\Models\Administration\Models\Country;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class DSC1 extends Model
 {
+    use UsesTenantConnection;
     protected $guarded = ['id'];
     protected $table = 'd_s_c1_s';
 

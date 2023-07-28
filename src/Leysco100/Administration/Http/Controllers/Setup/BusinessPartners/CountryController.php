@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\BusinessPartners;
+namespace Leysco100\Administration\Http\Controllers\Setup\BusinessPartners;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Domains\Administration\Models\Country;
-use App\Domains\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Administration\Http\Controllers\Controller;
+use Leysco100\Shared\Models\Administration\Models\Country;
 
 class CountryController extends Controller
 {

@@ -1,11 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\Inventory;
+namespace Leysco100\Administration\Http\Controllers\Setup\Inventory;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Domains\InventoryAndProduction\Models\OITG;
-use App\Domains\Shared\Services\ApiResponseService;
+
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\Administration\Models\ITG1;
+use Leysco100\Administration\Http\Controllers\Controller;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OITG;
+
+
 
 class ItemPropertyController extends Controller
 {
@@ -58,9 +62,9 @@ class ItemPropertyController extends Controller
         try {
             $data = OITG::create(
                 [
-                'ItmsGrpNam' => $request['ItmsGrpNam'],
-                'ItmsTypCod' => $request['ItmsTypCod'],
-            ]
+                    'ItmsGrpNam' => $request['ItmsGrpNam'],
+                    'ItmsTypCod' => $request['ItmsTypCod'],
+                ]
             );
             return (new ApiResponseService())
                 ->apiSuccessResponseService($data);
@@ -152,9 +156,9 @@ class ItemPropertyController extends Controller
         try {
             $data = ITG1::create(
                 [
-                'GrpName' => $request['GrpName'],
-                'ItmsTypCod' => $request['ItmsTypCod'],
-            ]
+                    'GrpName' => $request['GrpName'],
+                    'ItmsTypCod' => $request['ItmsTypCod'],
+                ]
             );
             return (new ApiResponseService())
                 ->apiSuccessResponseService($data);

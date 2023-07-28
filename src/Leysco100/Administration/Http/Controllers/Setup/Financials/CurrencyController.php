@@ -1,9 +1,6 @@
 <?php
+
 namespace Leysco100\Administration\Http\Controllers\Setup\Financials;
-
-
-
-
 
 use Illuminate\Http\Request;
 use Leysco100\Administration\Http\Controllers\Controller;
@@ -21,7 +18,7 @@ class CurrencyController extends Controller
         return Currency::get();
     }
 
-   
+
 
     /**
      * Store a newly created resource in storage.
@@ -33,13 +30,11 @@ class CurrencyController extends Controller
     {
         $this->validate($request, [
             'currency' => 'required',
-             'CurrCode' => 'required',
+            'CurrCode' => 'required',
         ]);
         return Currency::create([
             'currency' => $request['currency'],
-             'CurrCode' => $request['CurrCode'],
+            'CurrCode' => $request['CurrCode'],
         ]);
     }
-
-
 }
