@@ -5,7 +5,7 @@ namespace Leysco100\Shared\Models\Administration\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
-use App\Domains\BusinessPartner\Models\OCLG;
+use Leysco100\Shared\Models\BusinessPartner\Models\OCLG;
 use Leysco100\Shared\Models\Administration\Models\Channel;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
