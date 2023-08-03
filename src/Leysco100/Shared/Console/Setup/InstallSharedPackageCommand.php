@@ -3,10 +3,12 @@
 namespace Leysco100\Shared\Console\Setup;
 
 use Illuminate\Console\Command;
+use Spatie\Multitenancy\Models\Tenant;
 use Illuminate\Support\Facades\Artisan;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Models\Shared\Models\PDI1;
 use Spatie\Multitenancy\Commands\Concerns\TenantAware;
+use Leysco100\Shared\Models\Administration\Models\OADM;
 
 
 class InstallSharedPackageCommand extends Command
@@ -28,6 +30,12 @@ class InstallSharedPackageCommand extends Command
 
     public function handle()
     {
+
+
+        OADM::create([
+                'CompnyName' => Tenant::current()->name
+        ]);
+
 
         $modelstsJsonString = file_get_contents(base_path('resources/setupdata/models.json'));
         $models = json_decode($modelstsJsonString, true);
