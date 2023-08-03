@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\InventoryAndProduction\Models;
+namespace Leysco100\Shared\Models\InventoryAndProduction\Models;
 
 use App\Domains\Administration\Models\OIDG;
 use App\Domains\Administration\Models\OUGP;
@@ -11,9 +11,12 @@ use App\Domains\Marketing\Models\INV1;
 use App\Domains\Marketing\Models\RDR1;
 use App\Models\ITM15;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OITM extends Model
 {
+
+    use UsesTenantConnection;
     protected $guarded = ['id'];
     protected $table = 'o_i_t_m_s';
 

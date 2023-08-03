@@ -11,9 +11,12 @@ use App\Domains\Marketing\Models\OINV;
 use App\Domains\Marketing\Models\ORDR;
 use App\Models\AssetTracking;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OCRD extends Model
 {
+
+    use UsesTenantConnection;
     protected $guarded = ['id'];
     protected $table = 'o_c_r_d_s';
 
