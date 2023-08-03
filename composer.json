@@ -20,7 +20,9 @@
       "Leysco100\\Shared\\": "src/Leysco100/Shared",
       "Leysco100\\Administration\\": "src/Leysco100/Administration",
       "Leysco100\\Banking\\": "src/Leysco100/Banking",
-      "Leysco100\\Gpm\\": "src/Leysco100/Gpm"
+      "Leysco100\\Gpm\\": "src/Leysco100/Gpm",
+      "Leysco100\\ BusinessPartner\\": "src/Leysco100/BusinessPartner"
+    
     }
   },
   "config": {

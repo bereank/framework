@@ -1,0 +1,26 @@
+[
+
+  {
+    "icon": "mdi-account-group",
+    "icon-alt": "mdi-chevron-down",
+    "Label": "Business Partners",
+    "model": true,
+    "Visible": "N",
+    "children": [
+        {
+            "icon": "mdi-con",
+            "Label": "BP Master Data",
+            "link": "/business-partners/item-master-data",
+            "Visible": "Y",
+            "children": []
+        },
+        {
+            "icon": "mdi-con",
+            "Label": "Dealers",
+            "link": "/business-partners/dealers",
+            "Visible": "Y",
+            "children": []
+        }
+    ]
+}
+]
