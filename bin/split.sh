@@ -22,8 +22,8 @@ git pull origin $CURRENT_BRANCH
 remote shared git@github.com:leysco100/shared.git
 remote gpm git@github.com:leysco100/gpm.git
 remote administration git@github.com:leysco100/administration.git
-remote administration git@github.com:leysco100/business-partner.git
-remote administration git@github.com:leysco100/inventory.git
+remote business-partner git@github.com:leysco100/business-partner.git
+remote inventory git@github.com:leysco100/inventory.git
 
 split 'src/Leysco100/Shared' shared
 split 'src/Leysco100/Gpm' gpm
