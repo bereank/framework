@@ -1,0 +1,103 @@
+[
+
+    {
+        "icon": "mdi-chart-tree",
+        "icon-alt": "mdi-chevron-down",
+        "Label": "Inventory",
+        "model": true,
+        "Visible": "Y",
+        "children": [
+            {
+                "icon": "mdi-con",
+                "Label": "Item Master data",
+                "link": "/inventory/item-master-data",
+                "Visible": "N",
+                "children": []
+            },
+            {
+                "icon": "mdi-con",
+                "Label": "Item Management",
+                "Visible": "N",
+                "children": [
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Item Management",
+                        "Visible": "Y",
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "icon": "mdi-con",
+                "Label": "Inventory Transactions",
+                "model": true,
+                "Visible": "N",
+                "children": [
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Goods Receipt",
+                        "link": "/inventory/transactions/59",
+                        "Visible": "N",
+                        "children": []
+                    },
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Goods Issue",
+                        "link": "/inventory/transactions/60",
+                        "Visible": "N",
+                        "children": []
+                    },
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Inventory Transfer Request",
+                        "link": "/inventory/transactions/66",
+                        "Visible": "Y",
+                        "children": []
+                    },
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Inventory Transfer",
+                        "link": "/inventory/transactions/67",
+                        "Visible": "Y",
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "icon": "mdi-con",
+                "Label": "Price List",
+                "Visible": "N",
+                "children": [
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Price List",
+                        "link": "/inventory/price-list",
+                        "Visible": "Y",
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "icon": "mdi-con",
+                "Label": "Reports",
+                "Visible": "Y",
+                "children": [
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Stock Balances Report",
+                        "link": "/inventory/report",
+                        "Visible": "Y",
+                        "children": []
+                    },
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Serials Report",
+                        "link": "/inventory/report/serial-numbers-report",
+                        "Visible": "Y",
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    }
+]

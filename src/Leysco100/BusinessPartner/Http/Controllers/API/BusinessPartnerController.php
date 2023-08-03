@@ -1,14 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\API\BusinessPartner;
 
-
-
+namespace Leysco100\BusinessPartner\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\Storage;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
@@ -153,7 +149,7 @@ class BusinessPartnerController extends Controller
                 ]);
             }
 
-            NumberingSeries::dispatch($request['Series']);
+           // NumberingSeries::dispatch($request['Series']);
             DB::commit();
             return (new ApiResponseService())->apiSuccessResponseService();
         } catch (\Throwable $th) {

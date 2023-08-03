@@ -2,10 +2,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\BusinessPartner\DealerController;
-use App\Http\Controllers\API\BusinessPartner\BusinessPartnerController;
 
-
+use Leysco100\BusinessPartner\Http\Controllers\API\DealerController;
+use Leysco100\BusinessPartner\Http\Controllers\API\BusinessPartnerController;
 
 /*
 |--------------------------------------------------------------------------

@@ -1,6 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\API\BusinessPartner;
+
+namespace Leysco100\BusinessPartner\Http\Controllers\API;
 
 
 
