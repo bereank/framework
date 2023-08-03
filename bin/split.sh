@@ -29,4 +29,4 @@ split 'src/Leysco100/Shared' shared
 split 'src/Leysco100/Gpm' gpm
 split 'src/Leysco100/Administration' administration
 split 'src/Leysco100/BusinessPartner' business-partner
-split 'src/Leysco100/BusinessPartner' inventory
+split 'src/Leysco100/Inventory' inventory
