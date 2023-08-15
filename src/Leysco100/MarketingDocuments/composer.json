@@ -1,0 +1,20 @@
+{
+  "name": "leysco100/marketing-documents",
+  "description": "The Leysco100 marketing Documents Package",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Berean Kibet",
+      "email": "bereankibet@gmail.com"
+    }
+  ],
+  "require-dev": {
+    "orchestra/testbench": "^8.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "Leysco100\\MarketingDocuments\\": ""
+    }
+  }
+}
