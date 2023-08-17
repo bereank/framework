@@ -1,19 +1,16 @@
 <?php
 
-namespace App\Domains\Marketing\Models;
+namespace Leysco100\Shared\Models\MarketingDocuments\Models;
 
-use App\Domains\Administration\Models\OSLP;
-use App\Domains\Administration\Models\OUDP;
-use App\Domains\Administration\Models\User;
-use App\Domains\BusinessPartner\Models\OBPL;
-use App\Domains\BusinessPartner\Models\OCRD;
-use App\Domains\HumanResourse\Models\OHEM;
-use App\Domains\InventoryAndProduction\Models\OLCT;
-use App\Domains\Shared\Models\APDI;
+
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\Administration\Models\User;
+use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class ORDR extends Model
 {
+    use UsesTenantConnection;
     protected $guarded = ['id'];
     protected $table = 'o_r_d_r_s';
 

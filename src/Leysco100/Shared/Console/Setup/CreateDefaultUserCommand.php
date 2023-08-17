@@ -28,11 +28,11 @@ class CreateDefaultUserCommand extends Command
     public function handle()
     {
 
-        User::create([
-
-            'name' => 'Administrator',
+        User::firstOrCreate([
             'email' => 'manager@leysco100.com',
+        ],[
             'account' => 'manager',
+            'name' => 'Administrator',
             'DfltsGroup' => 1,
             'SUPERUSER' => 1,
             'gate_id' => 1,
