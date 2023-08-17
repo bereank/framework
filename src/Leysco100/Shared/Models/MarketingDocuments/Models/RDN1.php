@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\Marketing\Models;
+namespace Leysco100\Shared\Models\MarketingDocuments\Models;
 
 use App\Domains\Administration\Models\TaxGroup;
 use App\Domains\InventoryAndProduction\Models\OITM;

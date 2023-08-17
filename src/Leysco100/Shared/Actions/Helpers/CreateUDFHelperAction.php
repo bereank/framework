@@ -32,7 +32,32 @@ class CreateUDFHelperAction
             if ($this->checkIfColumnExist($this->tableName, $this->fieldName)) {
                 return true;
             }
+
+            if ($this->fieldType =='string') {
             $table->string($this->fieldName,$this->fieldSize)->comment($this->fieldDescription);
+
+            }
+
+            if ($this->fieldType =='integer') {
+            $table->integer($this->fieldName)->comment($this->fieldDescription);
+
+            }
+
+            if ($this->fieldType =='decimal') {
+            $table->decimal($this->fieldName,$this->fieldSize,3)->comment($this->fieldDescription);
+
+            }
+
+            if ($this->fieldType =='date') {
+                $table->date($this->fieldName)->comment($this->fieldDescription);
+    
+            }
+
+            
+            if ($this->fieldType =='timestamp') {
+                $table->timestamp($this->fieldName)->comment($this->fieldDescription);
+    
+            }
         });
     }
 
