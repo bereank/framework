@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
 use Leysco100\Gpm\Services\DocumentsService;
+use Leysco100\Shared\Actions\Helpers\HideTableRowsFieldsPerDocumentAction;
+use Leysco100\Shared\Models\Administration\Models\OUDP;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Http\Controllers\Controller;
 use Leysco100\Shared\Models\FormSetting\Models\FI100;
@@ -65,7 +67,7 @@ class FormSettingsController extends Controller
 
             $tableRows = FTR100::where('TabID', $value->id)->get();
             foreach ($tableRows as $key => $tableRow) {
-                $tableRow = (new DocumentsService())->hideTableRowsFieldsPerDocument($ObjType, $tableRow);
+                $tableRow = (new HideTableRowsFieldsPerDocumentAction($ObjType, $tableRow))->handle();
             }
             $value->tableRows = $tableRows;
             $value->tableRowsModalVisible = FTR100::where('TabID', $value->id)
@@ -107,10 +109,10 @@ class FormSettingsController extends Controller
          * Check if Service Call
          */
 
-        $serviceCallOrigins = [];
-        if ($ObjType) {
-            $serviceCallOrigins = OSCO::where('Locked', 'N')->get();
-        }
+//        $serviceCallOrigins = [];
+//        if ($ObjType) {
+//            $serviceCallOrigins = OSCO::where('Locked', 'N')->get();
+//        }
 
         return response()->json([
             'FormName' => $form->DocumentName,
@@ -123,7 +125,7 @@ class FormSettingsController extends Controller
             'users' => User::where('type', 'NU')->with('oudg.branch')->get(),
             'departments' => OUDP::get(),
             'DefaultBPLId' => Auth::user()->oudg->BPLId, // Default Branch
-            'serviceCallOrigins' => $serviceCallOrigins,
+//            'serviceCallOrigins' => $serviceCallOrigins,
         ]);
     }
 

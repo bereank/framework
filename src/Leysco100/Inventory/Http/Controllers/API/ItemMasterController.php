@@ -2,26 +2,16 @@
 
 namespace Leysco100\Inventory\Http\Controllers\API;
 
-use App\Domains\Administration\Models\ITG1;
-use App\Domains\Administration\Models\NNM1;
-use App\Domains\InventoryAndProduction\Models\OITG;
-use App\Domains\InventoryAndProduction\Models\OITM;
-use App\Domains\InventoryAndProduction\Models\OITW;
-use App\Domains\InventoryAndProduction\Models\OSRN;
-use App\Domains\InventoryAndProduction\Models\OSRQ;
-use App\Domains\InventoryAndProduction\Models\OWHS;
-use App\Domains\Shared\Services\ApiResponseService;
-use App\Http\Controllers\API\Sales\PriceCalculationController;
-use App\Http\Controllers\Controller;
-use App\Jobs\NumberingSeries;
-use App\Models\ITM15;
-use App\Services\AuthorizationService;
-use App\Services\InventoryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Leysco\LS100SharedPackage\Models\Domains\Administration\Models\OADM;
+use Leysco100\Inventory\Http\Controllers\Controller;
+use Leysco100\MarketingDocuments\Http\Controllers\API\PriceCalculationController;
+use Leysco100\Shared\Models\Administration\Models\OADM;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OITW;
+use Leysco100\Shared\Services\ApiResponseService;
 
 class ItemMasterController extends Controller
 {
@@ -32,7 +22,7 @@ class ItemMasterController extends Controller
      */
     public function index()
     {
-        (new AuthorizationService())->checkIfAuthorize(3, 'read');
+//        (new AuthorizationService())->checkIfAuthorize(3, 'read');
         try {
             $search = \Request::get('f');
 
@@ -491,7 +481,7 @@ class ItemMasterController extends Controller
 //                ->where('ItemCode', $ItemCode)
 //                ->first()->toArray();
             //get default price
-        $data= PriceCalculationController::fetchItemDefaultPrice($request->all());
+        $data = PriceCalculationController::fetchItemDefaultPrice($request->all());
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());

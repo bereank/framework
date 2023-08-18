@@ -17,6 +17,7 @@ class OCRD extends Model
 {
 
     use UsesTenantConnection;
+
     protected $guarded = ['id'];
     protected $table = 'o_c_r_d_s';
 

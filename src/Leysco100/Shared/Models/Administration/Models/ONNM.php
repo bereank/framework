@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Models\Administration\Models\NNM1;
 use Leysco100\Shared\Models\Administration\Models\NNM2;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class ONNM extends Model
 {
+    use UsesTenantConnection;
     //numbering series
     protected $guarded = ['id'];
     protected $table = 'o_n_n_m_s';

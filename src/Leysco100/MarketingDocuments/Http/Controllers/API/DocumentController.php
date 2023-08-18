@@ -2,14 +2,19 @@
 
 namespace Leysco100\MarketingDocuments\Http\Controllers\API;
 
-use App\Models\OSCL;
-
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Artisan;
+use Leysco100\Gpm\Services\DocumentsService;
+use Leysco100\Shared\Models\Administration\Models\OADM;
+use Leysco100\Shared\Models\Administration\Models\User;
+use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
+use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OITW;
+use Leysco100\Shared\Models\MarketingDocuments\Services\GeneralDocumentValidationService;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
@@ -390,7 +395,7 @@ class DocumentController extends Controller
             'ObjType' => 'required',
         ]);
 
-        (new GeneralDocumentValidationSerivce())->documentHeaderValidation($request);
+//        (new GeneralDocumentValidationService())->documentHeaderValidation($request);
 
         //Necessary Validations
 
@@ -441,7 +446,7 @@ class DocumentController extends Controller
         /**
          * Check If Authorized
          */
-        (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'write');
+//        (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'write');
 
         //If Base Type Exist
         if ($request['BaseType'] && $request['BaseEntry']) {
@@ -840,10 +845,9 @@ class DocumentController extends Controller
                 (new ServiceCallService())->mapServiceCallWithExpenseDocument($objectTypePassedToTns, $newDoc->id, $request['serviceCallId']);
             }
 
-            //            dd($saveToDraft);
-            if ($saveToDraft == false) {
-                (new TransactionInventoryEffectAction())->transactionInventoryEffect($ObjType, $newDoc->id);
-            }
+//            if ($saveToDraft == false) {
+//                (new TransactionInventoryEffectAction())->transactionInventoryEffect($ObjType, $newDoc->id);
+//            }
             DB::commit();
 //            $documentForDirecPostingToSAP = (new DocumentsService())->getDocumentForDirectPostingToSAP($newDoc->ObjType, $newDoc->id);
 //            $newDoc->documentForDirecPostingToSAP = $documentForDirecPostingToSAP;

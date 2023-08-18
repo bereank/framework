@@ -1,23 +1,18 @@
 <?php
 
-namespace App\Domains\Marketing\Services;
+namespace Leysco100\Shared\Models\MarketingDocuments\Services;
 
-use App\Actions\StoredProcedureExternalMethodsAction;
-use App\Domains\BusinessPartner\Models\OCRD;
-use App\Domains\InventoryAndProduction\Models\OITM;
-use App\Domains\Shared\Models\APDI;
-use App\Domains\Shared\Services\ApiResponseService;
-use App\Domains\Shared\Services\CommonService;
-use App\Services\DocumentsService;
 use App\Services\Shared\DatabaseValidationServices;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
+use Leysco100\Shared\Services\ApiResponseService;
 use function Composer\Autoload\includeFile;
 
 /**
  * Purchase and Marketing Document Validation Service
  */
-class GeneralDocumentValidationSerivce
+class GeneralDocumentValidationService
 {
     /**
      *  Entry Point for Document Validation
