@@ -4,6 +4,7 @@ namespace Leysco100\Shared\Models\Administration\Models;
 
 use Laravel\Sanctum\HasApiTokens;
 
+use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 

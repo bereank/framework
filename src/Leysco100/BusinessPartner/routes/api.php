@@ -21,4 +21,3 @@ Route::get('customer/{CustomerID}/{ObjType}', [BusinessPartnerController::class,
 Route::get('customer/{CustomerID}/{ObjType}/{DocStatus}', [BusinessPartnerController::class, 'getCustomerDocumentsStatus']);
 Route::apiResources(['bp_masterdata' => BusinessPartnerController::class]);
 Route::apiResources(['dealer_masterdata' => DealerController::class]);
-    

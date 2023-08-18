@@ -2,6 +2,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Leysco100\MarketingDocuments\Http\Controllers\API\DocModelController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DocumentController;
 
 
@@ -12,7 +13,7 @@ use Leysco100\MarketingDocuments\Http\Controllers\API\DocumentController;
     |
      */
     // Route::get('pending_recur_trans', [RecurringTransactionsTempController::class, 'pendingTransactions']);
-    // Route::post('documents', [DocumentController::class, 'store']);
+     Route::post('documents', [DocumentController::class, 'store']);
     // Route::put('documents', [DocumentController::class, 'updateSingleDocument']);
     // Route::put('attachments', [DocumentController::class, 'upload']);
     Route::post('documents/{ObjType}', [DocumentController::class, 'getDocData']);
@@ -30,7 +31,7 @@ use Leysco100\MarketingDocuments\Http\Controllers\API\DocumentController;
     // Route::post('form_settings_menu/{ID}', [FormSettingsController::class, 'updateSingleMenu']);
     // Route::get('form_settings_menu/user/{ID}', [FormSettingsController::class, 'getUserMenuSettings']);
     // Route::apiResources(['drafts' => DraftController::class]);
-    // Route::apiResources(['doc_model' => DocModelController::class]);
+     Route::apiResources(['doc_model' => DocModelController::class]);
     // Route::apiResources(['blanketagreement' => BlanketAgreementController::class]);
     // Route::apiResources(['recurringtransactiontemplates' => RecurringTransactionsTempController::class]);
     // //Mpesa Callback

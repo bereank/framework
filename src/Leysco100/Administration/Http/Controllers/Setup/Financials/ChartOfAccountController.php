@@ -36,17 +36,17 @@ class ChartOfAccountController extends Controller
     {
         $type = \Request::get('type');
 
-        if ($type) {
-            if ($type == "Revenue") {
-                $accounts = DB::select('call REVENUE_ACCOUNTS()');
-                return $accounts;
-            }
-
-            if ($type == "Checks") {
-                $accounts = DB::select('call CHECKS_ACCOUNTS()');
-                return $accounts;
-            }
-        }
+//        if ($type) {
+//            if ($type == "Revenue") {
+//                $accounts = DB::select('call REVENUE_ACCOUNTS()');
+//                return $accounts;
+//            }
+//
+//            if ($type == "Checks") {
+//                $accounts = DB::select('call CHECKS_ACCOUNTS()');
+//                return $accounts;
+//            }
+//        }
 
         return ChartOfAccount::select('id', 'AcctCode', 'Postable', 'AcctName', 'Finanse')
             ->where('Frozen', 'N')

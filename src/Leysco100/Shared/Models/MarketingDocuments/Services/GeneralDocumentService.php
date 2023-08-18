@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Domains\Marketing\Services;
+namespace Leysco100\Shared\Models\MarketingDocuments\Services;
+
 
 use App\Domains\InventoryAndProduction\Models\SRI1;
-use App\Domains\Shared\Models\APDI;
+use Leysco100\Shared\Models\Shared\Models\APDI;
 
 /**
  * Purchase and Marketing Document Shared Service
  */
-class GeneralDocumentSerivce
+class GeneralDocumentService
 {
     /**
      * Get Serial Numbers For specific Object and Row
