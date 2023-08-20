@@ -26,10 +26,7 @@ use Leysco100\Administration\Http\Controllers\Setup\BusinessPartners\CountryCont
 use Leysco100\Administration\Http\Controllers\Setup\Financials\ChartOfAccountController;
 use Leysco100\Administration\Http\Controllers\Setup\BusinessPartners\BPPropertiesController;
 use Leysco100\Administration\Http\Controllers\Setup\Financials\GLDetermination\GLAccountDeterminationController;
-
-
-
-
+use Leysco100\Administration\Http\Controllers\SystemInit\Authorization\PermissionController;
 
 
 Route::get('activeGLaccounts', [ChartOfAccountController::class, 'fetchActiveAccounts']);
@@ -53,7 +50,7 @@ Route::get('taxgroups/{Type}', [TaxGroupController::class, 'TaxGroupType']);
 // //Inventory
 // Route::post('itemsproperty_desc', [ItemPropertyController::class, 'itemDesc']);
 // // Permission
-// Route::get('authorization/check-if-permitted/{ObjectCode}', [PermissionController::class, 'checkIfCurrentUserIsPermitted']);
+ Route::get('authorization/check-if-permitted/{ObjectCode}', [PermissionController::class, 'checkIfCurrentUserIsPermitted']);
 // Route::post('authorization/assign-permission-to-user', [PermissionController::class, 'assignPermissionToUser']);
 // Route::post('authorization/assign-permission-to-role', [PermissionController::class, 'assignPermissionToRole']);
 // Route::get('users/{userID}/{ObjectType}', [UserController::class, 'fetchGroupPermission']);

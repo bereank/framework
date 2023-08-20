@@ -2,6 +2,11 @@
 
 namespace Leysco100\MarketingDocuments\Http\Controllers\API;
 
+use App\Domains\Banking\Models\RCT2;
+use App\Domains\InventoryAndProduction\Models\OSRN;
+use App\Domains\InventoryAndProduction\Models\SRI1;
+use App\Domains\Marketing\Models\OWDD;
+use App\Domains\Marketing\Models\WDD1;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -193,7 +198,7 @@ class DocumentController extends Controller
         $DocumentTables = APDI::with('pdi1')
             ->where('ObjectID', $ObjType)
             ->first();
-        (new AuthorizationService())->checkIfAuthorize($DocumentTables->id, 'view');
+//        (new AuthorizationService())->checkIfAuthorize($DocumentTables->id, 'view');
 
 //        $data = $DocumentTables->ObjectHeaderTable::with('objecttype', 'department', 'document_lines.taxgroup', 'branch', 'CreatedBy', 'location')
 //            ->where('id', $DocEntry)
@@ -243,12 +248,12 @@ class DocumentController extends Controller
                 /**
                  * Get Base Row ID
                  */
-                $baseRow = (new GeneralDocumentSerivce())
+                $baseRow = (new GeneralDocumentService())
                     ->getBaseLineDetails($row->BaseType, $row->BaseEntry, $row->BaseLine);
                 /**
                  * Get Base Details
                  */
-                $baseSerialNumbers = (new GeneralDocumentSerivce())
+                $baseSerialNumbers = (new GeneralDocumentService())
                     ->getDocumentLinesSerialNumbers($row->BaseType, $row->BaseEntry, $baseRow->id);
 
                 //                $serialNumbers = $serialNumbers->merge($baseSerialNumbers);
@@ -831,7 +836,7 @@ class DocumentController extends Controller
             /**
              * Compare the Document To BaseDocument
              */
-            (new GeneralDocumentSerivce())->comporeRowToBaseRow($TargetTables->ObjectID, $newDoc->id);
+            (new GeneralDocumentService())->comporeRowToBaseRow($TargetTables->ObjectID, $newDoc->id);
 
             $newDoc->newObjType = $objectTypePassedToTns;
 
@@ -1270,7 +1275,7 @@ class DocumentController extends Controller
             /**
              * Compare the Document To BaseDocument
              */
-            //   (new GeneralDocumentSerivce())->comporeRowToBaseRow($DocumentTables->ObjectID, $data->id);
+            //   (new GeneralDocumentService())->comporeRowToBaseRow($DocumentTables->ObjectID, $data->id);
 
             DB::commit();
             return (new ApiResponseService())->apiSuccessResponseService($data);
@@ -1646,7 +1651,7 @@ class DocumentController extends Controller
             /**
              * Compare the Document To BaseDocument
              */
-            //   (new GeneralDocumentSerivce())->comporeRowToBaseRow($DocumentTables->ObjectID, $data->id);
+            //   (new GeneralDocumentService())->comporeRowToBaseRow($DocumentTables->ObjectID, $data->id);
 
             DB::commit();
             return (new ApiResponseService())->apiSuccessResponseService($data);

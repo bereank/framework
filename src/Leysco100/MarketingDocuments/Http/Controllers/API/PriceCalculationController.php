@@ -182,10 +182,10 @@ class PriceCalculationController extends Controller
              /*  If Purchase Request Service
              */
             if ($ObjType == 205) {
-                $ITEM = DB::table('o_i_t_m_s')
+                $ITEM = DB::connection("tenant")->table('o_i_t_m_s')
                     ->select('id', 'ItemName', 'ItemCode', 'INUoMEntry', 'SUoMEntry', 'PUoMEntry', 'UgpEntry', 'VatGourpSa', 'VatGroupPu', 'ManSerNum', 'QryGroup61','PriceUnit')
                     ->where('ItemCode', $request['ItemCode'])->first()->toArray();
-                $itm1 = DB::table('i_t_m1_s')->where('ItemCode', $request['ItemCode'])->select('Price')
+                $itm1 = DB::connection("tenant")->table('i_t_m1_s')->where('ItemCode', $request['ItemCode'])->select('Price')
                     ->first();
                 //$details = [
                  //   'FINALSALESPRICE' => $itm1 ? $itm1->Price : 0,
@@ -198,7 +198,7 @@ class PriceCalculationController extends Controller
              * For Good Receipt,Good Issue and Inventory Transfer
              */
             if ($ObjType == 59 || $ObjType == 60 || $ObjType == 66 || $ObjType == 67) {
-                $ITEM = DB::table('o_i_t_m_s')
+                $ITEM = DB::connection("tenant")->table('o_i_t_m_s')
                     ->select('id', 'ItemName', 'ItemCode', 'INUoMEntry', 'SUoMEntry', 'PUoMEntry', 'UgpEntry', 'VatGourpSa', 'VatGroupPu', 'ManSerNum', 'QryGroup61','PriceUnit')
                     ->where('ItemCode',$request['ItemCode'])->first();
                 /*$details = [
@@ -218,11 +218,11 @@ class PriceCalculationController extends Controller
                 return "Customer is required";
             }
 
-            $bpPriceList = DB::table('o_c_r_d_s')->where('CardCode', $request['CardCode'])->value('ListNum');
+            $bpPriceList = DB::connection("tenant")->table('o_c_r_d_s')->where('CardCode', $request['CardCode'])->value('ListNum');
             if (!$bpPriceList) {
                 return "Customer does not have pricelist";
             }
-            $priceList = DB::table('o_p_l_n_s')->where('id', $bpPriceList)->select('isGrossPrc','id','ExtRef')->first();
+            $priceList = DB::connection("tenant")->table('o_p_l_n_s')->where('id', $bpPriceList)->select('isGrossPrc','id','ExtRef')->first();
 
             $priceIsGross = false;
 
@@ -231,7 +231,7 @@ class PriceCalculationController extends Controller
 
 
             //Getting UNITCONVERTEDTOBASEUOMu
-            $ITEM =DB::table('o_i_t_m_s')
+            $ITEM =DB::connection("tenant")->table('o_i_t_m_s')
                ->leftJoin('u_g_p1_s AS u_g_p1prcngunit', function ($join) use($request) {
                     ///$join->on('o_i_t_m_s.ItemCode', '=',DB::raw("'".$ItemCode."'"));
                     $join->where('ItemCode', $request['ItemCode']);
@@ -280,7 +280,7 @@ class PriceCalculationController extends Controller
             }
 
             //Getting Current Price and Curreny
-            $ITM1_DATA = DB::table('i_t_m1_s')->select('Price', 'Currency')
+            $ITM1_DATA = DB::connection("tenant")->table('i_t_m1_s')->select('Price', 'Currency')
                 ->where('ItemCode', $request['ItemCode'])
                 ->where('PriceList', $priceList->ExtRef)
                 ->first();
@@ -292,7 +292,7 @@ class PriceCalculationController extends Controller
                     'ItemDimensionDfts' => $itemDefaultDimmension->getdefiniteItemDefaultsDimensions( $request['ItemCode'],$ITEM->QryGroup61),
                 ];*/
                 $ITEMDATA['FINALSALESPRICE']=0;
-                $ITEMDATA['oitw']= DB::table('o_i_t_w_s')->where('ItemCode',  $request['ItemCode'])->selectRaw('id,WhsCode,ItemCode,OnHand,OnOrder,IsCommited,AvgPrice')->get();
+                $ITEMDATA['oitw']= DB::connection("tenant")->table('o_i_t_w_s')->where('ItemCode',  $request['ItemCode'])->selectRaw('id,WhsCode,ItemCode,OnHand,OnOrder,IsCommited,AvgPrice')->get();
                 if($request['type'])
                 if(!(strtolower($request['type'])=='pricedata'))
                 $ITEMDATA['ItemDimensionDfts']=$itemDefaultDimmension->getdefiniteItemDefaultsDimensions( $request['ItemCode'],$ITEM->QryGroup61);;
@@ -303,7 +303,7 @@ class PriceCalculationController extends Controller
              * Check IF there is a price in ITM9
              */
 
-            $itm9 =  DB::table('i_t_m9_s')->where('ItemCode', $ITEM->ItemCode)
+            $itm9 =  DB::connection("tenant")->table('i_t_m9_s')->where('ItemCode', $ITEM->ItemCode)
                 ->select('Price')
                 ->where('UomEntry', $ITEM->SUoMEntry)
                 ->where('PriceList', $bpPriceList)
@@ -317,7 +317,7 @@ class PriceCalculationController extends Controller
                 ];*/
 
                 $ITEMDATA['FINALSALESPRICE']=$priceIsGross ? $itm9->Price / $taxRate : $itm9->Price;
-                $ITEMDATA['oitw']= DB::table('o_i_t_w_s')->where('ItemCode',  $request['ItemCode'])->selectRaw('id,WhsCode,ItemCode,OnHand,OnOrder,IsCommited,AvgPrice')->get();
+                $ITEMDATA['oitw']= DB::connection("tenant")->table('o_i_t_w_s')->where('ItemCode',  $request['ItemCode'])->selectRaw('id,WhsCode,ItemCode,OnHand,OnOrder,IsCommited,AvgPrice')->get();
                 if($request['type'])
                 if(!(strtolower($request['type'])=='pricedata'))
                 $ITEMDATA['ItemDimensionDfts']=$itemDefaultDimmension->getdefiniteItemDefaultsDimensions( $request['ItemCode'],$ITEM->QryGroup61);;
@@ -350,7 +350,7 @@ class PriceCalculationController extends Controller
                 $ITEMDATA['PRICEPERPRICEUNIT'] = $PRICEPERPRICEUNIT;
                 $ITEMDATA['PRICINGCURRENCY'] = $PRICINGCURRENCY;
                 $ITEMDATA['U_AllowDisc'] = $ITEM->QryGroup61 == "Y" ? "N" : "Y";;
-                $ITEMDATA["oitw"] = DB::table('o_i_t_w_s')->where('ItemCode', $ITEM->ItemCode)->selectRaw('id,WhsCode,ItemCode,OnHand,OnOrder,IsCommited,AvgPrice')->get();
+                $ITEMDATA["oitw"] = DB::connection("tenant")->table('o_i_t_w_s')->where('ItemCode', $ITEM->ItemCode)->selectRaw('id,WhsCode,ItemCode,OnHand,OnOrder,IsCommited,AvgPrice')->get();
                 $ITEMDATA['FINALSALESPRICE'] = $priceIsGross ? $FINALSALESPRICE / $taxRate : $FINALSALESPRICE;
 
                 if($request['type'])

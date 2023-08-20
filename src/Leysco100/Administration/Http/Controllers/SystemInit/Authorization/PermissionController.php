@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\SystemInit\Authorization;
+namespace Leysco100\Administration\Http\Controllers\SystemInit\Authorization;
 
-use App\Domains\Administration\Models\User;
-use App\Domains\Shared\Models\APDI;
-use App\Domains\Shared\Services\ApiResponseService;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Leysco100\Administration\Http\Controllers\Controller;
+use Leysco100\Shared\Models\Shared\Models\APDI;
+use Leysco100\Shared\Services\ApiResponseService;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -181,31 +180,31 @@ class PermissionController extends Controller
                 return (new ApiResponseService())->apiFailedResponseService("Document Not Found");
             }
 
-            $docPermissions = Permission::select('name')
-                ->where('apdi_id', $document->id)
-                ->first();
-            if (!$docPermissions) {
-                return (new ApiResponseService())->apiFailedResponseService("Permissions Not Found");
-            }
+//            $docPermissions = Permission::select('name')
+//                ->where('apdi_id', $document->id)
+//                ->first();
+//            if (!$docPermissions) {
+//                return (new ApiResponseService())->apiFailedResponseService("Permissions Not Found");
+//            }
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
 
         // return $user->roles;
 
-        $read = Permission::select('name')
-            ->where('apdi_id', $document->id)
-            ->where('Label', 'read')
-            ->first();
-
-        $write = Permission::select('name')
-            ->where('apdi_id', $document->id)
-            ->where('Label', 'write')
-            ->first();
-        $update = Permission::select('name')
-            ->where('apdi_id', $document->id)
-            ->where('Label', 'update')
-            ->first();
+//        $read = Permission::select('name')
+//            ->where('apdi_id', $document->id)
+//            ->where('Label', 'read')
+//            ->first();
+//
+//        $write = Permission::select('name')
+//            ->where('apdi_id', $document->id)
+//            ->where('Label', 'write')
+//            ->first();
+//        $update = Permission::select('name')
+//            ->where('apdi_id', $document->id)
+//            ->where('Label', 'update')
+//            ->first();
         $document->read = true;
         $document->write = true;
         $document->update = true;

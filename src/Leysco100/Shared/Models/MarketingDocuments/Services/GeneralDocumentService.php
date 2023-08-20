@@ -58,7 +58,7 @@ class GeneralDocumentService
         $totalNotSimilarRows = count($allRowData);
         foreach ($allRowData as $key => $rowData) {
             if (!is_null($rowData->BaseLine)) {
-                $baseRowData = (new GeneralDocumentSerivce())
+                $baseRowData = (new GeneralDocumentService())
                     ->getBaseLineDetails($rowData->BaseType, $rowData->BaseEntry, $rowData->BaseLine);
 
                 if ($baseRowData) {
