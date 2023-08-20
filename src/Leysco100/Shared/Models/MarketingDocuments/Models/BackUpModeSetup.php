@@ -1,6 +1,6 @@
 <?php
 
-namespace Leysco100\Shared\Models\Marketing\Models;
+namespace Leysco100\Shared\Models\MarketingDocuments\Models;
 
 
 use Illuminate\Foundation\Auth\User;
@@ -10,7 +10,7 @@ use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class BackUpModeSetup extends Model
 {
-    use HasFactory,UsesTenantConnection;
+    use HasFactory, UsesTenantConnection;
     protected $guarded = [];
     // protected $fillable = ['id'];
     public function creator()

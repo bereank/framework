@@ -1,6 +1,6 @@
 <?php
 
-namespace Leysco100\Shared\Models\Marketing\Models;
+namespace Leysco100\Shared\Models\MarketingDocuments\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,7 +11,7 @@ use Leysco\LS100SharedPackage\Models\Domains\Marketing\Models\GPMGate;
 
 class BackUpModeEntries extends Model
 {
-    use HasFactory,UsesTenantConnection;
+    use HasFactory, UsesTenantConnection;
 
     protected $guarded = [];
     protected $appends = array('status', 'release');

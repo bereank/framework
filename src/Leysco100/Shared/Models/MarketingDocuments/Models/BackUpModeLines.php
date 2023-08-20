@@ -1,6 +1,6 @@
 <?php
 
-namespace Leysco100\Shared\Models\Marketing\Models;
+namespace Leysco100\Shared\Models\MarketingDocuments\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Leysco100\Shared\Models\Shared\Models\APDI;
@@ -13,7 +13,7 @@ use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class BackUpModeLines extends Model
 {
-    use HasFactory,UsesTenantConnection;
+    use HasFactory, UsesTenantConnection;
 
     protected $guarded = [];
     protected $appends = array('status', 'release');

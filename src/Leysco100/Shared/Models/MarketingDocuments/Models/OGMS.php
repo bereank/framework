@@ -1,6 +1,6 @@
 <?php
 
-namespace Leysco100\Shared\Models\Marketing\Models;
+namespace Leysco100\Shared\Models\MarketingDocuments\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +13,7 @@ use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OGMS extends Model
 {
-    use HasFactory,UsesTenantConnection;
+    use HasFactory, UsesTenantConnection;
 
     protected $guarded = ['id'];
     protected $table = 'o_g_m_s';
@@ -25,7 +25,7 @@ class OGMS extends Model
         return $this->belongsTo(APDI::class, 'ObjType', 'ObjectID');
     }
 
-    public function scanlog():BelongsTo
+    public function scanlog(): BelongsTo
     {
         return $this->belongsTo(GMS1::class, 'ScanLogID');
     }

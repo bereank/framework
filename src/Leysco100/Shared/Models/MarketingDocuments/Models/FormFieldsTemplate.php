@@ -1,6 +1,6 @@
 <?php
 
-namespace Leysco100\Shared\Models\Marketing\Models;
+namespace Leysco100\Shared\Models\MarketingDocuments\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -9,7 +9,7 @@ use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class FormFieldsTemplate extends Model
 {
-    use HasFactory,UsesTenantConnection;
+    use HasFactory, UsesTenantConnection;
 
     protected $guarded = [];
 

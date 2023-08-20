@@ -1,6 +1,6 @@
 <?php
 
-namespace Leysco100\Shared\Models\Marketing\Models;
+namespace Leysco100\Shared\Models\MarketingDocuments\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
@@ -14,7 +14,7 @@ use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class GMS1 extends Model
 {
-    use HasFactory,UsesTenantConnection;
+    use HasFactory, UsesTenantConnection;
 
     protected $guarded = ['id'];
     protected $table = 'g_m_s1_s';
