@@ -1,0 +1,191 @@
+[
+  {
+    "icon": "mdi-chart-multiple",
+    "icon-alt": "mdi-chevron-down",
+    "Label": "Sales",
+    "model": true,
+    "Visible": "Y",
+    "children": [
+      {
+        "icon": "mdi-con",
+        "Label": "Blanket Agreement",
+        "link": "/sales/lease-agreement",
+        "Visible": "N",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Quotations",
+        "link": "/sales/doc/8",
+        "Visible": "N",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Sales Order",
+        "link": "/sales/doc/17",
+        "Visible": "Y",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Delivery",
+        "link": "/sales/doc/15",
+        "Visible": "Y",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Return",
+        "link": "/sales/doc/16",
+        "Visible": "N",
+        "children": []
+      },
+
+      {
+        "icon": "mdi-con",
+        "Label": "A/R Invoice",
+        "link": "/sales/doc/13",
+        "Visible": "Y",
+        "children": []
+      },
+
+      {
+        "icon": "mdi-con",
+        "Label": "A/R Credit Memo",
+        "link": "/sales/doc/14",
+        "Visible": "N",
+        "children": []
+      },
+
+      {
+        "icon": "mdi-con",
+        "Label": "A/R Downpayment Invoice",
+        "Visible": "N",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "A/R Downpyt Invoice Payment",
+        "Visible": "N",
+        "children": []
+      },
+
+      {
+        "icon": "mdi-con",
+        "Label": "A/R Invoice + Payment",
+        "link": "/sales/doc/13?withPayment=1",
+        "Visible": "Y",
+        "children": []
+      },
+
+      {
+        "icon": "mdi-con",
+        "Label": "Recurring Transaction Template",
+        "link": "/sales/recurrent-templates",
+        "Visible": "N",
+        "children": []
+      }
+    ]
+  },
+  {
+    "icon": "mdi-chart-multiple",
+    "icon-alt": "mdi-chevron-down",
+    "Label": "Purchase -A/P",
+    "model": true,
+    "Visible": "N",
+    "children": [
+      {
+        "icon": "mdi-con",
+        "Label": "Purchase Blanket Agreement",
+        "link": "/purchasing/blanket-agreement",
+        "Visible": "N",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Purchase Request",
+        "link": "/purchasing/doc/205",
+        "Visible": "Y",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Purchase Quotation",
+        "link": "/purchasing/doc/201",
+        "Visible": "N",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Purchase Order",
+        "link": "/purchasing/doc/202",
+        "Visible": "N",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Good Receipt PO",
+        "link": "/purchasing/doc/203",
+        "Visible": "N",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Goods Return Request",
+        "link": "/purchasing/doc/206",
+        "Visible": "N",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Goods Return",
+        "link": "/purchasing/doc/207",
+        "Visible": "N",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "A/P Downpayment Request",
+        "link": "/purchasing/doc/208",
+        "Visible": "N",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "A/P Downpayment Invoice",
+        "link": "/purchasing/doc/209",
+        "Visible": "N",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "A/P Invoice",
+        "link": "/purchasing/doc/204",
+        "Visible": "N",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "A/P Credit Memo",
+        "link": "/purchasing/doc/210",
+        "Visible": "N",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "A/P Reserve Invoice",
+        "link": "/purchasing/doc/204",
+        "Visible": "N",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Recurring Transaction Template",
+        "link": "/sales/recurrent-templates",
+        "Visible": "N",
+        "children": []
+      }
+    ]
+  }
+]
