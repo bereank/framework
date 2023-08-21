@@ -1,12 +1,15 @@
 <?php
 
-namespace App\Domains\SalesOportunities\Models;
+namespace Leysco100\Shared\Models\SalesOportunities\Models;
 
-use App\Domains\Finance\Models\ODIM;
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\Shared\Models\ODIM;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OOCR extends Model
 {
+    use UsesTenantConnection;
+
     protected $guarded = ['id'];
     protected $table = 'o_o_c_r_s';
 

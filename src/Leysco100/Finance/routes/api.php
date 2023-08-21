@@ -2,14 +2,15 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Leysco100\Finance\Http\Controllers\API\CostAccounting\DistributionRulesController;
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Finance MODULE
-    |--------------------------------------------------------------------------
-    |
-     */
+/*
+|--------------------------------------------------------------------------
+| Finance MODULE
+|--------------------------------------------------------------------------
+|
+ */
 Route::apiResources(['dimensions' => DimensionController::class]);
 Route::apiResources(['cost-centers' => CostCenterController::class]);
 Route::apiResources(['distribution-rules' => DistributionRulesController::class]);

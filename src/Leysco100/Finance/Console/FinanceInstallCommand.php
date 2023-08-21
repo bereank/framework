@@ -12,9 +12,9 @@ class FinanceInstallCommand extends Command
 {
 
     use TenantAware;
-    protected $signature = 'leysco100:marketing-documents:install {--tenant=*}';
+    protected $signature = 'leysco100:finance:install {--tenant=*}';
 
-    protected $description = 'Installing Marketing Documents Package';
+    protected $description = 'Installing Finance Package';
 
     public function handle()
     {
