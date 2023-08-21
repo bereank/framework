@@ -2,13 +2,12 @@
 
 namespace Leysco100\Gpm\Reports;
 
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
-use Leysco100\Shared\Models\Marketing\Models\OGMS;
+
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Leysco100\Shared\Models\MarketingDocuments\Models\OGMS;
 
 
 class DocumentReport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize
@@ -23,7 +22,8 @@ class DocumentReport implements FromCollection, WithHeadings, WithMapping, Shoul
 
 
 
-        $document_rpt = OGMS::with('scanlog.gates','objecttype')->whereDate('GenerationDateTime', $this->date)->get();
+        $document_rpt = OGMS::with('scanlog.gates', 'objecttype')
+            ->whereDate('GenerationDateTime', $this->date)->get();
 
 
         // $document_rpt = DB::connection('tenant')->table('o_g_m_s')
@@ -52,7 +52,7 @@ class DocumentReport implements FromCollection, WithHeadings, WithMapping, Shoul
         }
 
 
-   
+
         return $document_rpt;
     }
     public function headings(): array

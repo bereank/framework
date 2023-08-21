@@ -6,20 +6,26 @@ use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Spatie\Multitenancy\Jobs\TenantAware;
+use Leysco100\Gpm\Jobs\BCPNotificationJob;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Leysco100\Gpm\Services\DocumentsService;
 use Leysco100\Gpm\Services\NotificationsService;
-use Leysco100\Shared\Models\Marketing\Models\OGMS;
-use Leysco100\Shared\Models\Marketing\Models\BackUpModeEntries;
+use Leysco100\Shared\Models\Administration\Models\OADM;
+use Leysco100\Shared\Models\MarketingDocuments\Models\GMS1;
+use Leysco100\Shared\Models\MarketingDocuments\Models\OGMS;
+use Leysco100\Shared\Models\MarketingDocuments\Models\BackUpModeLines;
+use Leysco100\Shared\Models\MarketingDocuments\Models\BackUpModeSetup;
+use Leysco100\Shared\Models\MarketingDocuments\Models\AutoBCModeSettings;
 
 
 
 
-class GPMDocsSyncronizationJob  implements ShouldQueue,TenantAware
+class GPMDocsSyncronizationJob  implements ShouldQueue, TenantAware
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -39,19 +45,27 @@ class GPMDocsSyncronizationJob  implements ShouldQueue,TenantAware
      */
     public function handle()
     {
+
+        $this->autoTurnOnBcp();
+        $this->deactivateBackupProcess();
+
         DB::connection('tenant')->beginTransaction();
         try {
-            $sycedLater = BackUpModeEntries::where('SyncStatus', 0)->select('DocNum', 'ReleaseStatus', 'ObjType')->get();
+            $sycedLater = BackUpModeLines::where('SyncStatus', 0)->select('DocNum', 'ReleaseStatus', 'ObjType', 'id')->get();
             foreach ($sycedLater as  $value) {
                 // Check if the record exists
                 $recordExists = OGMS::where('ObjType', $value->ObjType)->where('ExtRefDocNum', $value->DocNum)->exists();
                 if ($recordExists) {
-                    BackUpModeEntries::where('DocNum', $value->DocNum)
+                    BackUpModeLines::where('DocNum', $value->DocNum)
+                        ->where('ObjType', $value->ObjType)
                         ->where('SyncStatus', 0)
                         ->update([
                             'SyncStatus' => 1,
                             'DocDate' => Carbon::now()
                         ]);
+                    GMS1::where('id', $value->id)->update([
+                        'Released' => 1,
+                    ]);
                     if ($value->ReleaseStatus == 0) {
                         OGMS::where('ExtRefDocNum', $value->DocNum)
                             ->where('ObjType', $value->ObjType)->update([
@@ -60,7 +74,7 @@ class GPMDocsSyncronizationJob  implements ShouldQueue,TenantAware
                     }
                     if ($value->ReleaseStatus == 1) {
                         OGMS::where('ExtRefDocNum', $value->DocNum)->where('ObjType', $value->ObjType)->update([
-                            'Status' => 2,
+                            'Status' => 3,
                         ]);
                         // Close base documents
                         $docToClose =  OGMS::where('ExtRefDocNum', $value->DocNum)
@@ -76,7 +90,151 @@ class GPMDocsSyncronizationJob  implements ShouldQueue,TenantAware
             DB::connection('tenant')->rollback();
             $subject = 'Check if doc Sync Failure';
             (new NotificationsService())->sendFailureNotification($th, $subject);
-            Log::info($th);
         }
+    }
+    public function deactivateBackupProcess()
+    {
+        $affectedRows =   BackUpModeSetup::where('activatable_type', 2)
+            ->where('Enabled', 1)->where('EndTime', '<', Carbon::now())->update([
+                'Enabled' => 0,
+            ]);
+
+
+        if ($affectedRows > 0) {
+            Log::info("manual activation end");
+            $emailString = OADM::where('id', 1)->value("NotifEmail");
+            $emails = explode(';', $emailString);
+            $id = BackUpModeSetup::where('activatable_type', 2)
+                ->where('EndTime', '<', Carbon::now())
+                ->select('id')->first();
+            $this->sendReport($id);
+            // Mail::to($emails)->send(new GPMBCPReportMail($updatedId));
+        }
+
+
+        $Duration = '';
+        $ogms = OGMS::latest()->first();
+        $settings = AutoBCModeSettings::where('Status', 1)->firstorFail();
+        $timeDiff =  $ogms->created_at->diffInMinutes(now());
+
+        if ($settings->LastSyncDurationType == 'hours') {
+            $Duration = $settings->LastSyncDuration * 60;
+        } else {
+            $Duration = $settings->LastSyncDuration;
+        }
+
+        if ($timeDiff < $Duration) {
+            Log::info("Auto activation end");
+            $active = BackUpModeSetup::where('activatable_type', 1)->latest()
+                ->where('Enabled', 1)->firstorFail();
+
+            $StrtTime = Carbon::parse($active->StartDate . ' ' . $active->StartTime);
+
+            $minutes =  $StrtTime->diffInMinutes(Carbon::now());
+
+            $affectedRows = BackUpModeSetup::where('activatable_type', 1)
+                ->latest()->where('Enabled', 1)->update([
+                    'EndTime' =>  Carbon::now()->format('Y-m-d H:i:s'),
+                    'Enabled' => 0,
+                    'Hours' => floor($minutes / 60),
+                    'Minutes' => $minutes % 60,
+                ]);
+
+            if ($affectedRows > 0) {
+                // The update was successful
+                $updatedModel  = BackUpModeSetup::where('activatable_type', 1)
+                    ->latest()
+                    ->where('Enabled', 0)
+                    ->first();
+                Log::info($updatedModel);
+                if ($updatedModel) {
+                    $updatedId =  $updatedModel->id;
+                    $recipient = OADM::where('id', 1)->value("NotifEmail");
+                    $subject = 'Auto Back up mode deactivated';
+                    $body = 'Documents started syncing';
+                    Mail::raw($body, function ($message) use ($recipient, $subject) {
+                        $message->to($recipient)->subject($subject);
+                    });
+                    $this->sendReport($updatedId);
+                }
+            }
+        }
+    }
+
+    public function autoTurnOnBcp()
+    {
+
+        $currentDateTime = Carbon::now()->format('H:i');
+
+        DB::connection('tenant')->beginTransaction();
+        try {
+            $Duration = '';
+            $ogms = OGMS::latest()->first();
+
+            $settings = AutoBCModeSettings::where('Status', 1)->where('ActiveFrom', '<=', $currentDateTime)
+                ->where('ActiveTo', '>=', $currentDateTime)->firstOrFail();
+
+            $timeDiff =  $ogms->created_at->diffInMinutes(now());
+
+            if ($settings->DurationType == 'hours') {
+                $Duration = $settings->LastSyncDuration * 60;
+            } else {
+                $Duration = $settings->LastSyncDuration;
+            }
+            $logCountQuery = GMS1::where('created_at', '>=', now()->subMinutes($Duration))
+                ->where('created_at', '<=', now())
+                ->where('Status', 1);
+
+            if ($settings->isDistinctDocs) {
+                $logCountQuery->distinct('DocNum');
+            }
+
+            $logCount = $logCountQuery->count();
+
+
+            $logCount = GMS1::whereBetween('created_at', [now()->subMinutes($Duration), now()])->where('Status', 1)->count();
+
+            if ($timeDiff >= $Duration && ($logCount > $settings->DoesNotExistCount)) {
+                if (BackUpModeSetup::where('Enabled', true)->doesntExist()) {
+                    Log::info('Before creating BackUpModeSetup record');
+                    Log::info($settings);
+                    BackUpModeSetup::create([
+                        'UserSign' => $settings->UserSign,
+                        'ObjectType' => 215,
+                        'Enabled' => 1,
+                        'activatable_type' => 1,
+                        'StartDate' => Carbon::now()->format('Y-m-d'),
+                        'StartTime' =>  Carbon::now()->format('H:i:m'),
+                        'Hours' => 00,
+                        'Type' => 1,
+                        'Minutes' => 00,
+                        'OwnerID' => $settings->UserSign,
+                        'FieldsTemplate' => $settings->FieldsTemplate,
+                    ]);
+                    $recipient = OADM::where('id', 1)->value("NotifEmail");
+                    $subject = 'Back up mode activated';
+                    $body = 'Documents not syncing for over ' . $settings->LastSyncDuration . ' ' . $settings->DurationType . ' now. ' . $logCount . ' Scan logs does-not-exist recorded. Auto backup mode Activated !!';
+                    Mail::raw($body, function ($message) use ($recipient, $subject) {
+                        $message->to($recipient)->subject($subject);
+                    });
+                }
+            }
+            DB::connection('tenant')->commit();
+        } catch (\Throwable $th) {
+            Log::info($th);
+            DB::connection('tenant')->rollback();
+        }
+    }
+    public function sendReport($id)
+    {
+        $settings = AutoBCModeSettings::where('Status', 1)->firstorFail();
+        $notifyAfter = 1;
+        if ($settings->NotifyType == 'hours') {
+            $notifyAfter  = $settings->NotifyAfter * 60;
+        } else {
+            $notifyAfter  = $settings->NotifyAfter;
+        }
+        BCPNotificationJob::dispatch($id)
+            ->delay(now()->addMinutes($notifyAfter));
     }
 }

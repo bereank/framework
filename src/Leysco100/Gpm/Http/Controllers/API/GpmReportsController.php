@@ -5,9 +5,7 @@ namespace Leysco100\Gpm\Http\Controllers\API;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
-use Leysco\Gpm\Services\ReportsService;
-use Illuminate\Support\Facades\Validator;
-
+use Leysco100\Gpm\Services\ReportsService;
 use Leysco100\Gpm\Http\Controllers\Controller;
 use Leysco100\Shared\Services\ApiResponseService;
 

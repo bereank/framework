@@ -2,15 +2,13 @@
 
 namespace Leysco100\Gpm\Mail;
 
-use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Spatie\Multitenancy\Models\Tenant;
 use Illuminate\Support\Facades\Storage;
-use PhpOffice\PhpSpreadsheet\IOFactory;
-use Leysco100\Shared\Models\Marketing\Models\GMS1;
-use Leysco100\Shared\Models\Marketing\Models\OGMS;
+use Leysco100\Shared\Models\MarketingDocuments\Models\GMS1;
+use Leysco100\Shared\Models\MarketingDocuments\Models\OGMS;
 
 
 class GPMDailyReportMail extends Mailable
@@ -81,8 +79,8 @@ class GPMDailyReportMail extends Mailable
                         'totalSuccessfulReleased' => $totalSuccessfulReleased,
                         'totalFlagged' => $totalFlagged
                 ];
-          
-                return $this->subject(Tenant::current()->name .' :: ' .$this->date  . ' - ' . "  GPM Report")
+
+                return $this->subject(Tenant::current()->name . ' :: ' . $this->date  . ' - ' . "  GPM Report")
                         ->markdown('gpm::ReportNotification')
                         ->with('date', $this->date)
                         ->attach($url)
