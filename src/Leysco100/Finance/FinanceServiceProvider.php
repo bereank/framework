@@ -4,8 +4,7 @@ namespace Leysco100\Finance;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Leysco100\BusinessPartner\Console\BusinessPartnerInstallCommand;
-
+use Leysco100\Finance\Console\FinanceInstallCommand;
 
 
 class FinanceServiceProvider extends ServiceProvider
@@ -13,7 +12,7 @@ class FinanceServiceProvider extends ServiceProvider
 
     public function register()
     {
-        $this->mergeConfigFrom(__DIR__ . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "config.php", 'marketing-documents');
+        $this->mergeConfigFrom(__DIR__ . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "config.php", 'finance');
     }
 
 
@@ -24,7 +23,7 @@ class FinanceServiceProvider extends ServiceProvider
         // Register the command if we are using the application via the CLI
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "config.php" => config_path('marketing-documents.php'),
+                __DIR__ . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "config.php" => config_path('finance.php'),
             ], 'config');
 
 

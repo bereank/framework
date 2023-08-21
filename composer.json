@@ -23,7 +23,8 @@
       "Leysco100\\Gpm\\": "src/Leysco100/Gpm",
       "Leysco100\\BusinessPartner\\": "src/Leysco100/BusinessPartner",
       "Leysco100\\Inventory\\": "src/Leysco100/Inventory",
-      "Leysco100\\MarketingDocuments\\": "src/Leysco100/MarketingDocuments"
+      "Leysco100\\MarketingDocuments\\": "src/Leysco100/MarketingDocuments",
+      "Leysco100\\Finance\\": "src/Leysco100/Finance"
     }
   },
   "config": {
