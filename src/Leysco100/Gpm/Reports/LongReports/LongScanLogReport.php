@@ -2,8 +2,6 @@
 
 namespace Leysco100\Gpm\Reports\LongReports;
 
-use Carbon\Carbon;
-
 use Leysco100\Gpm\Services\ReportsService;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithHeadings;

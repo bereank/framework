@@ -11,8 +11,8 @@ use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 class BackUpModeSetup extends Model
 {
     use HasFactory, UsesTenantConnection;
-    protected $guarded = [];
-    // protected $fillable = ['id'];
+    protected $guarded = ['id'];
+
     public function creator()
     {
         return $this->hasOne(User::class, 'id', 'UserSign');

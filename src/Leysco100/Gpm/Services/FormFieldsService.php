@@ -3,15 +3,16 @@
 namespace Leysco100\Gpm\Services;
 
 use Illuminate\Support\Facades\DB;
-use Leysco100\Shared\Models\Marketing\Models\FormFieldsTemplate;
+use Leysco100\Shared\Models\MarketingDocuments\Models\FormFieldsTemplate;
 
 
 
 class FormFieldsService
 {
 
-    public function getFormFields($mode = 0)
+    public function getFormFields()
     {
+        // if ($mode == 1) {
         $isBackupMode = (new BackupModeService())->isBackupMode();
 
         if ($isBackupMode) {
@@ -19,6 +20,10 @@ class FormFieldsService
         } else {
             $template  = FormFieldsTemplate::where('DefaultTemplate', true)->first();
         }
+        // } else {
+        //     $template  = FormFieldsTemplate::where('DefaultTemplate', true)->first();
+        // }
+
 
 
         $form_fields = DB::connection('tenant')->table('form_fields_templates')
@@ -26,7 +31,7 @@ class FormFieldsService
             ->join('form_fields', 'form_fields.id', '=', 'fields_template_rows.FormFieldId')
             ->join('form_field_types', 'form_field_types.id', '=', 'form_fields.type_id')
             ->where('form_fields_templates.id', '=', $template->id)
-            ->select('form_fields.id', 'form_fields.key', 'form_fields.indexno', 'form_fields.title', 'form_field_types.Name as type', 'form_fields.mandatory');
+            ->select('form_fields.id', 'form_fields.key', 'form_fields.indexno', 'form_fields.title', 'form_field_types.Name as type', 'form_fields.mandatory as Mandatory');
         $res = collect();
         foreach ($form_fields->get() as $field) {
             if ($field->type == "Dropdown") {

@@ -5,10 +5,10 @@ namespace Leysco100\Shared\Models\MarketingDocuments\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Leysco100\Shared\Models\Shared\Models\APDI;
-use Leysco100\Shared\Models\Marketing\Models\GMS1;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Leysco100\Shared\Models\MarketingDocuments\Models\GMS1;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OGMS extends Model
@@ -28,6 +28,11 @@ class OGMS extends Model
     public function scanlog(): BelongsTo
     {
         return $this->belongsTo(GMS1::class, 'ScanLogID');
+    }
+    public function scanlogs(): HasMany
+    {
+
+        return $this->hasMany(GMS1::class, 'id', 'ScanLogID');
     }
 
     public function getStateAttribute()

@@ -4,12 +4,13 @@ namespace Leysco100\Gpm\Services;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Leysco100\Shared\Models\MarketingDocuments\Models\GMS1;
+use Leysco100\Shared\Models\MarketingDocuments\Models\OGMS;
 
-use Leysco100\Shared\Models\Marketing\Models\GMS1;
-use Leysco100\Shared\Models\Marketing\Models\OGMS;
 
 
-class  ReportsService 
+
+class  ReportsService
 {
     public function scanLogReport($startdate, $endate,  $paginate = false, $perPage = 10)
     {
@@ -66,7 +67,8 @@ class  ReportsService
 
     public function documentReport($startdate, $endate, $paginate = false, $perPage = 10)
     {
-        $document_rpt = DB::table('o_g_m_s')
+
+        $document_rpt = DB::connection('tenant')->table('o_g_m_s')
             ->whereBetween('o_g_m_s.GenerationDateTime', [
                 $startdate,
                 $endate,
@@ -74,8 +76,15 @@ class  ReportsService
             ->leftjoin('g_m_s1_s', 'g_m_s1_s.id', '=', 'o_g_m_s.ScanLogID')
             ->join('a_p_d_i_s', 'a_p_d_i_s.ObjectID', 'o_g_m_s.ObjType')
             ->leftjoin('gates', 'gates.id', '=', 'g_m_s1_s.GateID')
-            ->select('gates.name as gate_name', 'a_p_d_i_s.DocumentName', 'g_m_s1_s.*', 'o_g_m_s.Status as state', 'o_g_m_s.ExtRefDocNum as document_number', 'o_g_m_s.GenerationDateTime as gen_time')
-            ->groupBy('o_g_m_s.ExtRefDocNum')
+            ->select(
+                'gates.name as gate_name',
+                'a_p_d_i_s.DocumentName',
+                'o_g_m_s.Status as state',
+                'o_g_m_s.ExtRefDocNum as document_number',
+                'o_g_m_s.GenerationDateTime as gen_time',
+                'g_m_s1_s.*'
+            )
+            // ->groupBy('o_g_m_s.ExtRefDocNum')
             ->orderBy('o_g_m_s.Status', 'desc');
 
 

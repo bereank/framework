@@ -5,15 +5,12 @@ namespace Leysco100\Gpm\Http\Controllers\API;
 
 
 use Illuminate\Http\Request;
-use function Pest\Laravel\get;
-
-use PhpParser\Node\NullableType;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Gpm\Http\Controllers\Controller;
 use Leysco100\Shared\Services\ApiResponseService;
-use Leysco100\Shared\Models\Marketing\Models\FieldsTemplateRows;
-use Leysco100\Shared\Models\Marketing\Models\FormFieldsTemplate;
+use Leysco100\Shared\Models\MarketingDocuments\Models\FieldsTemplateRows;
+use Leysco100\Shared\Models\MarketingDocuments\Models\FormFieldsTemplate;
 
 
 

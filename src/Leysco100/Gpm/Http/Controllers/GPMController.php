@@ -5,13 +5,12 @@ namespace Leysco100\Gpm\Http\Controllers;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Log;
+use Leysco100\Gpm\Http\Controllers\Controller;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
-use Leysco100\Shared\Models\Marketing\Models\GMS1;
-use Leysco100\Shared\Models\Marketing\Models\GMS2;
-use Leysco100\Shared\Models\Marketing\Models\OGMS;
-
-
+use Leysco100\Shared\Models\MarketingDocuments\Models\GMS1;
+use Leysco100\Shared\Models\MarketingDocuments\Models\GMS2;
+use Leysco100\Shared\Models\MarketingDocuments\Models\OGMS;
 
 class GPMController extends Controller
 {

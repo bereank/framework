@@ -8,18 +8,16 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Gpm\Jobs\SendEmailJob;
-use Leysco100\Gpm\Mail\GPMNotificationMail;
 use Leysco100\Gpm\Services\BackupModeService;
 use Leysco100\Gpm\Services\FormFieldsService;
 use Leysco100\Gpm\Http\Controllers\Controller;
-use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
-use Leysco100\Shared\Models\Marketing\Models\GMS1;
-use Leysco100\Shared\Models\Marketing\Models\GMS2;
-use Leysco100\Shared\Models\Marketing\Models\OGMS;
 use Leysco100\Shared\Models\Administration\Models\OADM;
-use Leysco100\Shared\Models\Marketing\Models\BackUpModeLines;
-use Leysco100\Shared\Models\Marketing\Models\BackUpModeSetup;
+use Leysco100\Shared\Models\MarketingDocuments\Models\GMS1;
+use Leysco100\Shared\Models\MarketingDocuments\Models\GMS2;
+use Leysco100\Shared\Models\MarketingDocuments\Models\OGMS;
+use Leysco100\Shared\Models\MarketingDocuments\Models\BackUpModeLines;
+use Leysco100\Shared\Models\MarketingDocuments\Models\BackUpModeSetup;
 
 
 class GPMMobileAPPApiController extends Controller
@@ -123,9 +121,8 @@ class GPMMobileAPPApiController extends Controller
             ];
             $newRecord = new GMS1($scanLogData);
             $newRecord->save();
-            $this->postScanLogDetails($request['fields'], $newRecord->id);
-
             DB::commit();
+            $this->postScanLogDetails($request['fields'], $newRecord->id);
         } catch (\Throwable $th) {
             DB::rollback();
 
@@ -431,13 +428,12 @@ class GPMMobileAPPApiController extends Controller
                     'resultDesc' => 'Kindly confirm the Document',
                     'BackUpMode' => 0,
                     'errors' => [
+                        'record' => "",
                         "DocumentDetails" => $singleDocument,
                     ],
-
                     'details' => [
                         'record' =>  $singleDocument,
                     ],
-
                 ],
                 200
             );
@@ -638,9 +634,7 @@ class GPMMobileAPPApiController extends Controller
     public function postScanLogDetails($attachments, $scanLogID)
     {
         try {
-            //  $scanLog = OGMS::findOrFail($request['ScanLogId']);
 
-            //$attachments = $request['attachments'];
             DB::beginTransaction();
             foreach ($attachments as $key => $val) {
                 GMS2::firstOrCreate([
@@ -652,7 +646,6 @@ class GPMMobileAPPApiController extends Controller
             }
 
             DB::commit();
-            //return (new ApiResponseService())->apiSuccessResponseService("Uploaded Successfully");
         } catch (\Throwable $th) {
 
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
@@ -660,8 +653,9 @@ class GPMMobileAPPApiController extends Controller
     }
     public function saveScanLogDetails(Request $request)
     {
+
         try {
-            $scanLog = OGMS::findOrFail($request['ScanLogId']);
+            $scanLog = GMS1::findOrFail($request['ScanLogId']);
 
             $attachments = $request['attachments'];
             DB::beginTransaction();
