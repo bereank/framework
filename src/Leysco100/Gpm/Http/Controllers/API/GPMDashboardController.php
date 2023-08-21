@@ -5,7 +5,7 @@ namespace Leysco100\Gpm\Http\Controllers\API;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Shared\Services\ApiResponseService;
-use Leysco100\Shared\Models\Marketing\Models\GMS1;
+use Leysco100\Shared\Models\MarketingDocuments\Models\GMS1;
 
 
 class GPMDashboardController

@@ -1,7 +1,6 @@
 <?php
 
-namespace App\Domains\Marketing\Models;
-
+namespace Leysco100\Shared\Models\MarketingDocuments\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Domains\Marketing\Models\ODISPASS;
@@ -11,10 +10,11 @@ use Leysco\LS100SharedPackage\Models\Domains\Administration\Models\TaxGroup;
 use Leysco\LS100SharedPackage\Models\Domains\InventoryAndProduction\Models\OITM;
 use Leysco\LS100SharedPackage\Models\Domains\InventoryAndProduction\Models\OUOM;
 use Leysco\LS100SharedPackage\Models\Domains\InventoryAndProduction\Models\SRI1;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class DISPASS1 extends Model
 {
-    use HasFactory;
+    use HasFactory, UsesTenantConnection;
     protected $guarded = ['id'];
     protected $table = 'd_i_s_p_a_s_s1_s';
 
@@ -24,7 +24,7 @@ class DISPASS1 extends Model
         return $this->belongsTo(OITM::class, 'ItemCode', 'ItemCode');
     }
 
-    public function sri1()
+    public function SerialNumbers()
     {
         return $this->hasMany(SRI1::class, 'LineNum', 'id');
     }
@@ -43,6 +43,14 @@ class DISPASS1 extends Model
     }
     public function oslp()
     {
-        return $this->belongsTo(ORLP::class, 'SlpCode', 'RlpCode');
+        return $this->belongsTo(OSLP::class, 'SlpCode', 'SlpCode');
+    }
+    public function driver()
+    {
+        return $this->belongsTo(ORLP::class, 'RlpCode', 'RlpCode');
+    }
+    public function vehicle()
+    {
+        return $this->belongsTo(Vehicle::class);
     }
 }

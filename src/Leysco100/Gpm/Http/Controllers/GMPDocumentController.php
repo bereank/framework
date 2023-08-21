@@ -2,9 +2,7 @@
 
 namespace Leysco100\Gpm\Http\Controllers;
 
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Leysco100\Gpm\Mail\GPMScanLogs;
 
 
@@ -30,33 +28,33 @@ class GMPDocumentController extends Controller
      */
     public function __invoke(Request $request)
     {
-     
+
         dispatch(new ExtDocsSyncJob($request['data']));
-
-
     }
 
-    public function export_scan_logs(){
+    public function export_scan_logs()
+    {
         Excel::store(new ExportScanLog(), 'ExportScanLogReport.xlsx');
         $emailString = OADM::where('id', 1)->value("NotifEmail");
         $emails = explode(';', $emailString);
         try {
             Mail::to($emails)->send(new GPMScanLogs());
             $response = [
-                "message"=>"Scan log Report sent to $emailString",
-                "data"=>$emailString
+                "message" => "Scan log Report sent to $emailString",
+                "data" => $emailString
             ];
             return (new ApiResponseService())->apiSuccessResponseService($response);
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             return (new ApiResponseService())->apiFailedResponseService($e);
         }
     }
 
-    public function export_sap_documents(){
+    public function export_sap_documents()
+    {
         Excel::store(new ExportSapDocuments(), 'ExportSapDocuments.xlsx');
         $emailString = OADM::where('id', 1)->value("NotifEmail");
         $emails = explode(';', $emailString);
         Mail::to($emails)->send(new GPMSapDocuments());
-        return response()->json(["message"=>"Scan log Report sent to $emailString"]);
+        return response()->json(["message" => "Scan log Report sent to $emailString"]);
     }
 }

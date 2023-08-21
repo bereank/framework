@@ -7,9 +7,9 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Shared\Services\ApiResponseService;
-use Leysco100\Shared\Models\Marketing\Models\BackUpModGates;
-use Leysco100\Shared\Models\Marketing\Models\BackUpModUsers;
-use Leysco100\Shared\Models\Marketing\Models\BackUpModeSetup;
+use Leysco100\Shared\Models\MarketingDocuments\Models\BackUpModGates;
+use Leysco100\Shared\Models\MarketingDocuments\Models\BackUpModUsers;
+use Leysco100\Shared\Models\MarketingDocuments\Models\BackUpModeSetup;
 
 
 class BackupModeProcessController

@@ -43,17 +43,75 @@
       },
       {
         "icon": "mdi-con",
-        "Label": "Reports",
-        "link": "/gpm/reports",
+        "Label": "Form Fields",
+        "link": "/gpm/form-fields",
         "Visible": "Y",
         "children": []
       },
       {
         "icon": "mdi-con",
-        "Label": "Form Fields",
-        "link": "/gpm/form-fields",
+        "Label": "Form Fields Templates",
+        "link": "/gpm/form_field_template",
         "Visible": "Y",
         "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Backup Mode",
+        "link": "",
+        "Visible": "Y",
+        "children": [
+          {
+            "icon": "mdi-con",
+            "Label": "General Setting",
+            "link": "/gpm/backup_mode/settings",
+            "Visible": "Y",
+            "children": []
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Backup Mode",
+            "link": "/gpm/backup_mode",
+            "Visible": "Y",
+            "children": []
+          }
+        ]
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Reports",
+        "link": "",
+        "Visible": "Y",
+        "children": [
+          {
+            "icon": "mdi-con",
+            "Label": "Scanlogs Report",
+            "link": "/gpm/reports/scan_logs_reports",
+            "Visible": "Y",
+            "children": []
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Dublicate logs Report",
+            "link": "/gpm/reports/dublicate_logs_reports",
+            "Visible": "Y",
+            "children": []
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Does-not Exist Report",
+            "link": "/gpm/reports/notexist_docs_reports",
+            "Visible": "Y",
+            "children": []
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Document Report",
+            "link": "/gpm/reports/document_reports",
+            "Visible": "Y",
+            "children": []
+          }
+        ]
       }
     ]
   }

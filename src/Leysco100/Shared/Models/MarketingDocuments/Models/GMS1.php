@@ -1,20 +1,20 @@
 <?php
 
-namespace Leysco100\Shared\Models\Marketing\Models;
+namespace Leysco100\Shared\Models\MarketingDocuments\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
 
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Leysco100\Shared\Models\Marketing\Models\GPMGate;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
+use Leysco100\Shared\Models\MarketingDocuments\Models\GPMGate;
 
 class GMS1 extends Model
 {
-    use HasFactory,UsesTenantConnection;
+    use HasFactory, UsesTenantConnection;
 
     protected $guarded = ['id'];
     protected $table = 'g_m_s1_s';

@@ -2,14 +2,12 @@
 
 namespace Leysco100\Gpm\Mail;
 
-use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
-use PhpOffice\PhpSpreadsheet\IOFactory;
-use Leysco100\Shared\Models\Marketing\Models\GMS1;
-use Leysco100\Shared\Models\Marketing\Models\OGMS;
+use Leysco100\Shared\Models\MarketingDocuments\Models\GMS1;
+use Leysco100\Shared\Models\MarketingDocuments\Models\OGMS;
 
 
 class GPMExportLogsMail extends Mailable

@@ -13,11 +13,11 @@ use Spatie\Multitenancy\Jobs\TenantAware;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Leysco100\Gpm\Services\NotificationsService;
-use Leysco100\Shared\Models\Marketing\Models\OGMS;
+use Leysco100\Shared\Models\MarketingDocuments\Models\OGMS;
 
 
 
-class ExtDocsSyncJob  implements ShouldQueue,TenantAware
+class ExtDocsSyncJob  implements ShouldQueue, TenantAware
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -46,7 +46,7 @@ class ExtDocsSyncJob  implements ShouldQueue,TenantAware
             foreach ($data as $key => $value) {
 
                 if (!$value['LineDetails']) {
-            
+
                     continue;
                 }
 
@@ -65,7 +65,6 @@ class ExtDocsSyncJob  implements ShouldQueue,TenantAware
                         'LineDetails' => $value['LineDetails'],
                     ]
                 );
-    
             }
             DB::connection('tenant')->commit();
         } catch (\Throwable $th) {

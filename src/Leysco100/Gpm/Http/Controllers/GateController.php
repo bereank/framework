@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Leysco100\Gpm\Http\Controllers\Controller;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
-use Leysco100\Shared\Models\Marketing\Models\GPMGate;
+use Leysco100\Shared\Models\MarketingDocuments\Models\GPMGate;
 
 
 class GateController extends Controller
@@ -23,7 +23,7 @@ class GateController extends Controller
         $TargetTables = APDI::with('pdi1')
             ->where('ObjectID', $ObjType)
             ->first();
-        
+
         try {
             $data = GPMGate::get();
             return (new ApiResponseService())->apiSuccessResponseService($data);
@@ -41,7 +41,7 @@ class GateController extends Controller
         $TargetTables = APDI::with('pdi1')
             ->where('ObjectID', $ObjType)
             ->first();
-      
+
         try {
             $data = GPMGate::create([
                 'location_id' => 1,
@@ -83,7 +83,7 @@ class GateController extends Controller
         $TargetTables = APDI::with('pdi1')
             ->where('ObjectID', $ObjType)
             ->first();
-      
+
         try {
             $gate = GPMGate::findOrFail($id);
             $gate->update([
