@@ -380,7 +380,7 @@ class CreateOADMSTable extends Migration
             $table->string('EDProcess', 1)->nullable();
             $table->string('PAC', 1)->nullable();
             $table->string('NotifAlert', 1)->nullable();
-            $table->string('NotifEmail', 1)->nullable();
+            $table->string('NotifEmail', 100)->nullable();
             $table->string('EDocUDQCat', 1)->nullable();
             $table->string('EOutputPth', 1)->nullable();
             $table->string('EDelDocFrm', 1)->nullable();
@@ -542,17 +542,14 @@ class CreateOADMSTable extends Migration
             $table->integer('copyToUnsyncDocs')->default(0);
             $table->integer('SPEnabled')->default(0);
             $table->integer('SPAOffline')->default(0);
-            $table->integer('CompanyID')->references('id')->on('companies')->nullable();
-
             $table->integer('useLocalSearch')->default(0)->comment("0=No, 1=Yes");
-            $table->integer('fetchFromLocal')->default(0)->comment("0=No, 1=Yes");
-            $table->integer('postToLocal')->default(0)->comment("0=No, 1=Yes");
-            $table->string('localUrl')->nullable();//External Erp Url
-            $table->string('TimsUrl')->nullable();//Kra device
+            $table->string('localUrl')->nullable();
 
-            $table->integer('enableGateMaximumRadiusRestriction')->default(0)->comment("0=Not Enable, 1=Enable");
-            $table->integer('gateMaximumRadius')->default(10)->comment("Allowed Radius GPM");
-
+            $table->string('ExtBucketAccessID')->nullable();
+            $table->string('ExtBucketSecretKey')->nullable();
+            $table->string('ExtBucketDestDir')->nullable();
+            $table->string('ExtBucket')->nullable();
+            $table->string('ExtBucketRegion')->nullable();
             $table->timestamps();
         });
     }
