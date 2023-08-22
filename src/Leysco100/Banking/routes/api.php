@@ -1,9 +1,8 @@
 
 <?php
+
 use Illuminate\Support\Facades\Route;
-
-
-
+use Leysco100\Administration\Http\Controllers\Inventory\WarehouseController;
 
 
 Route::get('activeGLaccounts', [ChartOfAccountController::class, 'fetchActiveAccounts']);
@@ -62,7 +61,6 @@ Route::post('territory/{TerritoryID}/{EmployeeID}', [SalesEmployeeController::cl
    Route::apiResources(['drivers' => DriverController::class]);
    Route::apiResources(['itemgroup' => ItemGroupController::class]);
    Route::apiResources(['warehousetype' => WarehouseTypeConntroller::class]);
-   Route::apiResources(['warehouse' => WarehouseController::class]);
    Route::apiResources(['shippingtype' => ShippingTypeController::class]);
    Route::apiResources(['uomgroup' => UoMGroupController::class]);
    Route::apiResources(['uom' => UoMController::class]);
