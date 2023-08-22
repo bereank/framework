@@ -4,6 +4,7 @@ namespace Leysco100\Shared\Actions\Helpers;
 
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
+use Leysco100\Shared\Models\UserDict;
 
 class CreateUDFHelperAction
 {
@@ -28,10 +29,24 @@ class CreateUDFHelperAction
 
     public function handle()
     {
-        Schema::table($this->tableName, function (Blueprint $table) {
+        Schema::connection('tenant')->table($this->tableName, function (Blueprint $table) {
+
+            UserDict::firstOrCreate([
+                'FieldName' => $this->fieldName,
+                'TableName' => $this->tableName
+            ],[
+                'FieldDescription' => $this->fieldDescription,
+                'FieldType' => $this->fieldType,
+                'ObjType' => 4,
+                'FieldSize' =>$this->fieldSize
+            ]);
+
+
             if ($this->checkIfColumnExist($this->tableName, $this->fieldName)) {
                 return true;
             }
+
+        
 
             if ($this->fieldType =='string') {
             $table->string($this->fieldName,$this->fieldSize)->comment($this->fieldDescription);
@@ -58,13 +73,24 @@ class CreateUDFHelperAction
                 $table->timestamp($this->fieldName)->comment($this->fieldDescription);
     
             }
+
+            // $table->string('FieldName');
+            // $table->string('FieldDescription')->nullable();
+            // $table->string('FieldType')->nullable();
+            // $table->string('FieldIndex')->nullable();
+            // $table->integer('ObjType');
+            // $table->string('TableName')->nullable();
+            // $table->integer('FieldSize');
+            // $table->string('DefaultValue')->nullable();
+
+       
         });
     }
 
     public function checkIfColumnExist($table, $fieldName)
     {
 
-        if (Schema::hasColumn($table, $fieldName)) {
+        if (Schema::connection('tenant')->hasColumn($table, $fieldName)) {
             return true;
         }
 
