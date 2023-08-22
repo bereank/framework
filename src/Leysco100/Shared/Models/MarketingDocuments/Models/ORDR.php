@@ -43,7 +43,7 @@ class ORDR extends Model
         return $this->hasMany(RDR1::class, 'DocEntry');
     }
 
-    public function rows()
+    public function document_lines()
     {
         return $this->hasMany(RDR1::class, 'DocEntry');
     }

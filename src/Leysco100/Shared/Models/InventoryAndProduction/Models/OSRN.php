@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\InventoryAndProduction\Models;
+namespace Leysco100\Shared\Models\InventoryAndProduction\Models;
 
 use Illuminate\Database\Eloquent\Model;
 

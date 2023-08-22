@@ -1,18 +1,22 @@
 <?php
 
-namespace App\Domains\InventoryAndProduction\Models;
+namespace Leysco100\Shared\Models\InventoryAndProduction\Models;
 
-use App\Domains\Administration\Models\OSLP;
-use App\Domains\Administration\Models\OUDP;
-use App\Domains\Administration\Models\User;
-use App\Domains\BusinessPartner\Models\OBPL;
-use App\Domains\BusinessPartner\Models\OCRD;
-use App\Domains\Marketing\Models\RDR1;
-use App\Domains\Shared\Models\APDI;
+
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\Administration\Models\OSLP;
+use Leysco100\Shared\Models\Administration\Models\OUDP;
+use Leysco100\Shared\Models\Administration\Models\User;
+use Leysco100\Shared\Models\BusinessPartner\Models\OBPL;
+use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
+use Leysco100\Shared\Models\MarketingDocuments\Models\RDR1;
+use Leysco100\Shared\Models\Shared\Models\APDI;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OWTQ extends Model
 {
+    use UsesTenantConnection;
+
     protected $guarded = ['id'];
     protected $table = 'o_w_t_q_s';
 

@@ -1,12 +1,15 @@
 <?php
 
-namespace App\Domains\InventoryAndProduction\Models;
+namespace Leysco100\Shared\Models\InventoryAndProduction\Models;
 
-use App\Domains\BusinessPartner\Models\OBPL;
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\BusinessPartner\Models\OBPL;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OWHS extends Model
 {
+    use UsesTenantConnection;
+
     protected $guarded = ['id'];
     protected $table = 'o_w_h_s_s';
     public function whs1()

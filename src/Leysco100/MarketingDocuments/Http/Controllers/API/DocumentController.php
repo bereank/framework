@@ -2,11 +2,6 @@
 
 namespace Leysco100\MarketingDocuments\Http\Controllers\API;
 
-use App\Domains\Banking\Models\RCT2;
-use App\Domains\InventoryAndProduction\Models\OSRN;
-use App\Domains\InventoryAndProduction\Models\SRI1;
-use App\Domains\Marketing\Models\OWDD;
-use App\Domains\Marketing\Models\WDD1;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -19,6 +14,10 @@ use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITW;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
+use Leysco100\Shared\Models\MarketingDocuments\Models\ATC1;
+use Leysco100\Shared\Models\MarketingDocuments\Models\OWDD;
+use Leysco100\Shared\Models\MarketingDocuments\Models\WDD1;
 use Leysco100\Shared\Models\MarketingDocuments\Services\GeneralDocumentValidationService;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Leysco100\Shared\Models\Shared\Models\APDI;
@@ -204,7 +203,7 @@ class DocumentController extends Controller
 //            ->where('id', $DocEntry)
 //            ->first();
         $data = $DocumentTables->ObjectHeaderTable::where('id', $DocEntry)
-//            ->with("document_lines.oitm")
+            ->with("document_lines.oitm")
             ->first();
 
 

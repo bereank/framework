@@ -1,12 +1,15 @@
 <?php
 
-namespace App\Domains\InventoryAndProduction\Models;
+namespace Leysco100\Shared\Models\InventoryAndProduction\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Domains\Finance\Models\ChartOfAccount;
+use Leysco100\Shared\Models\Finance\Models\ChartOfAccount;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class WHS1 extends Model
 {
+    use UsesTenantConnection;
+
     protected $guarded = ['id'];
     protected $table = 'w_h_s1_s';
 
