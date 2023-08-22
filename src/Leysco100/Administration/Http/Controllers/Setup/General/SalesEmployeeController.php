@@ -4,7 +4,10 @@ namespace Leysco100\Administration\Http\Controllers\Setup\General;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Domains\BusinessPartner\Models\OCLG;
+use Leysco100\Shared\Models\Administration\Models\OTER;
+use Leysco100\Shared\Models\BusinessPartner\Models\OCLG;
+use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
+use Leysco100\Shared\Models\MarketingDocuments\Models\ORDR;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\Administration\Models\OADM;
 use Leysco100\Shared\Models\Administration\Models\OSLP;

@@ -2,6 +2,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Leysco100\Inventory\Http\Controllers\API\MInventoryController;
 use Leysco100\Inventory\Http\Controllers\API\PriceListController;
 use Leysco100\Inventory\Http\Controllers\API\ItemMasterController;
 use Leysco100\Inventory\Http\Controllers\API\InventoryTransactionsController;
@@ -26,3 +27,6 @@ Route::apiResources(['inventory-transactions' => InventoryTransactionsController
 Route::get('inventory/report', [ItemMasterController::class, "inventory_report"]);
 Route::get('inventory/serial-numbers/reports', [ItemMasterController::class, "serials_report"]);
 //Route::apiResources(['item_properties' => ItemPropertiesController::class]);
+
+Route::get('get-my-stock', [MInventoryController::class, 'getMyStock']);
+Route::get('warehouse', [MInventoryController::class, 'getWarehouse']);

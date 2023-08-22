@@ -6,9 +6,12 @@ use App\Domains\Administration\Models\OSLP;
 use App\Domains\Administration\Models\User;
 use App\Models\CallObjective;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OCLG extends Model
 {
+    use UsesTenantConnection;
+
     protected $guarded = ['id'];
     protected $table = 'o_c_l_g_s';
 

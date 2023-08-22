@@ -4,6 +4,7 @@ namespace Leysco100\Shared\Models\Administration\Models;
 
 use Laravel\Sanctum\HasApiTokens;
 
+use Leysco100\Shared\Models\BusinessPartner\Models\OBPL;
 use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
@@ -12,7 +13,6 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Leysco100\Shared\Models\Marketing\Models\GPMGate;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Leysco100\Shared\Models\Administration\Models\OUDG;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class User extends Authenticatable
