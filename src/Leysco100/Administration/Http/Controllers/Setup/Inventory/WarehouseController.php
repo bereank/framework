@@ -1,17 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\Inventory;
+namespace Leysco100\Administration\Http\Controllers\Setup\Inventory;
 
-use App\Domains\Finance\Models\ACP10;
-use App\Domains\Finance\Models\ChartOfAccount;
-use App\Domains\InventoryAndProduction\Models\OITW;
-use App\Domains\InventoryAndProduction\Models\OWHS;
-use App\Domains\InventoryAndProduction\Models\WHS1;
-use App\Domains\Shared\Services\ApiResponseService;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Leysco100\Administration\Http\Controllers\Controller;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OWHS;
+use Leysco100\Shared\Services\ApiResponseService;
 
 class WarehouseController extends Controller
 {
