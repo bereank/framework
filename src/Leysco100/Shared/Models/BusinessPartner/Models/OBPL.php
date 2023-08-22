@@ -4,9 +4,12 @@ namespace Leysco100\Shared\Models\BusinessPartner\Models;
 
 use App\Domains\InventoryAndProduction\Models\OLCT;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OBPL extends Model
 {
+    use UsesTenantConnection;
+
     protected $guarded = ['id'];
     protected $table = 'o_b_p_l_s';
 
