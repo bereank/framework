@@ -103,3 +103,5 @@ Route::apiResources(['bank' => BankController::class]);
 Route::apiResources(['house_bank' => HouseBankController::class]);
 // Route::apiResources(['documentnumbering' => DocNumberingController::class]);
 Route::apiResources(['vehicles' => VehicleController::class]);
+
+

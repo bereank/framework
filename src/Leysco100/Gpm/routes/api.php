@@ -85,4 +85,4 @@ Route::get('doesNotExistReport', [GpmReportsController::class, 'DoesNotExistRepo
 Route::get('bcp_doc_report', [GpmReportsController::class, 'BCPDocReport']);
 Route::resource('bcm_settings', BackupModeSettingsController::class);
 Route::apiResources(['back_up_mode' => BackupModeProcessController::class]);
-Route::apiResources(['back_up_mode/gpm_documents' => GPMBackUpModeApiController::class]);
+// Route::apiResources(['back_up_mode/gpm_documents' => GPMBackUpModeApiController::class]);
