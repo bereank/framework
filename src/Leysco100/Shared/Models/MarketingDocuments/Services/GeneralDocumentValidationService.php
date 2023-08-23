@@ -5,8 +5,11 @@ namespace Leysco100\Shared\Models\MarketingDocuments\Services;
 use App\Services\Shared\DatabaseValidationServices;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Leysco100\MarketingDocuments\Actions\StoredProcedureExternalMethodsAction;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
 use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Services\CommonService;
 use function Composer\Autoload\includeFile;
 
 /**
@@ -87,12 +90,12 @@ class GeneralDocumentValidationService
                 }
             }
 
-            if (!isset($request['U_IDNo'])) {
-                (new ApiResponseService())->apiSuccessAbortProcessResponse("Customer ID No is Required");
-            }
+//            if (!isset($request['U_IDNo'])) {
+//                (new ApiResponseService())->apiSuccessAbortProcessResponse("Customer ID No is Required");
+//            }
 
             if ($request['U_IDNo']) {
-                 if (!is_numeric($request['U_IDNo']) && strtolower($request['U_IDNo']) != "n/a" && strtolower($request['U_IDNo']) != "n\a") {
+                if (!is_numeric($request['U_IDNo'])) {
                     (new ApiResponseService())->apiSuccessAbortProcessResponse("Customer ID is incorrect");
                 }
             }
@@ -214,7 +217,7 @@ class GeneralDocumentValidationService
             }
         }
 
-        if (count($request['rows']) <= 0) {
+        if (count($request['document_lines']) <= 0) {
             (new ApiResponseService())->apiSuccessAbortProcessResponse("Items is required");
         }
 
@@ -226,7 +229,7 @@ class GeneralDocumentValidationService
      */
     public function documentRowValidation($request)
     {
-        foreach ($request['rows'] as $key => $value) {
+        foreach ($request['document_lines'] as $key => $value) {
             $ItemCode = null;
             $Dscription = $value['Dscription'];
 

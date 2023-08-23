@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;
+use Leysco100\Shared\Models\Administration\Models\TaxGroup;
 
 class PriceCalculationController extends Controller
 {
@@ -373,8 +374,8 @@ class PriceCalculationController extends Controller
 //        return null;
         $item = OITM::with('oidg')->where('id', $itemID)->first();
         $oudg = Auth::user()->oudg;
-        $getOcrCode2 = DB::select('call DEPARTMENT_AUTOCOGS(?)', array($item->ItemCode));
-        $getOcrCode3 = DB::select('call PRODUCTLINE_AUTOCOGS(?)', array($item->ItemCode));
+        $getOcrCode2 = DB::connection("tenant")->select('call DEPARTMENT_AUTOCOGS(?)', array($item->ItemCode));
+        $getOcrCode3 = DB::connection("tenant")->select('call PRODUCTLINE_AUTOCOGS(?)', array($item->ItemCode));
 
         return [
             'OcrCode' => $oudg->CogsOcrCod,
@@ -390,8 +391,8 @@ class PriceCalculationController extends Controller
 //        return null;
         //$item = OITM::with('oidg')->where('id', $itemID)->select()->first();
         $oudg = Auth::user()->oudg;
-        $getOcrCode2 = DB::select('call DEPARTMENT_AUTOCOGS(?)', array($ItemCode));
-        $getOcrCode3 = DB::select('call PRODUCTLINE_AUTOCOGS(?)', array($ItemCode));
+        $getOcrCode2 = DB::connection("tenant")->select('call DEPARTMENT_AUTOCOGS(?)', array($ItemCode));
+        $getOcrCode3 = DB::connection("tenant")->select('call PRODUCTLINE_AUTOCOGS(?)', array($ItemCode));
 
         return [
             'OcrCode' => $oudg->CogsOcrCod,

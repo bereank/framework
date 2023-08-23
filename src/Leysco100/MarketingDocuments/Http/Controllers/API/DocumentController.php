@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Artisan;
-use Leysco100\Gpm\Services\DocumentsService;
+use Leysco100\MarketingDocuments\Services\DocumentsService;
 use Leysco100\Shared\Models\Administration\Models\OADM;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
@@ -399,7 +399,7 @@ class DocumentController extends Controller
             'ObjType' => 'required',
         ]);
 
-//        (new GeneralDocumentValidationService())->documentHeaderValidation($request);
+        (new GeneralDocumentValidationService())->documentHeaderValidation($request);
 
         //Necessary Validations
 
@@ -860,8 +860,8 @@ class DocumentController extends Controller
 //            dd($th);
             Log::info($th);
             DB::rollback();
-//            dd($th);
-            return (new ApiResponseService())->apiFailedResponseService("Process failed, Server Error", $newDoc);
+            return $th;
+            return (new ApiResponseService())->apiFailedResponseService("Process failed, Server Error");
         }
     }
     // saving Attachments

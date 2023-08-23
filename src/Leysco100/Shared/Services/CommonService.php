@@ -1,11 +1,11 @@
 <?php
 namespace Leysco100\Shared\Services;
 
-use App\Domains\Administration\Models\NNM1;
-use App\Domains\Administration\Models\NNM2;
-use App\Domains\Administration\Models\ONNM;
-use App\Domains\Shared\Models\APDI;
 use Illuminate\Support\Facades\Auth;
+use Leysco100\Shared\Models\Administration\Models\NNM1;
+use Leysco100\Shared\Models\Administration\Models\NNM2;
+use Leysco100\Shared\Models\Administration\Models\ONNM;
+use Leysco100\Shared\Models\Shared\Models\APDI;
 
 /**
  * Common Item Services

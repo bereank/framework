@@ -10,6 +10,7 @@ class APDI extends Model
 {
 
     use UsesTenantConnection;
+
     protected $guarded = ['id'];
     protected $table = 'a_p_d_i_s';
 

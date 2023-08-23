@@ -1,11 +1,11 @@
 <?php
 
-namespace Leysco100\Administration;
+namespace Leysco100\Banking;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 
-class AdministrationServiceProvider extends ServiceProvider
+class BankingServiceProvider extends ServiceProvider
 {
     public function register()
     {
