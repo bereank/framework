@@ -12,15 +12,16 @@ use Leysco100\Shared\Models\Administration\Models\TaxGroup;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OUOM;
-use Leysco100\Shared\Models\MarketingDocuments\Models\ODISPASS;
+use Leysco100\Shared\Models\MarketingDocuments\Models\ODELCONF;
 
-
-
-class DISPASS1 extends Model
+class DELCONF1 extends Model
 {
     use HasFactory, UsesTenantConnection;
+
     protected $guarded = ['id'];
-    protected $table = 'd_i_s_p_a_s_s1_s';
+    protected $table = 'd_e_l_c_o_n_f1';
+
+
 
     public function oitm()
     {
@@ -40,10 +41,12 @@ class DISPASS1 extends Model
         return $this->belongsTo(OUOM::class, 'UomCode');
     }
 
+
     public function ordr()
     {
-        return $this->belongsTo(ODISPASS::class, 'DocEntry');
+        return $this->belongsTo(ODELCONF::class, 'DocEntry');
     }
+
     public function oslp()
     {
         return $this->belongsTo(OSLP::class, 'SlpCode', 'SlpCode');
