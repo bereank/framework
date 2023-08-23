@@ -1,4 +1,5 @@
 <?php
 return [
-  'posts_table' => 'posts',
+  'prefix' => 'api/v1',
+  'middleware' => ['tenant','auth:sanctum'],
 ];

@@ -4,6 +4,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Leysco100\Shared\Http\Controllers\API\FormSettingsController;
+use Leysco100\Shared\Http\Controllers\API\UserDefinedFieldsController;
 use Leysco100\Administration\Http\Controllers\Setup\General\GUserController;
 use Leysco100\Administration\Http\Controllers\SystemInit\GeneralSettings\GeneralSettingsController;
 
@@ -25,5 +26,9 @@ use Leysco100\Administration\Http\Controllers\SystemInit\GeneralSettings\General
  Route::post('form_settings_menu', [FormSettingsController::class, 'updateFormSettingsMenu']);
  Route::post('form_settings_menu/{ID}', [FormSettingsController::class, 'updateSingleMenu']);
  Route::get('form_settings_menu/user/{ID}', [FormSettingsController::class, 'getUserMenuSettings']);
+
+ Route::post('create-udf', UserDefinedFieldsController::class);
+
+
  Route::apiResources(['users' => GUserController::class]);
  Route::apiResources(['general_settings' => GeneralSettingsController::class]);
