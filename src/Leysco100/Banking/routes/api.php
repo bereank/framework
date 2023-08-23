@@ -3,10 +3,10 @@
 
 use Illuminate\Support\Facades\Route;
 use Leysco100\Administration\Http\Controllers\Inventory\WarehouseController;
+use Leysco100\Administration\Http\Controllers\Setup\Financials\TaxGroupController;
 
 
 Route::get('activeGLaccounts', [ChartOfAccountController::class, 'fetchActiveAccounts']);
-Route::get('taxgroups/{Type}', [TaxGroupController::class, 'TaxGroupType']);
 Route::get('getOutletsForRegions', [TerritoryController::class, 'getOutlets']);
 Route::get('employee/territory/{TerritoryID}', [SalesEmployeeController::class, 'getForRegion']);
 Route::put('employee/set_default/{EmployeeID}', [SalesEmployeeController::class, 'setDefault']);
@@ -62,7 +62,6 @@ Route::post('territory/{TerritoryID}/{EmployeeID}', [SalesEmployeeController::cl
    Route::apiResources(['itemgroup' => ItemGroupController::class]);
    Route::apiResources(['warehousetype' => WarehouseTypeConntroller::class]);
    Route::apiResources(['shippingtype' => ShippingTypeController::class]);
-   Route::apiResources(['uomgroup' => UoMGroupController::class]);
    Route::apiResources(['uom' => UoMController::class]);
    Route::apiResources(['manufacture' => ManufactureController::class]);
    Route::apiResources(['item-defaults' => ItemDefaultController::class]);
