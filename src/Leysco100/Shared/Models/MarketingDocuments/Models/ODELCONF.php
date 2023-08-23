@@ -2,9 +2,7 @@
 
 namespace Leysco100\Shared\Models\MarketingDocuments\Models;
 
-
 use Illuminate\Database\Eloquent\Model;
-
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
@@ -20,13 +18,12 @@ use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OLCT;
 use Leysco100\Shared\Models\MarketingDocuments\Models\DELCONF1;
 
-class ODISPRET extends Model
+class ODELCONF extends Model
 {
     use HasFactory, UsesTenantConnection;
 
     protected $guarded = ['id'];
-    protected $table = 'o_d_i_s_p_r_e_t_s';
-
+    protected $table = 'o_d_e_l_c_o_n_f';
 
     public function outlet()
     {

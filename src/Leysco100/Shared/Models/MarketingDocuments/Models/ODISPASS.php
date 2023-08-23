@@ -1,23 +1,26 @@
 <?php
 
-namespace App\Domains\Marketing\Models;
+namespace Leysco100\Shared\Models\MarketingDocuments\Models;
 
-use App\Domains\Administration\Models\ORLP;
 use Illuminate\Database\Eloquent\Model;
-use App\Domains\Marketing\Models\DISPASS1;
-use App\Domains\Administration\Models\User;
+use Leysco100\Shared\Models\Shared\Models\APDI;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Leysco\LS100SharedPackage\Models\Domains\Shared\Models\APDI;
-use Leysco\LS100SharedPackage\Models\Domains\HumanResourse\Models\OHEM;
-use Leysco\LS100SharedPackage\Models\Domains\Administration\Models\OSLP;
-use Leysco\LS100SharedPackage\Models\Domains\Administration\Models\OUDP;
-use Leysco\LS100SharedPackage\Models\Domains\BusinessPartner\Models\OBPL;
-use Leysco\LS100SharedPackage\Models\Domains\BusinessPartner\Models\OCRD;
-use Leysco\LS100SharedPackage\Models\Domains\InventoryAndProduction\Models\OLCT;
+use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
+use Leysco100\Shared\Models\Administration\Models\ORLP;
+use Leysco100\Shared\Models\Administration\Models\OSLP;
+use Leysco100\Shared\Models\Administration\Models\OUDP;
+use Leysco100\Shared\Models\Administration\Models\User;
+use Leysco100\Shared\Models\BusinessPartner\Models\OBPL;
+use Leysco100\Shared\Models\BusinessPartner\Models\OCLG;
+use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
+use Leysco100\Shared\Models\Administration\Models\Vehicle;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OLCT;
+use Leysco100\Shared\Models\MarketingDocuments\Models\DELCONF1;
 
 class ODISPASS extends Model
 {
-    use HasFactory;
+    use HasFactory, UsesTenantConnection;
 
     protected $guarded = ['id'];
     protected $table = 'o_d_i_s_p_a_s_s';
@@ -31,9 +34,9 @@ class ODISPASS extends Model
     {
         return $this->belongsTo(User::class, 'UserSign');
     }
-    public function rows()
+    public function document_lines()
     {
-        return $this->hasMany(DISPASS1::class, 'DocEntry');
+        return $this->hasMany(DELCONF1::class, 'DocEntry');
     }
     public function objecttype()
     {
@@ -58,9 +61,16 @@ class ODISPASS extends Model
     }
     public function oslp()
     {
-        return $this->belongsTo(ORLP::class, 'SlpCode', 'RlpCode');
+        return $this->belongsTo(OSLP::class, 'SlpCode', 'SlpCode');
     }
-
+    public function driver()
+    {
+        return $this->belongsTo(ORLP::class, 'RlpCode', 'RlpCode');
+    }
+    public function vehicle()
+    {
+        return $this->belongsTo(Vehicle::class);
+    }
     public function ohem()
     {
         return $this->belongsTo(OHEM::class, 'OwnerCode', 'empID');
@@ -69,5 +79,14 @@ class ODISPASS extends Model
     public function ocrd()
     {
         return $this->belongsTo(OCRD::class, 'CardCode', 'CardCode');
+    }
+
+    public function call()
+    {
+        return $this->hasOne(OCLG::class, 'id', 'ClgCode');
+    }
+    public function attachments()
+    {
+        return $this->hasMany(OATC::class, 'id', 'AtcEntry');
     }
 }
