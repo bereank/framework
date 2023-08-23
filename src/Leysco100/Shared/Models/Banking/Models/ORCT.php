@@ -1,11 +1,14 @@
 <?php
 
-namespace App\Domains\Banking\Models;
+namespace Leysco100\Shared\Models\Banking\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class ORCT extends Model
 {
+    use UsesTenantConnection;
+
     protected $guarded = ['id'];
     protected $table = 'o_r_c_t_s';
 

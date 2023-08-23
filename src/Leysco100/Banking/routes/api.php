@@ -6,7 +6,6 @@ use Leysco100\Administration\Http\Controllers\Inventory\WarehouseController;
 use Leysco100\Administration\Http\Controllers\Setup\Financials\TaxGroupController;
 
 
-Route::get('activeGLaccounts', [ChartOfAccountController::class, 'fetchActiveAccounts']);
 Route::get('getOutletsForRegions', [TerritoryController::class, 'getOutlets']);
 Route::get('employee/territory/{TerritoryID}', [SalesEmployeeController::class, 'getForRegion']);
 Route::put('employee/set_default/{EmployeeID}', [SalesEmployeeController::class, 'setDefault']);
@@ -27,7 +26,7 @@ Route::post('territory/{TerritoryID}/{EmployeeID}', [SalesEmployeeController::cl
    //Inventory
    Route::post('itemsproperty_desc', [ItemPropertyController::class, 'itemDesc']);
    // Permission
-   Route::get('authorization/check-if-permitted/{ObjectCode}', [PermissionController::class, 'checkIfCurrentUserIsPermitted']);
+//   Route::get('authorization/check-if-permitted/{ObjectCode}', [PermissionController::class, 'checkIfCurrentUserIsPermitted']);
    Route::post('authorization/assign-permission-to-user', [PermissionController::class, 'assignPermissionToUser']);
    Route::post('authorization/assign-permission-to-role', [PermissionController::class, 'assignPermissionToRole']);
    Route::get('users/{userID}/{ObjectType}', [UserController::class, 'fetchGroupPermission']);
@@ -56,20 +55,17 @@ Route::post('territory/{TerritoryID}/{EmployeeID}', [SalesEmployeeController::cl
    Route::apiResources(['departments' => DepartmentController::class]);
    Route::apiResources(['territories' => TerritoryController::class]);
    Route::apiResources(['commissiongroup' => CommissionGroupController::class]);
-   Route::apiResources(['employee' => SalesEmployeeController::class]);
-   Route::apiResources(['employee-master-data' => EmployeeController::class]);
    Route::apiResources(['drivers' => DriverController::class]);
    Route::apiResources(['itemgroup' => ItemGroupController::class]);
    Route::apiResources(['warehousetype' => WarehouseTypeConntroller::class]);
    Route::apiResources(['shippingtype' => ShippingTypeController::class]);
-   Route::apiResources(['uom' => UoMController::class]);
    Route::apiResources(['manufacture' => ManufactureController::class]);
    Route::apiResources(['item-defaults' => ItemDefaultController::class]);
    Route::apiResources(['itemsproperty' => ItemPropertyController::class]);
-   Route::apiResources(['currency' => CurrencyController::class]);
+//   Route::apiResources(['currency' => CurrencyController::class]);
    Route::apiResources(['chartofaccounts' => ChartOfAccountController::class]);
    Route::apiResources(['taxgroup' => TaxGroupController::class]);
-   Route::apiResources(['credit-card' => CreditCardController::class]);
+//   Route::apiResources(['credit-card' => CreditCardController::class]);
    Route::apiResources(['country' => CountryController::class]);
    Route::apiResources(['bp_properties' => BPPropertiesController::class]);
    Route::apiResources(['paymentterm' => PaymentTermsController::class]);

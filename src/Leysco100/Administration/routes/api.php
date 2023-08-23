@@ -3,6 +3,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Leysco100\Administration\Http\Controllers\Setup\Banking\BankController;
+use Leysco100\Administration\Http\Controllers\Setup\Financials\CreditCardController;
 use Leysco100\Administration\Http\Controllers\Setup\Inventory\UoMController;
 use Leysco100\Administration\Http\Controllers\Setup\General\DriverController;
 use Leysco100\Administration\Http\Controllers\Setup\General\VehicleController;
@@ -94,7 +95,7 @@ Route::apiResources(['itemsproperty' => ItemPropertyController::class]);
 Route::apiResources(['currency' => CurrencyController::class]);
 Route::apiResources(['chartofaccounts' => ChartOfAccountController::class]);
 Route::apiResources(['taxgroup' => TaxGroupController::class]);
-// Route::apiResources(['credit-card' => CreditCardController::class]);
+ Route::apiResources(['credit-card' => CreditCardController::class]);
 Route::apiResources(['country' => CountryController::class]);
 Route::apiResources(['bp_properties' => BPPropertiesController::class]);
 // Route::apiResources(['paymentterm' => PaymentTermsController::class]);

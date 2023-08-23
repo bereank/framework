@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\Financials;
+namespace Leysco100\Administration\Http\Controllers\Setup\Financials;
 
-use App\Domains\Administration\Models\TaxGroup;
-use App\Domains\Banking\Models\OCRC;
-use App\Domains\Shared\Services\ApiResponseService;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Leysco100\Administration\Http\Controllers\Controller;
+use Leysco100\Shared\Models\Administration\Models\TaxGroup;
+use Leysco100\Shared\Models\Banking\Models\OCRC;
+use Leysco100\Shared\Services\ApiResponseService;
 
 class CreditCardController extends Controller
 {

@@ -7,9 +7,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Artisan;
+use Leysco100\MarketingDocuments\Services\DatabaseValidationServices;
 use Leysco100\MarketingDocuments\Services\DocumentsService;
 use Leysco100\Shared\Models\Administration\Models\OADM;
 use Leysco100\Shared\Models\Administration\Models\User;
+use Leysco100\Shared\Models\Banking\Services\BankingDocumentService;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
@@ -18,7 +20,10 @@ use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
 use Leysco100\Shared\Models\MarketingDocuments\Models\ATC1;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OWDD;
 use Leysco100\Shared\Models\MarketingDocuments\Models\WDD1;
+use Leysco100\Shared\Models\MarketingDocuments\Services\GeneralDocumentService;
 use Leysco100\Shared\Models\MarketingDocuments\Services\GeneralDocumentValidationService;
+use Leysco100\Shared\Models\OSCL;
+use Leysco100\Shared\Models\Shared\Services\ServiceCallService;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
@@ -804,7 +809,7 @@ class DocumentController extends Controller
 
             //Validating Draft using Oringal base type
             if ($objectTypePassedToTns == 112) {
-                $mockedDataDraftMessage = (new GeneralDocumentValidationSerivce())->draftValidation($newDoc, $documentRows);
+                $mockedDataDraftMessage = (new GeneralDocumentValidationService())->draftValidation($newDoc, $documentRows);
                 if ($mockedDataDraftMessage) {
                     return (new ApiResponseService())->apiFailedResponseService($mockedDataDraftMessage);
                 }

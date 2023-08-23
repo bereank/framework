@@ -1,11 +1,14 @@
 <?php
 
-namespace App\Models;
+namespace Leysco100\Shared\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OSCL extends Model
 {
+    use UsesTenantConnection;
+
     protected $guarded = ['id'];
     protected $table = 'o_s_c_l_s';
 

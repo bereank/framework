@@ -1,12 +1,15 @@
 <?php
 
-namespace App\Domains\Banking\Models;
+namespace Leysco100\Shared\Models\Banking\Models;
 
-use App\Domains\Marketing\Models\OINV;
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\MarketingDocuments\Models\OINV;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class RCT2 extends Model
 {
+    use UsesTenantConnection;
+
     protected $guarded = ['id'];
     protected $table = 'r_c_t2_s';
 
