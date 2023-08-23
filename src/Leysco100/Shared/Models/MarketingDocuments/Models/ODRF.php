@@ -45,7 +45,7 @@ class ODRF extends Model
         return $this->hasMany(DRF1::class, 'DocEntry');
     }
 
-    public function rows()
+    public function document_lines()
     {
         return $this->hasMany(DRF1::class, 'DocEntry');
     }

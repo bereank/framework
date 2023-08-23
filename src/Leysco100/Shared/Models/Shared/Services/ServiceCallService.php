@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Domains\Shared\Services;
+namespace Leysco100\Shared\Models\Shared\Services;
 
-use App\Models\OSCL;
-use App\Models\SCL2;
-use App\Models\SCL4;
-use Leysco\LS100SharedPackage\Models\Domains\Shared\Models\APDI;
+
+use Leysco100\Shared\Models\OSCL;
+use Leysco100\Shared\Models\SCL2;
+use Leysco100\Shared\Models\SCL4;
+use Leysco100\Shared\Models\Shared\Models\APDI;
 
 /**
  * Common Item Services

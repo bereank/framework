@@ -1,16 +1,14 @@
 <?php
 
-namespace App\Domains\Banking\Services;
+namespace Leysco100\Shared\Models\Banking\Services;
 
-use App\Domains\Administration\Models\NNM1;
-use App\Domains\Banking\Models\ORCT;
-use App\Domains\Banking\Models\RCT1;
-use App\Domains\Banking\Models\RCT2;
-use App\Domains\Banking\Models\RCT3;
-use App\Domains\Banking\Models\RCT4;
-use App\Domains\Finance\Models\ChartOfAccount;
-use App\Domains\Shared\Services\CommonService;
-use App\Jobs\NumberingSeries;
+use Leysco100\Shared\Models\Administration\Models\NNM1;
+use Leysco100\Shared\Models\Banking\Models\ORCT;
+use Leysco100\Shared\Models\Banking\Models\RCT1;
+use Leysco100\Shared\Models\Banking\Models\RCT2;
+use Leysco100\Shared\Models\Banking\Models\RCT3;
+use Leysco100\Shared\Models\Banking\Models\RCT4;
+use Leysco100\Shared\Services\CommonService;
 
 /**
  * Process Banking Document
