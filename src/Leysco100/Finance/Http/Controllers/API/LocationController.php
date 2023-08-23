@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\API\Financials;
+namespace Leysco100\Finance\Http\Controllers\API;
 
-use App\Domains\InventoryAndProduction\Models\OLCT;
-use App\Domains\Shared\Services\ApiResponseService;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Leysco100\Finance\Http\Controllers\Controller;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OLCT;
 
 class LocationController extends Controller
 {
