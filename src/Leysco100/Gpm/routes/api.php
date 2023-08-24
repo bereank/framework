@@ -41,6 +41,7 @@ Route::get('/settings', AppSettingsController::class);
 Route::put('/general_settings/ext_bucket', [AppSettingsController::class, 'updateExtBucket']);
 
 Route::post('/scan-details', [GPMMobileAPPApiController::class, 'saveScanLogDetails']);
+Route::put('/scan-detail/{id}', [GPMMobileAPPApiController::class, 'updateScanLogDetails']);
 Route::apiResources(['gpm_documents' => GPMMobileAPPApiController::class]);
 Route::apiResources(['locations' => LocationController::class]);
 Route::apiResources(['gates' => GateController::class]);

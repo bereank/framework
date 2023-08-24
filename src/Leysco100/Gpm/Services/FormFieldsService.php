@@ -31,7 +31,14 @@ class FormFieldsService
             ->join('form_fields', 'form_fields.id', '=', 'fields_template_rows.FormFieldId')
             ->join('form_field_types', 'form_field_types.id', '=', 'form_fields.type_id')
             ->where('form_fields_templates.id', '=', $template->id)
-            ->select('form_fields.id', 'form_fields.key', 'form_fields.indexno', 'form_fields.title', 'form_field_types.Name as type', 'form_fields.mandatory as Mandatory');
+            ->select(
+                'form_fields.id',
+                'form_fields.key',
+                'form_fields.indexno',
+                'form_fields.title',
+                'form_field_types.Name as type',
+                'form_fields.mandatory'
+            );
         $res = collect();
         foreach ($form_fields->get() as $field) {
             if ($field->type == "Dropdown") {
