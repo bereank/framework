@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\InventoryAndProduction\Models;
+namespace Leysco100\Shared\Models\InventoryAndProduction\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
@@ -11,9 +11,11 @@ use Leysco\LS100SharedPackage\Models\Domains\BusinessPartner\Models\OCRD;
 use Leysco\LS100SharedPackage\Models\Domains\InventoryAndProduction\Models\OLCT;
 use Leysco\LS100SharedPackage\Models\Domains\Marketing\Models\RDR1;
 use Leysco\LS100SharedPackage\Models\Domains\Shared\Models\APDI;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OWTR extends Model
 {
+    use UsesTenantConnection;
     protected $guarded = ['id'];
     protected $table = 'o_w_t_r_s';
 

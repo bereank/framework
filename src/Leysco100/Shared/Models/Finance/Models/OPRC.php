@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Domains\Finance\Models;
+namespace Leysco100\Shared\Models\Finance\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OPRC extends Model
 {
+    use UsesTenantConnection;
     protected $guarded = ['id'];
     protected $table = 'o_p_r_c_s';
 

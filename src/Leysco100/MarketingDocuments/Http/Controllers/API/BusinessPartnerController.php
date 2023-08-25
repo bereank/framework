@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\Administration\Models\NNM1;
+use Leysco100\Shared\Models\BusinessPartner\Models\CQG1;
+use Leysco100\Shared\Models\BusinessPartner\Models\OCQG;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Leysco100\Shared\Models\BusinessPartner\Models\CRD15;
 use Leysco100\BusinessPartner\Http\Controllers\Controller;
@@ -48,16 +51,16 @@ class BusinessPartnerController extends Controller
     {
         $search = \Request::get('f');
 
-//        $data = OCRD::with('octg')->where('CardType', "C")
-//            ->where(function ($q) use ($search) {
-//                if ($search != null) {
-//                    $q->where('CardCode', 'LIKE', "%$search%")
-//                        ->orWhere('CardName', 'LIKE', "%$search%")
-//                        ->orWhere('CardFName', 'LIKE', $search);
-//                }
-//            })
-//            ->take(10)
-//            ->get();
+        //        $data = OCRD::with('octg')->where('CardType', "C")
+        //            ->where(function ($q) use ($search) {
+        //                if ($search != null) {
+        //                    $q->where('CardCode', 'LIKE', "%$search%")
+        //                        ->orWhere('CardName', 'LIKE', "%$search%")
+        //                        ->orWhere('CardFName', 'LIKE', $search);
+        //                }
+        //            })
+        //            ->take(10)
+        //            ->get();
 
         $data = OCRD::where('CardType', "C")
             ->where(function ($q) use ($search) {
@@ -67,7 +70,7 @@ class BusinessPartnerController extends Controller
                         ->orWhere('CardFName', 'LIKE', $search);
                 }
             })
-            ->select(['id','CardCode','CardName','CardFName','LicTradNum','Currency'])
+            ->select(['id', 'CardCode', 'CardName', 'CardFName', 'LicTradNum', 'Currency'])
             ->take(10)
             ->get();
         $counter = 1;
@@ -149,7 +152,7 @@ class BusinessPartnerController extends Controller
                 ]);
             }
 
-           // NumberingSeries::dispatch($request['Series']);
+            // NumberingSeries::dispatch($request['Series']);
             DB::commit();
             return (new ApiResponseService())->apiSuccessResponseService();
         } catch (\Throwable $th) {

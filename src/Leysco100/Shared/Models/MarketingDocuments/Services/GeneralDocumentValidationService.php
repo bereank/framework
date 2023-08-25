@@ -2,15 +2,17 @@
 
 namespace Leysco100\Shared\Models\MarketingDocuments\Services;
 
-use App\Services\Shared\DatabaseValidationServices;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Leysco100\MarketingDocuments\Actions\StoredProcedureExternalMethodsAction;
-use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
-use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
-use Leysco100\Shared\Services\ApiResponseService;
-use Leysco100\Shared\Services\CommonService;
 use function Composer\Autoload\includeFile;
+use Leysco100\Shared\Services\CommonService;
+use Leysco100\Shared\Models\Shared\Models\APDI;
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
+use Leysco100\MarketingDocuments\Services\DocumentsService;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
+use Leysco100\MarketingDocuments\Services\DatabaseValidationServices;
+use Leysco100\MarketingDocuments\Actions\StoredProcedureExternalMethodsAction;
 
 /**
  * Purchase and Marketing Document Validation Service
@@ -71,7 +73,7 @@ class GeneralDocumentValidationService
                     (new ApiResponseService())->apiSuccessAbortProcessResponse("Cash Customer is incorrect");
                 }
                 $validate_U_CashName = StoredProcedureExternalMethodsAction::ValidateName($request['U_CashName']);
-                if(!$validate_U_CashName){
+                if (!$validate_U_CashName) {
                     (new ApiResponseService())->apiSuccessAbortProcessResponse("CG - Ensure you have Captured A Valid Cash Customer Name with atleast 2 Names e.g \"Ali Tom\"");
                 }
             }
@@ -85,14 +87,14 @@ class GeneralDocumentValidationService
                     (new ApiResponseService())->apiSuccessAbortProcessResponse("Customer Phone is incorrect");
                 }
                 $validate_U_CashNo = StoredProcedureExternalMethodsAction::ValidateMobileNumber($request['U_CashNo']);
-                if (!$validate_U_CashNo){
+                if (!$validate_U_CashNo) {
                     (new ApiResponseService())->apiSuccessAbortProcessResponse("CG - Ensure you have Captured A Valid Mobile Phone Number e.g. +2547**123***");
                 }
             }
 
-//            if (!isset($request['U_IDNo'])) {
-//                (new ApiResponseService())->apiSuccessAbortProcessResponse("Customer ID No is Required");
-//            }
+            //            if (!isset($request['U_IDNo'])) {
+            //                (new ApiResponseService())->apiSuccessAbortProcessResponse("Customer ID No is Required");
+            //            }
 
             if ($request['U_IDNo']) {
                 if (!is_numeric($request['U_IDNo'])) {
@@ -101,15 +103,14 @@ class GeneralDocumentValidationService
             }
 
             if (!$request['U_CashMail']) {
-                    (new ApiResponseService())->apiSuccessAbortProcessResponse("Customer Email is Required");
+                (new ApiResponseService())->apiSuccessAbortProcessResponse("Customer Email is Required");
             }
 
             if ($request['U_CashMail']) {
                 $validate_U_CashMail = StoredProcedureExternalMethodsAction::ValidateEmail($request['U_CashMail']);
-                if(!$validate_U_CashMail){
+                if (!$validate_U_CashMail) {
                     (new ApiResponseService())->apiSuccessAbortProcessResponse("CG - Ensure you have Captured A Valid email Adress e.g.\"geff@gmail.com\", or indicate N/A where email does not exist");
                 }
-
             }
 
             $paymentTerms = $businessPartner->octg;
@@ -300,7 +301,7 @@ class GeneralDocumentValidationService
 
             DB::rollback();
             return $message;
-        } catch (\Throwable$th) {
+        } catch (\Throwable $th) {
             Log::info($th);
             DB::rollback();
         }

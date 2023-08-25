@@ -2,11 +2,41 @@
 
 namespace Leysco100\MarketingDocuments\Services;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Leysco100\Shared\Models\Shared\Models\APDI;
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
 use Leysco100\Shared\Models\Administration\Models\NNM1;
+use Leysco100\Shared\Models\Administration\Models\NNM2;
+use Leysco100\Shared\Models\Administration\Models\OADM;
+use Leysco100\Shared\Models\Administration\Models\OAIB;
+use Leysco100\Shared\Models\Administration\Models\OALR;
+use Leysco100\Shared\Models\Administration\Models\ONNM;
+use Leysco100\Shared\Models\Administration\Models\OUDG;
+use Leysco100\Shared\Models\Administration\Models\OWTM;
+use Leysco100\Shared\Models\Administration\Models\User;
+use Leysco100\Shared\Models\Administration\Models\WST1;
+use Leysco100\Shared\Models\Administration\Models\WTM2;
+use Leysco100\Shared\Models\BusinessPartner\Models\OBPL;
+use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
+use Leysco100\Shared\Models\SalesOportunities\Models\OOCR;
+use Leysco100\Shared\Models\Administration\Models\TaxGroup;
+use Leysco100\Shared\Models\MarketingDocuments\Models\DRF1;
+use Leysco100\Shared\Models\MarketingDocuments\Models\ODRF;
+use Leysco100\Shared\Models\MarketingDocuments\Models\ORDR;
+use Leysco100\Shared\Models\MarketingDocuments\Models\OWDD;
+use Leysco100\Shared\Models\MarketingDocuments\Models\WDD1;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OSRN;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OUOM;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
+use Leysco100\Shared\Models\Banking\Services\BankingDocumentService;
+use Leysco100\MarketingDocuments\Http\Controllers\API\V1\Integrator\ITransactionController;
+
+
 
 /**
  * Service for Marke
@@ -559,42 +589,42 @@ class DocumentsService
 
     public function getDocumentForDirectPostingToTims($ObjType, $docEntry)
     {
-//        $updated_at = \Request::get('updated_at');
-//        $docEntry = \Request::get('docEntry');
+        //        $updated_at = \Request::get('updated_at');
+        //        $docEntry = \Request::get('docEntry');
 
-//        if ($ObjType == 1470000113) {
-//
-//            $ObjType = 205;
-//        }
-//
-//        if ($ObjType == 1250000001) {
-//
-//            $ObjType = 66;
-//        }
+        //        if ($ObjType == 1470000113) {
+        //
+        //            $ObjType = 205;
+        //        }
+        //
+        //        if ($ObjType == 1250000001) {
+        //
+        //            $ObjType = 66;
+        //        }
 
-//        $isDraft = 0;
+        //        $isDraft = 0;
         $DocumentTables = APDI::with('pdi1')
             ->where('ObjectID', $ObjType)
             ->first();
 
-//        if ($DocumentTables->hasExtApproval == 1) {
-//            $isDraft = 1;
-//            $DocumentTables = APDI::with('pdi1')
-//                ->where('ObjectID', 112)
-//                ->first();
-//        }
+        //        if ($DocumentTables->hasExtApproval == 1) {
+        //            $isDraft = 1;
+        //            $DocumentTables = APDI::with('pdi1')
+        //                ->where('ObjectID', 112)
+        //                ->first();
+        //        }
 
         DB::beginTransaction();
         try {
-            $headerVal = $DocumentTables->ObjectHeaderTable::where("id",$docEntry)->first();
+            $headerVal = $DocumentTables->ObjectHeaderTable::where("id", $docEntry)->first();
 
-//            if ($ObjType == 205) {
-//                $ObjType = 1470000113;
-//            }
-//
-//            if ($ObjType == 66) {
-//                $ObjType = 1250000001;
-//            }
+            //            if ($ObjType == 205) {
+            //                $ObjType = 1470000113;
+            //            }
+            //
+            //            if ($ObjType == 66) {
+            //                $ObjType = 1250000001;
+            //            }
             if ($headerVal) {
                 /**
                  * Mark The document not transferred
@@ -602,7 +632,7 @@ class DocumentsService
 
                 $headerVal->ExtDocTotal = 0;
                 $headerVal->ObjType = $ObjType;
-//                $headerVal->isDraft = $isDraft;
+                //                $headerVal->isDraft = $isDraft;
                 $headerVal->DocNum = (int) $headerVal->DocNum;
                 $headerVal->DiscPrcnt = 0;
                 //Mappding Base Dcoument
@@ -611,9 +641,9 @@ class DocumentsService
                         ->where('ObjectID', $headerVal->BaseType)
                         ->first();
                     $baseDocument = $baseDocDocumentTables->ObjectHeaderTable::where('id', $headerVal->BaseEntry)->first();
-//                    if (!$baseDocument->ExtRef) {
-//                        $documents->forget($key);
-//                    }
+                    //                    if (!$baseDocument->ExtRef) {
+                    //                        $documents->forget($key);
+                    //                    }
                     $headerVal->BaseEntry = (int) $baseDocument->ExtRef;
                     $headerVal->BaseType = (int) $headerVal->BaseType != 66 ? $headerVal->BaseType : 1250000001;
                 }
@@ -674,16 +704,16 @@ class DocumentsService
                     }
 
                     $val->UnitPrice = $val->PriceBefDi;
-                    $taxGroup = TaxGroup::where('category', 'O')->where("code",$val->TaxCode)->first();
-                    if ($ObjType == "205"){
-                        $taxGroup = TaxGroup::where('category', 'I')->where("code",$val->TaxCode)->first();
+                    $taxGroup = TaxGroup::where('category', 'O')->where("code", $val->TaxCode)->first();
+                    if ($ObjType == "205") {
+                        $taxGroup = TaxGroup::where('category', 'I')->where("code", $val->TaxCode)->first();
                     }
                     $val->VatPrcnt = $taxGroup?->rate;
                     $val->VatGroup = $val->TaxCode;
                     $val->UoMEntry = OUOM::Where('id', $val->UomCode)->value('ExtRef') ?? null;
 
                     $val->UserFields = (object)[
-                        "U_HSCode"=>null
+                        "U_HSCode" => null
                     ];
                 }
                 $headerVal->document_lines = $rowData;
