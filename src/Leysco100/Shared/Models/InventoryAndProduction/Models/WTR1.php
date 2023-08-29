@@ -3,7 +3,6 @@
 namespace Leysco100\Shared\Models\InventoryAndProduction\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Leysco\LS100SharedPackage\Models\Domains\InventoryAndProduction\Models\OITM;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class WTR1 extends Model

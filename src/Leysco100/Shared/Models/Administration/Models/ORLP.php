@@ -2,10 +2,7 @@
 
 namespace Leysco100\Shared\Models\Administration\Models;
 
-
 use Illuminate\Database\Eloquent\Model;
-use Leysco100\Shared\Models\Administration\Models\Tier;
-use Leysco100\Shared\Models\Administration\Models\Channel;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class ORLP extends Model
@@ -22,5 +19,10 @@ class ORLP extends Model
     public function tier()
     {
         return $this->belongsTo(Tier::class, 'TierCode');
+    }
+
+    public function vehicle()
+    {
+        return $this->belongsTo(Vehicle::class);
     }
 }

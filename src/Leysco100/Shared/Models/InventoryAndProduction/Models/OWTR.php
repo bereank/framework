@@ -4,13 +4,12 @@ namespace Leysco100\Shared\Models\InventoryAndProduction\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
-use Leysco\LS100SharedPackage\Models\Domains\Administration\Models\OSLP;
-use Leysco\LS100SharedPackage\Models\Domains\Administration\Models\OUDP;
-use Leysco\LS100SharedPackage\Models\Domains\BusinessPartner\Models\OBPL;
-use Leysco\LS100SharedPackage\Models\Domains\BusinessPartner\Models\OCRD;
-use Leysco\LS100SharedPackage\Models\Domains\InventoryAndProduction\Models\OLCT;
-use Leysco\LS100SharedPackage\Models\Domains\Marketing\Models\RDR1;
-use Leysco\LS100SharedPackage\Models\Domains\Shared\Models\APDI;
+use Leysco100\Shared\Models\Administration\Models\OSLP;
+use Leysco100\Shared\Models\Administration\Models\OUDP;
+use Leysco100\Shared\Models\BusinessPartner\Models\OBPL;
+use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
+use Leysco100\Shared\Models\MarketingDocuments\Models\RDR1;
+use Leysco100\Shared\Models\Shared\Models\APDI;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OWTR extends Model
