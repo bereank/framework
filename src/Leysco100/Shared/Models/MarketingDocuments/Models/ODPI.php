@@ -3,6 +3,8 @@
 namespace Leysco100\Shared\Models\MarketingDocuments\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
+use Leysco100\Shared\Models\Shared\Models\APDI;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class ODPI extends Model
@@ -13,20 +15,20 @@ class ODPI extends Model
 
     public function items()
     {
-        return $this->hasMany('App\DPI1', 'DocEntry');
+        return $this->hasMany(DPI1::class, 'DocEntry');
     }
     public function outlet()
     {
-        return $this->belongsTo('App\OCRD', 'DocEntry');
+        return $this->belongsTo(OCRD::class, 'DocEntry');
     }
 
     public function rows()
     {
-        return $this->hasMany('App\DPI1', 'DocEntry');
+        return $this->hasMany(DPI1::class, 'DocEntry');
     }
 
     public function objecttype()
     {
-        return $this->belongsTo('App\APDI', 'ObjType', 'ObjectID');
+        return $this->belongsTo(APDI::class, 'ObjType', 'ObjectID');
     }
 }

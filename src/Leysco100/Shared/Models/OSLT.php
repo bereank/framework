@@ -9,9 +9,7 @@ use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OSLT extends Model
 {
-    use UsesTenantConnection;
-
-    use HasFactory;
+    use HasFactory, UsesTenantConnection;
 
     protected $guarded = ['id'];
     protected $table = 'o_s_l_t_s';

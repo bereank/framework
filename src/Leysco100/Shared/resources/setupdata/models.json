@@ -189,35 +189,35 @@
     },
     {
         "ObjectID": 60,
-        "ObjectHeaderTable": "App\\OIGE",
+        "ObjectHeaderTable": "Leysco100\\Shared\\Models\\InventoryAndProduction\\Models\\OIGE",
         "DocumentName": "Goods Issue",
         "PermissionName": "goods_issue",
         "RowStatus": "A",
         "isDoc": "Y",
         "JrnStatus": "Y",
-        "ChildTable": "App\\IGE1",
+        "ChildTable": "Leysco100\\Shared\\Models\\InventoryAndProduction\\Models\\IGE1",
         "ChildType": "Items"
     },
     {
         "ObjectID": 66,
-        "ObjectHeaderTable": "App\\Domains\\InventoryAndProduction\\Models\\OWTQ",
+        "ObjectHeaderTable": "Leysco100\\Shared\\Models\\InventoryAndProduction\\Models\\OWTQ",
         "DocumentName": "Inventory Transfer Request",
         "PermissionName": "inventory_transfer_request",
         "RowStatus": "A",
         "isDoc": "Y",
         "JrnStatus": "N",
-        "ChildTable": "App\\Domains\\InventoryAndProduction\\Models\\WTQ1",
+        "ChildTable": "Leysco100\\Shared\\Models\\InventoryAndProduction\\Models\\WTQ1",
         "ChildType": "Items"
     },
     {
         "ObjectID": 67,
-        "ObjectHeaderTable": "App\\Domains\\InventoryAndProduction\\Models\\OWTR",
+        "ObjectHeaderTable": "Leysco100\\Shared\\Models\\InventoryAndProduction\\Models\\OWTR",
         "DocumentName": "Inventory Transfer",
         "PermissionName": "inventory_transfer",
         "RowStatus": "A",
         "isDoc": "Y",
         "JrnStatus": "N",
-        "ChildTable": "App\\Domains\\InventoryAndProduction\\Models\\WTR1",
+        "ChildTable": "Leysco100\\Shared\\Models\\InventoryAndProduction\\Models\\WTR1",
         "ChildType": "Items"
     },
 
@@ -234,47 +234,47 @@
     },
     {
         "ObjectID": 176,
-        "ObjectHeaderTable": "App\\Models\\OINS",
+        "ObjectHeaderTable": "Leysco100\\Shared\\Models\\OINS",
         "DocumentName": "Customer Equipment Card",
         "PermissionName": "customer_equipment_card",
         "RowStatus": "A",
         "isDoc": "Y",
         "JrnStatus": "N",
-        "ChildTable": "App\\Models\\OINS",
+        "ChildTable": "Leysco100\\Shared\\Models\\OINS",
         "ChildType": "Items"
     },
     {
         "ObjectID": 189,
-        "ObjectHeaderTable": "App\\Models\\OSLT",
+        "ObjectHeaderTable": "Leysco100\\Shared\\Models\\OSLT",
         "DocumentName": "Service Call Solutions",
         "PermissionName": "service_call_solutions",
         "RowStatus": "A",
         "isDoc": "Y",
         "JrnStatus": "N",
-        "ChildTable": "App\\Models\\OSLT",
+        "ChildTable": "Leysco100\\Shared\\Models\\OSLT",
         "ChildType": "Items"
     },
     {
         "ObjectID": 191,
-        "ObjectHeaderTable": "App\\Models\\OSCL",
+        "ObjectHeaderTable": "Leysco100\\Shared\\Models\\OSCL",
         "DocumentName": "Service Calls",
         "PermissionName": "service_calss",
         "RowStatus": "A",
         "isDoc": "Y",
         "JrnStatus": "Y",
-        "ChildTable": "App\\Models\\OSCL",
+        "ChildTable": "Leysco100\\Shared\\Models\\OSCL",
         "ChildType": "Items"
     },
 
     {
         "ObjectID": 203,
-        "ObjectHeaderTable": "App\\ODPI",
+        "ObjectHeaderTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\ODPI",
         "DocumentName": "A/R Down Payment",
         "PermissionName": "down_payment",
         "RowStatus": "A",
         "isDoc": "Y",
         "JrnStatus": "Y",
-        "ChildTable": "App\\DPI1",
+        "ChildTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\DPI1",
         "ChildType": "Items"
     },
 
@@ -335,7 +335,7 @@
     },
     {
         "ObjectID": 205,
-        "ObjectHeaderTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\OPRQ",
+        "ObjectHeaderTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\OPRQ",
         "DocumentName": "Purchase Request",
         "PermissionName": "purchase_request",
         "RowStatus": "A",
