@@ -8,8 +8,6 @@ use Leysco100\Shared\Models\MarketingDocuments\Models\GMS1;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OGMS;
 
 
-
-
 class  ReportsService
 {
     public function scanLogReport($startdate, $endate,  $paginate = false, $perPage = 10)
@@ -212,5 +210,71 @@ class  ReportsService
 
 
         return $duplicate;
+    }
+    public function scanLogs(
+        $startdate,
+        $endate,
+        $docNum = null,
+        $gates,
+        $users
+    ) {
+
+        $scan_log_report = GMS1::whereBetween('g_m_s1_s.created_at', [
+            $startdate,
+            $endate,
+        ])
+            // ->with(['document' => function ($query) use ($docNum) {
+            //     $query->when(!is_null($docNum), function ($query) use ($docNum) {
+            //         $query->where('DocNum',  130003873);
+            //     });
+            // }])
+            ->when(!empty($gates), function ($query) use ($gates) {
+                return $query->whereIn('GateID', $gates);
+            })
+            ->when(!empty($users), function ($query) use ($users) {
+                return $query->whereIn('UserSign', $users);
+            })
+            ->with(['document'])
+            ->with(['attachments' => function ($query) {
+                $query->select(['DocEntry', 'Type', 'Name', 'Content']);
+            }])
+            ->with(['objecttype' => function ($query) {
+                $query->select(["id", 'DocumentName', 'ObjectID']);
+            }])
+            ->with(['creator' => function ($query) {
+                $query->select(["id", 'name', 'account', 'email', 'phone_number']);
+            }])
+            ->with(['gates' => function ($query) {
+                $query->select(["id", 'Name', 'Longitude', 'Latitude', 'Address']);
+            }])
+            ->when(!is_null($docNum), function ($query) use ($docNum) {
+                $query->where('DocNum', 'like', '%' . $docNum . '%');
+            })
+            ->orderBy('GateID');
+        $scan_log_report = $scan_log_report->get();
+        // check scan status
+        foreach ($scan_log_report as $key => $value) {
+            if ($value->Status == 0) {
+                $value->ResultDesc = "Successful";
+                $value->ReleaseDesc = "Released";
+            } elseif ($value->Status == 1) {
+                $value->ResultDesc = "Does not Exist";
+                $value->ReleaseDesc = "Not Released";
+            } elseif ($value->Status == 2) {
+                $value->ResultDesc = "Duplicate";
+                $value->ReleaseDesc = "Not Released";
+            } elseif ($value->Status == 3) {
+                $value->ResultDesc = "Flagged";
+                $value->ReleaseDesc = "Not Released";
+            }
+
+            if ($value->Released == 0) {
+                $value->ReleaseDesc = "Not Released";
+            } elseif ($value->Released == 1) {
+                $value->ReleaseDesc = "Released";
+            }
+        }
+
+        return $scan_log_report;
     }
 }

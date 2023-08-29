@@ -9,12 +9,13 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Leysco100\Gpm\Mail\GPMBCPReportMail;
+use Spatie\Multitenancy\Jobs\TenantAware;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Leysco100\Shared\Models\Administration\Models\OADM;
 use Leysco100\Shared\Models\MarketingDocuments\Models\BackUpModeSetup;
 
-class BCPNotificationJob implements ShouldQueue
+class BCPNotificationJob implements ShouldQueue, TenantAware
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -38,7 +39,7 @@ class BCPNotificationJob implements ShouldQueue
      */
     public function handle()
     {
-        Log::info("Send email after 3 mins :" . $this->id);
+        Log::info("Send email after :" . $this->id . "Mins");
         $emailString = OADM::where('id', 1)->value("NotifEmail");
         $emails = explode(';', $emailString);
         $updatedId = BackUpModeSetup::where('activatable_type', 1)->latest()
