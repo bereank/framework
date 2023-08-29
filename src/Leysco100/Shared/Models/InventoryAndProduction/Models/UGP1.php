@@ -11,6 +11,7 @@ use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 class UGP1 extends Model
 {
     use UsesTenantConnection;
+
     protected $guarded = ['id'];
     protected $table = 'u_g_p1_s';
 
