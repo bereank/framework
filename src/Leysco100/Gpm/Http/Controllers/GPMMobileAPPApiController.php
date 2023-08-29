@@ -76,6 +76,7 @@ class GPMMobileAPPApiController extends Controller
                             'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
                             'errors' => [
                                 'record' => 'Discrepancy Noted- Don’t Release Goods',
+                                'error'=>'String too short'
                             ],
                         ],
                         200
@@ -139,6 +140,7 @@ class GPMMobileAPPApiController extends Controller
                         'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
                         'errors' => [
                             'record' => 'Discrepancy Noted- Don’t Release Goods',
+                            'Error'=>$th,
                         ],
                     ],
                     200
