@@ -2,9 +2,10 @@
 
 namespace Leysco100\MarketingDocuments\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Leysco100\MarketingDocuments\Http\Controllers\Controller;
 use Leysco100\Shared\Models\Shared\Models\APDI;
+use Leysco100\Shared\Services\ApiResponseService;
 
 class DocModelController extends Controller
 {
