@@ -35,7 +35,7 @@ class OINV extends Model
     {
         return $this->hasMany(INV1::class, 'DocEntry');
     }
-    public function rows()
+    public function document_lines()
     {
         return $this->hasMany(INV1::class, 'DocEntry');
     }
