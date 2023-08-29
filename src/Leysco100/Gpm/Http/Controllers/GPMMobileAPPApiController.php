@@ -122,7 +122,10 @@ class GPMMobileAPPApiController extends Controller
             $newRecord = new GMS1($scanLogData);
             $newRecord->save();
             DB::commit();
-            $this->postScanLogDetails($request['fields'], $newRecord->id);
+            if($request['fields']){
+                $this->postScanLogDetails($request['fields'], $newRecord->id);
+            }
+            
         } catch (\Throwable $th) {
             DB::rollback();
 
