@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Models;
+namespace Leysco100\Shared\Models;
 
-use App\Models\GpsSetup;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class WorkdaySetup extends Model
 {
-    use HasFactory;
+    use HasFactory, UsesTenantConnection;
 
     public function gps()
     {
