@@ -15,6 +15,7 @@ use Leysco100\Shared\Models\Administration\Models\ORLP;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCLG;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;
+use Leysco100\Shared\Services\AuthorizationService;
 
 class DispatchController extends Controller
 {
