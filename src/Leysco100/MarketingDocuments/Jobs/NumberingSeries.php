@@ -3,12 +3,12 @@
 namespace Leysco100\MarketingDocuments\Jobs;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Spatie\Multitenancy\Jobs\TenantAware;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 use Leysco100\Shared\Models\Administration\Models\NNM1;
-use Spatie\Multitenancy\Jobs\TenantAware;
 
 class NumberingSeries implements ShouldQueue, TenantAware
 {

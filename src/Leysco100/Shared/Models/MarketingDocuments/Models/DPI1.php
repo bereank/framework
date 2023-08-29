@@ -1,12 +1,15 @@
 <?php
 
-namespace App\Domains\Marketing\Models;
+namespace Leysco100\Shared\Models\MarketingDocuments\Models;
 
-use App\Domains\InventoryAndProduction\Models\OITM;
+
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
 
 class DPI1 extends Model
 {
+    use UsesTenantConnection;
     protected $guarded = ['id'];
     protected $table = 'd_p_i1_s';
     public function odpi()

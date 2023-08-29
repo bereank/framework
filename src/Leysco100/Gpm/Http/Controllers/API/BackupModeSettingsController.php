@@ -38,12 +38,14 @@ class BackupModeSettingsController extends Controller
     {
         try {
             $request->validate([
-                'UserSign' => 'nullable|exists:users,id',
+                // 'UserSign' => 'nullable|exists:users,id',
+                'UserSign' => 'nullable',
                 'Status' => 'required|integer|in:0,1',
                 'DoesNotExistCount' => 'nullable|integer',
                 'LastSyncDuration' => 'nullable|integer',
                 'DurationType' => 'required|in:hours,minutes,seconds',
-                'FieldsTemplate' => 'required|exists:form_fields_templates,id',
+                //'FieldsTemplate' => 'required|exists:form_fields_templates,id',
+                'FieldsTemplate' => 'required',
                 'ActiveFrom' => "required",
                 "ActiveTo" => "required",
                 "isDistinctDocs" => 'required'

@@ -1,12 +1,14 @@
 <?php
 
-namespace App\Domains\InventoryAndProduction\Models;
+namespace Leysco100\Shared\Models\InventoryAndProduction\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Leysco\LS100SharedPackage\Models\Domains\InventoryAndProduction\Models\OITM;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class WTR1 extends Model
 {
+    use UsesTenantConnection;
     protected $guarded = ['id'];
     protected $table = 'w_t_r1_s';
 

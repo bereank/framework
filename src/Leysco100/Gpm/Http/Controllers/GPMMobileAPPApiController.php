@@ -651,6 +651,18 @@ class GPMMobileAPPApiController extends Controller
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
+    public function updateScanLogDetails(Request $request, $id)
+    {
+        try {
+            $scan_detail = GMS2::where('id', $id)->update([
+                'Content' => $request['value'],
+            ]);
+            return (new ApiResponseService())->apiSuccessResponseService($scan_detail);
+        } catch (\Throwable $th) {
+
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+        }
+    }
     public function saveScanLogDetails(Request $request)
     {
 
