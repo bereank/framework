@@ -1,15 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\API\Financials\CostAccounting;
+namespace Leysco100\Finance\Http\Controllers\API;
 
-use App\Models\OCR1;
-use App\Models\OOCR;
+use App\Domains\SalesOportunities\Models\OCR1;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Domains\Finance\Models\ODIM;
-use App\Domains\Finance\Models\OPRC;
-use App\Http\Controllers\Controller;
-use App\Domains\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\Finance\Models\OPRC;
+use Leysco100\Shared\Models\SalesOportunities\Models\OOCR;
+use Leysco100\Shared\Models\Shared\Models\ODIM;
+use Leysco100\Shared\Services\ApiResponseService;
 
 class CostCenterController extends Controller
 {

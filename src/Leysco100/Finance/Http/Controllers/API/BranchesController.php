@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\API\Financials;
+namespace Leysco100\Finance\Http\Controllers\API;
 
-use App\Domains\BusinessPartner\Models\OBPL;
-use App\Domains\Shared\Services\ApiResponseService;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Leysco100\Finance\Http\Controllers\Controller;
+use Leysco100\Shared\Models\BusinessPartner\Models\OBPL;
+use Leysco100\Shared\Services\ApiResponseService;
 
 class BranchesController extends Controller
 {

@@ -2,10 +2,10 @@
 
 
 use Illuminate\Support\Facades\Route;
+use Leysco100\Finance\Http\Controllers\API\LocationController;
 use Leysco100\Gpm\Http\Controllers\GPMReports;
 use Leysco100\Gpm\Http\Controllers\GPMController;
 use Leysco100\Gpm\Http\Controllers\GateController;
-use Leysco100\Gpm\Http\Controllers\LocationController;
 use Leysco100\Gpm\Http\Controllers\AppSettingsController;
 use Leysco100\Gpm\Http\Controllers\GMPDocumentController;
 use Leysco100\Gpm\Http\Controllers\GPMFormFieldsController;
@@ -37,7 +37,7 @@ Route::get('web-gpm-scan-logs', [GPMController::class, 'getScanLogs']);
 
 Route::get('web-gpm-scan-logs/{id}', [GPMController::class, 'getSingleScanLogs']);
 
-Route::get('/gpm/settings', AppSettingsController::class);
+Route::get('/settings', AppSettingsController::class);
 Route::put('/general_settings/ext_bucket', [AppSettingsController::class, 'updateExtBucket']);
 
 Route::post('/scan-details', [GPMMobileAPPApiController::class, 'saveScanLogDetails']);
