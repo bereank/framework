@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Models;
+namespace Leysco100\Shared\Models;
 
-use App\Models\TargetSetup;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Leysco\LS100SharedPackage\Models\Domains\Marketing\Models\OINV;
-use Leysco\LS100SharedPackage\Models\Domains\Administration\Models\OSLP;
+use Leysco100\Shared\Models\Administration\Models\OSLP;
+use Leysco100\Shared\Models\MarketingDocuments\Models\OINV;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class TargetSalesEmp extends Model
 {
-    use HasFactory;
+    use HasFactory, UsesTenantConnection;
+
     protected $guarded = ['id'];
     protected $table = 'target_sales_emps';
 

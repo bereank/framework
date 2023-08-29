@@ -37,7 +37,7 @@ Route::get('web-gpm-scan-logs', [GPMController::class, 'getScanLogs']);
 
 Route::get('web-gpm-scan-logs/{id}', [GPMController::class, 'getSingleScanLogs']);
 
-Route::get('/settings', AppSettingsController::class);
+Route::get('/gpm/settings', AppSettingsController::class);
 Route::put('/general_settings/ext_bucket', [AppSettingsController::class, 'updateExtBucket']);
 
 Route::post('/scan-details', [GPMMobileAPPApiController::class, 'saveScanLogDetails']);
