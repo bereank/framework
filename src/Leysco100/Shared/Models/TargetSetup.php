@@ -1,21 +1,18 @@
 <?php
 
-namespace App\Models;
+namespace Leysco100\Shared\Models;
 
-
-use App\Models\Targets;
-use App\Models\TargetItems;
-use App\Models\TargetSalesEmp;
-use Illuminate\Foundation\Auth\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Leysco\LS100SharedPackage\Models\Domains\Marketing\Models\OINV;
-
+use Leysco100\Shared\Models\Administration\Models\User;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OUOM;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 
 class TargetSetup extends Model
 {
-    use HasFactory;
+    use HasFactory, UsesTenantConnection;
+
     protected $guarded = ['id'];
     protected $table = 'target_setups';
 
@@ -37,7 +34,7 @@ class TargetSetup extends Model
     public function metrics()
     {
 
-        return $this->belongsTo('App\Domains\InventoryAndProduction\Models\OUOM',  'UoM');
+        return $this->belongsTo(OUOM::class,  'UoM');
     }
 
     public function user()

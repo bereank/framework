@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Models;
+namespace Leysco100\Shared\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Leysco\LS100SharedPackage\Models\Domains\InventoryAndProduction\Models\OITM;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class TargetItems extends Model
 {
-    use HasFactory;
+    use HasFactory, UsesTenantConnection;
 
     protected $guarded = ['id'];
     protected $table = 'target_items';

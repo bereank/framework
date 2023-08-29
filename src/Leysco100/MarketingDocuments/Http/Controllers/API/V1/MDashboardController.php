@@ -4,7 +4,6 @@ namespace Leysco100\MarketingDocuments\Http\Controllers\API\V1;
 
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
-use App\Models\TargetSetup;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Shared\Services\ApiResponseService;

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DispatchController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DocModelController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DocumentController;
+use Leysco100\MarketingDocuments\Http\Controllers\API\V1\GpsLocationController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\MCallController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\MItemController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\MOrderController;
@@ -22,6 +23,8 @@ use Leysco100\MarketingDocuments\Http\Controllers\API\V1\Integrator\IInventoryCo
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\Integrator\ITerritoryController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\Integrator\ITransactionController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\Integrator\IIncomingPaymentController;
+use Leysco100\MarketingDocuments\Http\Controllers\API\V1\RoutePlanningController;
+use Leysco100\MarketingDocuments\Http\Controllers\API\V1\TargetController;
 
 
 /*
@@ -55,12 +58,45 @@ Route::apiResources(['doc_model' => DocModelController::class]);
 // //Mpesa Callback
 // Route::post('mpesa-callback', [MpesaCallbackController::class, "mpesa_callback"])->withoutMiddleware(['auth:sanctum']);
 // Route::get('mpesa/transaction/data', [MpesaCallbackController::class, "getTransData"])->withoutMiddleware(['auth:sanctum']);
+
 /*
-    |--------------------------------------------------------------------------
-    | Dispatch
-    |--------------------------------------------------------------------------
-    |
-     */
+|--------------------------------------------------------------------------
+|  SALES DISTRIBUTION
+|--------------------------------------------------------------------------
+*/
+//Route::post('weekly_calls', [CallsController::class, 'weeklyCallsReport']);
+//Route::post('get_calls_reports', [CallsController::class, 'getCallsReports']);
+//Route::get('getrules/{id}', [SurveyController::class, 'getRules']);
+//Route::get('getschedules/{id}', [SurveyController::class, 'getSchedules']);
+//Route::get('getchoices/{id}', [RulesController::class, 'getChoices']);
+//Route::post('calls/filterCalls', [CallsController::class, 'filterCalls']);
+//Route::get('get_targets_skus/{id}', [TargetController::class, 'showSkus']);
+
+Route::get('items_data', [TargetController::class, 'ItemsData']);
+//Route::apiResources(['calls' => CallsController::class]);
+Route::apiResources(['targets' => TargetController::class]);
+//Route::apiResources(['tiers' => TierController::class]);
+//Route::apiResources(['channels' => ChannelController::class]);
+//Route::apiResources(['assets' => AssetsController::class]);
+//Route::apiResources(['surveys' => SurveyController::class]);
+//Route::apiResources(['schedules' => ScheduleController::class]);
+//Route::apiResources(['rules' => RulesController::class]);
+// Route Planning
+Route::post('route_outlets', [RoutePlanningController::class, 'createRouteOutlets']);
+Route::post('route_calls', [RoutePlanningController::class, 'createRouteCalls']);
+Route::apiResources(['routes' => RoutePlanningController::class]);
+// GPS LOCATIONS
+Route::get('getWorkDays', [GpsLocationController::class, 'getWorkDays']);
+Route::resource('gps-locations', GpsLocationController::class);
+
+/*
+
+/*
+|--------------------------------------------------------------------------
+| Dispatch
+|--------------------------------------------------------------------------
+|
+*/
 Route::put('document/cancellation/{ObjType}/{id}', [DispatchController::class, 'documentCancellation']);
 Route::get('/dispatch/summary-reports', [DispatchController::class, 'getSummaries']);
 Route::apiResources(['/dispatch/documents' => DispatchController::class]);
@@ -74,88 +110,82 @@ Route::apiResources(['/dispatch/documents' => DispatchController::class]);
  * ----------------------------------------------------------------------------------------------
  */
 
-Route::group(
-    [
-        'prefix' => 'v1',
-    ],
-    function () {
-        //        Route::post('login', [ApiAuthController::class, 'login']);
-        Route::group(['middleware' => ['auth:sanctum']], function () {
-            //OpenCall
+    //        Route::post('login', [ApiAuthController::class, 'login']);
+    Route::group(['middleware' => ['auth:sanctum']], function () {
+        //OpenCall
 
-            Route::post('openCall/{callID}', [MCallController::class, 'openCall']);
-            Route::post('closeCall/{callID}', [MCallController::class, 'closeCall']);
+        Route::post('openCall/{callID}', [MCallController::class, 'openCall']);
+        Route::post('closeCall/{callID}', [MCallController::class, 'closeCall']);
 
-            Route::post('osa', [RouteActionsController::class, 'OnShelfAvailabilty']);
-            // Route::post('pricetracking', 'API\V1\RouteActionsController@PriceTracking');
-            // Route::post('shareofshelf', 'API\V1\RouteActionsController@ShareOfShelf');
-            // Route::post('productplacement', 'API\V1\RouteActionsController@ProductPlacement');
-            // Route::post('callobjective', 'API\V1\RouteActionsController@CallObjective');
-            // Route::post('contactperson', 'API\V1\OutletController@CreateContactPerson');
+        Route::post('osa', [RouteActionsController::class, 'OnShelfAvailabilty']);
+        // Route::post('pricetracking', 'API\V1\RouteActionsController@PriceTracking');
+        // Route::post('shareofshelf', 'API\V1\RouteActionsController@ShareOfShelf');
+        // Route::post('productplacement', 'API\V1\RouteActionsController@ProductPlacement');
+        // Route::post('callobjective', 'API\V1\RouteActionsController@CallObjective');
+        // Route::post('contactperson', 'API\V1\OutletController@CreateContactPerson');
 
-            //DifferentOrders
-            Route::post('CashOrder', [MOrderController::class, 'CashOrder']);
+        //DifferentOrders
+        Route::post('CashOrder', [MOrderController::class, 'CashOrder']);
 
-            //Payment
-            //         Route::post('stk-push', [PaymentController::class,"stkPush"]);
+        //Payment
+        //         Route::post('stk-push', [PaymentController::class,"stkPush"]);
 
-            //  Route::post('CashOrderAndPayment', [PaymentController::class, "CashOrderAndPayment"]);
-            // Route::post('AdvancePayment', 'API\V1\PaymentController@AdvancePayment');
-            // Route::post('AllInvoicesPayment', 'API\V1\PaymentController@AllInvoicesPayment');
-            // Route::get('getAllPayments', 'API\V1\PaymentController@getAllPayments');
+        //  Route::post('CashOrderAndPayment', [PaymentController::class, "CashOrderAndPayment"]);
+        // Route::post('AdvancePayment', 'API\V1\PaymentController@AdvancePayment');
+        // Route::post('AllInvoicesPayment', 'API\V1\PaymentController@AllInvoicesPayment');
+        // Route::get('getAllPayments', 'API\V1\PaymentController@getAllPayments');
 
-            //outletprofile
-            Route::get('outlet/{OutletID}/{Type}', [OutletController::class, 'SingleOutlet']);
-            Route::get('customerMapFilter', [OutletController::class, 'customerMapFilter']);
-            Route::get('outletsCategory', [OutletController::class, 'outletCategory']);
+        //outletprofile
+        Route::get('outlet/{OutletID}/{Type}', [OutletController::class, 'SingleOutlet']);
+        Route::get('customerMapFilter', [OutletController::class, 'customerMapFilter']);
+        Route::get('outletsCategory', [OutletController::class, 'outletCategory']);
 
-            //Get Product Unit of Measure
-            Route::get('item-uom/{ougpID}', [MItemController::class, 'getUnitOfMeasure']);
-            Route::post('item-price', [MItemController::class, 'getDefaultPrice']);
-            Route::get('productcategory', [MInventoryController::class, 'getProductCategory']);
-            Route::get('unitofmeasure', [MItemController::class, 'getAllUnitOfMeasure']);
+        //Get Product Unit of Measure
+        Route::get('item-uom/{ougpID}', [MItemController::class, 'getUnitOfMeasure']);
+        Route::post('item-price', [MItemController::class, 'getDefaultPrice']);
+        Route::get('productcategory', [MInventoryController::class, 'getProductCategory']);
+        Route::get('unitofmeasure', [MItemController::class, 'getAllUnitOfMeasure']);
 
-            //Inventory
-            Route::get('get-my-stock', [MInventoryController::class, 'getMyStock']);
-            Route::get('warehouse', [MInventoryController::class, 'getWarehouse']);
+        //Inventory
+        Route::get('get-my-stock', [MInventoryController::class, 'getMyStock']);
+        Route::get('warehouse', [MInventoryController::class, 'getWarehouse']);
 
-            //Orders
-            Route::get('order-types', [MOrderController::class, 'getOrderTypes']);
+        //Orders
+        Route::get('order-types', [MOrderController::class, 'getOrderTypes']);
 
-            //Targets
-            // Route::get('emp-targets', [TargetController::class, 'getEmpTargets']);
-            // Route::get('sales_reps/targets', [TargetController::class, 'salesRepsTargets']);
-            // Route::get('target/items/{id}', [TargetController::class, 'getTargetItems']);
-            // Route::get('target_employeese/{id}', [TargetController::class, 'getTargetEmployeese']);
-            // Route::put('remove_target_slp/{id}', [TargetController::class, 'removeTargetSlp']);
-            // Route::get('target_rows/{id}', [TargetController::class, 'getEmployeesTargets']);
-            // Route::post('add_slp_to_target', [TargetController::class, 'addSlpToTarget']);
-            // Route::get('getTargetsVsPerfomance', [TargetController::class, 'getTargetsVsPerfomance']);
+        //Targets
+        // Route::get('emp-targets', [TargetController::class, 'getEmpTargets']);
+        // Route::get('sales_reps/targets', [TargetController::class, 'salesRepsTargets']);
+        // Route::get('target/items/{id}', [TargetController::class, 'getTargetItems']);
+        // Route::get('target_employeese/{id}', [TargetController::class, 'getTargetEmployeese']);
+        // Route::put('remove_target_slp/{id}', [TargetController::class, 'removeTargetSlp']);
+        // Route::get('target_rows/{id}', [TargetController::class, 'getEmployeesTargets']);
+        // Route::post('add_slp_to_target', [TargetController::class, 'addSlpToTarget']);
+        // Route::get('getTargetsVsPerfomance', [TargetController::class, 'getTargetsVsPerfomance']);
 
-            //Get All Prices:
-            Route::get('all-item-prices', [MPricelistController::class, 'itemPrices']);
+        //Get All Prices:
+        Route::get('all-item-prices', [MPricelistController::class, 'itemPrices']);
 
-            //Company
-            Route::get('settings', [ApiAuthController::class, 'companySetupData']);
+        //Company
+        Route::get('settings', [ApiAuthController::class, 'companySetupData']);
 
-            Route::apiResources(['expense' => ExpenseController::class]);
-            Route::apiResources(['dashboard' => MDashboardController::class]);
-            // Route::apiResources(['outlet' => OutletController::class]);
-            Route::apiResources(['item' => MItemController::class]);
-            Route::apiResources(['call' => MCallController::class]);
-            Route::apiResources(['order' => MOrderController::class]);
-            // Route::apiResources(['invoice' => 'API\V1\InvoiceController']);
-            // Route::apiResources(['CashOrder' => 'API\V1\OrderController']);
-            // Route::apiResources(['delivery' => 'API\V1\DeliveryController']);
-            // Route::apiResources(['ARinvoice' => 'API\V1\InvoiceController']);
-            //   Route::apiResources(['assettracking' => AssetTrackingController::class]);
-            // Route::apiResources(['banks' => 'API\V1\BankController']);
-            //  Route::apiResources(['territory' => MTerritoryController::class]);
-            Route::apiResources(['pricelist' => MPricelistController::class]);
-            Route::apiResources(['stock_request' => MInventoryController::class]);
-        });
-    }
-);
+        Route::apiResources(['expense' => ExpenseController::class]);
+        Route::apiResources(['dashboard' => MDashboardController::class]);
+        // Route::apiResources(['outlet' => OutletController::class]);
+        Route::apiResources(['item' => MItemController::class]);
+        Route::apiResources(['call' => MCallController::class]);
+        Route::apiResources(['order' => MOrderController::class]);
+        // Route::apiResources(['invoice' => 'API\V1\InvoiceController']);
+        // Route::apiResources(['CashOrder' => 'API\V1\OrderController']);
+        // Route::apiResources(['delivery' => 'API\V1\DeliveryController']);
+        // Route::apiResources(['ARinvoice' => 'API\V1\InvoiceController']);
+        //   Route::apiResources(['assettracking' => AssetTrackingController::class]);
+        // Route::apiResources(['banks' => 'API\V1\BankController']);
+        //  Route::apiResources(['territory' => MTerritoryController::class]);
+        Route::apiResources(['pricelist' => MPricelistController::class]);
+        Route::apiResources(['stock_request' => MInventoryController::class]);
+    });
+
 
 /**
  * ----------------------------------------------------------------------------------------------
@@ -167,7 +197,7 @@ Route::group(
 
 Route::group(
     [
-        'prefix' => 'v1/integrator',
+        'prefix' => 'integrator',
     ],
     function () {
         Route::post('login', [ApiAuthController::class, 'login']);

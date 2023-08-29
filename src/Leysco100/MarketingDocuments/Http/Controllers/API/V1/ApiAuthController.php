@@ -135,7 +135,9 @@ class ApiAuthController extends Controller
             ->first();
 
         $weekdays = "1,2,3,4,5,6";
-        $worKdays->weekdays = $weekdays;
+        if ($worKdays){
+            $worKdays->weekdays = $weekdays;
+        }
         return $worKdays;
     }
 }
