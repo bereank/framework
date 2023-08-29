@@ -2,6 +2,7 @@
 
 namespace Leysco100\Gpm\Mail;
 
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Maatwebsite\Excel\Facades\Excel;
@@ -59,7 +60,7 @@ class GPMBCPReportMail extends Mailable
 
 
         return $this->subject($subject)
-            ->markdown('gatepassmanagement::BCMNotification')
+            ->markdown('gpm::BCMNotification')
             ->with('summaryReport', $summaryReport)
             ->attach($url_2)
             ->with('error', $error);

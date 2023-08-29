@@ -22,7 +22,8 @@ class LongScanLogReport implements FromCollection, WithHeadings, WithMapping, Sh
     public function collection()
     {
 
-        $scan_log_report = (new ReportsService())->scanLogReport($this->from_date, $this->to_date);
+        $scan_log_report = (new ReportsService())->scanLogReport($this->from_date, $this->to_date,  $paginate = false, $perPage = null, $docNum = null, $users = [], $gates = []);
+
         return $scan_log_report;
     }
     public function headings(): array

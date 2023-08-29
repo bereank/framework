@@ -196,8 +196,7 @@ class GPMDocsSyncronizationJob  implements ShouldQueue, TenantAware
 
             if ($timeDiff >= $Duration && ($logCount > $settings->DoesNotExistCount)) {
                 if (BackUpModeSetup::where('Enabled', true)->doesntExist()) {
-                    Log::info('Before creating BackUpModeSetup record');
-                    Log::info($settings);
+
                     BackUpModeSetup::create([
                         'UserSign' => $settings->UserSign,
                         'ObjectType' => 215,
@@ -235,6 +234,6 @@ class GPMDocsSyncronizationJob  implements ShouldQueue, TenantAware
             $notifyAfter  = $settings->NotifyAfter;
         }
         BCPNotificationJob::dispatch($id)
-            ->delay(now()->addMinutes($notifyAfter));
+            ->delay(now()->addMinutes(2));
     }
 }
