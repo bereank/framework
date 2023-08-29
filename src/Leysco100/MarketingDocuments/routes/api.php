@@ -171,7 +171,7 @@ Route::apiResources(['/dispatch/documents' => DispatchController::class]);
 
         Route::apiResources(['expense' => ExpenseController::class]);
         Route::apiResources(['dashboard' => MDashboardController::class]);
-        // Route::apiResources(['outlet' => OutletController::class]);
+         Route::apiResources(['outlet' => OutletController::class]);
         Route::apiResources(['item' => MItemController::class]);
         Route::apiResources(['call' => MCallController::class]);
         Route::apiResources(['order' => MOrderController::class]);
