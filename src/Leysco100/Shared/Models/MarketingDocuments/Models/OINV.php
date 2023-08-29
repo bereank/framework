@@ -92,4 +92,9 @@ class OINV extends Model
     {
         return $this->hasOne(OCLG::class, 'id', 'ClgCode');
     }
+
+    public function attachments()
+    {
+        return $this->hasMany(OATC::class, 'id', 'AtcEntry');
+    }
 }
