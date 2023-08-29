@@ -167,7 +167,7 @@ Route::apiResources(['/dispatch/documents' => DispatchController::class]);
         Route::get('all-item-prices', [MPricelistController::class, 'itemPrices']);
 
         //Company
-        Route::get('settings', [ApiAuthController::class, 'companySetupData']);
+//        Route::get('settings', [ApiAuthController::class, 'companySetupData']);
 
         Route::apiResources(['expense' => ExpenseController::class]);
         Route::apiResources(['dashboard' => MDashboardController::class]);

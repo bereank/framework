@@ -5,6 +5,7 @@ namespace Leysco100\Shared\Models\Administration\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Leysco100\Shared\Models\BusinessPartner\Models\OBPL;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OWHS;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OUDG extends Model
