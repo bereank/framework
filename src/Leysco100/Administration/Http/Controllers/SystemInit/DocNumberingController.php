@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\SystemInit;
+namespace Leysco100\Administration\Http\Controllers\SystemInit;
 
-use App\Domains\Administration\Models\NNM1;
-use App\Domains\Administration\Models\NNM2;
-use App\Domains\Administration\Models\ONNM;
-use App\Domains\Administration\Models\User;
-use App\Domains\Shared\Services\ApiResponseService;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Leysco100\Administration\Http\Controllers\Controller;
+use Leysco100\Shared\Models\Administration\Models\NNM1;
+use Leysco100\Shared\Models\Administration\Models\NNM2;
+use Leysco100\Shared\Models\Administration\Models\ONNM;
+use Leysco100\Shared\Models\Administration\Models\User;
+use Leysco100\Shared\Services\ApiResponseService;
 
 class DocNumberingController extends Controller
 {
