@@ -389,7 +389,7 @@ class DispatchController extends Controller
                             'ItemCode' => $value['ItemCode'] ?? null,
                             'Dscription' => $value['Dscription'] ?? null,
                             'Quantity' => $value['OpenQty'] ?? 1,
-                            'BaseQty' => $value['OpenQty'] ?? 1,
+                            // 'BaseQty' => $value['OpenQty'] ?? 1,
                             'PackQty' => $value['PackQty'] ?? null,
                             'Price' => $value['Price'] ?? 0,
                             'UomCode' => $value['UomCode'] ?? null,
