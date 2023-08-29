@@ -4,6 +4,7 @@ namespace Leysco100\BusinessPartner\Http\Controllers\API\CostAccounting;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Leysco100\BusinessPartner\Http\Controllers\Controller;
 use Leysco100\Shared\Models\FormSetting\Models\FTR100;
 use Leysco100\Shared\Models\Shared\Models\ODIM;
 use Leysco100\Shared\Services\ApiResponseService;
