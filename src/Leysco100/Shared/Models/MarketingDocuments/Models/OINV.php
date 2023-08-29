@@ -3,10 +3,13 @@
 namespace Leysco100\Shared\Models\MarketingDocuments\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\Administration\Models\ORLP;
 use Leysco100\Shared\Models\Administration\Models\OSLP;
 use Leysco100\Shared\Models\Administration\Models\OUDP;
 use Leysco100\Shared\Models\Administration\Models\User;
+use Leysco100\Shared\Models\Administration\Models\Vehicle;
 use Leysco100\Shared\Models\BusinessPartner\Models\OBPL;
+use Leysco100\Shared\Models\BusinessPartner\Models\OCLG;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OLCT;
@@ -73,5 +76,20 @@ class OINV extends Model
     public function ocrd()
     {
         return $this->belongsTo(OCRD::class, 'CardCode', 'CardCode');
+    }
+
+    public function driver()
+    {
+        return $this->belongsTo(ORLP::class, 'RlpCode', 'RlpCode');
+    }
+
+    public function vehicle()
+    {
+        return $this->belongsTo(Vehicle::class);
+    }
+
+    public function call()
+    {
+        return $this->hasOne(OCLG::class, 'id', 'ClgCode');
     }
 }
