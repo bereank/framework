@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Domains\Marketing\Models;
+namespace Leysco100\Shared\Models\MarketingDocuments\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
+use Leysco100\Shared\Models\Shared\Models\APDI;
 
 class OQUT extends Model
 {
@@ -11,7 +13,7 @@ class OQUT extends Model
 
     public function outlet()
     {
-        return $this->belongsTo('App\OCRD', 'CardCode');
+        return $this->belongsTo(OCRD::class, 'CardCode');
     }
 
 
@@ -19,12 +21,12 @@ class OQUT extends Model
 
     public function rows()
     {
-        return $this->hasMany('App\QUT1', 'DocEntry');
+        return $this->hasMany(QUT1::class, 'DocEntry');
     }
 
 
     public function objecttype()
     {
-        return $this->belongsTo('App\APDI', 'ObjType', 'ObjectID');
+        return $this->belongsTo(APDI::class, 'ObjType', 'ObjectID');
     }
 }

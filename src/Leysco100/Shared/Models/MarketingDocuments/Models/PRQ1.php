@@ -1,12 +1,16 @@
 <?php
 
-namespace App\Domains\Marketing\Models;
+namespace Leysco100\Shared\Models\MarketingDocuments\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Domains\Administration\Models\TaxGroup;
+use Leysco100\Shared\Models\Administration\Models\TaxGroup;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class PRQ1 extends Model
 {
+    use UsesTenantConnection;
+
     protected $guarded = ['id'];
     protected $table = 'p_r_q1_s';
 

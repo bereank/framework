@@ -1,15 +1,16 @@
 <?php
 
-namespace App\Domains\Banking\Models;
+namespace Leysco100\Shared\Models\Banking\Models;
 
-use App\Domains\Marketing\Models\OPRQ;
 use Illuminate\Database\Eloquent\Model;
-use App\Domains\BusinessPartner\Models\OBPL;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Leysco100\Shared\Models\BusinessPartner\Models\OBPL;
+use Leysco100\Shared\Models\MarketingDocuments\Models\OPRQ;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OVPM extends Model
 {
-    use HasFactory;
+    use HasFactory, UsesTenantConnection;
 
     protected $guarded = ['id'];
     protected $table = 'o_v_p_m_s';

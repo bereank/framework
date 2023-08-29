@@ -2,8 +2,8 @@
 
 namespace Leysco100\Shared\Models\InventoryAndProduction\Models;
 
-use App\Domains\Marketing\Models\OPLN;
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\MarketingDocuments\Models\OPLN;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class ITM1 extends Model

@@ -2,15 +2,16 @@
 
 namespace Leysco100\Shared\Models\BusinessPartner\Models;
 
-use App\Domains\Administration\Models\OSLP;
-use App\Domains\Administration\Models\OTER;
-use App\Domains\Administration\Models\Tier;
-use App\Domains\Marketing\Models\ODLN;
-use App\Domains\Marketing\Models\ODPI;
-use App\Domains\Marketing\Models\OINV;
-use App\Domains\Marketing\Models\ORDR;
 use App\Models\AssetTracking;
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\Administration\Models\Channel;
+use Leysco100\Shared\Models\Administration\Models\OSLP;
+use Leysco100\Shared\Models\Administration\Models\OTER;
+use Leysco100\Shared\Models\Administration\Models\Tier;
+use Leysco100\Shared\Models\MarketingDocuments\Models\ODLN;
+use Leysco100\Shared\Models\MarketingDocuments\Models\ODPI;
+use Leysco100\Shared\Models\MarketingDocuments\Models\OINV;
+use Leysco100\Shared\Models\MarketingDocuments\Models\ORDR;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OCRD extends Model
