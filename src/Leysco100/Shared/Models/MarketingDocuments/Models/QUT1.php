@@ -3,6 +3,7 @@
 namespace Leysco100\Shared\Models\MarketingDocuments\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
 
 class QUT1 extends Model
 {
@@ -11,6 +12,6 @@ class QUT1 extends Model
 
     public function oitm()
     {
-        return $this->belongsTo('App\OITM', 'ItemCode');
+        return $this->belongsTo(OITM::class, 'ItemCode');
     }
 }

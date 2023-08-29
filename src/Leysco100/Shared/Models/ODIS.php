@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Models;
+namespace Leysco100\Shared\Models;
 
-use App\Domains\Marketing\Models\ORDR;
-use Illuminate\Database\Eloquent\Model;
-use App\Domains\Administration\Models\ORLP;
-use App\Domains\InventoryAndProduction\Models\OITM;
-use App\Domains\InventoryAndProduction\Models\OUOM;
+use Leysco100\Shared\Models\Administration\Models\ORLP;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OUOM;
+use Leysco100\Shared\Models\MarketingDocuments\Models\ORDR;
 
 class ODIS extends Model
 {

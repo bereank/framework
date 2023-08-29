@@ -2,11 +2,11 @@
 
 namespace Leysco100\Shared\Models\MarketingDocuments\Models;
 
-use App\Domains\Administration\Models\TaxGroup;
-use App\Domains\InventoryAndProduction\Models\OITM;
-use App\Domains\InventoryAndProduction\Models\OUOM;
-use App\Domains\InventoryAndProduction\Models\SRI1;
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\Administration\Models\TaxGroup;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OUOM;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
 
 class RDN1 extends Model
 {

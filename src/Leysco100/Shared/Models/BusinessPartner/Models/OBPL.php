@@ -2,8 +2,8 @@
 
 namespace Leysco100\Shared\Models\BusinessPartner\Models;
 
-use App\Domains\InventoryAndProduction\Models\OLCT;
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OLCT;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OBPL extends Model
