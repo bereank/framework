@@ -128,9 +128,10 @@ class MOrderController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        $this->validate($request, [
-            'CardCode' => 'required|exists:o_c_r_d_s,id',
-        ]);
+
+//        $this->validate($request, [
+//            'CardCode' => 'required|exists:o_c_r_d_s,id',
+//        ]);
 
         $Items = $request['Items'];
 
