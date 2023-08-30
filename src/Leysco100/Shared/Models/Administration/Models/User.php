@@ -47,6 +47,7 @@ class User extends Authenticatable
         'status',
         'useLocalSearch',
         'localUrl',
+        'gate_id'
     ];
 
     /**
