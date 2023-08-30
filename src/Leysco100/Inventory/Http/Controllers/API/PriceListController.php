@@ -5,8 +5,8 @@ namespace Leysco100\Inventory\Http\Controllers\API;
 use Illuminate\Http\Request;
 
 
+use Leysco100\Shared\Models\MarketingDocuments\Models\OPLN;
 use Leysco100\Shared\Services\ApiResponseService;
-use Leysco100\Shared\Models\Marketing\Models\OPLN;
 use Leysco100\Inventory\Http\Controllers\Controller;
 
 class PriceListController extends Controller

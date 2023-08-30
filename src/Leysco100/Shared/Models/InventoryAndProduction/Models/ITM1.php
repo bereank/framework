@@ -9,6 +9,7 @@ use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 class ITM1 extends Model
 {
     use UsesTenantConnection;
+
     protected $guarded = ['id'];
     protected $table = 'i_t_m1_s';
 
