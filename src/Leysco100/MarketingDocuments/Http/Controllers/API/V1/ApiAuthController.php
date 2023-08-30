@@ -3,6 +3,7 @@
 namespace Leysco100\MarketingDocuments\Http\Controllers\API\V1;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Leysco100\Shared\Models\GpsSetup;
 use Leysco100\Shared\Services\AuthorizationService;
@@ -139,5 +140,21 @@ class ApiAuthController extends Controller
             $worKdays->weekdays = $weekdays;
         }
         return $worKdays;
+    }
+    public function promptPasswordChange(Request $request)
+    {
+
+        $request->validate([
+            'password' => ['required', 'string', 'min:4', 'confirmed'],
+        ]);
+        $user = Auth::user();
+        $user->password = Hash::make($request['password']);
+        $user->password_changed = true;
+        $user->save();
+
+        return response()->json([
+            'message' => 'Successfully Changed',
+            'redirectUrl' => '/dashboard'
+        ]);
     }
 }

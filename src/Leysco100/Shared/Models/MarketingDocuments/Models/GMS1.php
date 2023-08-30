@@ -51,4 +51,12 @@ class GMS1 extends Model
     {
         return $this->belongsTo(GPMGate::class, 'GateID');
     }
+    public function attachments()
+    {
+        return $this->hasMany(GMS2::class, 'DocEntry');
+    }
+    public function document()
+    {
+        return $this->belongsTo(OGMS::class, 'ScanLogID');
+    }
 }

@@ -40,9 +40,10 @@ class FieldsTemplateController extends Controller
         try {
             $id = Auth::user()->id;
             $validatedData = $request->validate([
-                'ObjectType' => 'nullable|exists:a_p_d_i_s,id',
+                // 'ObjectType' => 'nullable|exists:a_p_d_i_s,id',
+                'ObjectType'=>'nullable',
                 'Enabled' => 'nullable|boolean',
-                'FormFields' => 'required|array',
+                'FormFields' => 'nullable|array',
                 'DefaultTemplate' => 'nullable',
                 'Name' => 'required',
             ]);
@@ -60,13 +61,15 @@ class FieldsTemplateController extends Controller
                 'Enabled' => $validatedData['Enabled'] ?? 0,
             ]);
 
+            if (!empty($validatedData['FormFields'])) {
+
             foreach ($validatedData['FormFields'] as $field) {
                 FieldsTemplateRows::create([
                     'FormFieldId' => $field,
                     'TemplateId' =>  $data->id,
                 ]);
             }
-
+        }
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
@@ -114,9 +117,9 @@ class FieldsTemplateController extends Controller
     {
         try {
             $validatedData = $request->validate([
-                'ObjectType' => 'nullable|exists:a_p_d_i_s,id',
+                'ObjectType' => 'nullable',
                 'Enabled' => 'nullable|boolean',
-                'FormFields' => 'required|array',
+                'FormFields' => 'nullable|array',
                 'Name' => 'required',
                 'DefaultTemplate' => 'nullable',
             ]);
@@ -139,7 +142,7 @@ class FieldsTemplateController extends Controller
             ]);
             $templateRows = FieldsTemplateRows::where('TemplateId', $data->id);
             $templateRows->delete();
-
+            if (!empty($validatedData['FormFields'])) {
             foreach ($validatedData['FormFields'] as $field) {
 
                 FieldsTemplateRows::create([
@@ -147,7 +150,7 @@ class FieldsTemplateController extends Controller
                     'TemplateId' =>  $data->id,
                 ]);
             }
-
+        }
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());

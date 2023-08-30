@@ -76,6 +76,7 @@ class GPMMobileAPPApiController extends Controller
                             'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
                             'errors' => [
                                 'record' => 'Discrepancy Noted- Don’t Release Goods',
+                                'error'=>'String too short'
                             ],
                         ],
                         200
@@ -122,7 +123,10 @@ class GPMMobileAPPApiController extends Controller
             $newRecord = new GMS1($scanLogData);
             $newRecord->save();
             DB::commit();
-            $this->postScanLogDetails($request['fields'], $newRecord->id);
+            if($request['fields']){
+                $this->postScanLogDetails($request['fields'], $newRecord->id);
+            }
+            
         } catch (\Throwable $th) {
             DB::rollback();
 
@@ -136,6 +140,7 @@ class GPMMobileAPPApiController extends Controller
                         'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
                         'errors' => [
                             'record' => 'Discrepancy Noted- Don’t Release Goods',
+                            'Error'=>$th,
                         ],
                     ],
                     200

@@ -65,4 +65,26 @@ class GeneralSettingsController extends Controller
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
+
+    
+    public function updatePswdChangOnReset(Request $request)
+    {
+
+        try {
+            $validatedData = $request->validate([
+                'PswdChangeOnReset' => 'nullable',
+                'HasOtpVerification' => 'nullable'
+            ]);
+
+            $PswdChange = OADM::findOrFail(1);
+            $PswdChange->PswdChangeOnReset = $validatedData['PswdChangeOnReset'];
+            $PswdChange->HasOtpVerification = $validatedData['HasOtpVerification'];
+            $PswdChange->save();
+
+            return (new ApiResponseService())->apiSuccessResponseService($request);
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+        }
+    }
 }

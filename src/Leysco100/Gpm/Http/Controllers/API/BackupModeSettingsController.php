@@ -48,7 +48,9 @@ class BackupModeSettingsController extends Controller
                 'FieldsTemplate' => 'required',
                 'ActiveFrom' => "required",
                 "ActiveTo" => "required",
-                "isDistinctDocs" => 'required'
+                "isDistinctDocs" => 'required',
+                "NotifyAfter" => 'required',
+                "NotifyType" => 'required'
             ]);
 
             AutoBCModeSettings::updateOrCreate(
@@ -62,8 +64,9 @@ class BackupModeSettingsController extends Controller
                     'Status' => $request['Status'],
                     'ActiveFrom' => $request['ActiveFrom'],
                     "ActiveTo" => $request['ActiveTo'],
-                    "isDistinctDocs" => $request["isDistinctDocs"]
-
+                    "isDistinctDocs" => $request["isDistinctDocs"],
+                    "NotifyType" => $request['NotifyType'],
+                    "NotifyAfter" => $request['NotifyAfter']
                 ]
             );
 

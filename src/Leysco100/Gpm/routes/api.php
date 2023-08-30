@@ -75,6 +75,7 @@ Route::get('scanLogsReport', [GpmReportsController::class, 'ScanLogReport']);
 Route::get('duplicateLogsReport', [GpmReportsController::class, 'DuplicateScanLogs']);
 Route::get('documentReport', [GpmReportsController::class, 'DocumentReport']);
 Route::get('doesNotExistReport', [GpmReportsController::class, 'DoesNotExistReport']);
+Route::post('export_scan_report', [GpmReportsController::class, 'ExportScanLogReport']);
 
 
 /*
