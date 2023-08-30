@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Shared\Models\OtpVerification;
-use Leysco100\Gpm\Http\Controllers\Controller;
 use Leysco100\Shared\Services\ApiResponseService;
 
 
@@ -63,7 +62,7 @@ class OtpVerificationController extends Controller
                 DB::beginTransaction();
 
                 // perform database operations here
-                $inserted_id =   DB::table('otp_verification')->insertGetId([
+                $inserted_id =   DB::connection("tenant")->table('otp_verification')->insertGetId([
                     "UserSign" => $UserSign->id,
                     "GateId" => $GateId,
                     "phone_number" => $phone_number,
@@ -143,7 +142,7 @@ class OtpVerificationController extends Controller
         $phone_number = $request['phone_number'];
 
         try {
-            $last =  DB::table('otp_verification')
+            $last =  DB::connection("tenant")->table('otp_verification')
                 ->where('phone_number', $phone_number)
                 ->where('UserSign', Auth::user()->id)
                 ->latest('created_at')->first();
@@ -163,7 +162,7 @@ class OtpVerificationController extends Controller
 
         if ($last->expires_at < date('Y-m-d H:i:s')) {
 
-            DB::table('otp_verification')
+            DB::connection("tenant")->table('otp_verification')
                 ->where('id', $last->id)
                 ->where('UserSign', Auth::user()->id)
                 ->limit(1)  //to ensure only one record is updated.
@@ -177,7 +176,7 @@ class OtpVerificationController extends Controller
 
         if ($last->otp_code == $otp) {
             try {
-                DB::table('otp_verification')
+                DB::connection("tenant")->table('otp_verification')
                     ->where('id', $last->id)
                     ->where('UserSign', Auth::user()->id)
                     ->limit(1)  //to ensure only one record is updated.
@@ -190,7 +189,7 @@ class OtpVerificationController extends Controller
             }
         } else {
             try {
-                DB::table('otp_verification')
+                DB::connection("tenant")->table('otp_verification')
                     ->where('id', $last->id)
                     ->where('UserSign', Auth::user()->id)
                     ->limit(1)  //to ensure only one record is updated.
