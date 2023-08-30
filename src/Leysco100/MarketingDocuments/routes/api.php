@@ -1,4 +1,3 @@
-
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -109,7 +108,8 @@ Route::apiResources(['/dispatch/documents' => DispatchController::class]);
  *
  * ----------------------------------------------------------------------------------------------
  */
-
+Route::post('password-change', [ApiAuthController::class, 'promptPasswordChange']);
+       
     //        Route::post('login', [ApiAuthController::class, 'login']);
     Route::group(['middleware' => ['auth:sanctum']], function () {
         //OpenCall

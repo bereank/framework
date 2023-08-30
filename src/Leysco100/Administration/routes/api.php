@@ -1,9 +1,7 @@
-
 <?php
 
 use Illuminate\Support\Facades\Route;
 use Leysco100\Administration\Http\Controllers\Setup\Banking\BankController;
-use Leysco100\Administration\Http\Controllers\Setup\Financials\CreditCardController;
 use Leysco100\Administration\Http\Controllers\Setup\Inventory\UoMController;
 use Leysco100\Administration\Http\Controllers\Setup\General\DriverController;
 use Leysco100\Administration\Http\Controllers\Setup\General\VehicleController;
@@ -11,12 +9,14 @@ use Leysco100\Administration\Http\Controllers\Setup\General\EmployeeController;
 use Leysco100\Administration\Http\Controllers\Setup\Banking\HouseBankController;
 use Leysco100\Administration\Http\Controllers\Setup\General\TerritoryController;
 use Leysco100\Administration\Http\Controllers\Setup\General\UserGroupController;
+use Leysco100\Administration\Http\Controllers\SystemInit\DocNumberingController;
 use Leysco100\Administration\Http\Controllers\Setup\General\DepartmentController;
 use Leysco100\Administration\Http\Controllers\Setup\Inventory\UoMGroupController;
 use Leysco100\Administration\Http\Controllers\Setup\Financials\CurrencyController;
 use Leysco100\Administration\Http\Controllers\Setup\Financials\TaxGroupController;
 use Leysco100\Administration\Http\Controllers\Setup\Inventory\ItemGroupController;
 use Leysco100\Administration\Http\Controllers\Setup\General\UserDefaultsController;
+use Leysco100\Administration\Http\Controllers\Setup\Financials\CreditCardController;
 use Leysco100\Administration\Http\Controllers\Setup\General\SalesEmployeeController;
 use Leysco100\Administration\Http\Controllers\Setup\Inventory\ItemDefaultController;
 use Leysco100\Administration\Http\Controllers\Setup\Inventory\ManufactureController;
@@ -26,9 +26,9 @@ use Leysco100\Administration\Http\Controllers\Setup\BusinessPartners\BPGroupCont
 use Leysco100\Administration\Http\Controllers\Setup\BusinessPartners\CountryController;
 use Leysco100\Administration\Http\Controllers\Setup\Financials\ChartOfAccountController;
 use Leysco100\Administration\Http\Controllers\Setup\BusinessPartners\BPPropertiesController;
-use Leysco100\Administration\Http\Controllers\Setup\Financials\GLDetermination\GLAccountDeterminationController;
 use Leysco100\Administration\Http\Controllers\SystemInit\Authorization\PermissionController;
-use Leysco100\Administration\Http\Controllers\SystemInit\DocNumberingController;
+use Leysco100\Administration\Http\Controllers\SystemInit\GeneralSettings\GeneralSettingsController;
+use Leysco100\Administration\Http\Controllers\Setup\Financials\GLDetermination\GLAccountDeterminationController;
 
 
 Route::get('activeGLaccounts', [ChartOfAccountController::class, 'fetchActiveAccounts']);
@@ -105,5 +105,4 @@ Route::apiResources(['bank' => BankController::class]);
 Route::apiResources(['house_bank' => HouseBankController::class]);
  Route::apiResources(['documentnumbering' => DocNumberingController::class]);
 Route::apiResources(['vehicles' => VehicleController::class]);
-
-
+Route::put('/settings/password_rest_change', [GeneralSettingsController::class, 'updatePswdChangOnReset']);
