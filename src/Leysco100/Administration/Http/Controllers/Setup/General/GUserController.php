@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\Administration\Models\OADM;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Administration\Http\Controllers\Controller;
 
