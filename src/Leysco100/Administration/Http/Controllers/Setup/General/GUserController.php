@@ -134,15 +134,28 @@ class GUserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {;
+    {
 
         try {
-
             $SUPERUSER = 0;
-            if ($request['SUPERUSER'] == true) {
+            $STATUS = 0;
+
+            if ($request['SUPERUSER']) {
                 $SUPERUSER = 1;
             }
+            if ($request['status']) {
+                $STATUS = 1;
+            }
+            $settings = OADM::first();
 
+            $password_changed = true;
+            if ($settings->PswdChangeOnReset) {
+                $password_changed = false;
+            }
+            //        return [
+            //            "status"=>$STATUS,
+            //            "SUPERUSER"=>$SUPERUSER,
+            //        ];
             $user = User::where('id', $id)->first();
             $user->update(array_filter([
                 'name' => $request['name'],
@@ -150,14 +163,19 @@ class GUserController extends Controller
                 'account' => $request['name'],
                 'DfltsGroup' => 1,
                 'phone_number' => $request['phone_number'],
-                'SUPERUSER' => $SUPERUSER,
+                //                'SUPERUSER' => $SUPERUSER,
                 'password' => $request["password"] ? Hash::make($request['password']) : $user->password,
                 'ExtRef' => $request['ExtRef'],
                 'type' => $request['type'],
                 'gate_id' => $request['gate_id'],
-                'status' => 1,
+                //                'status' => $STATUS,
 
             ]));
+            $user->update([
+                'SUPERUSER' => $SUPERUSER,
+                'status' => $STATUS,
+                'password_changed' =>   $password_changed,
+            ]);
             return (new ApiResponseService())->apiSuccessResponseService("Created Successfully");
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
