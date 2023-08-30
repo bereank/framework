@@ -3,6 +3,7 @@
 namespace Leysco100\MarketingDocuments\Http\Controllers\API\V1;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Leysco100\Shared\Models\GpsSetup;
 use Leysco100\Shared\Services\AuthorizationService;
