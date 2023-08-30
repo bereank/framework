@@ -140,4 +140,20 @@ class ApiAuthController extends Controller
         }
         return $worKdays;
     }
+    public function promptPasswordChange(Request $request)
+    {
+
+        $request->validate([
+            'password' => ['required', 'string', 'min:4', 'confirmed'],
+        ]);
+        $user = Auth::user();
+        $user->password = Hash::make($request['password']);
+        $user->password_changed = true;
+        $user->save();
+
+        return response()->json([
+            'message' => 'Successfully Changed',
+            'redirectUrl' => '/dashboard'
+        ]);
+    }
 }
