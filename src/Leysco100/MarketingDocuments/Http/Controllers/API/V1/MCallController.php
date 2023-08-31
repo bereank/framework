@@ -2,6 +2,7 @@
 
 namespace Leysco100\MarketingDocuments\Http\Controllers\API\V1;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Shared\Models\Administration\Models\OUDG;
@@ -20,18 +21,28 @@ class MCallController extends Controller
      */
     public function index()
     {
+        $currentTime = Carbon::now();
+
         $user_id = Auth::user()->id;
         $user_data =   User::where('id', $user_id)->with('oudg')->first();
         $data = OCLG::with('outlet')
             ->with('objectives')
-            ->whereDate('CallDate', '>=', date('Y-m-d'))
+           // ->whereDate('CallDate', '>=', date('Y-m-d'))
+            ->where(function ($query) use ($currentTime) {
+                $query->whereDate('CallDate', '<=', $currentTime->toDateString())
+                                    ->whereTime('CallTime', '<', $currentTime->toTimeString());
+                      })
+            ->where(function ($query) use ($currentTime) {
+                $query->whereDate('CloseDate', '>=', $currentTime->toDateString())
+                                    ->whereTime('CloseTime','>=', $currentTime->toTimeString());
+            })
             ->where(function ($query) use ($user_id, $user_data) {
                 $query->orwhere('UserSign', $user_id)
                     ->orwhere('RlpCode', $user_data?->oudg?->Driver);
             })
             ->latest()
             ->get();
-        foreach ($data as $key => $value) {
+        foreach ($data as $value) {
             $value->CallCode = rand(1, 300);
         }
 

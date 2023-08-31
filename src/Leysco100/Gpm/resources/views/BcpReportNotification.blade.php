@@ -6,7 +6,6 @@
 | Total Documents| {{$summaryReport['totalDocs']}} |
 | Total Released Documents | {{$summaryReport['totalReleased']}} |
 | Total Not Released | {{$summaryReport['totalNotReleased']}} |
-| Total Flagged Scans |{{$summaryReport['totalFlagged']}} |
 | Total Synced| {{$summaryReport['totalSynced']}} |
 | Total pending Sync| {{$summaryReport['totalNotSynced']}} |
 

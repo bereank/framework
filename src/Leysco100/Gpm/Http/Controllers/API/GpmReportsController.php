@@ -115,6 +115,7 @@ class  GpmReportsController extends Controller
                     $query->select(["id", 'Name', 'Longitude', 'Latitude', 'Address']);
                 }])
                 ->with('ordr')
+                ->latest()
                 ->paginate(100);
 
             return (new ApiResponseService())->apiSuccessResponseService($rpt);

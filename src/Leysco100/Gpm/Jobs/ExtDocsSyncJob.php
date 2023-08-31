@@ -13,6 +13,7 @@ use Spatie\Multitenancy\Jobs\TenantAware;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Leysco100\Gpm\Services\NotificationsService;
+use Leysco100\Shared\Models\Administration\Models\OADM;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OGMS;
 
 
@@ -65,13 +66,30 @@ class ExtDocsSyncJob  implements ShouldQueue, TenantAware
                         'LineDetails' => $value['LineDetails'],
                     ]
                 );
+                // if ($data->wasRecentlyCreated) {
+                //     Log::info('A new record was created');
+                // } else {
+                //     $lineOld = explode('|', $data->LineDetails);
+                //     $lineNew = explode('|', $value['LineDetails']);
+
+                //     $difference = array_diff($lineNew, $lineOld);
+
+                //     $res = collect($difference)->values()->join('|');
+
+                //     $result = $data->LineDetails . '|' . $res;
+
+                //     OGMS::where('ExtRefDocNum', $data->ExtRefDocNum)->update([
+                //         'LineDetails' => $result
+                //     ]);
+                // }
             }
             DB::connection('tenant')->commit();
         } catch (\Throwable $th) {
             DB::connection('tenant')->rollback();
-            $subject = 'EXT Syncing Failure';
-            (new NotificationsService())->sendFailureNotification($th, $subject);
-            Log::info($th);
+            $recipient = OADM::where('id', 2)->value("NotifEmail"); 
+            $message= 'EXT Syncing Failure'.'
+                 ' . $th->getMessage();
+            (new NotificationsService())->sendNotification($message, $recipient);
         }
     }
 }

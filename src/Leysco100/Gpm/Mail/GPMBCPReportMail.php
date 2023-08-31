@@ -60,7 +60,7 @@ class GPMBCPReportMail extends Mailable
 
 
         return $this->subject($subject)
-            ->markdown('gpm::BCMNotification')
+            ->markdown('gpm::BcpReportNotification')
             ->with('summaryReport', $summaryReport)
             ->attach($url_2)
             ->with('error', $error);

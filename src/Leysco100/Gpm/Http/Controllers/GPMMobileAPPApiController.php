@@ -11,6 +11,7 @@ use Leysco100\Gpm\Jobs\SendEmailJob;
 use Leysco100\Gpm\Services\BackupModeService;
 use Leysco100\Gpm\Services\FormFieldsService;
 use Leysco100\Gpm\Http\Controllers\Controller;
+use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\Administration\Models\OADM;
 use Leysco100\Shared\Models\MarketingDocuments\Models\GMS1;
@@ -258,6 +259,12 @@ class GPMMobileAPPApiController extends Controller
                         );
                 } else {
                     $backupmodeHeader = BackUpModeSetup::where('id', $isBackupMode->id)->first();
+                        if ($originSystem == "LS100") {
+                         $DocOrigin=1;
+                       }
+                       if ($originSystem == "SAP") {
+                        $DocOrigin=2; 
+                       }
                     $lineData = BackUpModeLines::updateOrCreate(
                         [
                             'DocNum' => $fullDocNum[2],
@@ -266,9 +273,9 @@ class GPMMobileAPPApiController extends Controller
                         [
                             "BaseType" => 240,
                             "BaseEntry" => $newRecord->id,
-                            'DocOrigin' => $fullDocNum[0],
+                            'DocOrigin' => $DocOrigin,
                             "DocEntry" => $backupmodeHeader->id,
-                            "DocDate" => Carbon::now(),
+                            // "DocDate" => Carbon::now(),
                             'UserSign' => $user->id,
                         ]
                     );
@@ -303,6 +310,7 @@ class GPMMobileAPPApiController extends Controller
              */
             $baseRecord = OGMS::where('ObjType', $record->BaseType)
                 ->where('ExtRef', $record->BaseEntry)
+                ->with('objecttype')
                 ->first();
 
             if ($baseRecord && $ObjType != 'DISPNOT') {
@@ -320,7 +328,7 @@ class GPMMobileAPPApiController extends Controller
                         'Comment' => "Base Document Closed",
                     ]);
 
-
+                  
                     return response()
                         ->json(
                             [
@@ -333,6 +341,9 @@ class GPMMobileAPPApiController extends Controller
                                 'errors' => [
                                     'record' => 'Discrepancy Noted- Don’t Release Goods',
                                 ],
+                                'details'=>[
+                              "Document"=>      $baseRecord,
+                                ]
                             ],
                             200
                         );
@@ -449,7 +460,22 @@ class GPMMobileAPPApiController extends Controller
 
         try {
             if ($request['BackUpMode']) {
-                $data = BackUpModeLines::where('DocEntry', $id)->firstOrFail();
+                $isBackupMode = (new BackupModeService())->isBackupMode();
+                if (!$isBackupMode) {
+                return response()
+                ->json(
+                    [
+                        'message' => "Back-up mode off. Try scanning again.",
+                        'resultCode' => 1500,
+                        'resultDesc' => 'Try scanning again',
+                        'errors' => [
+                            'record' => 'Try scanning again',
+                        ],
+                    ],
+                    200
+                );
+            }
+                $data = BackUpModeLines::findorFail($id);
                 if ($data->ReleaseStatus == 1) {
                     return response()
                         ->json(
@@ -473,7 +499,7 @@ class GPMMobileAPPApiController extends Controller
                     ->update([
                         'Released' => 1,
                     ]);
-                BackUpModeLines::where("DocEntry", $id)
+                BackUpModeLines::where("id", $id)
                     ->update([
                         'ReleaseStatus' => 1,
                     ]);

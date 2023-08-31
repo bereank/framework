@@ -40,7 +40,7 @@ class BackupModeSettingsController extends Controller
             $request->validate([
                 // 'UserSign' => 'nullable|exists:users,id',
                 'UserSign' => 'nullable',
-                'Status' => 'required|integer|in:0,1',
+                'Status' => 'required',
                 'DoesNotExistCount' => 'nullable|integer',
                 'LastSyncDuration' => 'nullable|integer',
                 'DurationType' => 'required|in:hours,minutes,seconds',
