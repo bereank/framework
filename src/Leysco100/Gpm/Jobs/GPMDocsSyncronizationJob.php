@@ -51,11 +51,16 @@ class GPMDocsSyncronizationJob  implements ShouldQueue, TenantAware
 
         DB::connection('tenant')->beginTransaction();
         try {
-            $sycedLater = BackUpModeLines::where('SyncStatus', 0)->select('DocNum', 'ReleaseStatus', 'ObjType', 'id')->get();
-            foreach ($sycedLater as  $value) {
+            $bcpDocs = BackUpModeLines::where('SyncStatus', 0)
+            ->select('DocNum', 'ReleaseStatus', 'ObjType', 'id')->get();
+         if(!$bcpDocs){
+            return;
+         }
+            foreach ($bcpDocs as  $value) {
                 // Check if the record exists
                 $recordExists = OGMS::where('ObjType', $value->ObjType)->where('ExtRefDocNum', $value->DocNum)->exists();
                 if ($recordExists) {
+                    
                     BackUpModeLines::where('DocNum', $value->DocNum)
                         ->where('ObjType', $value->ObjType)
                         ->where('SyncStatus', 0)
@@ -87,9 +92,13 @@ class GPMDocsSyncronizationJob  implements ShouldQueue, TenantAware
             }
             DB::connection('tenant')->commit();
         } catch (\Throwable $th) {
-            DB::connection('tenant')->rollback();
-            $subject = 'Check if doc Sync Failure';
-            (new NotificationsService())->sendFailureNotification($th, $subject);
+            DB::connection('tenant')->rollback();  
+            $recipient = OADM::where('id', 2)->value("NotifEmail");
+            
+            $message= 'An error occurred during the execution of Check if doc Synced Command:
+                 ' . $th->getMessage();
+            (new NotificationsService())->sendNotification($recipient,$message);
+           
         }
     }
     public function deactivateBackupProcess()
@@ -99,7 +108,6 @@ class GPMDocsSyncronizationJob  implements ShouldQueue, TenantAware
                 'Enabled' => 0,
             ]);
 
-
         if ($affectedRows > 0) {
             Log::info("manual activation end");
             $emailString = OADM::where('id', 1)->value("NotifEmail");
@@ -108,13 +116,16 @@ class GPMDocsSyncronizationJob  implements ShouldQueue, TenantAware
                 ->where('EndTime', '<', Carbon::now())
                 ->select('id')->first();
             $this->sendReport($id);
-            // Mail::to($emails)->send(new GPMBCPReportMail($updatedId));
         }
-
 
         $Duration = '';
         $ogms = OGMS::latest()->first();
-        $settings = AutoBCModeSettings::where('Status', 1)->firstorFail();
+        $settings = AutoBCModeSettings::where('Status', 1)->first();
+
+        if(!$settings){
+            return;
+        }
+
         $timeDiff =  $ogms->created_at->diffInMinutes(now());
 
         if ($settings->LastSyncDurationType == 'hours') {
@@ -125,9 +136,12 @@ class GPMDocsSyncronizationJob  implements ShouldQueue, TenantAware
 
         if ($timeDiff < $Duration) {
             Log::info("Auto activation end");
-            $active = BackUpModeSetup::where('activatable_type', 1)->latest()
-                ->where('Enabled', 1)->firstorFail();
 
+            $active = BackUpModeSetup::where('activatable_type', 1)->latest()
+                ->where('Enabled', 1)->first();
+                    if(!$active){
+                        return;
+                    }
             $StrtTime = Carbon::parse($active->StartDate . ' ' . $active->StartTime);
 
             $minutes =  $StrtTime->diffInMinutes(Carbon::now());
@@ -146,15 +160,14 @@ class GPMDocsSyncronizationJob  implements ShouldQueue, TenantAware
                     ->latest()
                     ->where('Enabled', 0)
                     ->first();
-                Log::info($updatedModel);
+              
                 if ($updatedModel) {
                     $updatedId =  $updatedModel->id;
                     $recipient = OADM::where('id', 1)->value("NotifEmail");
-                    $subject = 'Auto Back up mode deactivated';
-                    $body = 'Documents started syncing';
-                    Mail::raw($body, function ($message) use ($recipient, $subject) {
-                        $message->to($recipient)->subject($subject);
-                    });
+                    $message = "Back-up-mode Deactivated\nDocuments started syncing";
+
+                    (new NotificationsService())->sendNotification($recipient,$message);
+                
                     $this->sendReport($updatedId);
                 }
             }
@@ -170,10 +183,12 @@ class GPMDocsSyncronizationJob  implements ShouldQueue, TenantAware
         try {
             $Duration = '';
             $ogms = OGMS::latest()->first();
-
+            
             $settings = AutoBCModeSettings::where('Status', 1)->where('ActiveFrom', '<=', $currentDateTime)
-                ->where('ActiveTo', '>=', $currentDateTime)->firstOrFail();
-
+                ->where('ActiveTo', '>=', $currentDateTime)->first();
+if(!$settings){
+    return;
+}
             $timeDiff =  $ogms->created_at->diffInMinutes(now());
 
             if ($settings->DurationType == 'hours') {
@@ -210,23 +225,30 @@ class GPMDocsSyncronizationJob  implements ShouldQueue, TenantAware
                         'OwnerID' => $settings->UserSign,
                         'FieldsTemplate' => $settings->FieldsTemplate,
                     ]);
+
                     $recipient = OADM::where('id', 1)->value("NotifEmail");
-                    $subject = 'Back up mode activated';
-                    $body = 'Documents not syncing for over ' . $settings->LastSyncDuration . ' ' . $settings->DurationType . ' now. ' . $logCount . ' Scan logs does-not-exist recorded. Auto backup mode Activated !!';
-                    Mail::raw($body, function ($message) use ($recipient, $subject) {
-                        $message->to($recipient)->subject($subject);
-                    });
+    
+                    $message = 'Documents not syncing for over ' . $settings->LastSyncDuration . ' ' . $settings->DurationType . ' now. ' . $logCount . ' Scan logs does-not-exist recorded. Auto backup mode Activated !!';
+                  
+                    (new NotificationsService())->sendNotification($recipient,$message);
+                
                 }
             }
             DB::connection('tenant')->commit();
         } catch (\Throwable $th) {
-            Log::info($th);
             DB::connection('tenant')->rollback();
+            $recipient = OADM::where('id', 2)->value("NotifEmail");
+            $message= 'An error occured Turning on backup mode:
+                 ' . $th->getMessage();
+            (new NotificationsService())->sendNotification($recipient,$message);
         }
     }
     public function sendReport($id)
     {
-        $settings = AutoBCModeSettings::where('Status', 1)->firstorFail();
+        $settings = AutoBCModeSettings::where('Status', 1)->first();
+        if(!$settings){
+            return;
+        }
         $notifyAfter = 1;
         if ($settings->NotifyType == 'hours') {
             $notifyAfter  = $settings->NotifyAfter * 60;
@@ -234,6 +256,6 @@ class GPMDocsSyncronizationJob  implements ShouldQueue, TenantAware
             $notifyAfter  = $settings->NotifyAfter;
         }
         BCPNotificationJob::dispatch($id)
-            ->delay(now()->addMinutes(2));
+            ->delay(now()->addMinutes($notifyAfter));
     }
 }

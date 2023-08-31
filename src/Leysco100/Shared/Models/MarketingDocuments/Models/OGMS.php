@@ -42,8 +42,16 @@ class OGMS extends Model
         }
 
         if ($this->Status == 1) {
+            return "Scanned Not Released";
+        }
+        if ($this->Status == 2) {
+            return "Scanned But flagged";
+        }
+
+        if ($this->Status == 3) {
             return "Released";
         }
+
     }
     public function getOriginAttribute()
     {
