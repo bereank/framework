@@ -291,10 +291,8 @@ class GPMMobileAPPApiController extends Controller
                                 'resultDesc' => 'Back up mode on: Kindly confirm the Document',
                                 'errors' => [
                                     "DocumentDetails" => $lineData,
+                                    'record' => "Ok: Back up mode on",
                                 ],
-                                // 'errors' => [
-                                //     'record' => "Ok: Back up mode on",
-                                // ],
                             ],
                             200
                         );
