@@ -293,6 +293,7 @@ class GPMMobileAPPApiController extends Controller
                                     "DocumentDetails" => $lineData,
                                     'record' => "Ok: Back up mode on",
                                 ],
+                                "DocumentDetails" => $lineData,
                             ],
                             200
                         );
@@ -339,9 +340,7 @@ class GPMMobileAPPApiController extends Controller
                                 'errors' => [
                                     'record' => 'Discrepancy Noted- Don’t Release Goods',
                                 ],
-                                'details'=>[
-                              "Document"=>      $baseRecord,
-                                ]
+                                'DocumentDetails'=>$baseRecord,
                             ],
                             200
                         );
@@ -448,6 +447,7 @@ class GPMMobileAPPApiController extends Controller
                     'details' => [
                         'record' =>  $singleDocument,
                     ],
+                    "DocumentDetails" => $singleDocument,
                 ],
                 200
             );
