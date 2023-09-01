@@ -326,7 +326,23 @@ class GPMMobileAPPApiController extends Controller
                         'Status' => 2,
                         'Comment' => "Base Document Closed",
                     ]);
-
+                    
+                    $itemRows = [];
+            
+                        $lineDetails = explode('|',  $baseRecord->LineDetails);
+            
+                        foreach ($lineDetails as $key => $value) {
+                            $data = explode(';', $value);
+            
+                            $item = [
+                                'ItemCode' => $data[0],
+                                'Quantity' => $data[1],
+                            ];
+            
+                            array_push($itemRows, $item);
+                        }   
+            
+                    $baseRecord->LineDetails = $itemRows;
                   
                     return response()
                         ->json(
