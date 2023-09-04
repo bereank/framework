@@ -16,11 +16,10 @@ class TargetSetup extends Model
     protected $guarded = ['id'];
     protected $table = 'target_setups';
 
-    public function rows()
+    public function document_lines()
     {
         return $this->hasMany(Targets::class, 'target_setup_id');
     }
-
     public function salesEmployees()
     {
         return $this->hasMany(TargetSalesEmp::class, 'target_setup_id');

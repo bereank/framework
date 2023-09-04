@@ -3,22 +3,24 @@
 namespace Leysco100\MarketingDocuments\Http\Controllers\API\V1;
 
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Leysco100\Shared\Models\Targets;
+use Leysco100\Shared\Models\TargetItems;
+use Leysco100\Shared\Models\TargetSetup;
 use Illuminate\Support\Facades\Validator;
-use Leysco100\MarketingDocuments\Http\Controllers\Controller;
+use Leysco100\Shared\Models\TargetSalesEmp;
+use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\MarketingDocuments\Jobs\SalesTargetJob;
 use Leysco100\Shared\Models\Administration\Models\OSLP;
 use Leysco100\Shared\Models\Administration\Models\User;
-use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OINV;
-use Leysco100\Shared\Models\TargetItems;
-use Leysco100\Shared\Models\Targets;
-use Leysco100\Shared\Models\TargetSalesEmp;
-use Leysco100\Shared\Models\TargetSetup;
-use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\MarketingDocuments\Http\Controllers\Controller;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
+
 
 class TargetController extends Controller
 {
@@ -30,7 +32,7 @@ class TargetController extends Controller
     public function index()
     {
 
-        $user = user::where('id', Auth::user()->id)->with('oudg')->first();
+        $user = User::where('id', Auth::user()->id)->with('oudg')->first();
         $targetSetup = TargetSetup::with('document_lines', 'items');
 
         if (!$user->SUPERUSER) {
@@ -324,9 +326,9 @@ class TargetController extends Controller
     public function addSlpToTarget(Request $request)
     {
         $rules = [
-            'target_setup_id' => 'required|exists:target_setups,id',
+            'target_setup_id' => 'required',
             'employees' => 'array|required',
-            'employees.*' => 'exists:o_s_l_p_s,SlpCode',
+            'employees.*' => 'nullable',
         ];
 
         $messages = [
@@ -356,7 +358,7 @@ class TargetController extends Controller
     {
         try {
             $slpCode = null;
-            $user = user::where('id', Auth::user()->id)->with('oudg')->first();
+            $user = User::where('id', Auth::user()->id)->with('oudg')->first();
             if (!$user->SUPERUSER) {
                 $slpCode = $user->oudg->SalePerson ?? 0;
             };
@@ -484,7 +486,7 @@ class TargetController extends Controller
     public function getEmployeesTargets($id)
     {
 
-        $user = user::where('id', Auth::user()->id)->with('oudg')->first();
+        $user = User::where('id', Auth::user()->id)->with('oudg')->first();
 
         try {
             $target_row = Targets::findorFail($id);
