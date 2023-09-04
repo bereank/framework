@@ -69,11 +69,10 @@ Route::apiResources(['doc_model' => DocModelController::class]);
 //Route::get('getschedules/{id}', [SurveyController::class, 'getSchedules']);
 //Route::get('getchoices/{id}', [RulesController::class, 'getChoices']);
 //Route::post('calls/filterCalls', [CallsController::class, 'filterCalls']);
-//Route::get('get_targets_skus/{id}', [TargetController::class, 'showSkus']);
+
 
 Route::get('items_data', [TargetController::class, 'ItemsData']);
 //Route::apiResources(['calls' => CallsController::class]);
-Route::apiResources(['targets' => TargetController::class]);
 //Route::apiResources(['tiers' => TierController::class]);
 //Route::apiResources(['channels' => ChannelController::class]);
 //Route::apiResources(['assets' => AssetsController::class]);
@@ -153,16 +152,17 @@ Route::post('password-change', [ApiAuthController::class, 'promptPasswordChange'
         //Orders
         Route::get('order-types', [MOrderController::class, 'getOrderTypes']);
 
-        //Targets
-        // Route::get('emp-targets', [TargetController::class, 'getEmpTargets']);
-        // Route::get('sales_reps/targets', [TargetController::class, 'salesRepsTargets']);
-        // Route::get('target/items/{id}', [TargetController::class, 'getTargetItems']);
-        // Route::get('target_employeese/{id}', [TargetController::class, 'getTargetEmployeese']);
-        // Route::put('remove_target_slp/{id}', [TargetController::class, 'removeTargetSlp']);
-        // Route::get('target_rows/{id}', [TargetController::class, 'getEmployeesTargets']);
-        // Route::post('add_slp_to_target', [TargetController::class, 'addSlpToTarget']);
-        // Route::get('getTargetsVsPerfomance', [TargetController::class, 'getTargetsVsPerfomance']);
-
+        //Sales Targets
+        Route::get('emp-targets', [TargetController::class, 'getEmpTargets']);
+        Route::get('sales_reps/targets', [TargetController::class, 'salesRepsTargets']);
+        Route::get('target/items/{id}', [TargetController::class, 'getTargetItems']);
+        Route::get('target_employeese/{id}', [TargetController::class, 'getTargetEmployeese']);
+        Route::put('remove_target_slp/{id}', [TargetController::class, 'removeTargetSlp']);
+        Route::get('target_rows/{id}', [TargetController::class, 'getEmployeesTargets']);
+        Route::post('add_slp_to_target', [TargetController::class, 'addSlpToTarget']);
+        Route::get('getTargetsVsPerfomance', [TargetController::class, 'getTargetsVsPerfomance']);
+        Route::apiResources(['targets' => TargetController::class]);
+        Route::get('get_targets_skus/{id}', [TargetController::class, 'showSkus']);
         //Get All Prices:
         Route::get('all-item-prices', [MPricelistController::class, 'itemPrices']);
 
