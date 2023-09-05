@@ -8,6 +8,13 @@
     "children": [
       {
         "icon": "mdi-con",
+        "Label": "Users",
+        "link": "/gpm/users",
+        "Visible": "Y",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
         "Label": "Documents",
         "link": "/gpm-documents",
         "Visible": "Y",
@@ -22,58 +29,67 @@
       },
       {
         "icon": "mdi-con",
-        "Label": "Users",
-        "link": "/gpm/users",
-        "Visible": "Y",
-        "children": []
-      },
-      {
-        "icon": "mdi-con",
-        "Label": "Gates",
-        "link": "/gpm/gates",
-        "Visible": "Y",
-        "children": []
-      },
-      {
-        "icon": "mdi-con",
-        "Label": "Settings",
-        "link": "/gpm/settings",
-        "Visible": "Y",
-        "children": []
-      },
-      {
-        "icon": "mdi-con",
-        "Label": "Form Fields",
-        "link": "/gpm/form-fields",
-        "Visible": "Y",
-        "children": []
-      },
-      {
-        "icon": "mdi-con",
-        "Label": "Form Fields Templates",
-        "link": "/gpm/form_field_template",
-        "Visible": "Y",
-        "children": []
-      },
-      {
-        "icon": "mdi-con",
         "Label": "Backup Mode",
+        "link": "/gpm/backup_mode",
+        "Visible": "Y",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Gpm Settings",
         "link": "",
         "Visible": "Y",
         "children": [
           {
             "icon": "mdi-con",
-            "Label": "General Setting",
-            "link": "/gpm/backup_mode/settings",
+            "Label": "Settings",
+            "link": "/gpm/settings",
+            "Visible": "Y",
+            "children": []
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Gates",
+            "link": "/gpm/gates",
             "Visible": "Y",
             "children": []
           },
           {
             "icon": "mdi-con",
             "Label": "Backup Mode",
-            "link": "/gpm/backup_mode",
+            "link": "",
             "Visible": "Y",
-            "children": []
+            "children": [
+              {
+                "icon": "mdi-con",
+                "Label": "Setting",
+                "link": "/gpm/backup_mode/settings",
+                "Visible": "Y",
+                "children": []
+              }
+            ]
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Mobile Settings",
+            "link": "",
+            "Visible": "Y",
+            "children": [
+              {
+                "icon": "mdi-con",
+                "Label": "Form Fields",
+                "link": "/gpm/form-fields",
+                "Visible": "Y",
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "Form Fields Templates",
+                "link": "/gpm/form_field_template",
+                "Visible": "Y",
+                "children": []
+              }
+            ]
           }
         ]
       },
@@ -108,6 +124,20 @@
             "icon": "mdi-con",
             "Label": "Document Report",
             "link": "/gpm/reports/document_reports",
+            "Visible": "Y",
+            "children": []
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Document Report",
+            "link": "/gpm/reports/document_reports",
+            "Visible": "Y",
+            "children": []
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Backup Mode Reports",
+            "link": "/gpm/reports/bcp_reports",
             "Visible": "Y",
             "children": []
           }

@@ -12,14 +12,14 @@ class FormFieldsTemplate extends Model
 
     protected $guarded = [];
 
-    protected static function boot()
-    {
-        parent::boot();
+    // protected static function boot()
+    // {
+    //     parent::boot();
 
-        static::saving(function ($model) {
-            if ($model->DefaultTemplate !== null && static::where('DefaultTemplate', $model->DefaultTemplate)->exists()) {
-                $model->DefaultTemplate = null;
-            }
-        });
-    }
+    //     static::saving(function ($model) {
+    //         if ($model->DefaultTemplate !== null && static::where('DefaultTemplate', $model->DefaultTemplate)->exists()) {
+    //             $model->DefaultTemplate = null;
+    //         }
+    //     });
+    // }
 }

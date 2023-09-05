@@ -62,8 +62,8 @@ class GPMFormFieldsController extends Controller
         try {
 
             $validatedData = $request->validate([
-                'key' => 'required|string|max:255',
-                'indexno' => 'required|integer',
+                'key' => 'nullable|string|max:255',
+                'indexno' => 'nullable|integer',
                 'title' => 'required|string|max:255',
                 'type_id' => 'required|max:255',
                 'mandatory' => 'nullable|boolean',
@@ -78,11 +78,11 @@ class GPMFormFieldsController extends Controller
             }
 
             $formField = new FormField;
-            $formField->key = $validatedData['key'];
-            $formField->indexno = $validatedData['indexno'];
+            $formField->key = $validatedData['key']??0;
+            $formField->indexno = $validatedData['indexno']??0;
             $formField->title = $validatedData['title'];
             $formField->type_id = $validatedData['type_id'];
-            $formField->mandatory = $validatedData['mandatory'] ? 'Y' : 'N';
+            $formField->mandatory = isset( $validatedData['mandatory']) ? 'Y' : 'N';
             $formField->save();
 
             if (Arr::has($validatedData, 'drop_down_values')) {
@@ -129,11 +129,11 @@ class GPMFormFieldsController extends Controller
         //return $request;
         try {
             $validatedData = $request->validate([
-                'key' => 'required|string|max:255',
-                'indexno' => 'required|integer',
+                'key' => 'nullable|string|max:255',
+                'indexno' => 'nullable|integer',
                 'title' => 'required|string|max:255',
                 'type_id' => 'required|max:255',
-                'mandatory' => 'string|nullable',
+                'mandatory' => 'nullable|string',
                 'status' => 'boolean',
                 'drop_down_values' => 'nullable|array',
                 'drop_down_values.*.Value' => 'nullable|string|max:255',
@@ -142,14 +142,14 @@ class GPMFormFieldsController extends Controller
             if ($validatedData['type_id'] == 4 && !Arr::has($validatedData, 'drop_down_values')) {
                 return (new ApiResponseService())->apiFailedResponseService('Dropdown field must have at least one value');
             }
-
+        $mandatory=    $validatedData['mandatory']=='Y'? 'Y':'N';
             $formField = FormField::findOrFail($id); // find the form field by ID
 
-            $formField->key = $validatedData['key'];
-            $formField->indexno = $validatedData['indexno'];
+            $formField->key = $validatedData['key']??0;
+            $formField->indexno = $validatedData['indexno']??0;
             $formField->title = $validatedData['title'];
             $formField->type_id = $validatedData['type_id'];
-            $formField->mandatory = $validatedData['mandatory'] ? 'Y' : 'N';
+            $formField->mandatory = $mandatory;
             $formField->status = $validatedData['status'];
             $formField->save();
 
@@ -186,12 +186,12 @@ class GPMFormFieldsController extends Controller
         try {
 
             $validatedData = $request->validate([
-                'key' => 'required|string|max:255',
+                'key' => 'nullable|string|max:255',
                 'status' => 'required|boolean',
                 'title' => 'required|string|max:255'
             ]);
             $mobileNav = MobileNavBar::findOrFail($request->id);
-            $mobileNav->key = $validatedData['key'];
+            $mobileNav->key = $validatedData['key']??1;
             $mobileNav->title = $validatedData['title'];
             $mobileNav->status = $validatedData['status'];
             $mobileNav->save();

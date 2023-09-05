@@ -3,12 +3,12 @@
 namespace Leysco100\Gpm\Reports;
 
 
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OGMS;
-
 
 class DocumentReport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize
 {
@@ -20,22 +20,17 @@ class DocumentReport implements FromCollection, WithHeadings, WithMapping, Shoul
     public function collection()
     {
 
-
-
-        $document_rpt = OGMS::with('scanlog.gates', 'objecttype')
-            ->whereDate('GenerationDateTime', $this->date)->get();
-
-
-        // $document_rpt = DB::connection('tenant')->table('o_g_m_s')
-        //     ->whereDate('o_g_m_s.GenerationDateTime', $this->date)
-        //     ->leftjoin('g_m_s1_s', 'g_m_s1_s.id', '=', 'o_g_m_s.ScanLogID')
-        //     ->join('a_p_d_i_s', 'a_p_d_i_s.ObjectID', 'o_g_m_s.ObjType')
-        //     ->leftjoin('gates', 'gates.id', '=', 'g_m_s1_s.GateID')
-        //     ->select('gates.name as gate_name', 'a_p_d_i_s.DocumentName', 'g_m_s1_s.*', 'o_g_m_s.Status as state', 'o_g_m_s.ExtRefDocNum as document_number', 'o_g_m_s.GenerationDateTime as gen_time')
-        //     ->groupBy('o_g_m_s.ExtRefDocNum')
-        //     ->orderBy('o_g_m_s.Status', 'desc')
-        //     ->get();
-
+        // $document_rpt = OGMS::with('scanlog.gates', 'objecttype')
+        //     ->whereDate('GenerationDateTime', $this->date)->get();
+        $document_rpt = DB::connection('tenant')->table('o_g_m_s')
+            ->whereDate('o_g_m_s.GenerationDateTime', $this->date)
+            ->leftjoin('g_m_s1_s', 'g_m_s1_s.id', '=', 'o_g_m_s.ScanLogID')
+            ->join('a_p_d_i_s', 'a_p_d_i_s.ObjectID', 'o_g_m_s.ObjType')
+            ->leftjoin('gates', 'gates.id', '=', 'g_m_s1_s.GateID')
+            ->select('gates.name as gate_name', 'a_p_d_i_s.DocumentName', 'g_m_s1_s.*', 'o_g_m_s.Status as state', 'o_g_m_s.ExtRefDocNum as document_number', 'o_g_m_s.GenerationDateTime as gen_time')
+          //  ->groupBy('o_g_m_s.ExtRefDocNum')
+            // ->orderBy('o_g_m_s.Status', 'desc')
+            ->get();
 
         foreach ($document_rpt as $key => $value) {
             if ($value->state == 0) {
