@@ -3,16 +3,16 @@
 namespace Leysco100\MarketingDocuments\Http\Controllers\API\V1\Integrator;
 
 use Carbon\Carbon;
-use App\Models\OINS;
-use App\Models\OSCO;
 use Illuminate\Http\Request;
+use Leysco100\Shared\Models\MarketingDocuments\Models\OATS;
+use Leysco100\Shared\Models\OINS;
 use Leysco100\Shared\Models\OSCL;
+use Leysco100\Shared\Models\OSCO;
 use Leysco100\Shared\Models\OSLT;
 use Leysco100\Shared\Models\SCL4;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
-use App\Domains\Marketing\Models\OATS;
 use Illuminate\Support\Facades\Storage;
 use Leysco100\Shared\Services\CommonService;
 use Leysco100\Shared\Models\Shared\Models\APDI;
