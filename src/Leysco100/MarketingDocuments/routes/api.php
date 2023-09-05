@@ -195,11 +195,11 @@ Route::post('password-change', [ApiAuthController::class, 'promptPasswordChange'
  * ----------------------------------------------------------------------------------------------
  */
 
-Route::group(
-    [
-        'prefix' => 'integrator',
-    ],
-    function () {
+//Route::group(
+//    [
+//        'prefix' => 'integrator',
+//    ],
+//    function () {
         Route::post('login', [ApiAuthController::class, 'login']);
         Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::get('/enabled-pricelist', [ProductController::class, 'getEnabledPriceList']);
@@ -285,5 +285,5 @@ Route::group(
             Route::put('/gms_docs_create', [ITransactionController::class, 'createDocumentForGateManagementModule']);
             //        Route::put('/gms_docs_create', GMPDocumentController::class);
         });
-    }
-);
+//    }
+//);
