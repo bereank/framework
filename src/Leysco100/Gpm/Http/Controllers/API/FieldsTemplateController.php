@@ -6,6 +6,7 @@ namespace Leysco100\Gpm\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Gpm\Http\Controllers\Controller;
 use Leysco100\Shared\Services\ApiResponseService;
@@ -115,7 +116,7 @@ class FieldsTemplateController extends Controller
      */
     public function update(Request $request, $id)
     {
-        try {
+        try{
             $validatedData = $request->validate([
                 'ObjectType' => 'nullable',
                 'Enabled' => 'nullable|boolean',
@@ -126,17 +127,21 @@ class FieldsTemplateController extends Controller
             $userid = Auth::user()->id;
             $data = FormFieldsTemplate::findOrFail($id);
 
-            if ($validatedData['DefaultTemplate']) {
-                FormFieldsTemplate::where('DefaultTemplate', '!=', null)
-                    ->update([
-                        'DefaultTemplate' => null,
-                    ]);
-            }
+            // if ($validatedData['DefaultTemplate']) {
+            //     FormFieldsTemplate::where('DefaultTemplate', '!=', null)
+            //         ->update([
+            //             'DefaultTemplate' => null,
+            //         ]);
+            // }
+            $DefaultTemplate=null;
+             if( $validatedData['DefaultTemplate']==1 ||  $validatedData['DefaultTemplate']==true){
+                     $DefaultTemplate=1;
+              }
 
             $data->update([
                 'ObjectType' => $validatedData['ObjectType'] ?? null,
                 'UserSign' => $userid,
-                'DefaultTemplate' => $validatedData['DefaultTemplate'] ?? null,
+                'DefaultTemplate' => $validatedData['DefaultTemplate'],
                 'Name' => $validatedData['Name'],
                 'Enabled' => $validatedData['Enabled'],
             ]);

@@ -66,22 +66,24 @@ class ExtDocsSyncJob  implements ShouldQueue, TenantAware
                         'LineDetails' => $value['LineDetails'],
                     ]
                 );
-                // if ($data->wasRecentlyCreated) {
-                //     Log::info('A new record was created');
-                // } else {
-                //     $lineOld = explode('|', $data->LineDetails);
-                //     $lineNew = explode('|', $value['LineDetails']);
+                if ($data->wasRecentlyCreated) {
+                    Log::info('A new record was created');
+                } else {
+                    $lineOld = explode('|', $data->LineDetails);
+                    $lineNew = explode('|', $value['LineDetails']);
 
-                //     $difference = array_diff($lineNew, $lineOld);
+                    $difference = array_diff($lineNew, $lineOld);
+                  
+                    if(!empty($difference)){
+                        $res = collect($difference)->values()->join('|');
 
-                //     $res = collect($difference)->values()->join('|');
-
-                //     $result = $data->LineDetails . '|' . $res;
-
-                //     OGMS::where('ExtRefDocNum', $data->ExtRefDocNum)->update([
-                //         'LineDetails' => $result
-                //     ]);
-                // }
+                        $result = $data->LineDetails . '|' . $res;
+    
+                        OGMS::where('ExtRefDocNum', $data->ExtRefDocNum)->update([
+                            'LineDetails' => $result
+                        ]);
+                    }    
+                }
             }
             DB::connection('tenant')->commit();
         } catch (\Throwable $th) {

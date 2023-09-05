@@ -313,8 +313,8 @@ class GPMMobileAPPApiController extends Controller
                 ->first();
 
             if ($baseRecord && $ObjType != 'DISPNOT') {
-                if ($baseRecord->Status != 0) {
-                    $this->closeOtherDocuments($record->BaseType, $record->BaseEntry);
+                if ($baseRecord->Status == 3 ) {
+                //    $this->closeOtherDocuments($record->BaseType, $record->BaseEntry);
 
                     $record->update([
                         'Status' => 2,
@@ -404,9 +404,9 @@ class GPMMobileAPPApiController extends Controller
         ]);
 
         //Close SubSequent Documents
-        if ($record->BaseType && $record->BaseEntry) {
-            $this->closeOtherDocuments($record->BaseType, $record->BaseEntry);
-        }
+        // if ($record->BaseType && $record->BaseEntry) {
+        //     $this->closeOtherDocuments($record->BaseType, $record->BaseEntry);
+        // }
 
         $record->update([
             'Status' => 1,
@@ -537,6 +537,11 @@ class GPMMobileAPPApiController extends Controller
                     );
             } else {
                 $data = OGMS::findOrFail($id);
+
+                 //Close SubSequent Documents
+        if ($data->BaseType && $data->BaseEntry) {
+            $this->closeOtherDocuments($data->BaseType, $data->BaseEntry);
+        }
                 if ($data->Status == 3) {
                     return response()
                         ->json(
@@ -586,7 +591,7 @@ class GPMMobileAPPApiController extends Controller
         $record = OGMS::where('ObjType', $ObjType)
             ->where('ExtRef', $DocEntry)
             ->first();
-
+            Log::info($record);
         if (!$record) {
             return;
         }
