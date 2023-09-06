@@ -3,17 +3,20 @@
 namespace Leysco100\Shared\Models\MarketingDocuments\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\Shared\Models\APDI;
+use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
 use Leysco100\Shared\Models\Administration\Models\OSLP;
 use Leysco100\Shared\Models\Administration\Models\OUDP;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\BusinessPartner\Models\OBPL;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
-use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
+use Leysco100\Shared\Models\MarketingDocuments\Models\RIN1;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OLCT;
-use Leysco100\Shared\Models\Shared\Models\APDI;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class ORIN extends Model
 {
+    use UsesTenantConnection;
     protected $guarded = ['id'];
     protected $table = 'o_r_i_n_s';
 
@@ -37,7 +40,7 @@ class ORIN extends Model
         return $this->hasMany(RIN1::class, 'DocEntry');
     }
 
-    public function rows()
+    public function document_lines()
     {
         return $this->hasMany(RIN1::class, 'DocEntry');
     }
