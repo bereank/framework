@@ -12,6 +12,8 @@ use Leysco100\MarketingDocuments\Services\DatabaseValidationServices;
 use Leysco100\MarketingDocuments\Services\DocumentsService;
 use Leysco100\Shared\Models\Administration\Models\OADM;
 use Leysco100\Shared\Models\Administration\Models\User;
+use Leysco100\Shared\Models\Banking\Models\PDF2;
+use Leysco100\Shared\Models\Banking\Models\RCT2;
 use Leysco100\Shared\Models\Banking\Services\BankingDocumentService;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
