@@ -23,7 +23,7 @@ class CommonService
         $DocumentTables = APDI::with('pdi1')
             ->where('ObjectID', $ObjType)
             ->first();
-        $document = $DocumentTables->ObjectHeaderTable::with('objecttype', 'rows')
+        $document = $DocumentTables->ObjectHeaderTable::with('objecttype', 'document_lines')
             ->where('id', $DocEntry)
             ->first();
         return $document;

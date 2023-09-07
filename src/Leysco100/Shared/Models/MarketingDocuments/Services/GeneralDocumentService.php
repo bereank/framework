@@ -46,7 +46,7 @@ class GeneralDocumentService
             ->where('ObjectID', $ObjType)
             ->first();
 
-        $data = $DocumentTables->ObjectHeaderTable::with('rows')
+        $data = $DocumentTables->ObjectHeaderTable::with('document_lines')
             ->where('id', $DocEntry)
             ->first();
 
