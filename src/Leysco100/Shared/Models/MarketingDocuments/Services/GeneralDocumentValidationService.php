@@ -162,7 +162,7 @@ class GeneralDocumentValidationService
             $paymentData = $request['payment'] ?? null;
             if ($paymentTerms) {
                 if ($ObjType == 13 && $paymentTerms->ExtraDays == 0 && $paymentTerms->ExtraMonth == 0) {
-                    if (!$request['payment']) {
+                    if (!$request['payments']) {
                         (new ApiResponseService())->apiSuccessAbortProcessResponse("Payment details is Required");
                     }
 
