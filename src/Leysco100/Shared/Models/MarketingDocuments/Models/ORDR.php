@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
+use Leysco100\Shared\Models\Shared\Models\APDI;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class ORDR extends Model
