@@ -158,60 +158,62 @@ class GeneralDocumentValidationService
         /**
          * Validating Payments if the customer is cash Customer
          */
-        if ($ObjType == 13) {
-            $paymentData = $request['payment'] ?? null;
-            if ($paymentTerms) {
-                if ($ObjType == 13 && $paymentTerms->ExtraDays == 0 && $paymentTerms->ExtraMonth == 0) {
-                    if (!$request['payments']) {
-                        (new ApiResponseService())->apiSuccessAbortProcessResponse("Payment details is Required");
-                    }
+        if ($ObjType == 13 && $request["payments"]) {
+            foreach ($request['payments'] as $paymentData){
+                //               $paymentData = $request['payments'][0] ?? null;
+                if ($paymentTerms) {
+                    if ($ObjType == 13 && $paymentTerms->ExtraDays == 0 && $paymentTerms->ExtraMonth == 0) {
+                        if (!$request['payments']) {
+                            (new ApiResponseService())->apiSuccessAbortProcessResponse("Payment details is Required");
+                        }
 
-                    if ($request['DocTotal'] > $paymentData['TotalPaid']) {
-                        (new ApiResponseService())->apiSuccessAbortProcessResponse("Invoice & Receipt Must be paid Exactly");
+                        if ($request['DocTotal'] > $paymentData['TotalPaid']) {
+                            (new ApiResponseService())->apiSuccessAbortProcessResponse("Invoice & Receipt Must be paid Exactly");
+                        }
+
+                        if (!$paymentData['CashAcct'] && $paymentData['CashSum'] > 0) {
+                            (new ApiResponseService())->apiSuccessAbortProcessResponse("Cash GL Is required");
+                        }
+
+                        if (!isset($paymentData['CheckAcct']) && $paymentData['CheckSum'] > 0) {
+                            if (!isset($paymentData['CheckAcct'])) {
+                                (new ApiResponseService())->apiSuccessAbortProcessResponse("Checks GL Is required");
+                            }
+                        }
+
+                        if ($paymentData['TrsfrSum'] > 0) {
+                            if (!isset($paymentData['TrsfrRef'])) {
+                                (new ApiResponseService())->apiSuccessAbortProcessResponse('EOH Error - indicate the Bank Transfer/M-Pesa Reference');
+                            }
+
+                            if (!isset($paymentData['TrsfrAcct'])) {
+                                (new ApiResponseService())->apiSuccessAbortProcessResponse('Account for bank transfer has not been defined');
+                            }
+                        }
+
+                        if ($request['DocTotal'] < $paymentData['TotalPaid']) {
+                            (new ApiResponseService())->apiSuccessAbortProcessResponse("Payment Amount is greater than invoice amount");
+                        }
+                    }
+                }
+
+                if ($paymentData) {
+                    if ($request['DocTotal'] < $paymentData['TotalPaid']) {
+                        (new ApiResponseService())->apiSuccessAbortProcessResponse("Payment Amount is greater than invoice amount");
+                    }
+                    if (!$paymentData['CashAcct'] && $paymentData['CashSum'] > 0) {
+                        (new ApiResponseService())->apiSuccessAbortProcessResponse("Cash GL Is required");
                     }
 
                     if (!$paymentData['CashAcct'] && $paymentData['CashSum'] > 0) {
                         (new ApiResponseService())->apiSuccessAbortProcessResponse("Cash GL Is required");
                     }
 
-                    if (!isset($paymentData['CheckAcct']) && $paymentData['CheckSum'] > 0) {
-                        if (!isset($paymentData['CheckAcct'])) {
-                            (new ApiResponseService())->apiSuccessAbortProcessResponse("Checks GL Is required");
-                        }
-                    }
-
-                    if ($paymentData['TrsfrSum'] > 0) {
-                        if (!isset($paymentData['TrsfrRef'])) {
-                            (new ApiResponseService())->apiSuccessAbortProcessResponse('EOH Error - indicate the Bank Transfer/M-Pesa Reference');
-                        }
-
-                        if (!isset($paymentData['TrsfrAcct'])) {
-                            (new ApiResponseService())->apiSuccessAbortProcessResponse('Account for bank transfer has not been defined');
-                        }
-                    }
-
-                    if ($request['DocTotal'] < $paymentData['TotalPaid']) {
-                        (new ApiResponseService())->apiSuccessAbortProcessResponse("Payment Amount is greater than invoice amount");
-                    }
-                }
-            }
-
-            if ($paymentData) {
-                if ($request['DocTotal'] < $paymentData['TotalPaid']) {
-                    (new ApiResponseService())->apiSuccessAbortProcessResponse("Payment Amount is greater than invoice amount");
-                }
-                if (!$paymentData['CashAcct'] && $paymentData['CashSum'] > 0) {
-                    (new ApiResponseService())->apiSuccessAbortProcessResponse("Cash GL Is required");
-                }
-
-                if (!$paymentData['CashAcct'] && $paymentData['CashSum'] > 0) {
-                    (new ApiResponseService())->apiSuccessAbortProcessResponse("Cash GL Is required");
-                }
-
-                if (count($paymentData['rct3']) > 0) {
-                    foreach ($paymentData['rct3'] as $key => $rct3) {
-                        if (!isset($rct3['CreditCard'])) {
-                            (new ApiResponseService())->apiSuccessAbortProcessResponse("Credit Card Required");
+                    if (count($paymentData['rct3']) > 0) {
+                        foreach ($paymentData['rct3'] as $key => $rct3) {
+                            if (!isset($rct3['CreditCard'])) {
+                                (new ApiResponseService())->apiSuccessAbortProcessResponse("Credit Card Required");
+                            }
                         }
                     }
                 }
