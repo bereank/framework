@@ -54,7 +54,7 @@ class GeneralDocumentService
          * Compare Rows
          */
 
-        $allRowData = $data->rows;
+        $allRowData = $data->document_lines;
 
         $totalNotSimilarRows = count($allRowData);
         foreach ($allRowData as $key => $rowData) {
