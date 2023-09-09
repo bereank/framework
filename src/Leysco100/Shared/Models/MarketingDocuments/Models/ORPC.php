@@ -1,12 +1,19 @@
 <?php
 
-namespace App\Domains\Marketing\Models;
+namespace Leysco100\Shared\Models\MarketingDocuments\Models;
 
-use App\Domains\BusinessPartner\Models\OCRD;
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\Administration\Models\OSLP;
+use Leysco100\Shared\Models\Administration\Models\User;
+use Leysco100\Shared\Models\BusinessPartner\Models\OBPL;
+use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
+use Leysco100\Shared\Models\Shared\Models\APDI;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class ORPC extends Model
 {
+    use UsesTenantConnection;
+
     protected $guarded = ['id'];
     protected $table = 'o_r_p_c_s';
 

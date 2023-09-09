@@ -16,7 +16,6 @@ use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Leysco100\Shared\Models\Administration\Models\Vehicle;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OLCT;
-use Leysco100\Shared\Models\MarketingDocuments\Models\DELCONF1;
 
 class ODISPASS extends Model
 {
