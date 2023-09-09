@@ -596,7 +596,7 @@ class GPMMobileAPPApiController extends Controller
             return;
         }
         $record->update([
-            'Status' => 1,
+            'Status' => 3,
         ]);
 
         if ($record->BaseType) {

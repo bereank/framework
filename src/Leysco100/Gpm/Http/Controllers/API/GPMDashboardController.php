@@ -4,16 +4,19 @@ namespace Leysco100\Gpm\Http\Controllers\API;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Request;
+use Leysco100\Gpm\Http\Controllers\Controller;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\MarketingDocuments\Models\GMS1;
 
 
-class GPMDashboardController
+
+class GPMDashboardController  extends Controller
 {
     public function index()
     {
         try {
-            $param = \Request::get('periods');
+            $param = Request::get('periods');
             $hasPeriods = \Request::has('periods');
             $hasEnd = \Request::has('endDate');
             $hasStart = \Request::has('startDate');
