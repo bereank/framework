@@ -2,7 +2,6 @@
 
 
 use Illuminate\Support\Facades\Route;
-use Leysco100\Finance\Http\Controllers\API\LocationController;
 use Leysco100\Gpm\Http\Controllers\GPMReports;
 use Leysco100\Gpm\Http\Controllers\GPMController;
 use Leysco100\Gpm\Http\Controllers\GateController;
@@ -12,6 +11,8 @@ use Leysco100\Gpm\Http\Controllers\GPMFormFieldsController;
 use Leysco100\Gpm\Http\Controllers\API\GpmReportsController;
 use Leysco100\Gpm\Http\Controllers\GPMMobileAPPApiController;
 use Leysco100\Gpm\Http\Controllers\OtpVerificationController;
+use Leysco100\Finance\Http\Controllers\API\LocationController;
+use Leysco100\Gpm\Http\Controllers\API\GPMDashboardController;
 use Leysco100\Gpm\Http\Controllers\API\FieldsTemplateController;
 use Leysco100\Gpm\Http\Controllers\API\GPMBackUpModeApiController;
 use Leysco100\Gpm\Http\Controllers\API\BackupModeProcessController;
@@ -65,6 +66,9 @@ Route::put('update_mobile_nav', [GPMFormFieldsController::class, 'updateMobileNa
 Route::get('gpm_reports', [GPMReports::class, 'getScanLogsByDate']);
 Route::apiResources(['form_fields' => GPMFormFieldsController::class]);
 Route::apiResources(['fields_template' => FieldsTemplateController::class]);
+
+
+Route::get('gpm/dashboard', [GPMDashboardController::class, 'index']);
 /*
 |--------------------------------------------------------------------------
 | Reports API's
