@@ -21,20 +21,22 @@ class MCallController extends Controller
      */
     public function index()
     {
+
         $currentTime = Carbon::now();
 
         $user_id = Auth::user()->id;
-        $user_data =   User::where('id', $user_id)->with('oudg')->first();
+       $user_data =   User::where('id', $user_id)->with('oudg')->first();
         $data = OCLG::with('outlet')
             ->with('objectives')
            // ->whereDate('CallDate', '>=', date('Y-m-d'))
             ->where(function ($query) use ($currentTime) {
-                $query->whereDate('CallDate', '<=', $currentTime->toDateString())
-                                    ->whereTime('CallTime', '<', $currentTime->toTimeString());
-                      })
-            ->where(function ($query) use ($currentTime) {
-                $query->whereDate('CloseDate', '>=', $currentTime->toDateString())
-                                    ->whereTime('CloseTime','>=', $currentTime->toTimeString());
+                $query->where(function ($subQuery) use ($currentTime) {
+                    $subQuery->whereDate('CallDate', '=', $currentTime->toDateString())
+                        ->whereTime('CallTime', '<=', $currentTime->toTimeString());
+                })->orWhere(function ($subQuery) use ($currentTime) {
+                    $subQuery->whereDate('CloseDate', '=', $currentTime->toDateString())
+                        ->whereTime('CloseTime', '>=', $currentTime->toTimeString());
+                });
             })
             ->where(function ($query) use ($user_id, $user_data) {
                 $query->orwhere('UserSign', $user_id)
