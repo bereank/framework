@@ -2,10 +2,10 @@
 
 namespace Leysco100\Shared\Models\BusinessPartner\Models;
 
+use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\CallObjective;
 use App\Domains\Administration\Models\OSLP;
 use App\Domains\Administration\Models\User;
-use App\Models\CallObjective;
-use Illuminate\Database\Eloquent\Model;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OCLG extends Model
