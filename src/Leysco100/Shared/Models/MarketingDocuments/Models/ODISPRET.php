@@ -39,7 +39,7 @@ class ODISPRET extends Model
     }
     public function document_lines()
     {
-        return $this->hasMany(DELCONF1::class, 'DocEntry');
+        return $this->hasMany(DISPRET1::class, 'DocEntry');
     }
     public function objecttype()
     {
