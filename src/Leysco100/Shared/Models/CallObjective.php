@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Models;
+namespace Leysco100\Shared\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class CallObjective extends Model
 {
+    use UsesTenantConnection;
     protected $guarded = ['id'];
     protected $table = 'call_objectives';
 
