@@ -446,6 +446,10 @@ class DispatchController extends Controller
                         }
                     }
                 }
+                 //Sending Sms
+              if ($request['ObjType'] == 211) {
+                (new DocumentsService())->sendingAssignmentNotification($newDoc->id);
+            }
                 (new SystemDefaults())->updateNextNumberNumberingSeries($Numbering['id']);
             }
             DB::commit();

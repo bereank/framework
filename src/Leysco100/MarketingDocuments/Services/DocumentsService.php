@@ -16,6 +16,7 @@ use Leysco100\Shared\Models\Administration\Models\OADM;
 use Leysco100\Shared\Models\Administration\Models\OAIB;
 use Leysco100\Shared\Models\Administration\Models\OALR;
 use Leysco100\Shared\Models\Administration\Models\ONNM;
+use Leysco100\Shared\Models\Administration\Models\ORLP;
 use Leysco100\Shared\Models\Administration\Models\OUDG;
 use Leysco100\Shared\Models\Administration\Models\OWTM;
 use Leysco100\Shared\Models\Administration\Models\User;
@@ -33,6 +34,7 @@ use Leysco100\Shared\Models\MarketingDocuments\Models\WDD1;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OSRN;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OUOM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
+use Leysco100\Shared\Models\MarketingDocuments\Models\ODISPASS;
 use Leysco100\Shared\Models\Banking\Services\BankingDocumentService;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\Integrator\ITransactionController;
 
@@ -729,5 +731,42 @@ class DocumentsService
             Log::error($th);
             throw $th;
         }
+    }
+    public function sendingAssignmentNotification($DocEntry)
+    {
+        $data = OADM::where('id', 1)->first();
+
+        if (!$data->NotifAlert) {
+            info("SMS NOT ENABLE");
+            return;
+        }
+
+        $document = ODISPASS::where('id', $DocEntry)->first();
+        $driverData= ORLP::where('RlpCode',    $document->RlpCode)->first();
+        $assignmentSummary = "Assignment No: " . $document->DocNum . ",\n".
+        "Please check on your app and accept the assignments as soon as possible.\n".
+         "Thanks \nDate : " . $document->DocDate . ",\n";
+        $messageSignature = "SAMWEST DISTRIBUTORS";
+
+        $message = "Hi " . $driverData->RlpName . ",\n" .
+         "You have been assigned a delivery for dispatch:" . ",\n" .
+          $assignmentSummary . "\n\n" . $messageSignature;
+
+        if ($driverData->Telephone) {
+            $response = Http::withoutVerifying()
+                ->withHeaders([
+                    'h_api_key' => 'ed44559c987ef8fbec7b4e1eaa2704353d7907db0dd306bb1a21ea70b3c4dccc',
+
+                ])
+                ->post('https://api.mobitechtechnologies.com/sms/sendsms', [
+                    "sender_name" => "SAMWESTLTD",
+                    "sender_id" => 0,
+                    "response_type" => "json",
+                    "mobile" => $driverData->Telephone,
+                    'message' => $message,
+                ]);
+        }
+
+        return;
     }
 }
