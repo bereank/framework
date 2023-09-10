@@ -36,7 +36,7 @@ class ODISPNOT extends Model
     }
     public function document_lines()
     {
-        return $this->hasMany(DELCONF1::class, 'DocEntry');
+        return $this->hasMany(DISPNOT1::class, 'DocEntry');
     }
     public function objecttype()
     {
