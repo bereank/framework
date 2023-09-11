@@ -314,12 +314,17 @@ class DispatchController extends Controller
                             'CardCode' => $item['CardCode'], // Oulet/Customer
                             'CallDate' => $item['CallDate'] ??  Carbon::now()->toDateString(), //  Call Date
                             'CallTime' => $item['CallTime'] ?? Carbon::now()->startOfDay(), // CallTime
-                            'CallEndTime' => $item['CallEndTime'] ?? Carbon::now()->endOfDay(), // CallTime
+                            'CallEndTime' => $item['CallEndTime'] ?? Carbon::now()->addDay()->setTime(16, 0, 0), // CallTime
+                            'CloseDate'=> Carbon::now()->addDay(),
+                            'CloseTime'=>Carbon::now()->addDay()->setTime(16, 0, 0),
+                            'OpenedDate' => Carbon::now()->format('Y-m-d'),
+                            'OpenedTime'=> Carbon::now(),
                             'Repeat' => $item['Repeat'] ?? "N", // Recurrence Pattern //A=Annually, D=Daily, M=Monthly, N=None, W=Weekly
                             'UserSign' => $user->id ?? null,
                         ]);
                     }
                 }
+
 
                 $ObjType = $request['ObjType'];
                 $TargetTables = APDI::with('pdi1')
