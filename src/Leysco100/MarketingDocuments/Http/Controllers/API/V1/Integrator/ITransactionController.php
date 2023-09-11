@@ -625,7 +625,7 @@ class ITransactionController extends Controller
                 'Requester' => $request['Requester'],
                 'ReqType' => $request['ReqType'],
                 'Department' => $request['Department'],
-                // 'DocStatus' => $request['DocStatus'],
+                 'DocStatus' => $request['DocStatus'],
                 'CANCELED' => $request['CANCELED'],
                 'CardName' => $businessPartner ? $businessPartner->CardName : null,
                 'SlpCode' => $request['SlpCode'], // Sales Employee
@@ -764,7 +764,7 @@ class ITransactionController extends Controller
                     'BPLId' => $request['Branch'],
                     'WhsName' => isset($value['WhsName']) ? $value['WhsName'] : null,
                     'StockPrice' => $value['StockPrice'] ?? 0,
-                    // 'LineStatus' => $value['LineStatus'],
+                     'LineStatus' => $value['LineStatus'],
 
                 ];
                 $rowItems = new $DocumentTables->pdi1[0]['ChildTable']($rowdetails);
