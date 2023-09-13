@@ -6,10 +6,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Leysco100\Shared\Models\GpsSetup;
+use Leysco100\Shared\Models\MobileNavBar;
+use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Services\AuthorizationService;
 use Leysco100\Shared\Models\Administration\Models\OADM;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;
+use Leysco100\Shared\Models\MarketingDocuments\Models\GPMGate;
 
 
 class ApiAuthController extends Controller
@@ -116,6 +119,24 @@ class ApiAuthController extends Controller
      */
     public function companySetupData()
     {
+        $settings = OADM::first();
+        $loginUser = Auth::user();
+        $loginUser->gateData = GPMGate::where('id', $loginUser->gate_id)->first();
+        $data = [
+            'PswdChangeOnReset' =>  $settings->PswdChangeOnReset,
+            'HasOtpVerification' => $settings->HasOtpVerification,
+            'ExtBucket' => [
+                'accessKey' => $settings->ExtBucketAccessID,
+                'secretKey' => $settings->ExtBucketSecretKey,
+                'destDir' => $settings->ExtBucketDestDir,
+                'bucket' => $settings->ExtBucket,
+                'region' => $settings->ExtBucketRegion,
+            ],
+            'gateMaximumRadius' => 70,
+            'userData' => $loginUser,
+           'menuNavigation' => $this->gpmMobileNavBar(),
+        ];
+       
         return response([
             'MaximumAllowedPriceAgeInMin' => 25,
             'isAbleToPostPayment' => 1,
@@ -123,6 +144,10 @@ class ApiAuthController extends Controller
             'checkIfWithinRadius' => 0,
             'menuNavigation' => (new AuthorizationService())->mobileNavBar(),
             'gpsSetttings' => $this->getWorkDays(),
+                'ResultState' => true,
+                'ResultCode' => 1200,
+                'ResultDesc' => "Operation Was Successful",
+                'ResponseData' => $data,
         ]);
     }
 
@@ -131,6 +156,7 @@ class ApiAuthController extends Controller
      */
     public function getWorkDays()
     {
+        try{
         $worKdays = GpsSetup::with(['workDays:id,gps_setup_id,dayName,start_time,end_time'])
             ->select('id', 'max_latitude', 'min_latitude', 'max_longitude', 'min_longitude', 'start_time', 'end_time')
             ->first();
@@ -140,6 +166,9 @@ class ApiAuthController extends Controller
             $worKdays->weekdays = $weekdays;
         }
         return $worKdays;
+    } catch (\Throwable $th) {
+        return$th->getMessage();
+    }
     }
     public function promptPasswordChange(Request $request)
     {
@@ -156,5 +185,35 @@ class ApiAuthController extends Controller
             'message' => 'Successfully Changed',
             'redirectUrl' => '/dashboard'
         ]);
+    }
+
+    public function gpmMobileNavBar()
+    {
+        return  MobileNavBar::select('title', 'key')->get();
+    }
+    public function updateExtBucket(Request $request)
+    {
+
+        $validatedData = $request->validate([
+            'ExtBucketAccessID' => 'nullable|string|max:255',
+            'ExtBucketSecretKey' => 'nullable|string|max:255',
+            'ExtBucketDestDir' => 'nullable|string|max:255',
+            'ExtBucket' => 'nullable|string|max:255',
+            'ExtBucketRegion' => 'nullable|string|max:255',
+        ]);
+
+        try {
+            $extBuckt = OADM::findOrFail(1);
+            return $extBuckt;
+            $extBuckt->ExtBucketAccessID = $validatedData['ExtBucketAccessID'];
+            $extBuckt->ExtBucketSecretKey = $validatedData['ExtBucketSecretKey'];
+            $extBuckt->ExtBucketDestDir = $validatedData['ExtBucketDestDir'];
+            $extBuckt->ExtBucket = $validatedData['ExtBucket'];
+            $extBuckt->ExtBucketRegion = $validatedData['ExtBucketRegion'];
+            $extBuckt->save();
+            return (new ApiResponseService())->apiSuccessResponseService($extBuckt);
+        } catch (\Throwable $th) {
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+        }
     }
 }
