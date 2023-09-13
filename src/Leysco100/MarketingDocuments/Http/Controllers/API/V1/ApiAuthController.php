@@ -134,7 +134,7 @@ class ApiAuthController extends Controller
             ],
             'gateMaximumRadius' => 70,
             'userData' => $loginUser,
-           'menuNavigation' => $this->gpmMobileNavBar(),
+           'menuNavigation' => (new AuthorizationService())->mobileNavBar(),
         ];
        
         return response([
