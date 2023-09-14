@@ -72,7 +72,7 @@ class ITransactionController extends Controller
                 ->first();
         }
 
-        DB::beginTransaction();
+        DB::connection('tenant')->beginTransaction();
         try {
             $documents = $DocumentTables->ObjectHeaderTable::whereNull('ExtRef')
                 ->where('ObjType', $ObjType)
@@ -204,10 +204,10 @@ class ITransactionController extends Controller
                     $headerVal->payments = (new BankingDocumentService())->getInvoicePayment($headerVal->id);
                 }
             }
-            DB::commit();
+            DB::connection('tenant')->commit();
             return $documents;
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection('tenant')->rollback();
             Log::error($th);
             throw $th;
         }
