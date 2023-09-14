@@ -205,7 +205,12 @@ class ITransactionController extends Controller
                 }
             }
             DB::connection('tenant')->commit();
+
+            Log::info("  ********************************************* " . now() . "********************************************");
+            Log::info($documents);
             return $documents;
+            Log::info("  ********************************************* " . now() . "********************************************");
+
         } catch (\Throwable $th) {
             DB::connection('tenant')->rollback();
             Log::error($th);
