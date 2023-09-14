@@ -248,7 +248,7 @@ class ITransactionController extends Controller
             $ObjType = 66;
         }
 
-        DB::beginTransaction();
+        DB::connection('tenant')->beginTransaction();
         try {
             $DocumentTables = APDI::with('pdi1')
                 ->where('ObjectID', $ObjType)
@@ -285,7 +285,7 @@ class ITransactionController extends Controller
                     'Transfered' => "Y",
                 ]);
 
-                DB::commit();
+                DB::connection('tenant')->commit();
                 return $record;
             }
 
@@ -315,7 +315,7 @@ class ITransactionController extends Controller
                 (new TransactionInventoryEffectAction())->transactionInventoryEffect($ObjType, $record->id);
             }
 
-            DB::commit();
+            DB::connection('tenant')->commit();
             //Sending Sms
             if ($ObjType == 17) {
                 (new DocumentsService())->sendingSMS($record->id);
@@ -325,7 +325,7 @@ class ITransactionController extends Controller
         } catch (\Throwable $th) {
 
             Log::error($th);
-            DB::rollback();
+            DB::connection('tenant')->rollback();
             return response()
                 ->json([
                     'message' => $th->getMessage(),
