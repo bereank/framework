@@ -45,6 +45,7 @@ class GPMDocsSyncronizationJob  implements ShouldQueue, TenantAware
      */
     public function handle()
     {
+        Log::info("Check gpm doc last sync  job");
 
         $this->autoTurnOnBcp();
         $this->deactivateBackupProcess();
@@ -163,8 +164,9 @@ class GPMDocsSyncronizationJob  implements ShouldQueue, TenantAware
               
                 if ($updatedModel) {
                     $updatedId =  $updatedModel->id;
-                    $recipient = OADM::where('id', 1)->value("NotifEmail");
-                    $message = "Back-up-mode Deactivated\nDocuments started syncing";
+                    $emailString = OADM::where('id', 1)->value("NotifEmail");
+                    $recipient = explode(';', $emailString);
+                    $message = "Back-up mode Deactivated\n GPM Documents started syncing";
 
                     (new NotificationsService())->sendNotification($recipient,$message);
                 
@@ -186,9 +188,10 @@ class GPMDocsSyncronizationJob  implements ShouldQueue, TenantAware
             
             $settings = AutoBCModeSettings::where('Status', 1)->where('ActiveFrom', '<=', $currentDateTime)
                 ->where('ActiveTo', '>=', $currentDateTime)->first();
-if(!$settings){
-    return;
-}
+            if(!$settings){
+                        return;
+                     }
+            Log::info("Auto activate bcp");
             $timeDiff =  $ogms->created_at->diffInMinutes(now());
 
             if ($settings->DurationType == 'hours') {
@@ -226,9 +229,11 @@ if(!$settings){
                         'FieldsTemplate' => $settings->FieldsTemplate,
                     ]);
 
-                    $recipient = OADM::where('id', 1)->value("NotifEmail");
-    
-                    $message = 'Documents not syncing for over ' . $settings->LastSyncDuration . ' ' . $settings->DurationType . ' now. ' . $logCount . ' Scan logs does-not-exist recorded. Auto backup mode Activated !!';
+                    $emailString = OADM::where('id', 1)->value("NotifEmail");
+                    $recipient = explode(';', $emailString);
+                    $message = 'Documents not syncing for over '
+                     . $settings->LastSyncDuration . ' ' . $settings->DurationType . " now. \n" . 
+                     $logCount . " Scan logs does-not-exist recorded.\n Backup mode Activated !!";
                   
                     (new NotificationsService())->sendNotification($recipient,$message);
                 
@@ -255,6 +260,7 @@ if(!$settings){
         } else {
             $notifyAfter  = $settings->NotifyAfter;
         }
+        Log::info("send report");
         BCPNotificationJob::dispatch($id)
             ->delay(now()->addMinutes($notifyAfter));
     }

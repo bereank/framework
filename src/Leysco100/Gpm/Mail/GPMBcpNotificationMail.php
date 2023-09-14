@@ -2,6 +2,7 @@
 
 namespace Leysco100\Gpm\Mail;
 
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -29,11 +30,12 @@ class GPMBcpNotificationMail extends Mailable
     public function build()
     {
        $message = $this->message;
-
+$date = Carbon::today()->format('Y-m-d');
        $subject = "GPM Backup-Mode Notification ";
 
         return $this->subject($subject)
             ->markdown('gpm::BcpNotification')
-            ->with('message', $message);
+            ->with('message', $message)
+            ->with('date',$date);
     }
 }

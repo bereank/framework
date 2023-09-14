@@ -2,6 +2,8 @@
 
 {{ $message }}
 
+Date: {{ $date }}
+
 Thanks,
 
 {{ config('app.name') }}

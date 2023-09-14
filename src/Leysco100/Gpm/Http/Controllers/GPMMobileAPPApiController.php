@@ -225,17 +225,32 @@ class GPMMobileAPPApiController extends Controller
             }
 
             if ($isBackupMode) {
-                $requiredFields = (new FormFieldsService())->getFormFields(1);
-                $fieldsrequired =   array_column(collect($requiredFields)->toArray(), 'key');
-                $submitted =   array_column($request['fields'], 'key');
+                $Fields = (new FormFieldsService())->getFormFields(1);
 
-                if (count($requiredFields) > count($request['fields'])) {
+                $data = json_decode($Fields, true);
+                
+                if (is_array($data)) {
+                    $requiredFields = array_filter($data, function ($item) {
+                        return isset($item['mandatory']) && $item['mandatory'] === 'Y';
+                    });
+                    if (!is_array($requiredFields)) {
+                        $requiredFields = [];
+                    }
+                } else {
+                    $requiredFields = [];
+                }
+                
+                $fieldsrequired = array_column(collect($requiredFields)->toArray(), 'key');
+                $submitted = isset($request['fields']) && is_array($request['fields']) ? array_column($request['fields'], 'key') : [];
+                
+                if (count($requiredFields) > count($submitted)) {
                     return response()->json([
                         'message' => 'missing required fields',
                         'resultCode' => 1500,
-                        "resultDesc" => array_diff($fieldsrequired,  $submitted)
+                        "resultDesc" => array_diff($fieldsrequired, $submitted)
                     ]);
                 }
+                
                 $scanTime = GMS1::where('DocNum', $request['DocNum'])->count();
                 if ($scanTime >= 3) {
                     dispatch(new SendEmailJob($emails, $newRecord->id));
@@ -291,7 +306,7 @@ class GPMMobileAPPApiController extends Controller
                                 'resultDesc' => 'Back up mode on: Kindly confirm the Document',
                                 'errors' => [
                                     "DocumentDetails" => $lineData,
-                                    'record' => "Ok: Back up mode on",
+                                    'record' => "GPM is running on backup-mode",
                                 ],
                                 "DocumentDetails" => $lineData,
                             ],
