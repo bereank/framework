@@ -94,11 +94,11 @@ class GPMDocsSyncronizationJob  implements ShouldQueue, TenantAware
             DB::connection('tenant')->commit();
         } catch (\Throwable $th) {
             DB::connection('tenant')->rollback();  
-            $recipient = OADM::where('id', 2)->value("NotifEmail");
+            // $recipient = OADM::where('id', 2)->value("NotifEmail");
             
-            $message= 'An error occurred during the execution of Check if doc Synced Command:
-                 ' . $th->getMessage();
-            (new NotificationsService())->sendNotification($recipient,$message);
+            // $message= 'An error occurred during the execution of Check if doc Synced Command:
+            //      ' . $th->getMessage();
+            // (new NotificationsService())->sendNotification($recipient,$message);
            
         }
     }
@@ -242,10 +242,10 @@ class GPMDocsSyncronizationJob  implements ShouldQueue, TenantAware
             DB::connection('tenant')->commit();
         } catch (\Throwable $th) {
             DB::connection('tenant')->rollback();
-            $recipient = OADM::where('id', 2)->value("NotifEmail");
-            $message= 'An error occured Turning on backup mode:
-                 ' . $th->getMessage();
-            (new NotificationsService())->sendNotification($recipient,$message);
+            // $recipient = OADM::where('id', 2)->value("NotifEmail");
+            // $message= 'An error occured Turning on backup mode:
+            //      ' . $th->getMessage();
+            // (new NotificationsService())->sendNotification($recipient,$message);
         }
     }
     public function sendReport($id)
