@@ -15,7 +15,7 @@ class SharedServiceProvider extends ServiceProvider
           // Register the command if we are using the application via the CLI
           if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "config.php" => config_path('ggpm.php'),
+                __DIR__ . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "config.php" => config_path('gpm.php'),
             ], 'config');
 
             $this->commands([

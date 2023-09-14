@@ -8,7 +8,7 @@ use Leysco100\Shared\Models\UserDict;
 
 class CreateUDFHelperAction
 {
-     /**
+    /**
      * Create User Define Fields
      *
      * @var string $tableName
@@ -29,49 +29,46 @@ class CreateUDFHelperAction
 
     public function handle()
     {
-        Schema::connection('tenant')->table($this->tableName, function (Blueprint $table) {
 
+
+        Schema::connection('tenant')->table($this->tableName, function (Blueprint $table) {
+            $fieldName = "U_" . $this->fieldName;
             UserDict::firstOrCreate([
-                'FieldName' => $this->fieldName,
+                'FieldName' =>  $fieldName,
                 'TableName' => $this->tableName
-            ],[
+            ], [
                 'FieldDescription' => $this->fieldDescription,
                 'FieldType' => $this->fieldType,
                 'ObjType' => 4,
-                'FieldSize' =>$this->fieldSize
+                'FieldSize' => $this->fieldSize
             ]);
 
 
-            if ($this->checkIfColumnExist($this->tableName, $this->fieldName)) {
+            if ($this->checkIfColumnExist($this->tableName,   $fieldName)) {
                 return true;
             }
 
-        
 
-            if ($this->fieldType =='string') {
-            $table->string($this->fieldName,$this->fieldSize)->comment($this->fieldDescription);
 
+            if ($this->fieldType == 'string') {
+                $table->string($fieldName, $this->fieldSize)->comment($this->fieldDescription);
             }
 
-            if ($this->fieldType =='integer') {
-            $table->integer($this->fieldName)->comment($this->fieldDescription);
-
+            if ($this->fieldType == 'integer') {
+                $table->integer($fieldName)->comment($this->fieldDescription);
             }
 
-            if ($this->fieldType =='decimal') {
-            $table->decimal($this->fieldName,$this->fieldSize,3)->comment($this->fieldDescription);
-
+            if ($this->fieldType == 'decimal') {
+                $table->decimal($fieldName, $this->fieldSize, 3)->comment($this->fieldDescription);
             }
 
-            if ($this->fieldType =='date') {
-                $table->date($this->fieldName)->comment($this->fieldDescription);
-    
+            if ($this->fieldType == 'date') {
+                $table->date($fieldName)->comment($this->fieldDescription);
             }
 
-            
-            if ($this->fieldType =='timestamp') {
-                $table->timestamp($this->fieldName)->comment($this->fieldDescription);
-    
+
+            if ($this->fieldType == 'timestamp') {
+                $table->timestamp($fieldName)->comment($this->fieldDescription);
             }
 
             // $table->string('FieldName');
@@ -83,7 +80,7 @@ class CreateUDFHelperAction
             // $table->integer('FieldSize');
             // $table->string('DefaultValue')->nullable();
 
-       
+
         });
     }
 
