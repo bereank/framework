@@ -2,7 +2,6 @@
 
 namespace Leysco100\Shared\Models\Finance\Models;
 
-use App\Domains\Finance\Models\JDT1;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 

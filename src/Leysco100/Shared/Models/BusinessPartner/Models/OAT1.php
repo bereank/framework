@@ -2,12 +2,14 @@
 
 namespace Leysco100\Shared\Models\BusinessPartner\Models;
 
-use App\Models\OOAT;
 use Illuminate\Database\Eloquent\Model;
-use App\Domains\InventoryAndProduction\Models\OITM;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OAT1 extends Model
 {
+    use UsesTenantConnection;
+
     protected $guarded = ['id'];
     protected $table = 'o_a_t1_s';
 

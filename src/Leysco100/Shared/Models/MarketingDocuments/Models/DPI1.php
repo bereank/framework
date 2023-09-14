@@ -14,7 +14,7 @@ class DPI1 extends Model
     protected $table = 'd_p_i1_s';
     public function odpi()
     {
-        return $this->belongsTo('App\ODPI', 'DocEntry');
+        return $this->belongsTo(ODPI::class, 'DocEntry');
     }
     public function ItemDetails()
     {

@@ -10,6 +10,7 @@ use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 class ODPI extends Model
 {
     use UsesTenantConnection;
+
     protected $guarded = ['id'];
     protected $table = 'o_d_p_i_s';
 
