@@ -88,10 +88,11 @@ class ExtDocsSyncJob  implements ShouldQueue, TenantAware
             DB::connection('tenant')->commit();
         } catch (\Throwable $th) {
             DB::connection('tenant')->rollback();
-            $recipient = OADM::where('id', 2)->value("NotifEmail"); 
-            $message= 'EXT Syncing Failure'.'
-                 ' . $th->getMessage();
-            (new NotificationsService())->sendNotification($message, $recipient);
+            Log::info([$th]);
+            // $recipient = OADM::where('id', 2)->value("NotifEmail"); 
+            // $message= 'EXT Syncing Failure'.'
+            //      ' . $th->getMessage();
+            // (new NotificationsService())->sendNotification($message, $recipient);
         }
     }
 }
