@@ -1,12 +1,15 @@
 <?php
 
-namespace App\Models;
+namespace Leysco100\Shared\Models;
+
 
 use Illuminate\Database\Eloquent\Model;
-use App\Domains\Administration\Models\User;
+use Leysco100\Shared\Models\Administration\Models\User;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class Expense extends Model
 {
+    use UsesTenantConnection;
     protected $guarded = ['id'];
     protected $table = 'expenses';
 

@@ -2,9 +2,10 @@
 
 namespace Leysco100\MarketingDocuments\Http\Controllers\API\V1;
 
-use App\Models\Expense;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Leysco100\Shared\Models\Expense;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;
 
