@@ -15,6 +15,7 @@ use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 class OWTR extends Model
 {
     use UsesTenantConnection;
+
     protected $guarded = ['id'];
     protected $table = 'o_w_t_r_s';
 

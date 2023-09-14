@@ -4,7 +4,7 @@ namespace Leysco100\Shared\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Auth\User;
+use Leysco100\Shared\Models\Administration\Models\User;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OSLT extends Model
