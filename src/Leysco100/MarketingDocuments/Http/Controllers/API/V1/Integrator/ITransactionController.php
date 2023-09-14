@@ -207,7 +207,7 @@ class ITransactionController extends Controller
             DB::connection('tenant')->commit();
             return $documents;
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection('tenant')->rollback();
             Log::error($th);
             throw $th;
         }
