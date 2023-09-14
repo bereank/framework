@@ -40,6 +40,7 @@ class CreateUsersTable extends Migration
             $table->integer('status')->default(1)->comment("Active: 0=Inactive, 1=Active, 2=Suspended");
             $table->integer('useLocalSearch')->default(0)->comment("0=No, 1=Yes");
             $table->string('localUrl')->nullable();
+            $table->integer('gate_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
