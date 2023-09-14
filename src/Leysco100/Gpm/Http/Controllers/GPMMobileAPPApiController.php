@@ -186,6 +186,7 @@ class GPMMobileAPPApiController extends Controller
                         'resultCode' => 1500,
                         'BackUpMode' => 1,
                         'type' =>  'duplicate',
+                        'docnum'=>(string)$DocNum?? '0',
                         'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
                         'errors' => [
                             'record' => 'Discrepancy Noted- Don’t Release Goods',
@@ -214,6 +215,7 @@ class GPMMobileAPPApiController extends Controller
                             'resultCode' => 1500,
                             'BackUpMode' => 0,
                             'type' => 'notfound',
+                            'docnum'=>(string)$DocNum?? '0',
                             'ScanLogId' => $newRecord->id,
                             'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
                             'errors' => [
@@ -264,6 +266,7 @@ class GPMMobileAPPApiController extends Controller
                                 'resultCode' => 1500,
                                 'BackUpMode' => 1,
                                 'type' =>  'duplicate',
+                                'docnum'=>(string)$DocNum?? '0',
                                 'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
                                 'errors' => [
                                     'record' => 'Discrepancy Noted- Don’t Release Goods',
@@ -302,6 +305,7 @@ class GPMMobileAPPApiController extends Controller
                                 'resultCode' => 1500,
                                 'BackUpMode' => 1,
                                 'type' => 'notfound',
+                                'docnum'=>(string)$DocNum?? '0',
                                 'ScanLogId' => $newRecord->id,
                                 'resultDesc' => 'Back up mode on: Kindly confirm the Document',
                                 'errors' => [
@@ -365,6 +369,7 @@ class GPMMobileAPPApiController extends Controller
                                 'message' => "There exist scanned base document",
                                 'resultCode' => 1500,
                                 'BackUpMode' => 0,
+                                'docnum'=>(string)$DocNum?? '0',
                                 'type' =>  'duplicate',
                                 'ScanLogId' => $newRecord->id,
                                 'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
@@ -403,6 +408,7 @@ class GPMMobileAPPApiController extends Controller
                         'resultCode' => 1500,
                         'BackUpMode' => 0,
                         'type' => 'duplicate',
+                        'docnum'=>(string)$DocNum?? '0',
                         'ScanLogId' => $newRecord->id,
                         'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
                         'errors' => [
