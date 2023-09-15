@@ -169,7 +169,7 @@ class MOrderController extends Controller
         //User Defautls
         $systemDefaults = (new SystemDefaults())->getSystemDefaults();
 
-        DB::beginTransaction();
+        DB::connection('tenant')->beginTransaction();
         try {
             //Creating Order
             $QuoteDetails = [
@@ -293,8 +293,7 @@ class MOrderController extends Controller
 
             (new SystemDefaults())->updateNextNumberNumberingSeries($Series['Series']);
 
-            DB::commit();
-
+            DB::connection('tenant')->commit();
             return response()
                 ->json(
                     [
@@ -303,7 +302,7 @@ class MOrderController extends Controller
                     201
                 );
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection('tenant')->rollback();
             return response()
                 ->json(
                     [
