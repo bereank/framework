@@ -152,7 +152,7 @@ class ITransactionController extends Controller
                 $headerVal->UserFields = $userFields;
 
                 $rowData = $DocumentTables->pdi1[0]['ChildTable']::where('DocEntry', $headerVal->id)->get();
-
+                Log::info("TOTAL LINES FOUND : " . $rowData->count());
                 foreach ($rowData as $key => $val) {
                     $val->DiscPrcnt = $val->DiscPrcnt ?? 0;
                     $SerialNumbers = SRI1::where('LineNum', $val->id)
