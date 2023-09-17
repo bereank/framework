@@ -231,9 +231,10 @@ class GPMDocsSyncronizationJob  implements ShouldQueue, TenantAware
 
                     $emailString = OADM::where('id', 1)->value("NotifEmail");
                     $recipient = explode(';', $emailString);
-                    $message = 'Documents not syncing for over '
-                     . $settings->LastSyncDuration . ' ' . $settings->DurationType . " now. \n" . 
-                     $logCount . " Scan logs does-not-exist recorded.\n Backup mode Activated !!";
+                    $message = 'Documents have not Synched for over '
+                     . $settings->LastSyncDuration . ' ' . $settings->DurationType . " now,". PHP_EOL .
+                     $logCount . " Scan logs \"DOES-NOT-EXIST\" have been recorded as well." .PHP_EOL.
+                     "Backup mode Activated. Backup mode will run until document Synchronising is restored";
                   
                     (new NotificationsService())->sendNotification($recipient,$message);
                 
