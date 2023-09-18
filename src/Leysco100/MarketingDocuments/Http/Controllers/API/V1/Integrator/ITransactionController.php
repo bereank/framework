@@ -49,6 +49,7 @@ class ITransactionController extends Controller
 {
     public function getTransactions($ObjType)
     {
+        sleep(10);
         $updated_at = \Request::get('updated_at');
         $docEntry = \Request::get('docEntry');
 
