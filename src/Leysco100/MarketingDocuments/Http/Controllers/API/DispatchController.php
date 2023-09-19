@@ -451,12 +451,13 @@ class DispatchController extends Controller
                         }
                     }
                 }
-                 //Sending Sms
-              if ($request['ObjType'] == 211) {
-                (new DocumentsService())->sendingAssignmentNotification($newDoc->id);
-            }
+            
                 (new SystemDefaults())->updateNextNumberNumberingSeries($Numbering['id']);
             }
+                 //Sending Sms
+                 if ($request['ObjType'] == 211) {
+                    (new DocumentsService())->sendingAssignmentNotification($newDoc->id, $uniqueCardCodes);
+                }
             DB::commit();
             return (new ApiResponseService())->apiSuccessResponseService($newDoc);
         } catch (\Throwable $th) {

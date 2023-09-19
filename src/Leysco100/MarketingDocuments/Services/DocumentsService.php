@@ -732,27 +732,33 @@ class DocumentsService
             throw $th;
         }
     }
-    public function sendingAssignmentNotification($DocEntry)
+    public function sendingAssignmentNotification($DocEntry,  $items)
     {
+       
         $data = OADM::where('id', 1)->first();
 
         if (!$data->NotifAlert) {
             info("SMS NOT ENABLE");
             return;
         }
-
+        $listString = "";
+        foreach ($items as $key => $item) {
+            $listString .= ($key + 1) . '. ' . $item['CardName'] . "\n";
+        }
         $document = ODISPASS::where('id', $DocEntry)->first();
         $driverData= ORLP::where('RlpCode',    $document->RlpCode)->first();
-        $assignmentSummary = "Assignment No: " . $document->DocNum . ",\n".
-        "Please check on your app and accept the assignments as soon as possible.\n".
+        $assignmentSummary = $listString . 
+         "Please check on your app and accept the assignments as soon as possible.\n".
          "Thanks \nDate : " . $document->DocDate . ",\n";
-        $messageSignature = "SAMWEST DISTRIBUTORS";
+         $messageSignature = "SAMWEST DISTRIBUTORS";
 
-        $message = "Hi " . $driverData->RlpName . ",\n" .
-         "You have been assigned a delivery for dispatch:" . ",\n" .
+          $message = "Hi " . $driverData->RlpName . ",\n" .
+          "You have been assigned the deliveries for the following customers:" . "\n" .
           $assignmentSummary . "\n\n" . $messageSignature;
 
+     
         if ($driverData->Telephone) {
+           // Log::info($message);
             $response = Http::withoutVerifying()
                 ->withHeaders([
                     'h_api_key' => 'ed44559c987ef8fbec7b4e1eaa2704353d7907db0dd306bb1a21ea70b3c4dccc',
