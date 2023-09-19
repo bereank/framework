@@ -70,7 +70,7 @@ class MCallController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'CardCode' => 'required|exists:o_c_r_d_s,CardCode',
+            'CardCode' => 'required',
             'CallDate' => 'required|date|after_or_equal:today',
             'CallTime' => 'required',
         ]);
@@ -88,14 +88,17 @@ class MCallController extends Controller
                 );
         }
 
-        try {
+        // try {
             $user = Auth::user();
             $OCLG = OCLG::create([
                 'SlpCode' => OUDG::where('id', $user->DfltsGroup)->value('SalePerson'), // Sales Employee
                 'CardCode' => $request['CardCode'], // Oulet/Customer
                 'CallDate' => $request['CallDate'], //  Call Date
                 'CallTime' => $request['CallTime'], // CallTime
-                'CallEndTime' => $request['CallEndTime'], // CallTime
+                'UserSign'=> $user->id,
+                'CallEndTime' => $request['CallEndTime']?? null,// CallTime
+                'CloseDate'=> $request['CloseDate']?? null,
+                'CloseTime'=>$request['CloseTime'] ?? null,
                 'Repeat' => $request['Repeat'] ? $request['Repeat'] : "N", // Recurrence Pattern //A=Annually, D=Daily, M=Monthly, N=None, W=Weekly
             ]);
 
@@ -106,15 +109,15 @@ class MCallController extends Controller
                     ],
                     201
                 );
-        } catch (\Throwable $th) {
-            return response()
-                ->json(
-                    [
-                        'message' => $th->getMessage(),
-                    ],
-                    500
-                );
-        }
+        // } catch (\Throwable $th) {
+        //     return response()
+        //         ->json(
+        //             [
+        //                 'message' => $th->getMessage(),
+        //             ],
+        //             500
+        //         );
+        // }
     }
 
     /**
