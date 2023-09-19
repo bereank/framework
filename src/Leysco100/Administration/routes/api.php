@@ -24,6 +24,7 @@ use Leysco100\Administration\Http\Controllers\Setup\Inventory\ItemPropertyContro
 use Leysco100\Administration\Http\Controllers\Setup\Inventory\ShippingTypeController;
 use Leysco100\Administration\Http\Controllers\Setup\BusinessPartners\BPGroupController;
 use Leysco100\Administration\Http\Controllers\Setup\BusinessPartners\CountryController;
+use Leysco100\Administration\Http\Controllers\Setup\General\AlertsManagementController;
 use Leysco100\Administration\Http\Controllers\Setup\Financials\ChartOfAccountController;
 use Leysco100\Administration\Http\Controllers\Setup\BusinessPartners\BPPropertiesController;
 use Leysco100\Administration\Http\Controllers\SystemInit\Authorization\PermissionController;
@@ -106,3 +107,4 @@ Route::apiResources(['house_bank' => HouseBankController::class]);
  Route::apiResources(['documentnumbering' => DocNumberingController::class]);
 Route::apiResources(['vehicles' => VehicleController::class]);
 Route::put('/settings/password_rest_change', [GeneralSettingsController::class, 'updatePswdChangOnReset']);
+Route::apiResources(['alerts' => AlertsManagementController::class]);
