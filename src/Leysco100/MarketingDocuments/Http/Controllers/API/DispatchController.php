@@ -120,7 +120,9 @@ class DispatchController extends Controller
                         'CompanyID'
                     );
                 }])
-                ->whereBetween('created_at', [$startDate, $endDate])
+                ->when(!$CallId, function ($query) use($startDate, $endDate) {
+                 return   $query->whereBetween('created_at', [$startDate, $endDate]);
+                })
                 ->select(
                     'id',
                     'DocNum',
