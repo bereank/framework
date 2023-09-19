@@ -88,7 +88,7 @@ class MCallController extends Controller
                 );
         }
 
-        // try {
+        try {
             $user = Auth::user();
             $OCLG = OCLG::create([
                 'SlpCode' => OUDG::where('id', $user->DfltsGroup)->value('SalePerson'), // Sales Employee
@@ -109,15 +109,15 @@ class MCallController extends Controller
                     ],
                     201
                 );
-        // } catch (\Throwable $th) {
-        //     return response()
-        //         ->json(
-        //             [
-        //                 'message' => $th->getMessage(),
-        //             ],
-        //             500
-        //         );
-        // }
+        } catch (\Throwable $th) {
+            return response()
+                ->json(
+                    [
+                        'message' => $th->getMessage(),
+                    ],
+                    500
+                );
+        }
     }
 
     /**
