@@ -49,7 +49,7 @@ class ITransactionController extends Controller
 {
     public function getTransactions($ObjType)
     {
-        sleep(10);
+        
         $updated_at = \Request::get('updated_at');
         $docEntry = \Request::get('docEntry');
 
@@ -73,17 +73,17 @@ class ITransactionController extends Controller
                 ->first();
         }
 
-        DB::connection('tenant')->beginTransaction();
+       
         try {
             $documents = $DocumentTables->ObjectHeaderTable::whereNull('ExtRef')
                 ->where('ObjType', $ObjType)
-                ->where('Transfered', 'N')
+              //  ->where('Transfered', 'N')
                 ->where(function ($q) use ($docEntry) {
                     if ($docEntry != null) {
                         $q->where('id', $docEntry);
                     }
                 })
-                ->take(2)
+                ->take(5)
                 ->get();
 
             if ($ObjType == 205) {
@@ -97,9 +97,9 @@ class ITransactionController extends Controller
                 /**
                  * Mark The document not transferred
                  */
-                $headerVal->update([
-                    'Transfered' => "Y",
-                ]);
+                // $headerVal->update([
+                //     'Transfered' => "Y",
+                // ]);
 
                 $headerVal->ExtDocTotal = 0;
                 $headerVal->ObjType = $ObjType;
@@ -205,7 +205,7 @@ class ITransactionController extends Controller
                     $headerVal->payments = (new BankingDocumentService())->getInvoicePayment($headerVal->id);
                 }
             }
-            DB::connection('tenant')->commit();
+          
 
             Log::info("  ********************************************* " . now() . "********************************************");
             Log::info($documents);
@@ -213,7 +213,7 @@ class ITransactionController extends Controller
             Log::info("  ********************************************* " . now() . "********************************************");
 
         } catch (\Throwable $th) {
-            DB::connection('tenant')->rollback();
+         
             Log::error($th);
             throw $th;
         }
