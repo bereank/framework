@@ -77,7 +77,7 @@ class GPMMobileAPPApiController extends Controller
                             'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
                             'errors' => [
                                 'record' => 'Discrepancy Noted- Don’t Release Goods',
-                                'error'=>'String too short'
+                                'error' => 'String too short'
                             ],
                         ],
                         200
@@ -124,10 +124,9 @@ class GPMMobileAPPApiController extends Controller
             $newRecord = new GMS1($scanLogData);
             $newRecord->save();
             DB::commit();
-            if($request['fields']){
+            if ($request['fields']) {
                 $this->postScanLogDetails($request['fields'], $newRecord->id);
             }
-            
         } catch (\Throwable $th) {
             DB::rollback();
 
@@ -141,7 +140,7 @@ class GPMMobileAPPApiController extends Controller
                         'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
                         'errors' => [
                             'record' => 'Discrepancy Noted- Don’t Release Goods',
-                            'Error'=>$th,
+                            'Error' => $th,
                         ],
                     ],
                     200
@@ -186,7 +185,7 @@ class GPMMobileAPPApiController extends Controller
                         'resultCode' => 1500,
                         'BackUpMode' => 1,
                         'type' =>  'duplicate',
-                        'docnum'=>(string)$DocNum?? '0',
+                        'docnum' => (string)$DocNum ?? '0',
                         'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
                         'errors' => [
                             'record' => 'Discrepancy Noted- Don’t Release Goods',
@@ -215,7 +214,7 @@ class GPMMobileAPPApiController extends Controller
                             'resultCode' => 1500,
                             'BackUpMode' => 0,
                             'type' => 'notfound',
-                            'docnum'=>(string)$DocNum?? '0',
+                            'docnum' => (string)$DocNum ?? '0',
                             'ScanLogId' => $newRecord->id,
                             'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
                             'errors' => [
@@ -227,10 +226,10 @@ class GPMMobileAPPApiController extends Controller
             }
 
             if ($isBackupMode) {
-                $Fields = (new FormFieldsService())->getFormFields(1);
+                $Fields = (new FormFieldsService())->getFormFields();
 
                 $data = json_decode($Fields, true);
-                
+
                 if (is_array($data)) {
                     $requiredFields = array_filter($data, function ($item) {
                         return isset($item['mandatory']) && $item['mandatory'] === 'Y';
@@ -241,10 +240,10 @@ class GPMMobileAPPApiController extends Controller
                 } else {
                     $requiredFields = [];
                 }
-                
+
                 $fieldsrequired = array_column(collect($requiredFields)->toArray(), 'key');
                 $submitted = isset($request['fields']) && is_array($request['fields']) ? array_column($request['fields'], 'key') : [];
-                
+
                 if (count($requiredFields) > count($submitted)) {
                     return response()->json([
                         'message' => 'missing required fields',
@@ -252,7 +251,7 @@ class GPMMobileAPPApiController extends Controller
                         "resultDesc" => array_diff($fieldsrequired, $submitted)
                     ]);
                 }
-                
+
                 $scanTime = GMS1::where('DocNum', $request['DocNum'])->count();
                 if ($scanTime >= 3) {
                     dispatch(new SendEmailJob($emails, $newRecord->id));
@@ -266,7 +265,7 @@ class GPMMobileAPPApiController extends Controller
                                 'resultCode' => 1500,
                                 'BackUpMode' => 1,
                                 'type' =>  'duplicate',
-                                'docnum'=>(string)$DocNum?? '0',
+                                'docnum' => (string)$DocNum ?? '0',
                                 'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
                                 'errors' => [
                                     'record' => 'Discrepancy Noted- Don’t Release Goods',
@@ -277,12 +276,12 @@ class GPMMobileAPPApiController extends Controller
                         );
                 } else {
                     $backupmodeHeader = BackUpModeSetup::where('id', $isBackupMode->id)->first();
-                        if ($originSystem == "LS100") {
-                         $DocOrigin=1;
-                       }
-                       if ($originSystem == "SAP") {
-                        $DocOrigin=2; 
-                       }
+                    if ($originSystem == "LS100") {
+                        $DocOrigin = 1;
+                    }
+                    if ($originSystem == "SAP") {
+                        $DocOrigin = 2;
+                    }
                     $lineData = BackUpModeLines::updateOrCreate(
                         [
                             'DocNum' => $fullDocNum[2],
@@ -305,7 +304,7 @@ class GPMMobileAPPApiController extends Controller
                                 'resultCode' => 1500,
                                 'BackUpMode' => 1,
                                 'type' => 'notfound',
-                                'docnum'=>(string)$DocNum?? '0',
+                                'docnum' => (string)$DocNum ?? '0',
                                 'ScanLogId' => $newRecord->id,
                                 'resultDesc' => 'Back up mode on: Kindly confirm the Document',
                                 'errors' => [
@@ -321,8 +320,7 @@ class GPMMobileAPPApiController extends Controller
         }
 
 
-        if ($record->BaseType && $record->BaseEntry) {
-
+        if ($record->BaseType && $record->BaseEntry && $record->Status != 3) {
             /**
              * Check The Base Document is closed
              */
@@ -330,62 +328,67 @@ class GPMMobileAPPApiController extends Controller
                 ->where('ExtRef', $record->BaseEntry)
                 ->with('objecttype')
                 ->first();
+            if (($baseRecord && $ObjType != 'DISPNOT')) {
 
-            if ($baseRecord && $ObjType != 'DISPNOT') {
-                if ($baseRecord->Status == 3 ) {
-                //    $this->closeOtherDocuments($record->BaseType, $record->BaseEntry);
-
+                if ($baseRecord->Status == 3) {
+                    //    $this->closeOtherDocuments($record->BaseType, $record->BaseEntry);
+                    $allInstanceOfDocuments = OGMS::where('ObjType', $baseRecord->ObjType)
+                        ->where(function ($q) use ($originSystem, $baseRecord) {
+                            if ($originSystem == "LS100") {
+                                $q->where('DocNum', $baseRecord->DocNum);
+                            }
+                            if ($originSystem == "SAP") {
+                                $q->where('ExtRefDocNum', $baseRecord->ExtRefDocNum);
+                            }
+                        })
+                        ->get();
                     $record->update([
                         'Status' => 2,
                         'ScanLogID' => $newRecord->id,
                     ]);
-
-
                     $newRecord->update([
                         'Status' => 2,
                         'Comment' => "Base Document Closed",
                     ]);
-                    
-                    $itemRows = [];
-            
-                        $lineDetails = explode('|',  $baseRecord->LineDetails);
-            
+                    $rows = [];
+                    foreach ($allInstanceOfDocuments as $Documents) {
+                        $itemRows = [];
+
+                        $lineDetails = explode('|',  $Documents->LineDetails);
+
                         foreach ($lineDetails as $key => $value) {
                             $data = explode(';', $value);
-            
+
                             $item = [
                                 'ItemCode' => $data[0],
                                 'Quantity' => $data[1],
                             ];
-            
+
                             array_push($itemRows, $item);
-                        }   
-            
-                    $baseRecord->LineDetails = $itemRows;
-                  
+                        }
+                    }
+                    $newRow = array_merge($rows, $itemRows);
+                    $baseRecord->LineDetails = $newRow;
                     return response()
                         ->json(
                             [
                                 'message' => "There exist scanned base document",
                                 'resultCode' => 1500,
                                 'BackUpMode' => 0,
-                                'docnum'=>(string)$DocNum?? '0',
+                                'docnum' => (string)$DocNum ?? '0',
                                 'type' =>  'duplicate',
                                 'ScanLogId' => $newRecord->id,
                                 'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
                                 'errors' => [
                                     'record' => 'Discrepancy Noted- Don’t Release Goods',
                                 ],
-                                'DocumentDetails'=>$baseRecord,
+                                'DocumentDetails' => $baseRecord,
                             ],
                             200
                         );
                 }
             }
         }
-
-
-
         /**
          * status reference
          * 3=Released,2=Scanned But Flagged,1=Scanned But Not Confirmed, 0=Open
@@ -408,7 +411,7 @@ class GPMMobileAPPApiController extends Controller
                         'resultCode' => 1500,
                         'BackUpMode' => 0,
                         'type' => 'duplicate',
-                        'docnum'=>(string)$DocNum?? '0',
+                        'docnum' => (string)$DocNum ?? '0',
                         'ScanLogId' => $newRecord->id,
                         'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
                         'errors' => [
@@ -497,19 +500,19 @@ class GPMMobileAPPApiController extends Controller
             if ($request['BackUpMode']) {
                 $isBackupMode = (new BackupModeService())->isBackupMode();
                 if (!$isBackupMode) {
-                return response()
-                ->json(
-                    [
-                        'message' => "Back-up mode off. Try scanning again.",
-                        'resultCode' => 1500,
-                        'resultDesc' => 'Try scanning again',
-                        'errors' => [
-                            'record' => 'Try scanning again',
-                        ],
-                    ],
-                    200
-                );
-            }
+                    return response()
+                        ->json(
+                            [
+                                'message' => "Back-up mode off. Try scanning again.",
+                                'resultCode' => 1500,
+                                'resultDesc' => 'Try scanning again',
+                                'errors' => [
+                                    'record' => 'Try scanning again',
+                                ],
+                            ],
+                            200
+                        );
+                }
                 $data = BackUpModeLines::findorFail($id);
                 if ($data->ReleaseStatus == 1) {
                     return response()
@@ -559,10 +562,10 @@ class GPMMobileAPPApiController extends Controller
             } else {
                 $data = OGMS::findOrFail($id);
 
-                 //Close SubSequent Documents
-        if ($data->BaseType && $data->BaseEntry) {
-            $this->closeOtherDocuments($data->BaseType, $data->BaseEntry);
-        }
+                //Close SubSequent Documents
+                if ($data->BaseType && $data->BaseEntry) {
+                    $this->closeOtherDocuments($data->BaseType, $data->BaseEntry);
+                }
                 if ($data->Status == 3) {
                     return response()
                         ->json(
@@ -609,19 +612,20 @@ class GPMMobileAPPApiController extends Controller
 
     public function closeOtherDocuments($ObjType, $DocEntry)
     {
-        $record = OGMS::where('ObjType', $ObjType)
+        $records = OGMS::where('ObjType', $ObjType)
             ->where('ExtRef', $DocEntry)
-            ->first();
-            Log::info($record);
-        if (!$record) {
+            ->get();
+
+        if (!$records) {
             return;
         }
-        $record->update([
-            'Status' => 3,
-        ]);
-
-        if ($record->BaseType) {
-            $this->closeOtherDocuments($record->BaseType, $DocEntry);
+        foreach ($records as $record) {
+            $record->update([
+                'Status' => 3,
+            ]);
+            if ($record->BaseType) {
+                $this->closeOtherDocuments($record->BaseType, $DocEntry);
+            }
         }
     }
 
