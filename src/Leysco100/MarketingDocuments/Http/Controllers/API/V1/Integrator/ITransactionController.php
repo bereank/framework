@@ -4,6 +4,7 @@ namespace Leysco100\MarketingDocuments\Http\Controllers\API\V1\Integrator;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Leysco100\Shared\Models\MarketingDocuments\Services\GeneralDocumentService;
 use Leysco100\Shared\Models\OINS;
 use Leysco100\Shared\Models\OSCL;
 use Leysco100\Shared\Models\OSCO;
@@ -373,7 +374,7 @@ class ITransactionController extends Controller
             $rowItems = new $targetTables->pdi1[0]['ChildTable']($row->toArray());
             $rowItems->save();
 
-            $serialNumbers = (new GeneralDocumentSerivce())->getDocumentLinesSerialNumbers(112, $draftKey, $row->id);
+            $serialNumbers = (new GeneralDocumentService())->getDocumentLinesSerialNumbers(112, $draftKey, $row->id);
 
             foreach ($serialNumbers as $key => $serial) {
                 $serial->update([
