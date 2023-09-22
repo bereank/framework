@@ -35,8 +35,8 @@ use Leysco100\MarketingDocuments\Http\Controllers\API\V1\Integrator\IIncomingPay
      */
 // Route::get('pending_recur_trans', [RecurringTransactionsTempController::class, 'pendingTransactions']);
 Route::post('documents', [DocumentController::class, 'store']);
-// Route::put('documents', [DocumentController::class, 'updateSingleDocument']);
-// Route::put('attachments', [DocumentController::class, 'upload']);
+ Route::put('documents', [DocumentController::class, 'updateSingleDocument']);
+ Route::put('attachments', [DocumentController::class, 'upload']);
 Route::post('documents/{ObjType}', [DocumentController::class, 'getDocData']);
 // Route::post('marketing-doc-approvers/{ObjType}/{DocEntry}', [DocumentController::class, 'getDocumentApprovalStatus']);
 // Route::post('marketing-doc-close/{ObjType}/{DocEntry}', [DocumentController::class, 'closeSingleDocument']);
@@ -45,12 +45,6 @@ Route::get('documents/{ObjType}/{DocEntry}', [DocumentController::class, 'getSin
 // //update Transferred to no after api for direct posting to sap fails
 // Route::post('sales_doc_update/{ObjType}/{docEntry}', [DocumentController::class, 'updateSingleDocData']);
 // Route::get('customer_sales_doc/{ObjType}', [DocumentController::class, 'getCustomerDocData']);
-// Route::get('form_settings/{ObjType}', [FormSettingsController::class, 'getFormSettings']);
-// Route::post('form_settings', [FormSettingsController::class, 'updateFormSettings']);
-// Route::get('form_settings_menu', [FormSettingsController::class, 'formSettingsMenu']);
-// Route::post('form_settings_menu', [FormSettingsController::class, 'updateFormSettingsMenu']);
-// Route::post('form_settings_menu/{ID}', [FormSettingsController::class, 'updateSingleMenu']);
-// Route::get('form_settings_menu/user/{ID}', [FormSettingsController::class, 'getUserMenuSettings']);
 // Route::apiResources(['drafts' => DraftController::class]);
 Route::apiResources(['doc_model' => DocModelController::class]);
 // Route::apiResources(['blanketagreement' => BlanketAgreementController::class]);
@@ -201,7 +195,6 @@ Route::post('password-change', [ApiAuthController::class, 'promptPasswordChange'
 //        'prefix' => 'integrator',
 //    ],
 //    function () {
-        Route::post('login', [ApiAuthController::class, 'login']);
         Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::get('/enabled-pricelist', [ProductController::class, 'getEnabledPriceList']);
             Route::get('/object-update-status', [ProductController::class, 'getObjectUpdateStatus']);
@@ -238,7 +231,6 @@ Route::post('password-change', [ApiAuthController::class, 'promptPasswordChange'
             Route::put('/inventory/inventory_contents', [IInventoryController::class, 'update']);
 
             //Documents
-            // Route::get('/documents/{ObjType}', [IDocumentController::class, 'getDocuments']);
             // Route::post('/drafts/{draftKey}/{ObjType}', [IDraftController::class, 'createDocumentFromDraft']);
 
             Route::post('/third-party-payments', [IIncomingPaymentController::class, 'thirdPartyPayments']);
@@ -248,9 +240,6 @@ Route::post('password-change', [ApiAuthController::class, 'promptPasswordChange'
             Route::post('/transactions/error-log/{ObjType}', [ITransactionController::class, 'postTransactionErrorLog']);
 
             Route::post('/transactions_create', [ITransactionController::class, 'createOpeningBalanceTransaction']);
-            Route::post('/documents', [DocumentController::class, 'store']);
-            Route::put('documents', [DocumentController::class, 'updateSingleDocument']);
-            Route::put('attachments', [DocumentController::class, 'upload']);
             Route::get('/transactions_search/{ObjType}', [ITransactionController::class, 'searchOpeningBalanceTransaction']);
             Route::get('/transactions_open/{ObjType}', [ITransactionController::class, 'getOpeningBalanceTransaction']);
 
