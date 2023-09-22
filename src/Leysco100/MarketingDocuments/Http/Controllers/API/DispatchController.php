@@ -316,9 +316,9 @@ class DispatchController extends Controller
                             'CardCode' => $item['CardCode'], // Oulet/Customer
                             'CallDate' => $item['CallDate'] ??  Carbon::now()->toDateString(), //  Call Date
                             'CallTime' => $item['CallTime'] ?? Carbon::now()->startOfDay(), // CallTime
-                            'CallEndTime' => $item['CallEndTime'] ?? Carbon::now()->addDay()->setTime(16, 0, 0), // CallTime
+                            'CallEndTime' => $item['CallEndTime'] ?? Carbon::now()->addDay()->setTime(23, 0, 0), // CallTime
                             'CloseDate'=> Carbon::now()->addDay(),
-                            'CloseTime'=>Carbon::now()->addDay()->setTime(16, 0, 0),
+                            'CloseTime'=>Carbon::now()->addDay()->setTime(23, 0, 0),
                             'OpenedDate' => Carbon::now()->format('Y-m-d'),
                             'OpenedTime'=> Carbon::now(),
                             'Repeat' => $item['Repeat'] ?? "N", // Recurrence Pattern //A=Annually, D=Daily, M=Monthly, N=None, W=Weekly
@@ -360,7 +360,7 @@ class DispatchController extends Controller
                 }
                 $Numbering = (new DocumentsService())
                     ->getNumSerieByObjectId($request['ObjType']);
-
+                    
                 $user = Auth::user();
                 $default_vehicle = ORLP::where('RlpCode', $request['RlpCode'])->select('vehicle_id')->first();
                 $NewDocDetail = [
@@ -460,6 +460,15 @@ class DispatchController extends Controller
                  if ($request['ObjType'] == 211) {
                     (new DocumentsService())->sendingAssignmentNotification($newDoc->id, $uniqueCardCodes);
                 }
+                //Close call
+                if($request['ObjType'] == 213){
+                    OCLG::where('id',$newDoc->ClgCode)->update([
+                    'CallEndTime' =>  Carbon::now(),
+                    'CloseDate'=> Carbon::now(),
+                    'CloseTime'=>Carbon::now(),
+                    ]);    
+                }
+                
             DB::commit();
             return (new ApiResponseService())->apiSuccessResponseService($newDoc);
         } catch (\Throwable $th) {
