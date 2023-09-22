@@ -457,19 +457,21 @@ class DispatchController extends Controller
                 }
             
                 (new SystemDefaults())->updateNextNumberNumberingSeries($Numbering['id']);
-                 //Close call
-               \
+
+                 //Close calls
+               
                  if($request['ObjType'] == 214){
                     OCLG::where('id', $baseDocHeader->ClgCode)->update([
                     'CloseDate'=> Carbon::now(),
                     'CloseTime'=>Carbon::now(),
                     'CallEndTime'=>Carbon::now(), 
+
                     ]);    
                 }
             }
                  //Sending Sms
                  if ($request['ObjType'] == 211) {
-                  //  (new DocumentsService())->sendingAssignmentNotification($newDoc->id, $uniqueCardCodes);
+                    (new DocumentsService())->sendingAssignmentNotification($newDoc->id, $uniqueCardCodes);
                 }
                
                 
