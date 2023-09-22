@@ -50,7 +50,7 @@ class OutletController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'CardName' => 'required|unique:o_c_r_d_s',
+            'CardName' => 'required|unique:tenant.o_c_r_d_s',
         ]);
         $totalOutlet = OCRD::count();
         $CardCode = "M" . $totalOutlet;
@@ -71,7 +71,7 @@ class OutletController extends Controller
             'UserSign' => $user->id,
         ]);
 
-        NumberingSeries::dispatchSync($onmm->DfltSeries);
+//        NumberingSeries::dispatchSync($onmm->DfltSeries);
         return response()
             ->json(
                 [
@@ -165,6 +165,7 @@ class OutletController extends Controller
             'Longitude' => $request['Longitude'],
             'Latitude' => $request['Latitude'],
             'Address' => $request['Address'],
+            'Phone1'=>$request['Phone1'] ?? null
         ]);
 
         return $customer;
