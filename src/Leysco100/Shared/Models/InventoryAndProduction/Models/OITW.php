@@ -16,6 +16,6 @@ class OITW extends Model
 
     public function ITM1()
     {
-        return $this->hasMany('App\ITM1');
+        return $this->hasMany(ITM1::class);
     }
 }
