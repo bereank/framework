@@ -503,7 +503,7 @@ class DocumentController extends Controller
             $checkStockAvailabilty = true;
         }
 
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
 
             /**
@@ -860,14 +860,14 @@ class DocumentController extends Controller
 //            if ($saveToDraft == false) {
 //                (new TransactionInventoryEffectAction())->transactionInventoryEffect($ObjType, $newDoc->id);
 //            }
-            DB::commit();
+            DB::connection("tenant")->commit();
 //            $documentForDirecPostingToSAP = (new DocumentsService())->getDocumentForDirectPostingToSAP($newDoc->ObjType, $newDoc->id);
 //            $newDoc->documentForDirecPostingToSAP = $documentForDirecPostingToSAP;
             return (new ApiResponseService())->apiSuccessResponseService($newDoc);
         } catch (\Throwable $th) {
 //            dd($th);
             Log::info($th);
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             return $th;
             return (new ApiResponseService())->apiFailedResponseService("Process failed, Server Error");
         }
@@ -1003,7 +1003,7 @@ class DocumentController extends Controller
                 $request['DocNum'],
                 $request['Series']
             );
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
             $data->update([
                 'Series' => $request['Series'],
@@ -1284,10 +1284,10 @@ class DocumentController extends Controller
              */
             //   (new GeneralDocumentService())->comporeRowToBaseRow($DocumentTables->ObjectID, $data->id);
 
-            DB::commit();
+            DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
@@ -1379,7 +1379,7 @@ class DocumentController extends Controller
                 $request['DocNum'],
                 $request['Series']
             );
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
             $data->update([
                 'Series' => $request['Series'],
@@ -1660,10 +1660,10 @@ class DocumentController extends Controller
              */
             //   (new GeneralDocumentService())->comporeRowToBaseRow($DocumentTables->ObjectID, $data->id);
 
-            DB::commit();
+            DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }

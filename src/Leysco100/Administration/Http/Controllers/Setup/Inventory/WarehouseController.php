@@ -53,7 +53,7 @@ class WarehouseController extends Controller
      */
     public function store(Request $request)
     {
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
             $document_lines = is_array($request['document_lines']) ? 1 : 0;
 
@@ -85,11 +85,11 @@ class WarehouseController extends Controller
                 ]);
             }
 
-            DB::commit();
+            DB::connection("tenant")->commit();
             return (new ApiResponseService())
                 ->apiSuccessResponseService();
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
@@ -148,7 +148,7 @@ class WarehouseController extends Controller
             'WhsName' => 'required',
         ]);
 
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
             $details = [
                 'WhsName' => $request['WhsName'],
@@ -163,11 +163,11 @@ class WarehouseController extends Controller
 
                 WHS1::where('id', $value['id'])->update($listdetals);
             }
-            DB::commit();
+            DB::connection("tenant")->commit();
             return (new ApiResponseService())
                 ->apiSuccessResponseService();
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }

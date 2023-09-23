@@ -73,7 +73,7 @@ class PriceCalculationController extends Controller
             //Get Inventor Uom
             $INVUNIT = $ITEM->IUoMEntry;
             //Getting PRICINGUNITCONVERTEDTOBASEUOM
-            $PRICINGUNITCONVERTEDTOBASEUOM_QUERY = DB::table('o_i_t_m_s')
+            $PRICINGUNITCONVERTEDTOBASEUOM_QUERY = DB::connection("tenant")->table('o_i_t_m_s')
                 ->join('u_g_p1_s', 'o_i_t_m_s.UgpEntry', '=', 'u_g_p1_s.UgpEntry')
                 ->selectRaw('u_g_p1_s.BaseQty,AltQty, BaseQty/AltQty as PRICINGUNITCONVERTEDTOBASEUOM')
                 ->where('o_i_t_m_s.id', $ITEM->id)
@@ -83,7 +83,7 @@ class PriceCalculationController extends Controller
             $PRICINGUNITCONVERTEDTOBASEUOM = $PRICINGUNITCONVERTEDTOBASEUOM_QUERY ? $PRICINGUNITCONVERTEDTOBASEUOM_QUERY->PRICINGUNITCONVERTEDTOBASEUOM : null;
 
             //Getting SALESUNITCONVERTEDTOBASEUOMu
-            $SALESUNITCONVERTEDTOBASEUOM_QUERY = DB::table('o_i_t_m_s')
+            $SALESUNITCONVERTEDTOBASEUOM_QUERY = DB::connection("tenant")->table('o_i_t_m_s')
                 ->join('u_g_p1_s', 'o_i_t_m_s.UgpEntry', '=', 'u_g_p1_s.UgpEntry')
                 ->selectRaw('u_g_p1_s.BaseQty,AltQty, BaseQty/AltQty as SALESUNITCONVERTEDTOBASEUOM')
                 ->where('o_i_t_m_s.id', $ITEM->id)
@@ -92,7 +92,7 @@ class PriceCalculationController extends Controller
             $SALESUNITCONVERTEDTOBASEUOM = $SALESUNITCONVERTEDTOBASEUOM_QUERY ? $SALESUNITCONVERTEDTOBASEUOM_QUERY->SALESUNITCONVERTEDTOBASEUOM : null;
 
             ////Getting INVUNITCONVERTEDTOBASEUOM
-            $INVUNITCONVERTEDTOBASEUOM_QUERY = DB::table('o_i_t_m_s')
+            $INVUNITCONVERTEDTOBASEUOM_QUERY = DB::connection("tenant")->table('o_i_t_m_s')
                 ->join('u_g_p1_s', 'o_i_t_m_s.UgpEntry', '=', 'u_g_p1_s.UgpEntry')
                 ->selectRaw('u_g_p1_s.BaseQty,AltQty, BaseQty/AltQty as INVUNITCONVERTEDTOBASEUOM')
                 ->where('o_i_t_m_s.id', $ITEM->id)
@@ -342,7 +342,7 @@ class PriceCalculationController extends Controller
                 'PRICEPERPRICEUNIT' => $PRICEPERPRICEUNIT,
                 'PRICINGCURRENCY' => $PRICINGCURRENCY,
                 'ItemDimensionDfts' => $itemDefaultDimmension->getdefiniteItemDefaultsDimensions( $request['ItemCode'],$ITEM->QryGroup61),
-                "oitw" => DB::table('o_i_t_w_s')->where('ItemCode', $ITEM->ItemCode)->selectRaw('id,WhsCode,ItemCode,OnHand,OnOrder,IsCommited,AvgPrice')->get(),
+                "oitw" => DB::connection("tenant")->table('o_i_t_w_s')->where('ItemCode', $ITEM->ItemCode)->selectRaw('id,WhsCode,ItemCode,OnHand,OnOrder,IsCommited,AvgPrice')->get(),
                 'FINALSALESPRICE' => $priceIsGross ? $FINALSALESPRICE / $taxRate : $FINALSALESPRICE,
             ];*/
 

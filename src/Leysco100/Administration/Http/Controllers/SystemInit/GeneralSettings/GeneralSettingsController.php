@@ -83,7 +83,7 @@ class GeneralSettingsController extends Controller
 
             return (new ApiResponseService())->apiSuccessResponseService($request);
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }

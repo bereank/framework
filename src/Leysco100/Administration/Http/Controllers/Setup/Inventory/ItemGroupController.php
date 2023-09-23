@@ -53,7 +53,7 @@ class ItemGroupController extends Controller
         $this->validate($request, [
             'ItmsGrpCod' => 'required',
         ]);
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
             $document_lines = is_array($request['document_lines']) ? 1 : 0;
 
@@ -93,11 +93,11 @@ class ItemGroupController extends Controller
                 ]);
             }
 
-            DB::commit();
+            DB::connection("tenant")->commit();
             return (new ApiResponseService())
                 ->apiSuccessResponseService();
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
 
@@ -154,7 +154,7 @@ class ItemGroupController extends Controller
             'ItmsGrpNam' => 'required',
         ]);
 
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
             $details = [
                 'ItmsGrpNam' => $request['ItmsGrpNam'],
@@ -169,11 +169,11 @@ class ItemGroupController extends Controller
 
                 ITB1::where('id', $value['id'])->update($listdetals);
             }
-            DB::commit();
+            DB::connection("tenant")->commit();
             return (new ApiResponseService())
                 ->apiSuccessResponseService();
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }

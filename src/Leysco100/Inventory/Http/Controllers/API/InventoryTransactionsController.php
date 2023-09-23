@@ -134,7 +134,7 @@ class InventoryTransactionsController extends Controller
                 ->apiFailedResponseService("From Warehouse Required");
         }
 
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
 
             /**
@@ -384,14 +384,14 @@ class InventoryTransactionsController extends Controller
             }
 
             $newDoc->newObjType = $objectTypePassedToTns;
-            DB::commit();
+            DB::connection("tenant")->commit();
             $documentForDirecPostingToSAP = (new DocumentsService())->getDocumentForDirectPostingToSAP($newDoc->ObjType, $newDoc->id);
             $newDoc->documentForDirecPostingToSAP = $documentForDirecPostingToSAP;
 
 //            return (new ApiResponseService())->apiSuccessResponseService($newDoc);
             return (new ApiResponseService())->apiSuccessResponseService($newDoc);
         } catch (\Throwable$th) {
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }

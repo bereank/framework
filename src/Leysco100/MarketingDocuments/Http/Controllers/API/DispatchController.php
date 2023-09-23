@@ -286,7 +286,7 @@ class DispatchController extends Controller
     {
 
         try {
-            DB::beginTransaction();
+            DB::connection("tenant")->beginTransaction();
             $this->validate($request, [
                 'ObjType' => 'required',
                 'items' => 'required|array',
@@ -336,7 +336,7 @@ class DispatchController extends Controller
                     ->first();
 
                 if (!$TargetTables) {
-                    DB::rollBack();
+                    DB::connection("tenant")->rollback();
                     return (new ApiResponseService())->apiFailedResponseService("Not found document with objtype " . $ObjType);
                 }
 
@@ -346,7 +346,7 @@ class DispatchController extends Controller
                         ->first();
 
                     if (!$BaseTables) {
-                        DB::rollBack();
+                        DB::connection("tenant")->rollback();
                         return (new ApiResponseService())->apiFailedResponseService("Not found document with base type ");
                     }
 
@@ -357,7 +357,7 @@ class DispatchController extends Controller
                             ->apiFailedResponseService("Copying to not Possible, Base Document is closed");
                     }
                 } else {
-                    DB::rollBack();
+                    DB::connection("tenant")->rollback();
                     return (new ApiResponseService())->apiFailedResponseService("Not found document with base type ");
                 }
                 $Numbering = (new DocumentsService())
@@ -475,10 +475,10 @@ class DispatchController extends Controller
                 }
                
                 
-            DB::commit();
+            DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService($newDoc);
         } catch (\Throwable $th) {
-            DB::rollBack();
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
@@ -498,14 +498,14 @@ class DispatchController extends Controller
                 ->first();
 
             if (!$DocTables) {
-                DB::rollBack();
+                DB::connection("tenant")->rollback();
                 return (new ApiResponseService())->apiFailedResponseService("Not found document with base type ");
             }
 
             $DocHeader = $DocTables->ObjectHeaderTable::where('id', $id)
                 ->first();
         } else {
-            DB::rollBack();
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService("Not found document  type ");
         }
         $user = Auth::user();
@@ -645,7 +645,7 @@ class DispatchController extends Controller
         if (!$DocLines) {
             try {
 
-                DB::beginTransaction();
+                DB::connection("tenant")->beginTransaction();
                 $Numbering = (new DocumentsService())
                     ->getNumSerieByObjectId($ObjType);
                 $cancellation_header =  new $DocTables->ObjectHeaderTable($DocHeader->toArray());
@@ -699,11 +699,11 @@ class DispatchController extends Controller
                         ]);
                 }
                 (new SystemDefaults())->updateNextNumberNumberingSeries($Numbering['id']);
-                DB::commit();
+                DB::connection("tenant")->commit();
                 return (new ApiResponseService())->apiSuccessResponseService(['message' =>
                 "Successfully Canceled"]);
             } catch (\Throwable $th) {
-                DB::rollBack();
+                DB::connection("tenant")->rollback();
                 return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
             }
         } else {
