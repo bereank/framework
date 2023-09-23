@@ -5,17 +5,18 @@ namespace Leysco100\MarketingDocuments\Http\Controllers\API;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
-use Leysco100\Inventory\Services\InventoryService;
-use Leysco100\MarketingDocuments\Services\DocumentsService;
-use Leysco100\MarketingDocuments\Services\SystemDefaults;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Inventory\Services\InventoryService;
+use Leysco100\Shared\Services\AuthorizationService;
 use Leysco100\Shared\Models\Administration\Models\ORLP;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCLG;
+use Leysco100\MarketingDocuments\Services\SystemDefaults;
+use Leysco100\MarketingDocuments\Services\DocumentsService;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;
-use Leysco100\Shared\Services\AuthorizationService;
 
 class DispatchController extends Controller
 {
@@ -307,6 +308,7 @@ class DispatchController extends Controller
                     $OCLG = OCLG::whereDate('CallDate', $callTime)
                         ->where('CardCode', $item['CardCode'])
                         ->where('RlpCode', $item['RlpCode'])
+                        ->where('CallDate',Carbon::now()->format('Y-m-d'))
                         ->first();
                     if (is_null($OCLG)) {
                         //return "no call";
@@ -316,9 +318,9 @@ class DispatchController extends Controller
                             'CardCode' => $item['CardCode'], // Oulet/Customer
                             'CallDate' => $item['CallDate'] ??  Carbon::now()->toDateString(), //  Call Date
                             'CallTime' => $item['CallTime'] ?? Carbon::now()->startOfDay(), // CallTime
-                            'CallEndTime' => $item['CallEndTime'] ?? Carbon::now()->addDay()->setTime(16, 0, 0), // CallTime
+                            'CallEndTime' => $item['CallEndTime'] ?? Carbon::now()->addDay()->setTime(23, 0, 0), // CallTime
                             'CloseDate'=> Carbon::now()->addDay(),
-                            'CloseTime'=>Carbon::now()->addDay()->setTime(16, 0, 0),
+                            'CloseTime'=>Carbon::now()->addDay()->setTime(23, 0, 0),
                             'OpenedDate' => Carbon::now()->format('Y-m-d'),
                             'OpenedTime'=> Carbon::now(),
                             'Repeat' => $item['Repeat'] ?? "N", // Recurrence Pattern //A=Annually, D=Daily, M=Monthly, N=None, W=Weekly
@@ -360,7 +362,7 @@ class DispatchController extends Controller
                 }
                 $Numbering = (new DocumentsService())
                     ->getNumSerieByObjectId($request['ObjType']);
-
+                    
                 $user = Auth::user();
                 $default_vehicle = ORLP::where('RlpCode', $request['RlpCode'])->select('vehicle_id')->first();
                 $NewDocDetail = [
@@ -455,11 +457,24 @@ class DispatchController extends Controller
                 }
             
                 (new SystemDefaults())->updateNextNumberNumberingSeries($Numbering['id']);
+
+                 //Close calls
+               
+                 if($request['ObjType'] == 214){
+                    OCLG::where('id', $baseDocHeader->ClgCode)->update([
+                    'CloseDate'=> Carbon::now(),
+                    'CloseTime'=>Carbon::now(),
+                    'CallEndTime'=>Carbon::now(), 
+
+                    ]);    
+                }
             }
                  //Sending Sms
                  if ($request['ObjType'] == 211) {
                     (new DocumentsService())->sendingAssignmentNotification($newDoc->id, $uniqueCardCodes);
                 }
+               
+                
             DB::commit();
             return (new ApiResponseService())->apiSuccessResponseService($newDoc);
         } catch (\Throwable $th) {
