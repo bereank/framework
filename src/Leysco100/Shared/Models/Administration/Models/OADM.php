@@ -4,7 +4,7 @@ namespace Leysco100\Shared\Models\Administration\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
-use Leysco100\Shared\Models\Marketing\Models\OPLN;
+use Leysco100\Shared\Models\MarketingDocuments\Models\OPLN;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OADM extends Model

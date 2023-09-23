@@ -17,8 +17,6 @@ class UserDefinedFieldsController extends Controller
 
 
 
-      
-       
         try {
 
             $tableName = $request['tableName'];
