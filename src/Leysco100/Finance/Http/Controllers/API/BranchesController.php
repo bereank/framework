@@ -51,17 +51,17 @@ class BranchesController extends Controller
      */
     public function store(Request $request)
     {
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
             $data = OBPL::create([
                 'LocationCode' => $request['LocationCode'],
                 'BPLName' => $request['BPLName'],
                 'ExtRef' => $request['ExtRef'],
             ]);
-            DB::commit();
+            DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
@@ -102,7 +102,7 @@ class BranchesController extends Controller
      */
     public function update(Request $request, $id)
     {
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
             $branch = OBPL::where('id', $id)->first();
             $branch->update([
@@ -110,10 +110,10 @@ class BranchesController extends Controller
                 'BPLName' => $request['BPLName'],
                 'ExtRef' => $request['ExtRef'],
             ]);
-            DB::commit();
+            DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService($branch);
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }

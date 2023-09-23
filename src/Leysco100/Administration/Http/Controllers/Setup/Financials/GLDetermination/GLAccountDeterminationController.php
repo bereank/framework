@@ -56,7 +56,7 @@ class GLAccountDeterminationController extends Controller
      */
     public function store(Request $request)
     {
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
             $details = [
                 'CostPrcLst' => $request['CostPrcLst'], //Based Price Origin
@@ -77,11 +77,11 @@ class GLAccountDeterminationController extends Controller
                 ACP10::where('id', $value['id'])->update($listdetals);
             }
 
-            DB::commit();
+            DB::connection("tenant")->commit();
             return (new ApiResponseService())
                 ->apiSuccessResponseService();
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }

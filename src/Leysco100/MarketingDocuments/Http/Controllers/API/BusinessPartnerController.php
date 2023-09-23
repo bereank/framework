@@ -102,7 +102,7 @@ class BusinessPartnerController extends Controller
                 ->apiFailedResponseService($th->getMessage());
         }
 
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
             $bpCreate = OCRD::create([
                 'CardCode' => $CardCode,
@@ -153,10 +153,10 @@ class BusinessPartnerController extends Controller
             }
 
             // NumberingSeries::dispatch($request['Series']);
-            DB::commit();
+            DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService();
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
@@ -318,7 +318,7 @@ class BusinessPartnerController extends Controller
     //         'GroupName' => "GT",
     //     ]);
 
-    //     DB::beginTransaction();
+    //     DB::connection("tenant")->beginTransaction();
     //     try {
     //         $array = Excel::toCollection(new BPImport(), request()->file('bpData'));
     //         foreach ($array as $key => $value) {
@@ -331,10 +331,10 @@ class BusinessPartnerController extends Controller
     //                 ]);
     //             }
     //         }
-    //         DB::commit();
+    //         DB::connection("tenant")->commit();
     //         return (new ApiResponseService())->apiSuccessResponseService();
     //     } catch (\Throwable $th) {
-    //         DB::rollback();
+    //         DB::connection("tenant")->rollback();
     //         return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
     //     }
     // }

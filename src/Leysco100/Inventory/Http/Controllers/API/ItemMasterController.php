@@ -7,11 +7,20 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Leysco100\Inventory\Http\Controllers\Controller;
+use Leysco100\Inventory\Services\InventoryService;
 use Leysco100\MarketingDocuments\Http\Controllers\API\PriceCalculationController;
+use Leysco100\MarketingDocuments\Jobs\NumberingSeries;
+use Leysco100\Shared\Models\Administration\Models\ITG1;
 use Leysco100\Shared\Models\Administration\Models\OADM;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OITG;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITW;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OSRN;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OSRQ;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OWHS;
+use Leysco100\Shared\Models\ITM15;
 use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Services\AuthorizationService;
 
 class ItemMasterController extends Controller
 {
@@ -93,7 +102,7 @@ class ItemMasterController extends Controller
 
 
 //            $data = OITW::select('o_i_t_w_s.id', 'o_i_t_w_s.ItemCode','a.ItemName', 'o_i_t_w_s.WhsCode', 'o_i_t_w_s.IsCommited', 'o_i_t_w_s.OnHand', 'o_i_t_w_s.OnOrder')
-            $oitwdata = DB::table('o_i_t_w_s')
+            $oitwdata = DB::connection("tenant")->table('o_i_t_w_s')
             ->selectRaw("id, ItemCode,WhsCode, IsCommited, OnHand, OnOrder")
             ->where(function ($q) use ($search, $itemcodesearch, $whsecodesearch) {
                     if ($search != null) {
@@ -118,7 +127,7 @@ class ItemMasterController extends Controller
                 ->toSql();
 
 
-            $data = DB::table('o_i_t_m_s')
+            $data = DB::connection("tenant")->table('o_i_t_m_s')
 
                 ///->join(DB::raw("({$services} as services)"), 'services.customer_id', '=', 'customers.customer_id')
                 ->join(DB::raw("({$oitwdata}) as oitwdata"), 'oitwdata.ItemCode', '=', 'o_i_t_m_s.ItemCode','right outer')
@@ -148,7 +157,7 @@ class ItemMasterController extends Controller
 //            $serrialnumbersearch = \Request::get('serialnumber');
 //            $count = \Request::get('count');
 
-            $osrnData =DB::table("o_s_r_n_s")
+            $osrnData =DB::connection("tenant")->table("o_s_r_n_s")
             ->select('id', 'ItemCode','DistNumber', 'SysNumber','InDate','ItemName')
 //                ->where(function ($q) use ($search, $itemcodesearch, $ItemNamesearch,$serrialnumbersearch ) {
                 ->where(function ($q) use ($search) {
@@ -181,7 +190,7 @@ class ItemMasterController extends Controller
                 ->orderBy('DistNumber', 'asc')
                 ->toSql();
 
-            $data = DB::table('o_s_r_q_s')
+            $data = DB::connection("tenant")->table('o_s_r_q_s')
                 ->join(DB::raw("({$osrnData}) as osrnData") ,function($join){
                     $join->on('osrnData.ItemCode', '=', 'o_s_r_q_s.ItemCode')
                     ->on('osrnData.SysNumber', '=', 'o_s_r_q_s.SysNumber');
@@ -247,7 +256,7 @@ class ItemMasterController extends Controller
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
 
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
             $newItem = OITM::create([
                 'ItemCode' => $ItemCode,
@@ -330,10 +339,10 @@ class ItemMasterController extends Controller
 
             //Updating the NextNumber
             NumberingSeries::dispatch($request['Series']);
-            DB::commit();
+            DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService();
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }

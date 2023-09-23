@@ -72,7 +72,7 @@ class UserController extends Controller
             return (new ApiResponseService())->apiFailedResponseService("Email Taken");
         }
 
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
             $SUPERUSER = 0;
             if ($request['SUPERUSER'] == true) {
@@ -117,10 +117,10 @@ class UserController extends Controller
             }
 
             CreateMenuForUser::dispatch($user->id);
-            DB::commit();
+            DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService("Created Successfully");
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
@@ -250,7 +250,7 @@ class UserController extends Controller
         if ($request['status'] == true) {
             $status = 1;
         }
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
             $user->update([
                 'name' => $request['name'],
@@ -300,10 +300,10 @@ class UserController extends Controller
                     ->send(new UserCredentialsNotification($request, $currenlyLoginUser->id));
             }
 
-            DB::commit();
+            DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService("Updated Successfully");
         } catch (\Throwable $th) {
-            DB::rollBack();
+            DB::connection("tenant")->rollback();
             Log::info($th);
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }

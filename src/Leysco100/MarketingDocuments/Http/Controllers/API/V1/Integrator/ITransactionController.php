@@ -621,7 +621,7 @@ class ITransactionController extends Controller
         $Numbering = (new DocumentsService())
             ->getNumSerieByObjectId($request['ObjType']);
 
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
             $NewDocDetails = [
                 'ObjType' => $request['ObjType'],
@@ -792,12 +792,12 @@ class ITransactionController extends Controller
             // }
             //  NumberingSeries::dispatch($openingBalanceNumbering->id);
             (new SystemDefaults())->updateNextNumberNumberingSeries($Numbering['id']);
-            DB::commit();
+            DB::connection("tenant")->commit();
             $newDoc->document_lines = $rowData;
 
             return $newDoc;
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             throw $th;
         }
     }
@@ -867,7 +867,7 @@ class ITransactionController extends Controller
 
     public function getServiceCall()
     {
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
             $data = OSCL::where('Transfered', 'N')
                 ->get();
@@ -907,10 +907,10 @@ class ITransactionController extends Controller
                 $value->Series = $nnm1->ExtRef;
             }
 
-            DB::commit();
+            DB::connection("tenant")->commit();
             return $data;
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             Log::error($th);
             throw $th;
         }

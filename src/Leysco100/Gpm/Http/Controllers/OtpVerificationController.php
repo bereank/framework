@@ -59,7 +59,7 @@ class OtpVerificationController extends Controller
             $phone_number = $request['phone_number'];
             $expires_at = date('Y-m-d H:i:s', strtotime('+30 minutes'));
             try {
-                DB::beginTransaction();
+                DB::connection("tenant")->beginTransaction();
 
                 // perform database operations here
                 $inserted_id =   DB::connection("tenant")->table('otp_verification')->insertGetId([
@@ -72,9 +72,9 @@ class OtpVerificationController extends Controller
                     "sms_response" => $response,
                     "created_at" => date('Y-m-d H:i:s'),
                 ]);
-                DB::commit();
+                DB::connection("tenant")->commit();
             } catch (\Exception $e) {
-                DB::rollBack();
+                DB::connection("tenant")->rollback();
                 return (new ApiResponseService())->apiFailedResponseService($e);
                 // handle the exception
             }
