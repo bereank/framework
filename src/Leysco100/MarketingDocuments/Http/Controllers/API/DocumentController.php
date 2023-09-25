@@ -19,6 +19,7 @@ use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITW;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OSRN;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
 use Leysco100\Shared\Models\MarketingDocuments\Models\ATC1;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OWDD;
