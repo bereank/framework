@@ -461,7 +461,7 @@ class DocumentController extends Controller
         /**
          * Check If Authorized
          */
-        (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'write');
+//        (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'write');
 
         //If Base Type Exist
         if ($request['BaseType'] && $request['BaseEntry']) {
@@ -860,9 +860,9 @@ class DocumentController extends Controller
             }
 
             //            dd($saveToDraft);
-            if ($saveToDraft == false) {
-                (new TransactionInventoryEffectAction())->transactionInventoryEffect($ObjType, $newDoc->id);
-            }
+//            if ($saveToDraft == false) {
+//                (new TransactionInventoryEffectAction())->transactionInventoryEffect($ObjType, $newDoc->id);
+//            }
             DB::connection("tenant")->commit();
             //            $documentForDirecPostingToSAP = (new DocumentsService())->getDocumentForDirectPostingToSAP($newDoc->ObjType, $newDoc->id);
             //            $newDoc->documentForDirecPostingToSAP = $documentForDirecPostingToSAP;
