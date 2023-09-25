@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DispatchController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DocModelController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DocumentController;
+use Leysco100\MarketingDocuments\Http\Controllers\API\MpesaCallbackController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\MCallController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\MItemController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\MOrderController;
@@ -50,8 +51,8 @@ Route::apiResources(['doc_model' => DocModelController::class]);
 // Route::apiResources(['blanketagreement' => BlanketAgreementController::class]);
 // Route::apiResources(['recurringtransactiontemplates' => RecurringTransactionsTempController::class]);
 // //Mpesa Callback
-// Route::post('mpesa-callback', [MpesaCallbackController::class, "mpesa_callback"])->withoutMiddleware(['auth:sanctum']);
-// Route::get('mpesa/transaction/data', [MpesaCallbackController::class, "getTransData"])->withoutMiddleware(['auth:sanctum']);
+ Route::post('mpesa-callback', [MpesaCallbackController::class, "mpesa_callback"])->withoutMiddleware(['auth:sanctum']);
+ Route::get('mpesa/transaction/data', [MpesaCallbackController::class, "getTransData"])->withoutMiddleware(['auth:sanctum']);
 
 /*
 |--------------------------------------------------------------------------
