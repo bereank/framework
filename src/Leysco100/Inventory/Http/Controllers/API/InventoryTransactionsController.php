@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 use Leysco100\Gpm\Services\DocumentsService;
+use Leysco100\MarketingDocuments\Jobs\NumberingSeries;
+use Leysco100\MarketingDocuments\Services\DatabaseValidationServices;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Inventory\Http\Controllers\Controller;
@@ -374,7 +376,7 @@ class InventoryTransactionsController extends Controller
 
             //Validating Draft using Oringal base type
             if ($objectTypePassedToTns == 112) {
-                $mockedDataDraftMessage = (new GeneralDocumentValidationSerivce())->draftValidation($newDoc, $documentdocument_lines);
+                $mockedDataDraftMessage = (new GeneralDocumentValidationService())->draftValidation($newDoc, $documentdocument_lines);
                 if ($mockedDataDraftMessage) {
                     return (new ApiResponseService())->apiFailedResponseService($mockedDataDraftMessage);
                 }
