@@ -815,7 +815,7 @@ class DocumentController extends Controller
 
             //Validating Draft using Oringal base type
             if ($objectTypePassedToTns == 112) {
-                $mockedDataDraftMessage = (new GeneralDocumentValidationSerivce())->draftValidation($newDoc, $documentRows);
+                $mockedDataDraftMessage = (new GeneralDocumentValidationService())->draftValidation($newDoc, $documentRows);
                 if ($mockedDataDraftMessage) {
                     return (new ApiResponseService())->apiFailedResponseService($mockedDataDraftMessage);
                 }
@@ -1276,7 +1276,7 @@ class DocumentController extends Controller
 
             //Validating Draft using Oringal base type
             if ($ObjType == 112) {
-                $mockedDataDraftMessage = (new GeneralDocumentValidationSerivce())->draftValidation($data, $documentRows);
+                $mockedDataDraftMessage = (new GeneralDocumentValidationService())->draftValidation($data, $documentRows);
                 if ($mockedDataDraftMessage) {
                     return (new ApiResponseService())->apiFailedResponseService($mockedDataDraftMessage);
                 }
@@ -1652,7 +1652,7 @@ class DocumentController extends Controller
 
             //Validating Draft using Oringal base type
             if ($ObjType == 112) {
-                $mockedDataDraftMessage = (new GeneralDocumentValidationSerivce())->draftValidation($data, $documentRows);
+                $mockedDataDraftMessage = (new GeneralDocumentValidationService())->draftValidation($data, $documentRows);
                 if ($mockedDataDraftMessage) {
                     return (new ApiResponseService())->apiFailedResponseService($mockedDataDraftMessage);
                 }
