@@ -39,7 +39,7 @@ Route::post('documents', [DocumentController::class, 'store']);
  Route::put('documents', [DocumentController::class, 'updateSingleDocument']);
  Route::put('attachments', [DocumentController::class, 'upload']);
 Route::post('documents/{ObjType}', [DocumentController::class, 'getDocData']);
-// Route::post('marketing-doc-approvers/{ObjType}/{DocEntry}', [DocumentController::class, 'getDocumentApprovalStatus']);
+ Route::post('marketing-doc-approvers/{ObjType}/{DocEntry}', [DocumentController::class, 'getDocumentApprovalStatus']);
 // Route::post('marketing-doc-close/{ObjType}/{DocEntry}', [DocumentController::class, 'closeSingleDocument']);
 // Route::post('marketing-doc-printed/{ObjType}/{DocEntry}', [DocumentController::class, 'markDocumentPrinted']);
 Route::get('documents/{ObjType}/{DocEntry}', [DocumentController::class, 'getSingleDocData']);
