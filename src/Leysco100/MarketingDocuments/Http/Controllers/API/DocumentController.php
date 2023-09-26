@@ -1750,7 +1750,7 @@ class DocumentController extends Controller
                 ->where('ObjectID', $ObjType)
                 ->first();
 
-            (new AuthorizationService())->checkIfAuthorize($DocumentTables->id, 'view');
+//            (new AuthorizationService())->checkIfAuthorize($DocumentTables->id, 'view');
 
             $data = $DocumentTables->ObjectHeaderTable::where('id', $DocEntry)
                 ->first();
