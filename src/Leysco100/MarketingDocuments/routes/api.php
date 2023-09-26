@@ -5,6 +5,7 @@ use Leysco100\MarketingDocuments\Http\Controllers\API\DispatchController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DocModelController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DocumentController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\MpesaCallbackController;
+use Leysco100\MarketingDocuments\Http\Controllers\API\V1\Integrator\IDraftController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\MCallController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\MItemController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\MOrderController;
@@ -46,7 +47,7 @@ Route::get('documents/{ObjType}/{DocEntry}', [DocumentController::class, 'getSin
 // //update Transferred to no after api for direct posting to sap fails
 // Route::post('sales_doc_update/{ObjType}/{docEntry}', [DocumentController::class, 'updateSingleDocData']);
 // Route::get('customer_sales_doc/{ObjType}', [DocumentController::class, 'getCustomerDocData']);
-// Route::apiResources(['drafts' => DraftController::class]);
+ Route::apiResources(['drafts' => DraftController::class]);
 Route::apiResources(['doc_model' => DocModelController::class]);
 // Route::apiResources(['blanketagreement' => BlanketAgreementController::class]);
 // Route::apiResources(['recurringtransactiontemplates' => RecurringTransactionsTempController::class]);
@@ -232,7 +233,7 @@ Route::post('password-change', [ApiAuthController::class, 'promptPasswordChange'
             Route::put('/inventory/inventory_contents', [IInventoryController::class, 'update']);
 
             //Documents
-            // Route::post('/drafts/{draftKey}/{ObjType}', [IDraftController::class, 'createDocumentFromDraft']);
+             Route::post('/drafts/{draftKey}/{ObjType}', [IDraftController::class, 'createDocumentFromDraft']);
 
             Route::post('/third-party-payments', [IIncomingPaymentController::class, 'thirdPartyPayments']);
 
