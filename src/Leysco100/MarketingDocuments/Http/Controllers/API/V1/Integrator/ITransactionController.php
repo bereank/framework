@@ -583,13 +583,15 @@ class ITransactionController extends Controller
         }
 
         $ExtRef = \Request::get('ExtRef');
-        $data = $DocumentTables->ObjectHeaderTable::where('ExtRef', $ExtRef)
-            ->first();
+        if ($ExtRef){
+            $data = $DocumentTables->ObjectHeaderTable::where('ExtRef', $ExtRef)
+                ->first();
 
-        if ($data) {
-            $data->document_lines = $DocumentTables->pdi1[0]['ChildTable']::where('DocEntry', $data->id)->get();
-            $data->UserSign = 1;
-            return $data;
+            if ($data) {
+                $data->document_lines = $DocumentTables->pdi1[0]['ChildTable']::where('DocEntry', $data->id)->get();
+                $data->UserSign = 1;
+                return $data;
+            }
         }
 
         $businessPartner = [];
