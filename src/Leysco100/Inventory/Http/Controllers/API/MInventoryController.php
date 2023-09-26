@@ -42,7 +42,7 @@ class MInventoryController extends Controller
      */
     public function store(Request $request)
     {
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
             $TargetTables = APDI::with('pdi1')->where('ObjectID', 66)
                 ->first();
@@ -81,7 +81,7 @@ class MInventoryController extends Controller
 
             //Updating the NextNumber
             NumberingSeries::dispatchNow($Series['Series']);
-            DB::commit();
+            DB::connection("tenant")->commit();
             return response()
                 ->json(
                     [
@@ -91,7 +91,7 @@ class MInventoryController extends Controller
                     201
                 );
         } catch (\Throwable$th) {
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             return response()
                 ->json(
                     [

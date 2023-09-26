@@ -2,15 +2,14 @@
 
 namespace Leysco100\Shared\Models\InventoryAndProduction\Models;
 
-use App\Domains\Administration\Models\OIDG;
-use App\Domains\Administration\Models\OUGP;
-use App\Domains\Administration\Models\TaxGroup;
-use App\Domains\BusinessPartner\Models\OAT1;
-use App\Domains\Marketing\Models\DLN1;
-use App\Domains\Marketing\Models\INV1;
-use App\Domains\Marketing\Models\RDR1;
-use App\Models\ITM15;
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\Administration\Models\OIDG;
+use Leysco100\Shared\Models\Administration\Models\OUGP;
+use Leysco100\Shared\Models\Administration\Models\TaxGroup;
+use Leysco100\Shared\Models\BusinessPartner\Models\OAT1;
+use Leysco100\Shared\Models\MarketingDocuments\Models\DLN1;
+use Leysco100\Shared\Models\MarketingDocuments\Models\INV1;
+use Leysco100\Shared\Models\MarketingDocuments\Models\RDR1;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OITM extends Model

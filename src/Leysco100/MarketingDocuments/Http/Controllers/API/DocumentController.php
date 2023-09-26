@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Artisan;
 use Leysco100\MarketingDocuments\Jobs\NumberingSeries;
 use Leysco100\MarketingDocuments\Services\DatabaseValidationServices;
 use Leysco100\MarketingDocuments\Services\DocumentsService;
+use Leysco100\Shared\Actions\TransactionInventoryEffectAction;
 use Leysco100\Shared\Models\Administration\Models\OADM;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\Banking\Models\PDF2;
@@ -19,6 +20,7 @@ use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITW;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OSRN;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
 use Leysco100\Shared\Models\MarketingDocuments\Models\ATC1;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OWDD;
@@ -27,6 +29,7 @@ use Leysco100\Shared\Models\MarketingDocuments\Services\GeneralDocumentService;
 use Leysco100\Shared\Models\MarketingDocuments\Services\GeneralDocumentValidationService;
 use Leysco100\Shared\Models\OSCL;
 use Leysco100\Shared\Models\Shared\Services\ServiceCallService;
+use Leysco100\Shared\Services\AuthorizationService;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
@@ -503,7 +506,7 @@ class DocumentController extends Controller
             $checkStockAvailabilty = true;
         }
 
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
 
             /**
@@ -818,12 +821,12 @@ class DocumentController extends Controller
                 }
             }
             if ($newDoc->ObjType == 13 && $request['payments']) {
-                foreach ($request['payments'] as $payment){
+                foreach ($request['payments'] as $payment) {
                     $storedProcedureResponse = null;
-                    if ($saveToDraft){
+                    if ($saveToDraft) {
                         $newPayment = (new BankingDocumentService())->processDraftIncomingPayment($newDoc, $payment);
                         $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions(140, "A", $newPayment->id);
-                    }else{
+                    } else {
                         $newPayment = (new BankingDocumentService())->processIncomingPayment($newDoc, $payment);
                         $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions(24, "A", $newPayment->id);
                     }
@@ -833,7 +836,6 @@ class DocumentController extends Controller
                         }
                     }
                 }
-
             }
 
             if ($objectTypePassedToTns != 112) {
@@ -857,19 +859,20 @@ class DocumentController extends Controller
                 (new ServiceCallService())->mapServiceCallWithExpenseDocument($objectTypePassedToTns, $newDoc->id, $request['serviceCallId']);
             }
 
+            //            dd($saveToDraft);
 //            if ($saveToDraft == false) {
 //                (new TransactionInventoryEffectAction())->transactionInventoryEffect($ObjType, $newDoc->id);
 //            }
-            DB::commit();
-//            $documentForDirecPostingToSAP = (new DocumentsService())->getDocumentForDirectPostingToSAP($newDoc->ObjType, $newDoc->id);
-//            $newDoc->documentForDirecPostingToSAP = $documentForDirecPostingToSAP;
+            DB::connection("tenant")->commit();
+            //            $documentForDirecPostingToSAP = (new DocumentsService())->getDocumentForDirectPostingToSAP($newDoc->ObjType, $newDoc->id);
+            //            $newDoc->documentForDirecPostingToSAP = $documentForDirecPostingToSAP;
             return (new ApiResponseService())->apiSuccessResponseService($newDoc);
         } catch (\Throwable $th) {
-//            dd($th);
+            //            dd($th);
             Log::info($th);
-            DB::rollback();
-            return $th;
-            return (new ApiResponseService())->apiFailedResponseService("Process failed, Server Error");
+            DB::connection("tenant")->rollback();
+            //            dd($th);
+            return (new ApiResponseService())->apiFailedResponseService("Process failed, Server Error", $newDoc);
         }
     }
     // saving Attachments
@@ -1003,7 +1006,7 @@ class DocumentController extends Controller
                 $request['DocNum'],
                 $request['Series']
             );
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
             $data->update([
                 'Series' => $request['Series'],
@@ -1273,7 +1276,7 @@ class DocumentController extends Controller
 
             //Validating Draft using Oringal base type
             if ($ObjType == 112) {
-                $mockedDataDraftMessage = (new GeneralDocumentValidationSerivce())->draftValidation($data, $documentRows);
+                $mockedDataDraftMessage = (new GeneralDocumentValidationService())->draftValidation($data, $documentRows);
                 if ($mockedDataDraftMessage) {
                     return (new ApiResponseService())->apiFailedResponseService($mockedDataDraftMessage);
                 }
@@ -1284,10 +1287,10 @@ class DocumentController extends Controller
              */
             //   (new GeneralDocumentService())->comporeRowToBaseRow($DocumentTables->ObjectID, $data->id);
 
-            DB::commit();
+            DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
@@ -1379,7 +1382,7 @@ class DocumentController extends Controller
                 $request['DocNum'],
                 $request['Series']
             );
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
             $data->update([
                 'Series' => $request['Series'],
@@ -1649,7 +1652,7 @@ class DocumentController extends Controller
 
             //Validating Draft using Oringal base type
             if ($ObjType == 112) {
-                $mockedDataDraftMessage = (new GeneralDocumentValidationSerivce())->draftValidation($data, $documentRows);
+                $mockedDataDraftMessage = (new GeneralDocumentValidationService())->draftValidation($data, $documentRows);
                 if ($mockedDataDraftMessage) {
                     return (new ApiResponseService())->apiFailedResponseService($mockedDataDraftMessage);
                 }
@@ -1660,10 +1663,10 @@ class DocumentController extends Controller
              */
             //   (new GeneralDocumentService())->comporeRowToBaseRow($DocumentTables->ObjectID, $data->id);
 
-            DB::commit();
+            DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
@@ -1747,7 +1750,7 @@ class DocumentController extends Controller
                 ->where('ObjectID', $ObjType)
                 ->first();
 
-            (new AuthorizationService())->checkIfAuthorize($DocumentTables->id, 'view');
+//            (new AuthorizationService())->checkIfAuthorize($DocumentTables->id, 'view');
 
             $data = $DocumentTables->ObjectHeaderTable::where('id', $DocEntry)
                 ->first();

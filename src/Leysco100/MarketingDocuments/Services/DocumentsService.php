@@ -87,12 +87,12 @@ class DocumentsService
             ->get();
 
         if ($fetchAllAprovals->isNotEmpty()) {
-            DB::beginTransaction();
+            DB::connection("tenant")->beginTransaction();
             try {
                 $draftDetails = $this->creatingDraftDocument($request, $fetchAllAprovals);
-                DB::commit();
+                DB::connection("tenant")->commit();
             } catch (\Throwable $th) {
-                DB::rollback();
+                DB::connection("tenant")->rollback();
                 abort_if(
                     $th,
                     (new ApiResponseService())->apiFailedResponseService($th->getMessage())
@@ -616,7 +616,7 @@ class DocumentsService
         //                ->first();
         //        }
 
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
             $headerVal = $DocumentTables->ObjectHeaderTable::where("id", $docEntry)->first();
 
@@ -724,10 +724,10 @@ class DocumentsService
                     $headerVal->payments = (new BankingDocumentService())->getInvoicePayment($headerVal->id);
                 }
             }
-            DB::commit();
+            DB::connection("tenant")->commit();
             return $headerVal;
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             Log::error($th);
             throw $th;
         }

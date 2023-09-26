@@ -71,7 +71,7 @@ class UserController extends Controller
             return (new ApiResponseService())->apiFailedResponseService("Email Taken");
         }
 
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
             $SUPERUSER = 0;
             if ($request['SUPERUSER'] == true) {
@@ -124,10 +124,10 @@ class UserController extends Controller
             }
 
             CreateMenuForUser::dispatch($user->id);
-            DB::commit();
+            DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService("Created Successfully");
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
@@ -260,12 +260,7 @@ class UserController extends Controller
         if ($request['status'] == true) {
             $status = 1;
         }
-        $settings = OADM::first();
-        $password_changed = true;
-        if ($settings->PswdChangeOnReset) {
-            $password_changed = false;
-        }
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
             $user->update([
                 'name' => $request['name'],
@@ -283,14 +278,11 @@ class UserController extends Controller
 
             if ($request['password']) {
                 $user->update([
+                    'status' => $status,
                     'password' => Hash::make($request['password']),
                 ]);
             }
-            $user->update([
-                'status' => $status,
-                'password_changed' =>   $password_changed,
-            ]);
-
+    
             if($request['gate_id']){
                 $user->update([
                     'gate_id' => $request['gate_id']
@@ -325,10 +317,10 @@ class UserController extends Controller
             //         ->send(new UserCredentialsNotification($request, $currenlyLoginUser->id));
             // }
 
-            DB::commit();
+            DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService("Updated Successfully");
         } catch (\Throwable $th) {
-            DB::rollBack();
+            DB::connection("tenant")->rollback();
             Log::info($th);
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }

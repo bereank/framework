@@ -93,7 +93,7 @@ class DimensionController extends Controller
      */
     public function update(Request $request, $id)
     {
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
             $data = ODIM::where('id', $id)->first();
 
@@ -126,11 +126,11 @@ class DimensionController extends Controller
                     'text' => $request['DimDesc'],
                 ]);
             }
-            DB::commit();
+            DB::connection("tenant")->commit();
             return (new ApiResponseService())
                 ->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())
                 ->apiFailedResponseService($th->getMessage());
         }

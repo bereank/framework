@@ -94,7 +94,7 @@ class GUserController extends Controller
             ]);
             return (new ApiResponseService())->apiSuccessResponseService("Created Successfully");
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
@@ -111,7 +111,7 @@ class GUserController extends Controller
             $data = User::where('id', $id)->first();
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }

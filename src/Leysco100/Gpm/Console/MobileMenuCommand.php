@@ -44,7 +44,7 @@ class MobileMenuCommand extends Command
 
 
         foreach ($data as $item) {
-            DB::table('mobile_nav_bars')->insert($item);
+            DB::connection("tenant")->table('mobile_nav_bars')->insert($item);
         }
 
         $this->info('data inserted successfully.');

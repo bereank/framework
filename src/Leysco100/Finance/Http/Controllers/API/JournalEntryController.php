@@ -47,7 +47,7 @@ class JournalEntryController extends Controller
      */
     public function store(Request $request)
     {
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
 
         try {
             $newItem = OJDT::create([
@@ -81,10 +81,10 @@ class JournalEntryController extends Controller
                 $firstAccount->update($firstAccountDetails);
             }
 
-            DB::commit();
+            DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService();
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }

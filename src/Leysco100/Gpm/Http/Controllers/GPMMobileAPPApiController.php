@@ -63,7 +63,7 @@ class GPMMobileAPPApiController extends Controller
         $emailString = OADM::where('id', 1)->value("NotifEmail");
 
         $emails = explode(';', $emailString);
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
             $fullDocNum = explode("-", $request['DocNum']);
 
@@ -123,12 +123,12 @@ class GPMMobileAPPApiController extends Controller
             ];
             $newRecord = new GMS1($scanLogData);
             $newRecord->save();
-            DB::commit();
+            DB::connection("tenant")->commit();
             if ($request['fields']) {
                 $this->postScanLogDetails($request['fields'], $newRecord->id);
             }
         } catch (\Throwable $th) {
-            DB::rollback();
+            DB::connection("tenant")->rollback();
 
             Log::info($th);
             return response()
@@ -710,7 +710,7 @@ class GPMMobileAPPApiController extends Controller
     {
         try {
 
-            DB::beginTransaction();
+            DB::connection("tenant")->beginTransaction();
             foreach ($attachments as $key => $val) {
                 GMS2::firstOrCreate([
                     'DocEntry' => $scanLogID,
@@ -720,7 +720,7 @@ class GPMMobileAPPApiController extends Controller
                 ]);
             }
 
-            DB::commit();
+            DB::connection("tenant")->commit();
         } catch (\Throwable $th) {
 
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
@@ -745,7 +745,7 @@ class GPMMobileAPPApiController extends Controller
             $scanLog = GMS1::findOrFail($request['ScanLogId']);
 
             $attachments = $request['attachments'];
-            DB::beginTransaction();
+            DB::connection("tenant")->beginTransaction();
             foreach ($attachments as $key => $val) {
                 GMS2::firstOrCreate([
                     'DocEntry' => $scanLog->id,
@@ -754,10 +754,10 @@ class GPMMobileAPPApiController extends Controller
                     'Content' => $val['value'],
                 ]);
             }
-            DB::commit();
+            DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService("Uploaded Successfully");
         } catch (\Throwable $th) {
-            DB::rollBack();
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }

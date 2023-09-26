@@ -266,7 +266,7 @@ class GeneralDocumentValidationService
      */
     public function draftValidation($draftHeader, $draftRows)
     {
-        DB::beginTransaction();
+        DB::connection("tenant")->beginTransaction();
         try {
             $targetTables = APDI::with('pdi1')
                 ->where('ObjectID', $draftHeader->ObjType)
@@ -301,11 +301,11 @@ class GeneralDocumentValidationService
                 }
             }
 
-            DB::rollback();
+            DB::connection("tenant")->rollback();
             return $message;
         } catch (\Throwable $th) {
             Log::info($th);
-            DB::rollback();
+            DB::connection("tenant")->rollback();
         }
     }
 }
