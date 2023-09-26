@@ -2,10 +2,11 @@
 namespace Leysco100\Shared\Services;
 
 use Illuminate\Support\Facades\Auth;
+use Leysco100\Shared\Models\Shared\Models\APDI;
+use Leysco100\Shared\Models\FormSetting\Models\FM100;
 use Leysco100\Shared\Models\Administration\Models\NNM1;
 use Leysco100\Shared\Models\Administration\Models\NNM2;
 use Leysco100\Shared\Models\Administration\Models\ONNM;
-use Leysco100\Shared\Models\Shared\Models\APDI;
 
 /**
  * Common Item Services
@@ -110,5 +111,22 @@ class CommonService
                 "key" => "setting",
             ],
         ];
+    }
+    public function createOrUpdateMenu($menuData, $parentID = null)
+    {
+        foreach ($menuData as $item) {
+            $menu = FM100::updateOrCreate([
+                'UserSign' => 1,
+                'ParentID' => $parentID,
+                'Label' => $item['Label'],
+                'Visible' => $item['Visible'],
+                'icon' => array_key_exists('icon', $item) ? $item['icon'] : null,
+                'link' => array_key_exists('link', $item) ? $item['link'] : null,
+            ]);
+
+            if (isset($item['children']) && is_array($item['children'])) {
+                $this->createOrUpdateMenu($item['children'], $menu->id);
+            }
+        }
     }
 }

@@ -4,11 +4,12 @@ namespace Leysco100\Administration\Http\Controllers\SystemInit\Authorization;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Leysco100\Administration\Http\Controllers\Controller;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
+use Leysco100\Shared\Models\Administration\Models\Role;
+use Leysco100\Shared\Models\Administration\Models\User;
+use Leysco100\Administration\Http\Controllers\Controller;
+use Leysco100\Shared\Models\Administration\Models\Permission;
 
 class PermissionController extends Controller
 {
@@ -114,16 +115,16 @@ class PermissionController extends Controller
                 ->first();
             if ($read) {
                 $newRead = $value['read'] ? $user->givePermissionTo($read->id) :
-                $user->revokePermissionTo($read->id);
+                    $user->revokePermissionTo($read->id);
             }
             if ($write) {
                 $newWrite = $value['write'] ? $user->givePermissionTo($write->id) :
-                $user->revokePermissionTo($write->id);
+                    $user->revokePermissionTo($write->id);
             }
 
             if ($update) {
                 $newUpdarte = $value['update'] ? $user->givePermissionTo($update->id) :
-                $user->revokePermissionTo($update->id);
+                    $user->revokePermissionTo($update->id);
             }
         }
         return (new ApiResponseService())->apiSuccessResponseService();
@@ -138,6 +139,7 @@ class PermissionController extends Controller
      */
     public function assignPermissionToRole(Request $request)
     {
+
         $role = Role::where('id', $request['id'])->first();
 
         if (!$role) {
@@ -153,12 +155,18 @@ class PermissionController extends Controller
             $update = Permission::where('apdi_id', $value['id'])
                 ->where('Label', 'update')
                 ->first();
-            $newRead = $value['read'] ? $role->givePermissionTo($read->name) :
-            $role->revokePermissionTo($read->name);
-            $newWrite = $value['write'] ? $role->givePermissionTo($write->id) :
-            $role->revokePermissionTo($write->id);
-            $newUpdarte = $value['update'] ? $role->givePermissionTo($update->id) :
-            $role->revokePermissionTo($update->id);
+            if ($read) {
+                $newRead = $value['read'] ? $role->givePermissionTo($read->id) :
+                    $role->revokePermissionTo($read->id);
+            }
+            if ($write) {
+                $newWrite = $value['write'] ? $role->givePermissionTo($write->id) :
+                    $role->revokePermissionTo($write->id);
+            }
+            if ($update) {
+                $newUpdarte = $value['update'] ? $role->givePermissionTo($update->id) :
+                    $role->revokePermissionTo($update->id);
+            }
         }
         return (new ApiResponseService())->apiSuccessResponseService();
     }
@@ -180,31 +188,31 @@ class PermissionController extends Controller
                 return (new ApiResponseService())->apiFailedResponseService("Document Not Found");
             }
 
-//            $docPermissions = Permission::select('name')
-//                ->where('apdi_id', $document->id)
-//                ->first();
-//            if (!$docPermissions) {
-//                return (new ApiResponseService())->apiFailedResponseService("Permissions Not Found");
-//            }
+            //            $docPermissions = Permission::select('name')
+            //                ->where('apdi_id', $document->id)
+            //                ->first();
+            //            if (!$docPermissions) {
+            //                return (new ApiResponseService())->apiFailedResponseService("Permissions Not Found");
+            //            }
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
 
         // return $user->roles;
 
-//        $read = Permission::select('name')
-//            ->where('apdi_id', $document->id)
-//            ->where('Label', 'read')
-//            ->first();
-//
-//        $write = Permission::select('name')
-//            ->where('apdi_id', $document->id)
-//            ->where('Label', 'write')
-//            ->first();
-//        $update = Permission::select('name')
-//            ->where('apdi_id', $document->id)
-//            ->where('Label', 'update')
-//            ->first();
+        //        $read = Permission::select('name')
+        //            ->where('apdi_id', $document->id)
+        //            ->where('Label', 'read')
+        //            ->first();
+        //
+        //        $write = Permission::select('name')
+        //            ->where('apdi_id', $document->id)
+        //            ->where('Label', 'write')
+        //            ->first();
+        //        $update = Permission::select('name')
+        //            ->where('apdi_id', $document->id)
+        //            ->where('Label', 'update')
+        //            ->first();
         $document->read = true;
         $document->write = true;
         $document->update = true;

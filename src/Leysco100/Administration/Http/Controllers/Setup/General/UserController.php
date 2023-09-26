@@ -1,25 +1,24 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\General;
+namespace Leysco100\Administration\Http\Controllers\Setup\General;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Domains\Shared\Models\APDI;
 use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\Controller;
-use App\Mail\SystemNotificationMail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use App\Services\AuthorizationService;
-use Spatie\Permission\Models\Permission;
-use App\Mail\UserCredentialsNotification;
-use App\Domains\Administration\Models\OAIB;
-use App\Domains\Administration\Models\User;
-use App\Domains\Administration\Models\USR1;
-use App\Domains\BusinessPartner\Models\OBPL;
-use App\Domains\Shared\Services\ApiResponseService;
-use App\Domains\Administration\Jobs\CreateMenuForUser;
+use Leysco100\Shared\Models\Shared\Models\APDI;
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Services\AuthorizationService;
+use Leysco100\Shared\Models\Administration\Models\OADM;
+use Leysco100\Shared\Models\Administration\Models\OAIB;
+use Leysco100\Shared\Models\Administration\Models\User;
+use Leysco100\Shared\Models\Administration\Models\USR1;
+use Leysco100\Shared\Models\BusinessPartner\Models\OBPL;
+use Leysco100\Administration\Http\Controllers\Controller;
+use Leysco100\Shared\Models\Administration\Models\Permission;
+use Leysco100\Shared\Models\Administration\Jobs\CreateMenuForUser;
 
 class UserController extends Controller
 {
@@ -34,7 +33,7 @@ class UserController extends Controller
         $TargetTables = APDI::with('pdi1')
             ->where('ObjectID', $ObjType)
             ->first();
-        (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'read');
+       (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'read');
         try {
             $data = User::select('id', 'name', 'email', 'phone_number', 'status', 'active_until')->get();
             //            $data = $TargetTables->select('id', 'name', 'email', 'phone_number', 'status', 'active_until')->get();
@@ -78,6 +77,10 @@ class UserController extends Controller
             if ($request['SUPERUSER'] == true) {
                 $SUPERUSER = 1;
             }
+            $status=0;
+            if ($request['status'] == true) {
+                $status = 1;
+            }
             $user = User::create([
                 'name' => $request['name'],
                 'email' => $request['email'],
@@ -89,10 +92,14 @@ class UserController extends Controller
                 'all_Branches' => $request['BPLid'] == -1 ? 1 : 0,
                 'ExtRef' => $request['ExtRef'],
                 'type' => $request['type'],
-                'status' => 1,
-                'EmpID' => $request['EmpID'],
+                'status' => $status,
+                'EmpID' => $request['EmpID']
             ]);
-
+            if($request['gate_id']){
+                $user->update([
+                    'gate_id' => $request['gate_id']
+                ]); 
+            }
             if ($request['usergroups']) {
                 foreach ($request['usergroups'] as $key => $value) {
                     $user->assignRole($value);
@@ -133,6 +140,7 @@ class UserController extends Controller
      */
     public function show($id)
     {
+       
         $ObjType = 6;
         $TargetTables = APDI::with('pdi1')
             ->where('ObjectID', $ObjType)
@@ -151,7 +159,8 @@ class UserController extends Controller
             $user->getAllPermissions();
         }
         $user = User::where('id', $id)
-            ->with('nnm2', 'oudg.warehouse', 'oudg.employee', 'oudg.driver')
+           // ->with('nnm2', 'oudg.warehouse', 'oudg.employee', 'oudg.driver')
+           ->with('oudg.warehouse', 'oudg.employee', 'oudg.driver')
             ->first();
 
         $user->usergroups = $user->roles()->pluck("id");
@@ -234,6 +243,7 @@ class UserController extends Controller
         $this->validate($request, [
             'name' => 'required|string|max:191',
             'email' => 'required|string|email|max:191|unique:users,email,' . $user->id,
+            'phone_number' => 'nullable|max:21',
         ]);
 
         if ($request['password']) {
@@ -250,6 +260,11 @@ class UserController extends Controller
         if ($request['status'] == true) {
             $status = 1;
         }
+        $settings = OADM::first();
+        $password_changed = true;
+        if ($settings->PswdChangeOnReset) {
+            $password_changed = false;
+        }
         DB::beginTransaction();
         try {
             $user->update([
@@ -261,9 +276,9 @@ class UserController extends Controller
                 'ExtRef' => $request['ExtRef'],
                 'EmpID' => $request['EmpID'],
                 'type' => $request['type'],
-                'status' => $status,
+                'phone_number' => $request['phone_number'],
                 'useLocalSearch' => $request['useLocalSearch'] == true ? 1 : 0,
-                'localUrl' => $request['localUrl'],
+                'localUrl' => $request['localUrl']
             ]);
 
             if ($request['password']) {
@@ -271,7 +286,17 @@ class UserController extends Controller
                     'password' => Hash::make($request['password']),
                 ]);
             }
+            $user->update([
+                'status' => $status,
+                'password_changed' =>   $password_changed,
+            ]);
 
+            if($request['gate_id']){
+                $user->update([
+                    'gate_id' => $request['gate_id']
+                ]); 
+            }
+            
             $user->branches()->sync($request['branches']);
             if ($request['BPLid'] == -1) {
                 $branches = OBPL::pluck('id');
@@ -293,12 +318,12 @@ class UserController extends Controller
             //     ->cc("gilbert.mutai@cargen.com")
             //     ->send(new SystemNotificationMail($oldUserData, $newUserData, $currenlyLoginUser->id));
 
-            if ($request['e_pass']) {
-                $email = $request['email'];
-                Mail::to($email)
-                    ->cc("robert.kimaru@leysco.co.ke")
-                    ->send(new UserCredentialsNotification($request, $currenlyLoginUser->id));
-            }
+            // if ($request['e_pass']) {
+            //     $email = $request['email'];
+            //     Mail::to($email)
+            //         ->cc("robert.kimaru@leysco.co.ke")
+            //         ->send(new UserCredentialsNotification($request, $currenlyLoginUser->id));
+            // }
 
             DB::commit();
             return (new ApiResponseService())->apiSuccessResponseService("Updated Successfully");
@@ -311,6 +336,7 @@ class UserController extends Controller
 
     public function fetchGroupPermission($userID, $ObjectType)
     {
+       
         $user = User::select('id')->find($userID);
 
         $document = APDI::select('id', 'DocumentName', 'ObjectID')
@@ -328,6 +354,7 @@ class UserController extends Controller
             ->where('apdi_id', $document->id)
             ->where('Label', 'update')
             ->first();
+
         foreach ($user->roles as $key => $val) {
             $val->read = $val->hasPermissionTo($read->name);
             $val->write = $val->hasPermissionTo($write->name);

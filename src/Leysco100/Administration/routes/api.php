@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Leysco100\Administration\Http\Controllers\Setup\Banking\BankController;
+use Leysco100\Administration\Http\Controllers\Setup\General\UserController;
 use Leysco100\Administration\Http\Controllers\Setup\Inventory\UoMController;
 use Leysco100\Administration\Http\Controllers\Setup\General\DriverController;
 use Leysco100\Administration\Http\Controllers\Setup\General\VehicleController;
@@ -28,6 +29,8 @@ use Leysco100\Administration\Http\Controllers\Setup\General\AlertsManagementCont
 use Leysco100\Administration\Http\Controllers\Setup\Financials\ChartOfAccountController;
 use Leysco100\Administration\Http\Controllers\Setup\BusinessPartners\BPPropertiesController;
 use Leysco100\Administration\Http\Controllers\SystemInit\Authorization\PermissionController;
+use Leysco100\Administration\Http\Controllers\SystemInit\Authorization\DataOwnershipController;
+use Leysco100\Administration\Http\Controllers\SystemInit\CompanyDetails\CompanyDetailsController;
 use Leysco100\Administration\Http\Controllers\SystemInit\GeneralSettings\GeneralSettingsController;
 use Leysco100\Administration\Http\Controllers\Setup\Financials\GLDetermination\GLAccountDeterminationController;
 
@@ -54,9 +57,12 @@ Route::get('taxgroups/{Type}', [TaxGroupController::class, 'TaxGroupType']);
 // Route::post('itemsproperty_desc', [ItemPropertyController::class, 'itemDesc']);
 // // Permission
  Route::get('authorization/check-if-permitted/{ObjectCode}', [PermissionController::class, 'checkIfCurrentUserIsPermitted']);
-// Route::post('authorization/assign-permission-to-user', [PermissionController::class, 'assignPermissionToUser']);
-// Route::post('authorization/assign-permission-to-role', [PermissionController::class, 'assignPermissionToRole']);
-// Route::get('users/{userID}/{ObjectType}', [UserController::class, 'fetchGroupPermission']);
+Route::post('authorization/assign-permission-to-user', [PermissionController::class, 'assignPermissionToUser']);
+Route::post('authorization/assign-permission-to-role', [PermissionController::class, 'assignPermissionToRole']);
+Route::get('users/auth/{userID}', [UserController::class, 'show']);
+Route::get('users/{userID}/{ObjectType}', [UserController::class, 'fetchGroupPermission']);
+Route::apiResources(['permissions' => PermissionController::class]);
+
 // //Users
 // Route::get('users/get-user-defaults', [UserController::class, 'fetchDefaultsForCurrentUser']);
 // Route::get('users/inbox', [UserController::class, 'inbox']);
@@ -69,12 +75,10 @@ Route::get('taxgroups/{Type}', [TaxGroupController::class, 'TaxGroupType']);
 // Route::apiResources(['open-documents' => ExternalOpenDocumentsController::class]);
 
 // Route::get('gl_account-determination-category/{category}', [GLAccountDeterminationController::class, 'getAccountPerCategory']);
-// Route::apiResources(['posting-periods' => PostingPeriodController::class]);
-// Route::apiResources(['company_details' => CompanyDetailsController::class]);
-// Route::apiResources(['general_settings' => GeneralSettingsController::class]);
-// Route::apiResources(['permissions' => PermissionController::class]);
-// Route::apiResources(['permissions' => PermissionController::class]);
-// Route::apiResources(['users' => UserController::class]);
+//Route::apiResources(['posting-periods' => PostingPeriodController::class]);
+Route::apiResources(['company_details' => CompanyDetailsController::class]);
+Route::apiResources(['general_settings' => GeneralSettingsController::class]);
+Route::apiResources(['users' => UserController::class]);
 // Route::apiResources(['administration' => SystemSettingsController::class]);
 Route::apiResources(['gl_account_determination' => GLAccountDeterminationController::class]);
 Route::apiResources(['usergroup' => UserGroupController::class]);
@@ -108,3 +112,4 @@ Route::apiResources(['house_bank' => HouseBankController::class]);
 Route::apiResources(['vehicles' => VehicleController::class]);
 Route::put('/settings/password_rest_change', [GeneralSettingsController::class, 'updatePswdChangOnReset']);
 Route::apiResources(['alerts' => AlertsManagementController::class]);
+Route::apiResources(['data-ownerships' => DataOwnershipController::class]);

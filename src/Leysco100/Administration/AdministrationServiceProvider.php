@@ -5,6 +5,7 @@ namespace Leysco100\Administration;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Leysco100\Administration\Console\AdministrationInstallCommand;
+use Leysco100\Administration\Console\CreatePermissions;
 
 class AdministrationServiceProvider extends ServiceProvider
 {
@@ -27,7 +28,8 @@ class AdministrationServiceProvider extends ServiceProvider
 
 
             $this->commands([
-                AdministrationInstallCommand::class
+                AdministrationInstallCommand::class,
+                CreatePermissions::class
             ]);
         }
 

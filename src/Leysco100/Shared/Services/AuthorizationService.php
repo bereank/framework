@@ -6,12 +6,12 @@ use Gate;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
-use Spatie\Permission\Models\Permission;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
 use Leysco100\Shared\Models\Administration\Models\OUDG;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\BusinessPartner\Models\OBPL;
+use Leysco100\Shared\Models\Administration\Models\Permission;
 
 
 /**

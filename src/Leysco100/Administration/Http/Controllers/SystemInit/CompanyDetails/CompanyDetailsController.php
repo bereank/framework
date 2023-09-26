@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\API\Administration\Setup\SystemInit\CompanyDetails;
+namespace Leysco100\Administration\Http\Controllers\SystemInit\CompanyDetails;
 
-use App\Domains\Administration\Models\OADM;
-use App\Domains\Shared\Services\ApiResponseService;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\Administration\Models\OADM;
+use Leysco100\Administration\Http\Controllers\Controller;
+
+
 
 class CompanyDetailsController extends Controller
 {
@@ -126,7 +128,6 @@ class CompanyDetailsController extends Controller
                     'HQLocation' => $request['HQLocation'],
                     'BTWCity' => $request['BTWCity'],
                     'BTWZip' => $request['BTWZip'],
-                    'E_Mail' => $request['E_Mail'],
                     'Phone1' => $request['Phone1'],
 
                 ];
@@ -141,7 +142,6 @@ class CompanyDetailsController extends Controller
                     'HQLocation' => $request['HQLocation'],
                     'BTWCity' => $request['BTWCity'],
                     'BTWZip' => $request['BTWZip'],
-                    'E_Mail' => $request['E_Mail'],
                     'Phone1' => $request['Phone1'],
                 ]);
             }
