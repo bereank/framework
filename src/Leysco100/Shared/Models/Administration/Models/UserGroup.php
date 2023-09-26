@@ -8,7 +8,7 @@ use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class UserGroup extends Model
 {
-    use SoftDeletes,UsesTenantConnection;
+    use UsesTenantConnection;
     protected $guarded = ['id'];
     protected $table = 'roles';
 }

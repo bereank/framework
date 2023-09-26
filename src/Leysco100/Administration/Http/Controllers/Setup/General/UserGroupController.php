@@ -6,13 +6,13 @@ namespace Leysco100\Administration\Http\Controllers\Setup\General;
 
 
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\Administration\Models\Role;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Administration\Http\Controllers\Controller;
 use Leysco100\Shared\Models\Administration\Models\UserGroup;
+use Leysco100\Shared\Models\Administration\Models\Permission;
 
 class UserGroupController extends Controller
 {
@@ -24,7 +24,7 @@ class UserGroupController extends Controller
     public function index()
     {
         try {
-            $data = UserGroup::get();
+            $data = Role::get();
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
@@ -45,8 +45,9 @@ class UserGroupController extends Controller
         ]);
 
         try {
-            $role = UserGroup::create([
+            $role = Role::create([
                 'name' => $request['name'],
+                'guard_name' => 'web',
             ]);
             if ($request['users']) {
                 foreach ($request['users'] as $key => $value) {
@@ -67,10 +68,10 @@ class UserGroupController extends Controller
      */
     public function show($id)
     {
-        $role = UserGroup::where('id', $id)->first();
+        $role = Role::where('id', $id)->first();
 
         if (!$role) {
-            return "User Group doesnt exist";
+            return (new ApiResponseService())->apiFailedResponseService("User Group doesnt exist");
         }
 
         $documents = APDI::select('id', 'DocumentName', 'ObjectID')->get();
@@ -138,7 +139,8 @@ class UserGroupController extends Controller
      */
     public function destroy($id)
     {
-        $user = UserGroup::findOrFail($id);
+        $user = Role::findOrFail($id);
         $user->delete();
+        return (new ApiResponseService())->apiSuccessResponseService();
     }
 }

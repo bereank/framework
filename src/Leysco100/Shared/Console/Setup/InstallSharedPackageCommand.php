@@ -35,10 +35,10 @@ class InstallSharedPackageCommand extends Command
         OADM::create([
                 'CompnyName' => Tenant::current()->name
         ]);
-
-
-        $modelstsJsonString = file_get_contents(base_path('resources/setupdata/models.json'));
-        $models = json_decode($modelstsJsonString, true);
+        
+        $modelsJsonString = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'models.json');
+       
+        $models = json_decode($modelsJsonString, true);
         foreach ($models as $key => $value) {
             $Header = APDI::updateOrCreate([
                 'ObjectID' => $value['ObjectID'],
@@ -48,14 +48,17 @@ class InstallSharedPackageCommand extends Command
                 'DocumentName' => $value['DocumentName'],
                 'JrnStatus' => $value['JrnStatus'],
                 'isDoc' => $value['isDoc'],
+                'ObjAcronym'=>$value['ObjAcronym']??null
             ]);
-            $Row = PDI1::updateOrCreate([
-                'DocEntry' => $Header->id,
-
-            ], [
-                'ChildType' => $value['ChildType'],
-                'ChildTable' => $value['ChildTable'],
-            ]);
+            if(array_key_exists('ChildTable',$value) && !empty($value['ChildTable'])){
+                $Row = PDI1::updateOrCreate([
+                    'DocEntry' => $Header->id,
+                ], [
+                    'ChildType' => $value['ChildType'],
+                    'ChildTable' => $value['ChildTable'],
+                ]);
+            }
+           
 
         }
 

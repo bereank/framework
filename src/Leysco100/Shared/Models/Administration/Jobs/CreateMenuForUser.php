@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Domains\Administration\Jobs;
+namespace Leysco100\Shared\Models\Administration\Jobs;
 
-use App\Domains\FormSetting\Models\FM100;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Leysco100\Shared\Models\FormSetting\Models\FM100;
 
 class CreateMenuForUser implements ShouldQueue
 {

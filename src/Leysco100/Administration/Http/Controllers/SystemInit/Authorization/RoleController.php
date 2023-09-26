@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\API\Administration\Setup\SystemInit\Authorization;
 
-use App\Http\Controllers\Controller;
+
 use Illuminate\Http\Request;
+use Leysco100\Administration\Http\Controllers\Controller;
 
 class RoleController extends Controller
 {
