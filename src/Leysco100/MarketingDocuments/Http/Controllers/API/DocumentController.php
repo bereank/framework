@@ -138,7 +138,7 @@ class DocumentController extends Controller
 
                             if (!$showAll) {
 //                                $q->where('UserSign', $createdBy);
-                                $q->where('OwnerCode', Auth::user()->EmpId);
+                                $q->where('OwnerCode', Auth::user()->EmpID);
                             }
                         }
                     })
