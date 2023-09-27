@@ -531,7 +531,8 @@ class DocumentController extends Controller
                 'CardName' => $customerDetails ? $customerDetails->CardName : null,
                 'SlpCode' => $request['SlpCode'], // Sales Employee
                 'U_SalePipe' => $request['U_SalePipe'], // Sales Pipe Line
-                'OwnerCode' => $user->EmpID, //Owner Code
+//                'OwnerCode' => $user->EmpID, //Owner Code
+                'OwnerCode' => $request['OwnerCode'], //Owner Code
                 'U_CashMail' => $request['U_CashMail'], //Cash Customer  Email
                 'U_CashName' => $request['U_CashName'], //Cash Customer  Name
                 'U_CashNo' => $request['U_CashNo'], // Cash Customer No
