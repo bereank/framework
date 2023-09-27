@@ -76,9 +76,9 @@ class BankingDocumentService
         $newInvoiceDetails->save();
 
         // $invoice = OINV::where('id', $document->id)->first();
-        $invoiceBalance = $document->DocTotal - ($document->PaidToDate + $request['TotalPaid']);
+//        $invoiceBalance = $document->DocTotal - ($document->PaidToDate + $request['TotalPaid']);
         $InvoiceDetails = [
-            'PaidToDate' => $document->PaidToDate + $request['TotalPaid'],
+            'PaidToDate' => $document->PaidToDate ? $document->PaidToDate : 0 + $request['TotalPaid'],
         ];
 
         $document->update($InvoiceDetails);
@@ -175,9 +175,9 @@ class BankingDocumentService
         $newInvoiceDetails->save();
 
         // $invoice = OINV::where('id', $document->id)->first();
-        $invoiceBalance = $document->DocTotal - ($document->PaidToDate + $request['TotalPaid']);
+//        $invoiceBalance = $document->DocTotal - ($document->PaidToDate + $request['TotalPaid']);
         $InvoiceDetails = [
-            'PaidToDate' => $document->PaidToDate + $request['TotalPaid'],
+            'PaidToDate' => $document->PaidToDate ? $document->PaidToDate : 0 + $request['TotalPaid'],
         ];
 
         $document->update($InvoiceDetails);
