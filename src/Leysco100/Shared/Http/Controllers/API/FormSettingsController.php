@@ -4,14 +4,12 @@ namespace Leysco100\Shared\Http\Controllers\API;
 
 
 use Illuminate\Http\Request;
-use App\Jobs\FormSettingUpdate;
 use Illuminate\Support\Facades\Log;
 
 use Illuminate\Support\Facades\Auth;
 
 use Leysco100\Gpm\Services\DocumentsService;
-use Leysco100\Shared\Actions\Helpers\HideTableRowsFieldsPerDocumentAction;
-use Leysco100\Shared\Models\Administration\Models\OUDP;
+use Leysco100\Shared\Jobs\FormSettingUpdate;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Http\Controllers\Controller;
 use Leysco100\Shared\Models\FormSetting\Models\FI100;
@@ -21,7 +19,9 @@ use Leysco100\Shared\Models\FormSetting\Models\FTR100;
 use Leysco100\Shared\Models\Administration\Models\NNM1;
 use Leysco100\Shared\Models\Administration\Models\NNM2;
 use Leysco100\Shared\Models\Administration\Models\ONNM;
+use Leysco100\Shared\Models\Administration\Models\OUDP;
 use Leysco100\Shared\Models\Administration\Models\User;
+use Leysco100\Shared\Actions\Helpers\HideTableRowsFieldsPerDocumentAction;
 
 
 class FormSettingsController extends Controller
@@ -261,14 +261,14 @@ class FormSettingsController extends Controller
 
     public function updateFormSettingsMenu(Request $request)
     {
-        return response()->json([
-            'Message' => "Updated Successfully",
-        ]);
+        
         $this->validate($request, [
             'UserSign' => 'required',
         ]);
-
-        FormSettingUpdate::dispatch($request['AllIds'], $request['SelectedIds'], $request['UserSign']);
+      
+        FormSettingUpdate::dispatchSync($request['AllIds'],
+         $request['SelectedIds'],
+          $request['UserSign']);
         return response()->json([
             'Message' => "Updated Successfully",
         ]);

@@ -6,7 +6,9 @@ namespace Leysco100\Gpm\Http\Controllers\API;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Gpm\Http\Controllers\Controller;
+use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Services\AuthorizationService;
 use Leysco100\Shared\Models\MarketingDocuments\Models\AutoBCModeSettings;
 
 class BackupModeSettingsController extends Controller
@@ -19,6 +21,11 @@ class BackupModeSettingsController extends Controller
     public function index()
     {
 
+        $ObjType = 216;
+        $TargetTables = APDI::with('pdi1')
+            ->where('ObjectID', $ObjType)
+            ->first();
+        (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'read');
         try {
             $data = AutoBCModeSettings::first();
             return (new ApiResponseService())->apiSuccessResponseService($data);
@@ -36,6 +43,12 @@ class BackupModeSettingsController extends Controller
      */
     public function store(Request $request)
     {
+
+        $ObjType = 216;
+        $TargetTables = APDI::with('pdi1')
+            ->where('ObjectID', $ObjType)
+            ->first();
+        (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'create');
         try {
             $request->validate([
                 // 'UserSign' => 'nullable|exists:users,id',
