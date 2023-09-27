@@ -871,8 +871,7 @@ class DocumentController extends Controller
             //            dd($th);
             Log::info($th);
             DB::connection("tenant")->rollback();
-            //            dd($th);
-            return (new ApiResponseService())->apiFailedResponseService("Process failed, Server Error", $newDoc);
+            return (new ApiResponseService())->apiFailedResponseService("Process failed, Server Error", $th);
         }
     }
     // saving Attachments
