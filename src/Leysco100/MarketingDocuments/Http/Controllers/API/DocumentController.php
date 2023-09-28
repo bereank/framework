@@ -138,7 +138,8 @@ class DocumentController extends Controller
                             }
 
                             if (!$showAll) {
-                                $q->where('UserSign', $createdBy);
+//                                $q->where('UserSign', $createdBy);
+                                $q->where('OwnerCode', Auth::user()->EmpID);
                             }
                         }
                     })
@@ -532,7 +533,8 @@ class DocumentController extends Controller
                 'CardName' => $customerDetails ? $customerDetails->CardName : null,
                 'SlpCode' => $request['SlpCode'], // Sales Employee
                 'U_SalePipe' => $request['U_SalePipe'], // Sales Pipe Line
-                'OwnerCode' => $user->EmpID, //Owner Code
+//                'OwnerCode' => $user->EmpID, //Owner Code
+                'OwnerCode' => $request['OwnerCode'], //Owner Code
                 'U_CashMail' => $request['U_CashMail'], //Cash Customer  Email
                 'U_CashName' => $request['U_CashName'], //Cash Customer  Name
                 'U_CashNo' => $request['U_CashNo'], // Cash Customer No
@@ -872,8 +874,7 @@ class DocumentController extends Controller
             //            dd($th);
             Log::info($th);
             DB::connection("tenant")->rollback();
-            //            dd($th);
-            return (new ApiResponseService())->apiFailedResponseService("Process failed, Server Error", $newDoc);
+            return (new ApiResponseService())->apiFailedResponseService("Process failed, Server Error", $th);
         }
     }
     // saving Attachments
