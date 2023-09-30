@@ -32,11 +32,14 @@ class MOrderController extends Controller
      */
     public function index()
     {
-        $user = Auth::user();
-
+        
         $CardCode = \Request::get('CardCode');
         $data = ORDR::with('outlet:id,CardCode,CardName,Address,frozenFor')
             ->with('CreatedBy:id,name')
+            ->with(['document_lines' => function ($query) {
+                $query->with('ItemDetails:id,ItemCode,ItemName')
+                ->select('id','DocEntry', 'Quantity', 'Price', 'LineTotal', 'ItemCode');
+            }])
             ->select('id', 'CardCode', 'DocType', 'DocTotal', 'UserSign', 'created_at', 'WddStatus', 'ExtRef', 'ExtRefDocNum')
             ->where(function ($q) {
                 $user = Auth::user();
@@ -44,13 +47,14 @@ class MOrderController extends Controller
                     $q->where('UserSign', $user->id);
                 }
             })
+          
             ->where(function ($q) use ($CardCode) {
                 if ($CardCode) {
                     $q->where('CardCode', $CardCode);
                 }
             })
             ->latest()
-            ->take(10)
+            ->take(200)
             ->get();
 
         foreach ($data as $key => $value) {
@@ -58,12 +62,7 @@ class MOrderController extends Controller
                 ->where('DocEntry', $value->id)
                 ->orderBy('id', 'desc')
                 ->first();
-
-            $Items = RDR1::select('id', 'Quantity', 'Price', 'LineTotal', 'ItemCode')
-                ->with('ItemDetails:id,ItemCode,ItemName')
-                ->where('DocEntry', $value->id)
-                ->get();
-            $value->OrderedItems = $Items;
+        //    $value->OrderedItems = $Items;
 
             $value->WddStatus = "N";
             $value->ErrorMessage = $checkErrors ? $checkErrors->ErrorMessage : "Pending Sync";
@@ -337,26 +336,36 @@ class MOrderController extends Controller
     {
         try {
             $data = [
-                // [
-                //     "id" => 1,
-                //     "Type" => "Cash",
-                //     "Name" => "Cash",
-                // ],
+                [
+                    "id" => 1,
+                    "Type" => "Order",
+                    "Name" => "Sales Order",
+                    "doctype"=>17
+                ],
                 [
                     "id" => 2,
-                    "Type" => "Credit",
-                    "Name" => "Credit",
+                    "Type" => "Delivery",
+                    "Name" => "Delivery",
+                    "doctype" => 15,
                 ],
-                // [
-                //     "id" => 3,
-                //     "Type" => "Advance",
-                //     "Name" => "Advance",
-                // ],
-                // [
-                //     "id" => 4,
-                //     "Type" => "Secondary",
-                //     "Name" => "Secondary",
-                // ],
+                [
+                    "id" => 3,
+                    "Type" => "Invoice",
+                    "Name" => "Invoice",
+                    "doctype" => 13,
+                ],
+                [
+                    "id" => 4,
+                    "Type" => "Payments",
+                    "Name" => "invoice and Payments",
+                    "doctype"=>13,
+                ],
+                [
+                    "id" => 5,
+                    "Type" => "Quotation",
+                    "Name" => "Sales Quotation",
+                    "doctype"=>23
+                ],
             ];
             return $data;
         } catch (\Throwable $th) {

@@ -18,11 +18,11 @@ class BackupModeProcessController
 {
     public function index()
     {
-        $ObjType = 215;
-        $TargetTables = APDI::with('pdi1')
-            ->where('ObjectID', $ObjType)
-            ->first();
-        (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'read');
+        // $ObjType = 215;
+        // $TargetTables = APDI::with('pdi1')
+        //     ->where('ObjectID', $ObjType)
+        //     ->first();
+        // (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'read');
         try {
             $data = BackUpModeSetup::with('creator')->get();
 
@@ -34,11 +34,11 @@ class BackupModeProcessController
 
     public function store(Request $request)
     {
-        $ObjType = 215;
-        $TargetTables = APDI::with('pdi1')
-            ->where('ObjectID', $ObjType)
-            ->first();
-        (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'create');
+        // $ObjType = 215;
+        // $TargetTables = APDI::with('pdi1')
+        //     ->where('ObjectID', $ObjType)
+        //     ->first();
+        // (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'create');
         try {
             $id = Auth::user()->id;
             $startTime = DateTime::createFromFormat('Y-m-d', $request['StartDate']);
@@ -91,11 +91,11 @@ class BackupModeProcessController
     public function show($id)
     {
 
-        $ObjType = 215;
-        $TargetTables = APDI::with('pdi1')
-            ->where('ObjectID', $ObjType)
-            ->first();
-        (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'read');
+        // $ObjType = 215;
+        // $TargetTables = APDI::with('pdi1')
+        //     ->where('ObjectID', $ObjType)
+        //     ->first();
+        // (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'read');
         try {
             $data = BackUpModeSetup::with('creator', 'template')
                 ->with(['users' => function ($query) {
@@ -123,11 +123,11 @@ class BackupModeProcessController
     }
     public function update(Request $request, $id)
     {
-        $ObjType = 215;
-        $TargetTables = APDI::with('pdi1')
-            ->where('ObjectID', $ObjType)
-            ->first();
-        (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'update');
+        // $ObjType = 215;
+        // $TargetTables = APDI::with('pdi1')
+        //     ->where('ObjectID', $ObjType)
+        //     ->first();
+        // (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'update');
         try {
             $user_id = Auth::user()->id;
             $startTime = DateTime::createFromFormat('Y-m-d', $request['StartDate']);

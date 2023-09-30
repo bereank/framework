@@ -52,6 +52,10 @@ class DispatchController extends Controller
             $dispItems = $DocumentTables->ObjectHeaderTable::with([
                 'document_lines' => function ($query) use ($DocStatus) {
                     $query->where('LineStatus',  $DocStatus)
+                    ->with(['oitm' => function ($query) {
+                        $query->select('SWeight1', 'ItemCode');
+                    }])->select('SWeight1,ItemCode')
+        
                         ->select(
                             'id',
                             'Quantity',
@@ -130,7 +134,6 @@ class DispatchController extends Controller
                     'CardName',
                     'DocNum',
                     'DocDate',
-                    'ExtRefDocNum',
                     'CardCode',
                     'NumAtCard',
                     'ClgCode',
@@ -191,8 +194,13 @@ class DispatchController extends Controller
 
         try {
             $dispItems = $DocumentTables->ObjectHeaderTable::with([
-                'document_lines' => function ($query) {
-                    $query->select(
+                'document_lines' => function ($query) {          
+                    $query
+                    ->with(['oitm' => function ($query) {
+                        $query->select('SWeight1', 'ItemCode');
+                    }])->select('SWeight1,ItemCode')
+        
+                    ->select(
                         'id',
                         'Quantity',
                         'DelivrdQty',
@@ -277,6 +285,8 @@ class DispatchController extends Controller
                     'Attachment'
                 )
                 ->first();
+             
+               
             return (new ApiResponseService())->apiSuccessResponseService($dispItems);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
@@ -284,7 +294,6 @@ class DispatchController extends Controller
     }
     public function store(Request $request)
     {
-
         try {
             DB::connection("tenant")->beginTransaction();
             $this->validate($request, [
@@ -391,6 +400,7 @@ class DispatchController extends Controller
                 foreach ($itemRowsData as $key => $row) {
 
                     foreach ($row['document_lines'] as $key => $value) {
+                        Log::info($value);
                         $LineNum = ++$key;
                         $rowdetails = [
                             'DocEntry' => $newDoc->id,
@@ -426,7 +436,6 @@ class DispatchController extends Controller
                             'CodeBars' => $value['CodeBars'] ?? null, //    Bar Code
                             'SerialNum' => $value['SerialNum'] ?? null //    Serial No.
                         ];
-
                         $rowItems = new $TargetTables->pdi1[0]['ChildTable']($rowdetails);
                         $rowItems->save();
                         (new InventoryService())->dispatchEffectOnOrder(

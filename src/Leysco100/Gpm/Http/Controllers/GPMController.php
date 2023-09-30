@@ -19,11 +19,11 @@ class GPMController extends Controller
     public function getGPMDocuments(Request $request)
     {
 
-        $ObjType = 300;
-        $TargetTables = APDI::with('pdi1')
-            ->where('ObjectID', $ObjType)
-            ->first();
-        (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'read');
+        // $ObjType = 300;
+        // $TargetTables = APDI::with('pdi1')
+        //     ->where('ObjectID', $ObjType)
+        //     ->first();
+        // (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'read');
         try {
             $page = $request->input('page', 1);
             $perPage = $request->input('per_page', 50);
@@ -70,11 +70,11 @@ class GPMController extends Controller
     public function getScanLogs(Request $request)
     {
 
-        $ObjType = 301;
-        $TargetTables = APDI::with('pdi1')
-            ->where('ObjectID', $ObjType)
-            ->first();
-        (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'read');
+        // $ObjType = 301;
+        // $TargetTables = APDI::with('pdi1')
+        //     ->where('ObjectID', $ObjType)
+        //     ->first();
+        // (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'read');
         try {
             // $data = GMS1::with('objecttype', 'creator', 'gates')
             //     ->orderBy('id', 'desc')
@@ -132,11 +132,11 @@ class GPMController extends Controller
     public function getSingleScanLogs($id)
     {
 
-        $ObjType = 301;
-        $TargetTables = APDI::with('pdi1')
-            ->where('ObjectID', $ObjType)
-            ->first();
-        (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'read');
+        // $ObjType = 301;
+        // $TargetTables = APDI::with('pdi1')
+        //     ->where('ObjectID', $ObjType)
+        //     ->first();
+        // (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'read');
         try {
             $data = GMS1::with('objecttype', 'creator')->orderBy('id', 'desc')
                 ->where('id', $id)
