@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Leysco100\Shared\Models\MobileErrorLog;
 use Leysco100\Gpm\Http\Controllers\Controller;
+use Leysco100\Gpm\Services\NotificationsService;
 use Leysco100\Shared\Services\ApiResponseService;
 
 
@@ -54,12 +55,25 @@ class MobileErrorLogController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
-        // MobileErrorLog::create($data);
-        $recipient="john.muchira@leysco.co.ke";
-        $subject="Mobile Error Log";
+        //ErrorLog::create($data);
+        $recipient = ["john.muchira@leysco.co.ke"];
+        $ErrorCode = $request['ErrorCode'] ?? null;
+        $Message = $request['ErrorCode'] ?? null;
+        $AdditionalData = $request['ErrorCode'] ?? null;
+        $AppType =  $request['AppType'] ?? null;
+        $BaseURL =  $request['BaseURL'] ?? null;
+        $Version = $request['Version'] ?? null;
 
-        Mail::raw($data, function ($message) use ($recipient, $subject) {
-            $message->to($recipient)->subject($subject);
+        $message = 'Message=>' . $Message . PHP_EOL .
+            'ErrorCode=>' . $ErrorCode . PHP_EOL .
+            'AdditionalData=>' . $AdditionalData . PHP_EOL .
+            'BaseURL=>' . $BaseURL . PHP_EOL .
+            'AppType=>' . $AppType . PHP_EOL .
+            'Version=>' . $Version;
+        $subject = 'Mobile Error Logs';
+
+        Mail::raw($message, function ($mail) use ($recipient, $subject) {
+            $mail->to($recipient)->subject($subject);
         });
     }
 

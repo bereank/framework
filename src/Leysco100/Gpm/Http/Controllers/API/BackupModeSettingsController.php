@@ -21,11 +21,11 @@ class BackupModeSettingsController extends Controller
     public function index()
     {
 
-        $ObjType = 216;
-        $TargetTables = APDI::with('pdi1')
-            ->where('ObjectID', $ObjType)
-            ->first();
-        (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'read');
+        // $ObjType = 216;
+        // $TargetTables = APDI::with('pdi1')
+        //     ->where('ObjectID', $ObjType)
+        //     ->first();
+        // (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'read');
         try {
             $data = AutoBCModeSettings::first();
             return (new ApiResponseService())->apiSuccessResponseService($data);
@@ -44,11 +44,11 @@ class BackupModeSettingsController extends Controller
     public function store(Request $request)
     {
 
-        $ObjType = 216;
-        $TargetTables = APDI::with('pdi1')
-            ->where('ObjectID', $ObjType)
-            ->first();
-        (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'create');
+        // $ObjType = 216;
+        // $TargetTables = APDI::with('pdi1')
+        //     ->where('ObjectID', $ObjType)
+        //     ->first();
+        // (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'create');
         try {
             $request->validate([
                 // 'UserSign' => 'nullable|exists:users,id',
