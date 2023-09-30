@@ -14,4 +14,9 @@ class OATC extends Model
 
     protected $guarded = ['id'];
     protected $table = 'o_a_t_c_s';
+
+    public function attachment_lines()
+    {
+        return $this->hasMany(ATC1::class, 'AbsEntry');
+    }
 }
