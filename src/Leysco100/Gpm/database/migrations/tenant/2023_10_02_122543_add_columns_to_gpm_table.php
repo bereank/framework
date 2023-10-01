@@ -36,6 +36,18 @@ return new class extends Migration
             if (!Schema::hasColumn('o_a_d_m_s', 'ExtBucketRegion')) {
                 $table->string('ExtBucketRegion', 255)->nullable();
             }
+            if (!Schema::hasColumn('g_m_s1_s', 'OwnerCode')) {
+                $table->string('OwnerCode', 255)->nullable();
+            }
+            if (!Schema::hasColumn('o_g_m_s', 'OwnerCode')) {
+                $table->string('OwnerCode', 255)->nullable();
+            }
+            if (!Schema::hasColumn('gates', 'OwnerCode')) {
+                $table->string('OwnerCode', 255)->nullable();
+            }
+            if (!Schema::hasColumn('back_up_mode_lines', 'OwnerCode')) {
+                $table->string('OwnerCode', 255)->nullable();
+            }
         });
     }
 
