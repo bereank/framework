@@ -30,16 +30,56 @@ class MOrderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    // public function index()
+    // {
+        
+    //     $CardCode = \Request::get('CardCode');
+    //     $data = ORDR::with('outlet:id,CardCode,CardName,Address,frozenFor')
+    //         ->with('CreatedBy:id,name')
+    //         ->with(['document_lines' => function ($query) {
+    //             $query->with('ItemDetails:id,ItemCode,ItemName')
+    //             ->select('id','DocEntry', 'Quantity', 'Price', 'LineTotal', 'ItemCode');
+    //         }])
+    //         ->select('id', 'CardCode', 'DocType', 'DocTotal', 'UserSign', 'created_at', 'WddStatus', 'ExtRef', 'ExtRefDocNum')
+    //         ->where(function ($q) {
+    //             $user = Auth::user();
+    //             if ($user->id != 8 || $user->id != 1) {
+    //                 $q->where('UserSign', $user->id);
+    //             }
+    //         })
+          
+    //         ->where(function ($q) use ($CardCode) {
+    //             if ($CardCode) {
+    //                 $q->where('CardCode', $CardCode);
+    //             }
+    //         })
+    //         ->latest()
+    //         ->take(200)
+    //         ->get();
+
+    //     foreach ($data as $key => $value) {
+    //         $checkErrors = EOTS::where('ObjType', 17)
+    //             ->where('DocEntry', $value->id)
+    //             ->orderBy('id', 'desc')
+    //             ->first();
+    //     //    $value->OrderedItems = $Items;
+
+    //         $value->WddStatus = "N";
+    //         $value->ErrorMessage = $checkErrors ? $checkErrors->ErrorMessage : "Pending Sync";
+    //         if ($value->ExtRef) {
+    //             $value->WddStatus = "Y";
+    //             $value->ErrorMessage = null;
+    //         }
+    //     }
+    //     return $data;
+    // }
     public function index()
     {
-        
+        $user = Auth::user();
+
         $CardCode = \Request::get('CardCode');
         $data = ORDR::with('outlet:id,CardCode,CardName,Address,frozenFor')
             ->with('CreatedBy:id,name')
-            ->with(['document_lines' => function ($query) {
-                $query->with('ItemDetails:id,ItemCode,ItemName')
-                ->select('id','DocEntry', 'Quantity', 'Price', 'LineTotal', 'ItemCode');
-            }])
             ->select('id', 'CardCode', 'DocType', 'DocTotal', 'UserSign', 'created_at', 'WddStatus', 'ExtRef', 'ExtRefDocNum')
             ->where(function ($q) {
                 $user = Auth::user();
@@ -47,14 +87,13 @@ class MOrderController extends Controller
                     $q->where('UserSign', $user->id);
                 }
             })
-          
             ->where(function ($q) use ($CardCode) {
                 if ($CardCode) {
                     $q->where('CardCode', $CardCode);
                 }
             })
             ->latest()
-            ->take(200)
+            ->take(10)
             ->get();
 
         foreach ($data as $key => $value) {
@@ -62,7 +101,12 @@ class MOrderController extends Controller
                 ->where('DocEntry', $value->id)
                 ->orderBy('id', 'desc')
                 ->first();
-        //    $value->OrderedItems = $Items;
+
+            $Items = RDR1::select('id', 'Quantity', 'Price', 'LineTotal', 'ItemCode')
+                ->with('ItemDetails:id,ItemCode,ItemName')
+                ->where('DocEntry', $value->id)
+                ->get();
+            $value->OrderedItems = $Items;
 
             $value->WddStatus = "N";
             $value->ErrorMessage = $checkErrors ? $checkErrors->ErrorMessage : "Pending Sync";
