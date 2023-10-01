@@ -274,8 +274,8 @@ Route::post('password-change', [ApiAuthController::class, 'promptPasswordChange'
             Route::apiResources(['incoming-payments' => IIncomingPaymentController::class]);
 
             //ogms create
-            Route::put('/gms_docs_create', [ITransactionController::class, 'createDocumentForGateManagementModule']);
-            //        Route::put('/gms_docs_create', GMPDocumentController::class);
+          // Route::put('/gms_docs_create', [ITransactionController::class, 'createDocumentForGateManagementModule']);
+            // Route::put('/gms_docs_create', GMPDocumentController::class);
         });
 //    }
 //);
