@@ -37,11 +37,11 @@ class TargetController extends Controller
 
         if (!$user->SUPERUSER) {
             $slpCode = $user->oudg->SalePerson ?? 0;
-            $targetSetup =  $targetSetup->whereHas('salesEmployees', function ($query) use ($slpCode) {
+            $targetSetup = $targetSetup->whereHas('salesEmployees', function ($query) use ($slpCode) {
                 $query->where('SlpCode', $slpCode);
             });
         }
-        $targetSetup =  $targetSetup->get();
+        $targetSetup = $targetSetup->get();
 
         //  $targetSetup = TargetSetup::with('document_lines', 'items', 'salesEmployees')->get();
 
@@ -116,7 +116,7 @@ class TargetController extends Controller
                     break;
                 case 'N':
                     $periodCode = $startDate . '_' . $endDate;
-                    $periodName =  $startDate;
+                    $periodName = $startDate;
                     $periods[] = ['code' => $periodCode, 'name' => $periodName, 'start_date' => $startDate, 'end_date' => $endDate];
                     break;
             }
@@ -156,8 +156,10 @@ class TargetController extends Controller
         }
         $user = Auth::user();
         $HeaderDetails = TargetSetup::create([
-            'TfromDate' =>   $request['StartDate'], //Target  From Date
-            'TtoDate' =>   $request['EndDate'], //Target To Date
+            'TfromDate' => $request['StartDate'],
+            //Target  From Date
+            'TtoDate' => $request['EndDate'],
+            //Target To Date
             'Comment' => $request['comment'] ?? "",
             'RecurPat' => $request['RecurPat'] ?? "",
             'UserSign' => $user->id,
@@ -187,10 +189,11 @@ class TargetController extends Controller
             Log::info($key, $val);
             $TargetRows = Targets::create([
                 'target_setup_id' => $HeaderDetails->id,
-                'TargetType' => $request['TargetType'] ?? "", //O--OUOM,M--Monetory
-                'UoM' => $request['UoM'] ?? "", //Target Metric
+                'UoM' => $request['UoM'] ?? null,
+                //Target Metric
                 'Tvalue' => $request['Tvalue'],
                 'TargetType' => $request['TargetType'] ?? null,
+                //O--OUOM,M--Monetory
                 'PeriodStart' => $val['start_date'],
                 'PeriodEnd' => $val['end_date'],
                 'TCode' => $val['code'],
@@ -199,7 +202,7 @@ class TargetController extends Controller
         }
 
         if ($request['selectAllItems']) {
-            $data = OITM::select('id',  'ItemCode')
+            $data = OITM::select('id', 'ItemCode')
                 ->where('SellItem', 'Y')
                 ->orderBy('ItemCode', 'asc')
                 ->get();
@@ -212,9 +215,12 @@ class TargetController extends Controller
             //Creating Rows:
             foreach ($request['skus'] as $key => $item) {
                 $Items = TargetItems::create([
-                    'UoM' => $request['UoM'] ?? "", //Target Metric
-                    'ItemCode' => $item, //Target Val
-                    'target_setup_id' => $HeaderDetails->id, //User
+                    'UoM' => $request['UoM'] ?? "",
+                    //Target Metric
+                    'ItemCode' => $item,
+                    //Target Val
+                    'target_setup_id' => $HeaderDetails->id,
+                    //User
                 ]);
             }
         }
@@ -237,7 +243,7 @@ class TargetController extends Controller
     public function getEmpTargets()
     {
 
-        $sales_target =   Targets::with('document_lines.oitm', 'user', 'employees', 'metrics', 'invoices')->get();
+        $sales_target = Targets::with('document_lines.oitm', 'user', 'employees', 'metrics', 'invoices')->get();
 
         return (new ApiResponseService())->apiSuccessResponseService($sales_target);
     }
@@ -247,14 +253,16 @@ class TargetController extends Controller
         $collection = collect();
 
         foreach ($targets as $target) {
-            $results = Targets::with(['invoices' => function ($query) use ($target) {
-                $query->select('id', 'SlpCode', 'VatSum', 'DocDate', DB::raw('SUM(DocTotal) as TotalDocTotal'))
-                    ->whereBetween('DocDate', [
-                        Carbon::parse($target->TfromDate)->subDay(),
-                        Carbon::parse($target->TtoDate)->addDay(),
-                    ])
-                    ->where('CANCELED', "=", 'N');
-            }])
+            $results = Targets::with([
+                'invoices' => function ($query) use ($target) {
+                    $query->select('id', 'SlpCode', 'VatSum', 'DocDate', DB::raw('SUM(DocTotal) as TotalDocTotal'))
+                        ->whereBetween('DocDate', [
+                            Carbon::parse($target->TfromDate)->subDay(),
+                            Carbon::parse($target->TtoDate)->addDay(),
+                        ])
+                        ->where('CANCELED', "=", 'N');
+                }
+            ])
                 ->with('employees')
                 ->with('document_lines')
                 ->where('id', $target->id)
@@ -290,7 +298,7 @@ class TargetController extends Controller
                     'Comment' => $flat->Comment ?? null,
                     'AchievementRatio' => isset($total["TotalDocTotal"]) ? (($total["TotalDocTotal"] / $target['Tvalue']) * 100) : 0.00,
                     'Dailytarget' => $result ?? 0,
-                    'TodaySales' =>  $todaySalesToday  ?? 0,
+                    'TodaySales' => $todaySalesToday ?? 0,
 
                 ],
             );
@@ -306,7 +314,7 @@ class TargetController extends Controller
 
     public function getTargetItems($id)
     {
-        $TargetItems =  Targets::with('items.oitm', 'setup.employees')->where('id', $id)->first();
+        $TargetItems = Targets::with('items.oitm', 'setup.employees')->where('id', $id)->first();
         return (new ApiResponseService())->apiSuccessResponseService($TargetItems);
     }
 
@@ -356,44 +364,80 @@ class TargetController extends Controller
     }
     public function getTargetsVsPerfomance()
     {
-        try {
-            $slpCode = null;
-            $user = User::where('id', Auth::user()->id)->with('oudg')->first();
-            if (!$user->SUPERUSER) {
-                $slpCode = $user->oudg->SalePerson ?? 0;
-            };
-            $startdate = request()->filled('startdate') ? Carbon::parse(request()->input('startdate'))->startOfDay() : Carbon::now()->startOfMonth();
+        //  try {
+        $slpCode = null;
+        $user = User::where('id', Auth::user()->id)->with('oudg')->first();
+        if (!$user->SUPERUSER) {
+            $slpCode = $user->oudg->SalePerson ?? 0;
+        }
+        ;
+        $startdate = request()->filled('startdate') ? Carbon::parse(request()->input('startdate'))->startOfDay() : Carbon::now()->startOfMonth();
 
-            $endate = request()->filled('enddate') ? Carbon::parse(request()->input('enddate'))->endOfDay() : Carbon::now()->endOfMonth();
+        $endate = request()->filled('enddate') ? Carbon::parse(request()->input('enddate'))->endOfDay() : Carbon::now()->endOfMonth();
 
-            $isSingleSlp = false;
-            $slpCodes = [];
-            if (request()->filled('SlpCodes')) {
-                $slpCodes =  explode(',', request()->input('SlpCodes'));
-                $isSingleSlp = true;
-            }
+        $isSingleSlp = false;
+        $slpCodes = [];
+        if (request()->filled('SlpCodes')) {
+            $slpCodes = explode(',', request()->input('SlpCodes'));
+            $isSingleSlp = true;
+        }
 
-            // $res = [];
-            //   return $slpCodes;
-            // foreach ($slpCodes as $slpCode) {
-            // $slpCode = 0;
+        // $res = [];
+        //   return $slpCodes;
+        // foreach ($slpCodes as $slpCode) {
+        // $slpCode = 0;
 
-            $target_items = DB::connection("tenant")->table('target_items')
-                //->groupby('target_setup_id')
-                ->select('target_setup_id', 'ItemCode');
-            //, DB::raw("GROUP_CONCAT(`ItemCode` SEPARATOR ',') as `ItemCode`"));
+        $target_items = DB::connection("tenant")->table('target_items')
+            //->groupby('target_setup_id')
+            ->select('target_setup_id', 'ItemCode');
+        //, DB::raw("GROUP_CONCAT(`ItemCode` SEPARATOR ',') as `ItemCode`"));
 
-            $filteredtargets = DB::connection("tenant")->table('targets')->whereBetween('PeriodStart', [
+        $filteredtargets = DB::connection("tenant")->table('targets')->whereBetween('PeriodStart', [
+            $startdate,
+            $endate,
+        ])
+            ->whereBetween('PeriodEnd', [
                 $startdate,
                 $endate,
             ])
-                ->whereBetween('PeriodEnd', [
-                    $startdate,
-                    $endate,
-                ])
-                ->select('target_setup_id',  'Tvalue', 'PeriodStart', 'PeriodEnd');
+            ->select('target_setup_id', 'Tvalue', 'PeriodStart', 'PeriodEnd');
 
-            $validinvoices = DB::connection("tenant")->table('o_i_n_v_s')->where('CANCELED', "=", 'N')->select('id', 'SlpCode', 'DocDate')->whereBetween('DocDate', [
+
+        //Invoices Start
+        $validinvoices = DB::connection("tenant")->table('o_i_n_v_s')->where('CANCELED', "=", 'N')->select('id', 'SlpCode', 'DocDate')->whereBetween('DocDate', [
+            $startdate,
+            $endate,
+        ])
+            ->whereBetween('DocDate', [
+                $startdate,
+                $endate,
+            ]);
+
+
+        $invoicelines = DB::connection("tenant")->table('i_n_v1_s')
+            ->whereBetween('i_n_v1_s.DocDate', [
+                $startdate,
+                $endate,
+            ])
+
+            ->joinSub($validinvoices, 'invoices', function ($join) {
+                $join->on("invoices.id", '=', 'i_n_v1_s.DocEntry');
+            })
+            ->groupBy('invoices.SlpCode')
+            ->groupBy('i_n_v1_s.ItemCode')
+            ->groupBy('i_n_v1_s.DocDate')
+            ->select(
+                'i_n_v1_s.ItemCode',
+                'invoices.DocDate',
+                'invoices.SlpCode',
+                DB::connection("tenant")->raw("SUM(i_n_v1_s.LineTotal) as LineTotal"),
+                DB::connection("tenant")->raw("SUM(i_n_v1_s.GTotal) as GTotal"),
+                DB::connection("tenant")->raw("SUM(i_n_v1_s.Quantity) as Quantity")
+            );
+        // Invoices End
+
+      //  Credit-Notes start
+            $validCreditNotes  = DB::connection("tenant")->table('o_r_i_n_s')->where('CANCELED', "=", 'N')->select('id', 'SlpCode', 'DocDate')->whereBetween('DocDate', [
                 $startdate,
                 $endate,
             ])
@@ -401,87 +445,100 @@ class TargetController extends Controller
                     $startdate,
                     $endate,
                 ]);
+    
 
-            $invoicelines = DB::connection("tenant")->table('i_n_v1_s')
-                ->whereBetween('i_n_v1_s.DocDate', [
-                    $startdate,
-                    $endate,
-                ])
+            $creditNotelines  = DB::connection("tenant")->table('r_i_n1_s')
+            ->whereBetween('r_i_n1_s.DocDate', [
+                $startdate,
+                $endate,
+            ])
+            ->joinSub($validCreditNotes, 'credit_notes', function ($join) {
+                $join->on("credit_notes.id", '=', 'r_i_n1_s.DocEntry');
+            })
+            ->groupBy('credit_notes.SlpCode')
+            ->groupBy('r_i_n1_s.ItemCode')
+            ->groupBy('r_i_n1_s.DocDate')
+            
+            ->select(
+                'r_i_n1_s.ItemCode',
+                'credit_notes.DocDate',
+                'credit_notes.SlpCode',
+                DB::connection("tenant")->raw("SUM(r_i_n1_s.LineTotal) as CreditNoteLineTotal"),
+                DB::connection("tenant")->raw("SUM(r_i_n1_s.GTotal) as CreditNoteGTotal"),
+                DB::connection("tenant")->raw("SUM(r_i_n1_s.Quantity) as CreditNoteQuantity")
+            );
+        //Credit Notes End
+        $target_row = DB::connection("tenant")->table('target_sales_emps')
+            ->join('o_s_l_p_s', 'o_s_l_p_s.SlpCode', '=', 'target_sales_emps.SlpCode')
 
-                ->joinSub($validinvoices, 'invoices', function ($join) {
-                    $join->on("invoices.id", '=', 'i_n_v1_s.DocEntry');
-                })
-                ->groupBy('invoices.SlpCode')
-                ->groupBy('i_n_v1_s.ItemCode')
-                ->groupBy('i_n_v1_s.DocDate')
-                ->select(
-                    'i_n_v1_s.ItemCode',
-                    'invoices.DocDate',
-                    'invoices.SlpCode',
-                    DB::connection("tenant")->raw("SUM(i_n_v1_s.LineTotal) as LineTotal"),
-                    DB::connection("tenant")->raw("SUM(i_n_v1_s.GTotal) as GTotal"),
-                    DB::connection("tenant")->raw("SUM(i_n_v1_s.Quantity) as Quantity")
-                );
+            ->when($isSingleSlp, function ($query) use ($slpCodes) {
+                $query->whereIn('target_sales_emps.SlpCode', $slpCodes);
+            })
+            ->when(!$user->SUPERUSER, function ($query) use ($slpCode) {
+                $query->where('target_sales_emps.SlpCode', $slpCode);
+            })
+            ->joinSub($filteredtargets, 'filteredtargets', function ($join) {
+                $join->on("filteredtargets.target_setup_id", '=', 'target_sales_emps.target_setup_id');
+            })
+            ->join('target_setups', 'filteredtargets.target_setup_id', '=', 'target_setups.id')
+            ->joinSub($target_items, 'items', function ($join) {
+                $join->on("filteredtargets.target_setup_id", '=', 'items.target_setup_id');
+            })
 
-            $target_row = DB::connection("tenant")->table('target_sales_emps')
-                ->join('o_s_l_p_s', 'o_s_l_p_s.SlpCode', '=', 'target_sales_emps.SlpCode')
+            ->leftJoinSub($invoicelines, 'invoices', function ($join) {
+                $join->on("target_sales_emps.SlpCode", '=', 'invoices.SlpCode');
+                $join->on("invoices.ItemCode", "items.ItemCode");
+                $join->on(DB::connection("tenant")->raw('invoices.DocDate BETWEEN filteredtargets.PeriodStart AND filteredtargets.PeriodEnd'), DB::raw("TRUE"));
+            })
 
-                ->when($isSingleSlp, function ($query) use ($slpCodes) {
-                    $query->whereIn('target_sales_emps.SlpCode', $slpCodes);
-                })
-                ->when(!$user->SUPERUSER, function ($query) use ($slpCode) {
-                    $query->where('target_sales_emps.SlpCode', $slpCode);
-                })
-                ->joinSub($filteredtargets, 'filteredtargets', function ($join) {
-                    $join->on("filteredtargets.target_setup_id", '=', 'target_sales_emps.target_setup_id');
-                })
-                ->join('target_setups', 'filteredtargets.target_setup_id', '=', 'target_setups.id')
-                ->joinSub($target_items, 'items', function ($join) {
-                    $join->on("filteredtargets.target_setup_id", '=', 'items.target_setup_id');
-                })
+            ->leftJoinSub($creditNotelines, 'creditNotes', function ($join) {
+                $join->on("target_sales_emps.SlpCode", '=', 'creditNotes.SlpCode');
+                $join->on("creditNotes.ItemCode", "items.ItemCode");
+                $join->on(DB::connection("tenant")->raw('creditNotes.DocDate BETWEEN filteredtargets.PeriodStart AND filteredtargets.PeriodEnd'), DB::raw("TRUE"));
+            })
 
-                ->leftJoinSub($invoicelines, 'invoices', function ($join) {
-                    $join->on("target_sales_emps.SlpCode", '=', 'invoices.SlpCode');
-                    $join->on("invoices.ItemCode", "items.ItemCode");
-                    $join->on(DB::connection("tenant")->raw('invoices.DocDate BETWEEN filteredtargets.PeriodStart AND filteredtargets.PeriodEnd'), DB::raw("TRUE"));
-                })
+            //->groupBy('items.ItemCode')
+            ->groupBy('target_sales_emps.SlpCode')
+            ->groupBy('o_s_l_p_s.SlpName')
+            ->groupBy('filteredtargets.Tvalue')
+            ->groupBy('filteredtargets.PeriodStart')
+            ->groupBy('filteredtargets.PeriodEnd')
+            ->groupBy('target_setups.Comment')
 
-                //->groupBy('items.ItemCode')
-                ->groupBy('target_sales_emps.SlpCode')
-                ->groupBy('o_s_l_p_s.SlpName')
-                ->groupBy('filteredtargets.Tvalue')
-                ->groupBy('filteredtargets.PeriodStart')
-                ->groupBy('filteredtargets.PeriodEnd')
-                ->groupBy('target_setups.Comment')
+            ->select(
+                'target_setups.Comment',
+                //'items.ItemCode',
+                'o_s_l_p_s.SlpName',
+                'target_sales_emps.SlpCode',
+                'filteredtargets.Tvalue',
+                'filteredtargets.PeriodStart',
+                'filteredtargets.PeriodEnd',
+                //DB::raw("GROUP_CONCAT(items.ItemCode SEPARATOR ',') as ItemCode"),
+                DB::connection("tenant")->raw('COALESCE(ROUND(SUM(invoices.LineTotal) / filteredtargets.Tvalue * 100, 2),0) AS line_total_percentage'),
+                DB::connection("tenant")->raw("COALESCE(ROUND(SUM(invoices.LineTotal), 2), 0) AS LineTotal"),
+                DB::connection("tenant")->raw("COALESCE(ROUND(SUM(invoices.GTotal), 2), 0) AS GTotal"),
+                DB::connection("tenant")->raw("COALESCE(ROUND(SUM(invoices.Quantity), 2), 0) AS Quantity"),
 
-                ->select(
-                    'target_setups.Comment',
-                    //'items.ItemCode',
-                    'o_s_l_p_s.SlpName',
-                    'target_sales_emps.SlpCode',
-                    'filteredtargets.Tvalue',
-                    'filteredtargets.PeriodStart',
-                    'filteredtargets.PeriodEnd',
-                    //DB::raw("GROUP_CONCAT(items.ItemCode SEPARATOR ',') as ItemCode"),
-                    DB::connection("tenant")->raw('COALESCE(ROUND(SUM(invoices.LineTotal) / filteredtargets.Tvalue * 100, 2),0) AS line_total_percentage'),
-                    DB::connection("tenant")->raw("COALESCE(ROUND(SUM(invoices.LineTotal), 2), 0) AS LineTotal"),
-                    DB::connection("tenant")->raw("COALESCE(ROUND(SUM(invoices.GTotal), 2), 0) AS GTotal"),
-                    DB::connection("tenant")->raw("COALESCE(ROUND(SUM(invoices.Quantity), 2), 0) AS Quantity")
-                )->get();
-            //     array_push($res, $target_row);
-            // }
-            // dd($target_row);
+                DB::connection("tenant")->raw("COALESCE(ROUND(SUM(creditNotes.CreditNoteLineTotal), 2), 0) AS CreditNoteLineTotal"),
+                DB::connection("tenant")->raw("COALESCE(ROUND(SUM(creditNotes.CreditNoteGTotal), 2), 0) AS CreditNoteGTotal"),
+                DB::connection("tenant")->raw("COALESCE(ROUND(SUM(creditNotes.CreditNoteQuantity), 2), 0) AS CreditNoteQuantity")
 
-            //->toSql();
-            // $sql =  Str::replaceArray('?', $target_row->getBindings(), $target_row->toSql());
-            // return $sql;
-            // Your Eloquent query executed by using get()
+            )
+        ->get();
+        //     array_push($res, $target_row);
+        // }
+        //  return ($target_row);
 
-            //dd(DB::getQueryLog());
-            return (new ApiResponseService())->apiSuccessResponseService($target_row);
-        } catch (\Throwable $th) {
-            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
-        }
+       // ->toSql();
+        // $sql =  Str::replaceArray('?', $target_row->getBindings(), $target_row->toSql());
+        // Log::info($sql);
+        //     // Your Eloquent query executed by using get()
+
+        //Log::info(DB::getQueryLog());
+        return (new ApiResponseService())->apiSuccessResponseService($target_row);
+        // } catch (\Throwable $th) {
+        //     return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+        // }
     }
     public function getEmployeesTargets($id)
     {
@@ -495,10 +552,11 @@ class TargetController extends Controller
 
             if (!$user->SUPERUSER) {
                 $slpCode = $user->oudg->SalePerson ?? 0;
-                $sales_employees =  $sales_employees->where('SlpCode', $slpCode);
-            };
+                $sales_employees = $sales_employees->where('SlpCode', $slpCode);
+            }
+            ;
 
-            $sales_employees =  $sales_employees->get();
+            $sales_employees = $sales_employees->get();
 
             $target_items = TargetItems::where('target_setup_id', $target_row['target_setup_id'])->get()->pluck('ItemCode')->toArray();
 
@@ -514,7 +572,7 @@ class TargetController extends Controller
                 //     $employee['achievement_quantity_percentage'] = number_format($employee['achievement_quantity_percentage'], 2);
                 // }
                 // if ($target_row['TargetType'] == "A") {
-                $employee['achievement_amount_percentage'] =  ($employee['Tvalue'] && $achievement['totalAmount']) ? ($achievement['totalAmount'] / $target_row['Tvalue'] * 100) : 0;
+                $employee['achievement_amount_percentage'] = ($employee['Tvalue'] && $achievement['totalAmount']) ? ($achievement['totalAmount'] / $target_row['Tvalue'] * 100) : 0;
 
                 $employee['achievement_amount_percentage'] = number_format($employee['achievement_amount_percentage'], 2);
                 // }
@@ -540,20 +598,22 @@ class TargetController extends Controller
                 Carbon::parse($periodEnd)->endOfDay(),
             ])
             ->where('SlpCode', $slpCode)
-            ->with(['document_lines' => function ($query) use ($items) {
-                $query->whereIn('ItemCode', $items)
-                    ->select(["id", 'ItemCode', 'DocEntry', 'LineTotal', 'Dscription', 'Price', 'Quantity']);
-            }])
+            ->with([
+                'document_lines' => function ($query) use ($items) {
+                    $query->whereIn('ItemCode', $items)
+                        ->select(["id", 'ItemCode', 'DocEntry', 'LineTotal', 'Dscription', 'Price', 'Quantity']);
+                }
+            ])
             ->select('id', 'SlpCode', 'DocTotal', 'DocNum', 'VatSum', 'DocDate')
             ->get();
 
-        $totalAmount =  $invoices->sum('DocTotal');
+        $totalAmount = $invoices->sum('DocTotal');
 
         $totalQuantity = $invoices->flatMap(function ($invoice) {
             return $invoice['document_lines'];
         })->sum('Quantity');
 
-        return   ['totalQuantity' => $totalQuantity, 'totalAmount' => $totalAmount];
+        return ['totalQuantity' => $totalQuantity, 'totalAmount' => $totalAmount];
     }
 
     public function ItemsData()
