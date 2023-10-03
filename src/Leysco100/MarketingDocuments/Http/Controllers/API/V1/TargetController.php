@@ -426,6 +426,8 @@ class TargetController extends Controller
             ->groupBy('invoices.SlpCode')
             ->groupBy('i_n_v1_s.ItemCode')
             ->groupBy('i_n_v1_s.DocDate')
+            ->groupBy('invoices.DocDate')
+           
             ->select(
                 'i_n_v1_s.ItemCode',
                 'invoices.DocDate',
