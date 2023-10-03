@@ -141,6 +141,7 @@ class DispatchController extends Controller
                     'ObjType',
                     'DocType',
                     'ExtRef',
+                    'ExtRefDocNum',
                     'SlpCode',
                     'RlpCode',
                     'vehicle_id',

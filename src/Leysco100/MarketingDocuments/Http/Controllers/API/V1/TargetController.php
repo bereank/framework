@@ -458,7 +458,7 @@ class TargetController extends Controller
             ->groupBy('credit_notes.SlpCode')
             ->groupBy('r_i_n1_s.ItemCode')
             ->groupBy('r_i_n1_s.DocDate')
-            
+            ->groupBy('credit_notes.DocDate')
             ->select(
                 'r_i_n1_s.ItemCode',
                 'credit_notes.DocDate',
