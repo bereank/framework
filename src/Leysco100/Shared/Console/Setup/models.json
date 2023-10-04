@@ -84,18 +84,6 @@
     "ObjAcronym": ""
   },
   {
-    "ObjectID": 8,
-    "ObjectHeaderTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\OQUT",
-    "PermissionName": "quotations",
-    "RowStatus": "A",
-    "isDoc": "Y",
-    "JrnStatus": "N",
-    "DocumentName": "Sales Quotations",
-    "ChildTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\QUT1",
-    "ChildType": "Quotation",
-    "ObjAcronym": ""
-  },
-  {
     "ObjectID": 13,
     "ObjectHeaderTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\OINV",
     "PermissionName": "invoice",
@@ -169,14 +157,14 @@
   },
   {
     "ObjectID": 23,
-    "ObjectHeaderTable": "Leysco100\\Shared\\Models\\Banking\\Models\\OQUT",
-    "DocumentName": "Sales Quotation",
-    "PermissionName": "sales_quotation",
+    "ObjectHeaderTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\OQUT",
+    "PermissionName": "sales_quotations",
     "RowStatus": "A",
     "isDoc": "Y",
-    "JrnStatus": "Y",
-    "ChildTable": "Leysco100\\Shared\\Models\\Banking\\Models\\QUT1",
-    "ChildType": "Items",
+    "JrnStatus": "N",
+    "DocumentName": "Sales Quotations",
+    "ChildTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\QUT1",
+    "ChildType": "Quotation",
     "ObjAcronym": ""
   },
   {
