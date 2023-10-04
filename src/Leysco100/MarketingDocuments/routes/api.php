@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DispatchController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DocModelController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DocumentController;
+use Leysco100\MarketingDocuments\Http\Controllers\API\DraftController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\MpesaCallbackController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\Integrator\IDraftController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\MCallController;
