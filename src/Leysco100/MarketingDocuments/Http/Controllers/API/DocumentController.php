@@ -809,12 +809,12 @@ class DocumentController extends Controller
                 $objectTypePassedToTns = 112;
             }
 
-            $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions($objectTypePassedToTns, "A", $newDoc->id);
-            if ($storedProcedureResponse) {
-                if ($storedProcedureResponse->error != 0) {
-                    return (new ApiResponseService())->apiFailedResponseService($storedProcedureResponse->error_message);
-                }
-            }
+//            $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions($objectTypePassedToTns, "A", $newDoc->id);
+//            if ($storedProcedureResponse) {
+//                if ($storedProcedureResponse->error != 0) {
+//                    return (new ApiResponseService())->apiFailedResponseService($storedProcedureResponse->error_message);
+//                }
+//            }
 
             //Validating Draft using Oringal base type
             if ($objectTypePassedToTns == 112) {
@@ -828,10 +828,10 @@ class DocumentController extends Controller
                     $storedProcedureResponse = null;
                     if ($saveToDraft) {
                         $newPayment = (new BankingDocumentService())->processDraftIncomingPayment($newDoc, $payment);
-                        $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions(140, "A", $newPayment->id);
+//                        $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions(140, "A", $newPayment->id);
                     } else {
                         $newPayment = (new BankingDocumentService())->processIncomingPayment($newDoc, $payment);
-                        $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions(24, "A", $newPayment->id);
+//                        $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions(24, "A", $newPayment->id);
                     }
                     if ($storedProcedureResponse) {
                         if ($storedProcedureResponse->error != 0) {
