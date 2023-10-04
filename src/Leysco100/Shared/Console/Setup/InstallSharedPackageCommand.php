@@ -19,7 +19,6 @@ class InstallSharedPackageCommand extends Command
      * @var string
      */
     use TenantAware;
-
     protected $signature = 'leysco100:shared:initial_setup {--tenant=*}';
 
     /**
@@ -38,8 +37,6 @@ class InstallSharedPackageCommand extends Command
         ]);
         
         $modelsJsonString = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'models.json');
-
-        dd($modelsJsonString);
        
         $models = json_decode($modelsJsonString, true);
         foreach ($models as $key => $value) {
