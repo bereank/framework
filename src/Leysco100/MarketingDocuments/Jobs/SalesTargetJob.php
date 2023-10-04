@@ -2,11 +2,10 @@
 
 namespace Leysco100\MarketingDocuments\Jobs;
 
-
-use App\Models\TargetItems;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
+use Leysco100\Shared\Models\TargetItems;
 use Spatie\Multitenancy\Jobs\TenantAware;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -41,7 +40,7 @@ class SalesTargetJob implements ShouldQueue, TenantAware
         //
         foreach ($this->items  as $item) {
             $Items = TargetItems::create([
-                'UoM' => $UoM ?? "", //Target Metric
+                'UoM' =>  $this->UoM ?? "", //Target Metric
                 'ItemCode' => $item['ItemCode'], //Target Val
                 'target_setup_id' => $this->Headerid,
             ]);

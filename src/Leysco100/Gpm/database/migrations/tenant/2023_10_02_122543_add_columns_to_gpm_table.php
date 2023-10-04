@@ -36,6 +36,27 @@ return new class extends Migration
             if (!Schema::hasColumn('o_a_d_m_s', 'ExtBucketRegion')) {
                 $table->string('ExtBucketRegion', 255)->nullable();
             }
+          
+        });
+        Schema::table('g_m_s1_s', function (Blueprint $table) {
+            if (!Schema::hasColumn('g_m_s1_s', 'OwnerCode')) {
+                $table->string('OwnerCode', 100)->nullable();
+            }
+        });
+        Schema::table('o_g_m_s', function (Blueprint $table) {
+            if (!Schema::hasColumn('o_g_m_s', 'OwnerCode')) {
+                $table->string('OwnerCode', 100)->nullable();
+            }
+        });
+        Schema::table('gates', function (Blueprint $table) {
+            if (!Schema::hasColumn('gates', 'OwnerCode')) {
+                $table->string('OwnerCode', 100)->nullable();
+            }
+        });
+            Schema::table('back_up_mode_lines', function (Blueprint $table) {
+            if (!Schema::hasColumn('back_up_mode_lines', 'OwnerCode')) {
+                $table->string('OwnerCode', 100)->nullable();
+            }
         });
     }
 

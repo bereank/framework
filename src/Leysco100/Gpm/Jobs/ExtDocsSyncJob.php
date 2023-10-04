@@ -41,6 +41,7 @@ class ExtDocsSyncJob  implements ShouldQueue, TenantAware
      */
     public function handle()
     {
+       
         DB::connection('tenant')->beginTransaction();
         try {
             $data = $this->newRecords;
@@ -64,6 +65,7 @@ class ExtDocsSyncJob  implements ShouldQueue, TenantAware
                         'GenerationDateTime' => Carbon::parse($value['GenerationDateTime'])->format('Y-m-d H:i:s'),
                         'DocTotal' => $value['DocTotal'],
                         'LineDetails' => $value['LineDetails'],
+                        'OwnerCode'=> $value['OwnerCode'] ?? null
                     ]
                 );
                 if ($data->wasRecentlyCreated) {

@@ -29,16 +29,21 @@ class MItemController extends Controller
      */
     public function index()
     {
+       
         $search = \Request::get('filter');
-        $data = OITM::select('id', 'ItemName', 'ItemCode', 'UgpEntry', 'SUoMEntry', 'OnHand')
+        $all = \Request::get('all');
+        $data = OITM::select('id', 'ItemName', 'ItemCode', 'UgpEntry',
+         'SUoMEntry', 'OnHand','frozenFor')
             ->where(function ($q) use ($search) {
                 if ($search) {
                     $q->where('ItemCode', 'LIKE', "%$search%")
                         ->orWhere('ItemName', 'LIKE', "%$search%");
                 }
             })
-            ->where('frozenFor', "N")
-            ->where('OnHand', '>', 0)
+            ->when(!$all, function ($query) {
+               $query->where('frozenFor', "N")
+                ->where('OnHand', '>', 0);
+            })  
             ->get();
         return $data;
     }

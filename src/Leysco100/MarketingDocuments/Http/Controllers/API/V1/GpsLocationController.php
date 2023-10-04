@@ -42,7 +42,8 @@ class GpsLocationController extends Controller
 
 
         $rules = [
-            'user_id' => 'required|exists:users,id',
+           // 'user_id' => 'required|unique:tenant.users,id',
+           'user_id' => 'required',
             'email' => 'required|email',
             'name' => 'required',
             'latitude' => 'required|numeric',

@@ -2,9 +2,10 @@
 
 namespace Leysco100\Shared\Actions\Helpers;
 
+use Leysco100\Shared\Models\CUFD;
+use Leysco100\Shared\Models\UserDict;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
-use Leysco100\Shared\Models\UserDict;
 
 class CreateUDFHelperAction
 {
@@ -33,7 +34,7 @@ class CreateUDFHelperAction
 
         Schema::connection('tenant')->table($this->tableName, function (Blueprint $table) {
             $fieldName = "U_" . $this->fieldName;
-            UserDict::firstOrCreate([
+            CUFD::firstOrCreate([
                 'FieldName' =>  $fieldName,
                 'TableName' => $this->tableName
             ], [

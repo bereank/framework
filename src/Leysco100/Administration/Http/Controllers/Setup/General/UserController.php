@@ -29,11 +29,11 @@ class UserController extends Controller
      */
     public function index()
     {
-        $ObjType = 6;
-        $TargetTables = APDI::with('pdi1')
-            ->where('ObjectID', $ObjType)
-            ->first();
-       (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'read');
+    //     $ObjType = 6;
+    //     $TargetTables = APDI::with('pdi1')
+    //         ->where('ObjectID', $ObjType)
+    //         ->first();
+    //    (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'read');
         try {
             $data = User::select('id', 'name', 'email', 'phone_number', 'status', 'active_until')->get();
             //            $data = $TargetTables->select('id', 'name', 'email', 'phone_number', 'status', 'active_until')->get();
@@ -61,11 +61,11 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $ObjType = 6;
-        $TargetTables = APDI::with('pdi1')
-            ->where('ObjectID', $ObjType)
-            ->first();
-        (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'create');
+        // $ObjType = 6;
+        // $TargetTables = APDI::with('pdi1')
+        //     ->where('ObjectID', $ObjType)
+        //     ->first();
+        // (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'create');
         $user = User::where('email', $request['email'])->first();
         if ($user) {
             return (new ApiResponseService())->apiFailedResponseService("Email Taken");
@@ -141,11 +141,11 @@ class UserController extends Controller
     public function show($id)
     {
        
-        $ObjType = 6;
-        $TargetTables = APDI::with('pdi1')
-            ->where('ObjectID', $ObjType)
-            ->first();
-        (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'read');
+        // $ObjType = 6;
+        // $TargetTables = APDI::with('pdi1')
+        //     ->where('ObjectID', $ObjType)
+        //     ->first();
+        // (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'read');
         $user = User::where('id', $id)->first();
 
         if (!$user) {
@@ -227,11 +227,11 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $ObjType = 6;
-        $TargetTables = APDI::with('pdi1')
-            ->where('ObjectID', $ObjType)
-            ->first();
-        (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'update');
+        // $ObjType = 6;
+        // $TargetTables = APDI::with('pdi1')
+        //     ->where('ObjectID', $ObjType)
+        //     ->first();
+        // (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'update');
         $currenlyLoginUser = Auth::user();
         $oldUserData = User::where('id', $id)->first();
 
