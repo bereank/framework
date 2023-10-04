@@ -32,9 +32,9 @@ class InstallSharedPackageCommand extends Command
     {
 
 
-        OADM::create([
-                'CompnyName' => Tenant::current()->name
-        ]);
+//        OADM::create([
+//                'CompnyName' => Tenant::current()->name
+//        ]);
         
         $modelsJsonString = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'models.json');
        
@@ -63,8 +63,8 @@ class InstallSharedPackageCommand extends Command
         }
 
 
-        $this->info("Creating Default User");
-        Artisan::call('leysco100:shared:create-default-user');
+//        $this->info("Creating Default User");
+//        Artisan::call('leysco100:shared:create-default-user');
 
     }
 }
