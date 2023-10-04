@@ -8,7 +8,7 @@ class MapApiFieldAction
 {
   public static function handle($request)
   {
-    $fieldsJsonString = file_get_contents(base_path('resources/setupdata/field_header_footer_details.json'));
+    $fieldsJsonString = file_get_contents(base_path('resources/Setup/field_header_footer_details.json'));
     $fields = json_decode($fieldsJsonString, true);
     $documentData = [];
 
