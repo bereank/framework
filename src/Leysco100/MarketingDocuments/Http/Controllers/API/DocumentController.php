@@ -551,7 +551,7 @@ class DocumentController extends Controller
                 'AgrNo' => $request['AgrNo'],
                 'LicTradNum' => $request['LicTradNum'],
                 'BaseEntry' => $request['BaseEntry'] ? $request['BaseEntry'] : null, //BaseKey
-                'BaseType' => $request['BaseType'] ? $request['BaseType'] : null, //BaseKey
+                'BaseType' => $request['BaseType'] ?? "1", //BaseKey
                 'UserSign' => $user->id,
                 //Inventory Transaction Values
                 'Ref2' => $request['Ref2'] ? $request['Ref2'] : null, // Ref2
@@ -871,7 +871,6 @@ class DocumentController extends Controller
             //            $newDoc->documentForDirecPostingToSAP = $documentForDirecPostingToSAP;
             return (new ApiResponseService())->apiSuccessResponseService($newDoc);
         } catch (\Throwable $th) {
-            //            dd($th);
             Log::info($th);
             DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService("Process failed, Server Error", $th);
