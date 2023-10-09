@@ -44,7 +44,7 @@ class ImportNumberingSeries extends Command
         foreach ($series as $key => $value) {
              DB::connection("tenant")->beginTransaction();
             try {
-                if (!isset($value['Series Name'])) {
+                if (!isset($value['SeriesName'])) {
                     continue;
                 }
 
