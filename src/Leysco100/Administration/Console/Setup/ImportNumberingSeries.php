@@ -66,7 +66,7 @@ class ImportNumberingSeries extends Command
                     continue;
                 }
 
-                $this->info("Creating Series" . $value['Series Name']);
+                $this->info("Creating Series" . $value['SeriesName']);
 
                 $nnm1 = NNM1::updateOrCreate([
                     'ExtRef' => $value['Series'],
