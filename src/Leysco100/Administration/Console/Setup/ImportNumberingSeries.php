@@ -6,6 +6,8 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Leysco100\Shared\Models\Administration\Models\NNM1;
+use Leysco100\Shared\Models\Administration\Models\ONNM;
+use Leysco100\Shared\Models\Shared\Models\APDI;
 use Spatie\Multitenancy\Commands\Concerns\TenantAware;
 
 class ImportNumberingSeries extends Command
