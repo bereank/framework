@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DispatchController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DocModelController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DocumentController;
+use Leysco100\MarketingDocuments\Http\Controllers\API\DraftController;
+use Leysco100\MarketingDocuments\Http\Controllers\API\MpesaCallbackController;
+use Leysco100\MarketingDocuments\Http\Controllers\API\V1\Integrator\IDraftController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\MCallController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\MItemController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\MOrderController;
@@ -43,7 +46,7 @@ Route::put('attachments', [DocumentController::class, 'upload']);
 Route::post('documents/{ObjType}', [DocumentController::class, 'getDocData']);
 Route::post('marketing-doc-approvers/{ObjType}/{DocEntry}', [DocumentController::class, 'getDocumentApprovalStatus']);
 // Route::post('marketing-doc-close/{ObjType}/{DocEntry}', [DocumentController::class, 'closeSingleDocument']);
-// Route::post('marketing-doc-printed/{ObjType}/{DocEntry}', [DocumentController::class, 'markDocumentPrinted']);
+ Route::post('marketing-doc-printed/{ObjType}/{DocEntry}', [DocumentController::class, 'markDocumentPrinted']);
 Route::get('documents/{ObjType}/{DocEntry}', [DocumentController::class, 'getSingleDocData']);
 // //update Transferred to no after api for direct posting to sap fails
 // Route::post('sales_doc_update/{ObjType}/{docEntry}', [DocumentController::class, 'updateSingleDocData']);

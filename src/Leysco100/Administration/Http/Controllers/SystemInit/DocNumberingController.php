@@ -22,7 +22,7 @@ class DocNumberingController extends Controller
     {
         return ONNM::with('objecttype', 'defaultseries')
             ->whereHas('objecttype', function ($q) {
-                $q->whereIn('ObjectID', [17, 15, 16, 13, 14, 24, 205, 66, 67, 191, 211, 212, 213, 214]);
+                $q->whereIn('ObjectID', [17, 15, 16, 13, 14, 23, 24, 205, 66, 67, 191, 211, 212, 213, 214]);
             })
             ->orderBy('ObjectCode', 'asc')->get();
     }

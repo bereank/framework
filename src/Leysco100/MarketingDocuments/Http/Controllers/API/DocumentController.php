@@ -223,33 +223,33 @@ class DocumentController extends Controller
 
         $rows = $data->document_lines;
         $generalObjects = [205, 66];
-//        if (!in_array($ObjType, $generalObjects)) {
-////            $data = $DocumentTables->ObjectHeaderTable::with(
-////                'CreatedBy',
-////                'location',
-////                'BusinessPartner.octg',
-////                'branch.location',
-////                'objecttype',
-////                'oslp',
-////                'document_lines.oitm',
-////                'document_lines.unitofmeasure',
-////                'document_lines.oitm.itm1',
-////                'document_lines.oitm.oitw',
-////                'document_lines.oitm.inventoryuom',
-////                'document_lines.oitm.ougp.ouom',
-////                'document_lines.oitm.oitb',
-////                'document_lines.taxgroup'
-////            )
-////                ->where('id', $DocEntry)
-////                ->first();
+        if (!in_array($ObjType, $generalObjects)) {
 //            $data = $DocumentTables->ObjectHeaderTable::with(
+//                'CreatedBy',
+//                'location',
+//                'BusinessPartner.octg',
+//                'branch.location',
+//                'objecttype',
+//                'oslp',
 //                'document_lines.oitm',
-//            )->where('id', $DocEntry)
+//                'document_lines.unitofmeasure',
+//                'document_lines.oitm.itm1',
+//                'document_lines.oitm.oitw',
+//                'document_lines.oitm.inventoryuom',
+//                'document_lines.oitm.ougp.ouom',
+//                'document_lines.oitm.oitb',
+//                'document_lines.taxgroup'
+//            )
+//                ->where('id', $DocEntry)
 //                ->first();
-//            $rows = $data->document_lines;
-//        }
-
-//        return $data->document_lines;
+            $data = $DocumentTables->ObjectHeaderTable::with(
+                'document_lines.oitm',
+                'BusinessPartner.octg',
+                'CreatedBy'
+            )->where('id', $DocEntry)
+                ->first();
+            $rows = $data->document_lines;
+        }
 
         foreach ($rows as $key => $row) {
             $serialNumbers = SRI1::where('BaseType', $ObjType)
@@ -551,7 +551,7 @@ class DocumentController extends Controller
                 'AgrNo' => $request['AgrNo'],
                 'LicTradNum' => $request['LicTradNum'],
                 'BaseEntry' => $request['BaseEntry'] ? $request['BaseEntry'] : null, //BaseKey
-                'BaseType' => $request['BaseType'] ? $request['BaseType'] : null, //BaseKey
+                'BaseType' => $request['BaseType'] ?? "1", //BaseKey
                 'UserSign' => $user->id,
                 //Inventory Transaction Values
                 'Ref2' => $request['Ref2'] ? $request['Ref2'] : null, // Ref2
@@ -809,12 +809,12 @@ class DocumentController extends Controller
                 $objectTypePassedToTns = 112;
             }
 
-            $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions($objectTypePassedToTns, "A", $newDoc->id);
-            if ($storedProcedureResponse) {
-                if ($storedProcedureResponse->error != 0) {
-                    return (new ApiResponseService())->apiFailedResponseService($storedProcedureResponse->error_message);
-                }
-            }
+//            $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions($objectTypePassedToTns, "A", $newDoc->id);
+//            if ($storedProcedureResponse) {
+//                if ($storedProcedureResponse->error != 0) {
+//                    return (new ApiResponseService())->apiFailedResponseService($storedProcedureResponse->error_message);
+//                }
+//            }
 
             //Validating Draft using Oringal base type
             if ($objectTypePassedToTns == 112) {
@@ -828,10 +828,10 @@ class DocumentController extends Controller
                     $storedProcedureResponse = null;
                     if ($saveToDraft) {
                         $newPayment = (new BankingDocumentService())->processDraftIncomingPayment($newDoc, $payment);
-                        $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions(140, "A", $newPayment->id);
+//                        $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions(140, "A", $newPayment->id);
                     } else {
                         $newPayment = (new BankingDocumentService())->processIncomingPayment($newDoc, $payment);
-                        $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions(24, "A", $newPayment->id);
+//                        $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions(24, "A", $newPayment->id);
                     }
                     if ($storedProcedureResponse) {
                         if ($storedProcedureResponse->error != 0) {
@@ -871,7 +871,6 @@ class DocumentController extends Controller
             //            $newDoc->documentForDirecPostingToSAP = $documentForDirecPostingToSAP;
             return (new ApiResponseService())->apiSuccessResponseService($newDoc);
         } catch (\Throwable $th) {
-            //            dd($th);
             Log::info($th);
             DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService("Process failed, Server Error", $th);
@@ -1709,13 +1708,12 @@ class DocumentController extends Controller
         $DocumentTables = APDI::with('pdi1')
             ->where('ObjectID', $ObjType)
             ->first();
-        (new AuthorizationService())->checkIfAuthorize($DocumentTables->id, 'update');
+//        (new AuthorizationService())->checkIfAuthorize($DocumentTables->id, 'update');
         try {
             $data = $DocumentTables->ObjectHeaderTable::where('id', $DocEntry)->first();
             if (!$data) {
                 return (new ApiResponseService())->apiFailedResponseService("Document Does not Exist");
             }
-
             $data->update([
                 'Printed' => "Y",
             ]);
