@@ -223,33 +223,33 @@ class DocumentController extends Controller
 
         $rows = $data->document_lines;
         $generalObjects = [205, 66];
-//        if (!in_array($ObjType, $generalObjects)) {
-////            $data = $DocumentTables->ObjectHeaderTable::with(
-////                'CreatedBy',
-////                'location',
-////                'BusinessPartner.octg',
-////                'branch.location',
-////                'objecttype',
-////                'oslp',
-////                'document_lines.oitm',
-////                'document_lines.unitofmeasure',
-////                'document_lines.oitm.itm1',
-////                'document_lines.oitm.oitw',
-////                'document_lines.oitm.inventoryuom',
-////                'document_lines.oitm.ougp.ouom',
-////                'document_lines.oitm.oitb',
-////                'document_lines.taxgroup'
-////            )
-////                ->where('id', $DocEntry)
-////                ->first();
+        if (!in_array($ObjType, $generalObjects)) {
 //            $data = $DocumentTables->ObjectHeaderTable::with(
+//                'CreatedBy',
+//                'location',
+//                'BusinessPartner.octg',
+//                'branch.location',
+//                'objecttype',
+//                'oslp',
 //                'document_lines.oitm',
-//            )->where('id', $DocEntry)
+//                'document_lines.unitofmeasure',
+//                'document_lines.oitm.itm1',
+//                'document_lines.oitm.oitw',
+//                'document_lines.oitm.inventoryuom',
+//                'document_lines.oitm.ougp.ouom',
+//                'document_lines.oitm.oitb',
+//                'document_lines.taxgroup'
+//            )
+//                ->where('id', $DocEntry)
 //                ->first();
-//            $rows = $data->document_lines;
-//        }
-
-//        return $data->document_lines;
+            $data = $DocumentTables->ObjectHeaderTable::with(
+                'document_lines.oitm',
+                'BusinessPartner.octg',
+                'CreatedBy'
+            )->where('id', $DocEntry)
+                ->first();
+            $rows = $data->document_lines;
+        }
 
         foreach ($rows as $key => $row) {
             $serialNumbers = SRI1::where('BaseType', $ObjType)
