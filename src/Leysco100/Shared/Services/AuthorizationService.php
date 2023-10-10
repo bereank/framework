@@ -54,9 +54,9 @@ class AuthorizationService
 
     public function mobileNavBar($userID = null)
     {
+
         $userID = $userID ?? Auth::user()->id;
         $user = User::where('id', $userID)->first();
-
         $nav_array = [
             [
                 "title" => "Home",
