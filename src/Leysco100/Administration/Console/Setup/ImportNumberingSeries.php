@@ -42,7 +42,7 @@ class ImportNumberingSeries extends Command
         $seriesJsonString = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'numberingseries.json');;
         $series = json_decode($seriesJsonString, true);
         foreach ($series as $key => $value) {
-             DB::connection("tenant")->beginTransaction();
+//             DB::connection("tenant")->beginTransaction();
             try {
                 if (!isset($value['SeriesName'])) {
                     continue;
@@ -62,32 +62,31 @@ class ImportNumberingSeries extends Command
 //                }
 
                 $details = $this->getObjectDetails($document);
+//                dd($details);
                 if (!$details) {
                     continue;
                 }
 
                 $this->info("Creating Series" . $value['SeriesName']);
 
-                $nnm1 = NNM1::updateOrCreate([
+                $nnm1 = NNM1::create([
                     'ExtRef' => $value['Series'],
-                ], [
                     'SeriesName' => $SeriesName, //Series Name
                     'ObjectCode' => $details->id, // ID FROM ONNM
                     'InitialNum' => $value['InitialNum'], //Initial Number
                     'NextNumber' => $value['InitialNum'], // NextNumber
                     'LastNum' => $value['LastNum'], //LastNum
                     'BeginStr' => $value['BeginStr'],
-                    'Remark' => $value['Remarks'],
+                    'Remark' => $value['Remarks'] ?? null,
                     'Locked' => $value['Locked'] ?? "N", //Locked
                     'IsForCncl' => $value['Is Series for Cancelation'] ?? "N",
                     'GroupCode' => $value['Group'] ?? 1,
                 ]);
-
-//                $this->comment("CREATED SERIES ID: " . $nnm1->id);
-                 DB::connection("tenant")->commit();
+                $this->comment("CREATED SERIES ID: " . $nnm1->id);
+//                 DB::connection("tenant")->commit();
             } catch (\Throwable $th) {
                 Log::info($th);
-                 DB::connection("tenant")->rollback();
+//                 DB::connection("tenant")->rollback();
             }
         }
     }
