@@ -1708,13 +1708,12 @@ class DocumentController extends Controller
         $DocumentTables = APDI::with('pdi1')
             ->where('ObjectID', $ObjType)
             ->first();
-        (new AuthorizationService())->checkIfAuthorize($DocumentTables->id, 'update');
+//        (new AuthorizationService())->checkIfAuthorize($DocumentTables->id, 'update');
         try {
             $data = $DocumentTables->ObjectHeaderTable::where('id', $DocEntry)->first();
             if (!$data) {
                 return (new ApiResponseService())->apiFailedResponseService("Document Does not Exist");
             }
-
             $data->update([
                 'Printed' => "Y",
             ]);
