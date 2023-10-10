@@ -12,6 +12,7 @@ use Leysco100\Shared\Models\Administration\Models\OUDG;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\BusinessPartner\Models\OBPL;
 use Leysco100\Shared\Models\Administration\Models\Permission;
+use Leysco100\Shared\Models\Administration\Models\DataOwnerships;
 
 
 /**
@@ -67,7 +68,7 @@ class AuthorizationService
 
             ],
             [
-                "title" => "Outlets",
+                "title" => "Customers",
                 "key" => "outlet",
             ],
             [
@@ -77,6 +78,10 @@ class AuthorizationService
             [
                 "title" => "Orders",
                 "key" => "order",
+            ],
+            [
+                "title" => "Sales",
+                "key" => "sales",
             ],
             [
                 "title" => "Dispatch",
@@ -259,6 +264,7 @@ class AuthorizationService
     public function CheckIfActive($ObjType, $empID)
     {
         $data = DataOwnerships::where('ObjType', $ObjType)->where('EmpId', $empID)
+            ->where('Active', 1)
             ->select('Active')->first();
         return $data;
     }
