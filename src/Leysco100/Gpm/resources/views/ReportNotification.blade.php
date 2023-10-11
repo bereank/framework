@@ -18,6 +18,7 @@
 | Total Sync Documents | {{$summaryReport['totalSyncY']}} |
 | Total Open Documents | {{$summaryReport['totalOpenY']}} |
 | Total Released Documents | {{$summaryReport['totalReleasedY']}} |
+| Total Closed By Target Documents | {{$summaryReport['totalReleasedbyTargetY']}} |
 @endcomponent
 
 
