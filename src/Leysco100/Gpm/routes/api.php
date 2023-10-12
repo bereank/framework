@@ -14,7 +14,7 @@ use Leysco100\Gpm\Http\Controllers\OtpVerificationController;
 use Leysco100\Finance\Http\Controllers\API\LocationController;
 use Leysco100\Gpm\Http\Controllers\API\GPMDashboardController;
 use Leysco100\Gpm\Http\Controllers\API\FieldsTemplateController;
-use Leysco100\Gpm\Http\Controllers\API\MobileErrorLogController;
+use Leysco100\Gpm\Http\Controllers\API\ErrorLogController;
 use Leysco100\Gpm\Http\Controllers\API\GPMBackUpModeApiController;
 use Leysco100\Gpm\Http\Controllers\API\BackupModeProcessController;
 use Leysco100\Gpm\Http\Controllers\API\BackupModeSettingsController;
@@ -94,4 +94,4 @@ Route::resource('bcm_settings', BackupModeSettingsController::class);
 Route::apiResources(['back_up_mode' => BackupModeProcessController::class]);
 // Route::apiResources(['back_up_mode/gpm_documents' => GPMBackUpModeApiController::class]);
 
-Route::apiResources(['error_log' => MobileErrorLogController::class]);
+Route::apiResources(['error_log' => ErrorLogController::class]);
