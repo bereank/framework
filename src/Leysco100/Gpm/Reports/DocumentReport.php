@@ -23,7 +23,7 @@ class DocumentReport implements FromCollection, WithHeadings, WithMapping, Shoul
         // $document_rpt = OGMS::with('scanlog.gates', 'objecttype')
         //     ->whereDate('GenerationDateTime', $this->date)->get();
         $document_rpt = DB::connection('tenant')->table('o_g_m_s')
-            ->whereDate('o_g_m_s.GenerationDateTime', $this->date)
+            ->whereDate('o_g_m_s.updated_at', $this->date)
             ->leftjoin('g_m_s1_s', 'g_m_s1_s.id', '=', 'o_g_m_s.ScanLogID')
             ->join('a_p_d_i_s', 'a_p_d_i_s.ObjectID', 'o_g_m_s.ObjType')
             ->leftjoin('gates', 'gates.id', '=', 'g_m_s1_s.GateID')
