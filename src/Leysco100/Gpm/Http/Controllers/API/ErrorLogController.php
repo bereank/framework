@@ -72,9 +72,9 @@ class ErrorLogController extends Controller
             'Version=>' . $Version;
         $subject = 'Mobile Error Logs';
 
-        Mail::raw($message, function ($mail) use ($recipient, $subject) {
-            $mail->to($recipient)->subject($subject);
-        });
+        // Mail::raw($message, function ($mail) use ($recipient, $subject) {
+        //     $mail->to($recipient)->subject($subject);
+        // });
     }
 
 
