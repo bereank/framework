@@ -36,7 +36,7 @@ class OtpVerificationController extends Controller
             $curl = curl_init();
 
             curl_setopt_array($curl, array(
-                CURLOPT_URL => 'http://www.sms.co.tz/api.php?do=sms&username=' . $username . '&password=' . $password . '&senderid=' . $sender_id . '&dest=' . $destination . '&msg=' . $otp,
+                CURLOPT_URL => 'https://www.sms.co.tz/api.php?do=sms&username=' . $username . '&password=' . $password . '&senderid=' . $sender_id . '&dest=' . $destination . '&msg=' . $otp,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
