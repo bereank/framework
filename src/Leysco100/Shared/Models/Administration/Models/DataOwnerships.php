@@ -11,7 +11,7 @@ use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 class DataOwnerships extends Model
 {
     use HasFactory, UsesTenantConnection;
-    //numbering series
+  
     protected $guarded = ['id'];
     protected $table = 'data_ownerships';
 
