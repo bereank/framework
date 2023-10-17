@@ -238,7 +238,7 @@ class MarketingDocumentService
             'SlpCode' => $data['SlpCode'], // Sales Employee
             'U_SalePipe' => $data['U_SalePipe'], // Sales Pipe Line
             //                'OwnerCode' => $user->EmpID, //Owner Code
-            'OwnerCode' => $data['OwnerCode'], //Owner Code
+            'OwnerCode' => $data['OwnerCode'] ? $data['OwnerCode'] :Auth::user()->EmpID, //Owner Code
             'U_CashMail' => $data['U_CashMail'], //Cash Customer  Email
             'U_CashName' => $data['U_CashName'], //Cash Customer  Name
             'U_CashNo' => $data['U_CashNo'], // Cash Customer No
@@ -398,7 +398,7 @@ class MarketingDocumentService
 
             $rowdetails = [
                 'DocEntry' => $newDoc->id,
-                'OwnerCode' => $data['OwnerCode'], //Owner Code
+                'OwnerCode' =>$data['OwnerCode'] ? $data['OwnerCode'] :Auth::user()->EmpID , //Owner Code
                 'LineNum' => $LineNum, //    Row Number
                 'ItemCode' => $value['ItemCode'] ?? null,
                 'Dscription' =>  $product->Dscription, // Item Description

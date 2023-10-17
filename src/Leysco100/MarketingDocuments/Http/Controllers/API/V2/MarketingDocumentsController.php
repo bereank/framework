@@ -3,31 +3,16 @@
 namespace Leysco100\MarketingDocuments\Http\Controllers\API\V2;
 
 use Illuminate\Http\Request;
-use Leysco100\Shared\Models\OSCL;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Services\AuthorizationService;
-use Leysco100\MarketingDocuments\Jobs\NumberingSeries;
 use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
 use Leysco100\Shared\Models\Administration\Models\EOTS;
-use Leysco100\Shared\Models\Administration\Models\OADM;
 use Leysco100\Shared\Models\Administration\Models\User;
-use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Leysco100\MarketingDocuments\Services\DocumentsService;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;
-use Leysco100\Shared\Actions\TransactionInventoryEffectAction;
-use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
-use Leysco100\Shared\Models\InventoryAndProduction\Models\OITW;
-use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
-use Leysco100\Shared\Models\Shared\Services\ServiceCallService;
 use Leysco100\MarketingDocuments\Services\MarketingDocumentService;
-use Leysco100\Shared\Models\Banking\Services\BankingDocumentService;
-use Leysco100\MarketingDocuments\Services\DatabaseValidationServices;
-use Leysco100\Shared\Models\MarketingDocuments\Services\GeneralDocumentService;
-use Leysco100\Shared\Models\MarketingDocuments\Services\GeneralDocumentValidationService;
 
 
 
@@ -41,7 +26,7 @@ class MarketingDocumentsController extends Controller
         $docNum = \Request::get('docNum');
         $page = $request->input('page', 1);
         $perPage = $request->input('per_page', 50);
-
+        $user = User::where('id', Auth::user()->id)->with('oudg')->first();
         $tableObjType = $ObjType;
         if ($isDoc == 0) {
             $tableObjType = 112;
@@ -52,7 +37,13 @@ class MarketingDocumentsController extends Controller
             ->where('ObjectID', $tableObjType)
             ->first();
         //    (new AuthorizationService())->checkIfAuthorize($DocumentTables->id, 'read');
+        $ownerData = [];
+        $dataOwnership = (new AuthorizationService())->CheckIfActive($ObjType, $user->EmpID);
 
+        if ($dataOwnership) {
+            $ownerData =  (new AuthorizationService())->getDataOwnershipAuth($ObjType, 1);
+        }
+     
         try {
             $data = $DocumentTables->ObjectHeaderTable::where('ObjType', $ObjType)
                 ->with('CreatedBy.ohem')
@@ -61,6 +52,9 @@ class MarketingDocumentsController extends Controller
             if ($ObjType != 205) {
                 $data = $DocumentTables->ObjectHeaderTable::select('id', 'CardCode', 'DocNum', 'CardName', 'ExtRef', 'ExtRefDocNum', 'UserSign', 'SlpCode', 'DataSource', 'DocStatus', 'ObjType', 'OwnerCode', 'DocDate', 'DocTotal', 'created_at')
                     ->where('ObjType', $ObjType)
+                    ->when($dataOwnership->Active, function ($query) use ($ownerData) {
+                        $query->wherein('OwnerCode', $ownerData);
+                    })
                     ->with('CreatedBy:name', 'ohem:id,empID,firstName,middleName,lastName')
                     ->with(['document_lines' => function ($query) {
                         $query->with('ItemDetails:id,ItemCode,ItemName')
@@ -125,7 +119,7 @@ class MarketingDocumentsController extends Controller
     public function store(Request $request)
     {
 
-       
+
         $data = (new MarketingDocumentService())->BasicValidation($request);
 
 

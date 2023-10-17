@@ -36,11 +36,12 @@ class OHEM extends Model
 
     public function subordinates()
     {
-        return $this->employees()->with(
-            ['subordinates' => function ($query) {
-                $query->select('id', 'firstName', 'middleName', 'lastName', 'manager', 'empID');
-            }]
-        );
+        // return $this->employees()->with(
+        //     ['subordinates' => function ($query) {
+        //         $query->select('id', 'firstName', 'middleName', 'lastName', 'manager', 'empID');
+        //     }]
+        // );
+        return $this->employees();
     }
 
     public function peers()
