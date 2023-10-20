@@ -542,12 +542,21 @@ class TargetController extends Controller
     public function getEmployeesTargets($id)
     {
 
-        $user = User::where('id', Auth::user()->id)->with('oudg')->first();
+        $user = User::where('id', Auth::user()->id)
+            ->with(['oudg' => function ($query) {
+                $query->select('id', 'SalePerson');
+            }])
+            ->select('SUPERUSER', 'id')
+            ->first();
 
         try {
-            $target_row = Targets::findorFail($id);
+            $target_row = Targets::find($id);
 
-            $sales_employees = TargetSalesEmp::where('target_setup_id', $target_row['target_setup_id'])->with('employees');
+            $sales_employees = TargetSalesEmp::where(
+                'target_setup_id',
+                $target_row['target_setup_id']
+            )
+                ->with('employees');
 
             if (!$user->SUPERUSER) {
                 $slpCode = $user->oudg->SalePerson ?? 0;
@@ -557,7 +566,13 @@ class TargetController extends Controller
 
             $sales_employees = $sales_employees->get();
 
-            $target_items = TargetItems::where('target_setup_id', $target_row['target_setup_id'])->get()->pluck('ItemCode')->toArray();
+            $target_items = TargetItems::where(
+                'target_setup_id',
+                $target_row['target_setup_id']
+            )->get()
+                ->pluck('ItemCode')->toArray();
+
+
 
             $sales_employees = $sales_employees->map(function ($employee) use ($target_row, $target_items) {
                 $achievement = $this->slpAchievement($employee['SlpCode'], $target_row['PeriodStart'], $target_row['PeriodEnd'], $target_items);
@@ -590,39 +605,37 @@ class TargetController extends Controller
 
     public function slpAchievement($slpCode, $periodStart, $periodEnd, $items)
     {
-
         $invoices_model = 'Leysco100\Shared\Models\MarketingDocuments\Models\OINV';
+        $creditNotes_model = 'Leysco100\Shared\Models\MarketingDocuments\Models\ORIN';
 
         $invoices = $this->getvalues($slpCode, $periodStart, $periodEnd, $items, $invoices_model);
+        $creditNotes = $this->getvalues($slpCode, $periodStart, $periodEnd, $items, $creditNotes_model);
 
+        $invoiceTotals = $this->calculateDocumentTotals($invoices);
+        $creditNoteTotals = $this->calculateDocumentTotals($creditNotes); 
+
+        return [
+            'totalQuantity' => $invoiceTotals['quantityTotal'],
+            'totalAmount' => $invoiceTotals['lineTotalTotal'],
+            "CrNotelineTotal" => $creditNoteTotals['quantityTotal'],
+            "CrNotequantityTotal" => $creditNoteTotals['lineTotalTotal']
+        ];
+    }
+    private function calculateDocumentTotals($documents)
+    {
         $lineTotalTotal = 0;
         $quantityTotal = 0;
 
-        foreach ($invoices as $invoice) {
-            foreach ($invoice->document_lines as $line) {
+        foreach ($documents as $document) {
+            foreach ($document->document_lines as $line) {
                 $lineTotalTotal += $line->LineTotal;
                 $quantityTotal += $line->Quantity;
             }
         }
 
-        $creditNotes_model = 'Leysco100\Shared\Models\MarketingDocuments\Models\ORIN';
-        $creditNotes = $this->getvalues($slpCode, $periodStart, $periodEnd, $items, $creditNotes_model);
-
-        $CrNotelineTotal = 0;
-        $CrNotequantityTotal = 0;
-
-        foreach ($creditNotes as $creditNote) {
-            foreach ($creditNote->document_lines as $row) {
-                $CrNotelineTotal += $row->LineTotal;
-                $CrNotequantityTotal += $row->Quantity;
-            }
-        }
-
         return [
-            'totalQuantity' => $quantityTotal,
-            'totalAmount' =>  $lineTotalTotal,
-            "CrNotelineTotal" => $CrNotelineTotal,
-            "CrNotequantityTotal" => $CrNotequantityTotal
+            'lineTotalTotal' => $lineTotalTotal,
+            'quantityTotal' => $quantityTotal
         ];
     }
 
@@ -642,24 +655,26 @@ class TargetController extends Controller
 
     public function getvalues($slpCode, $periodStart, $periodEnd, $items, $model)
     {
-
-        $data = $model::where('CANCELED', "=", 'N')
-            ->whereHas('document_lines', function ($query) use ($items) {
-                $query->whereIn('ItemCode', $items);
-            })
+        $data = $model::where('CANCELED', 'N')
+            ->where('SlpCode', $slpCode)
+            // ->whereHas('document_lines', function ($query) use ($items) {
+            //     $query
+            //         ->whereIn('ItemCode', $items);
+            // })
             ->whereBetween('DocDate', [
                 Carbon::parse($periodStart)->startOfDay(),
                 Carbon::parse($periodEnd)->endOfDay(),
             ])
-            ->where('SlpCode', $slpCode)
             ->with([
-                'document_lines' => function ($query) use ($items) {
+                'document_lines' => function ($query) use ($items,$slpCode) {
                     $query->whereIn('ItemCode', $items)
-                        ->select(["id", 'DocEntry', 'LineTotal', 'Quantity']);
+                        ->where('SlpCode', $slpCode)
+                        ->select('DocEntry', 'LineTotal', 'Quantity');
                 }
             ])
-            ->select('id', 'SlpCode', 'DocTotal')
+            ->select('id', 'DocTotal')
             ->get();
+
         return $data;
     }
 }
