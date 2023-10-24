@@ -881,6 +881,7 @@ class DocumentController extends Controller
     {
         $ObjType = $request['ObjType'];
         $DocEntry = $request['DocEntry'];
+
         if (!$DocEntry && $request['id']){
             $DocEntry = $request['id'];
         }

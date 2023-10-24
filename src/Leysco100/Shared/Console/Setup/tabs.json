@@ -1,0 +1,22 @@
+[
+  {
+    "Label": "GENERAL",
+    "WithTable": 1
+  },
+  {
+    "Label": "CONTENTS",
+    "WithTable": 2
+  },
+  {
+    "Label": "ACCOUNTING",
+    "WithTable": 3
+  },
+  {
+    "Label": "ATTACHMENT",
+    "WithTable": 4
+  },
+  {
+    "Label": "UDFs",
+    "WithTable": 5
+  }
+]
