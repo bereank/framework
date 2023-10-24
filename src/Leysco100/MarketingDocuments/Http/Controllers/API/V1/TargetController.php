@@ -33,7 +33,7 @@ class TargetController extends Controller
     {
 
         $user = User::where('id', Auth::user()->id)->with('oudg')->first();
-        $targetSetup = TargetSetup::with('document_lines', 'items');
+        $targetSetup = TargetSetup::with('document_lines');
 
         if (!$user->SUPERUSER) {
             $slpCode = $user->oudg->SalePerson ?? 0;
@@ -42,8 +42,6 @@ class TargetController extends Controller
             });
         }
         $targetSetup = $targetSetup->get();
-
-        //  $targetSetup = TargetSetup::with('document_lines', 'items', 'salesEmployees')->get();
 
         return (new ApiResponseService())->apiSuccessResponseService($targetSetup);
     }
@@ -369,8 +367,7 @@ class TargetController extends Controller
         $user = User::where('id', Auth::user()->id)->with('oudg')->first();
         if (!$user->SUPERUSER) {
             $slpCode = $user->oudg->SalePerson ?? 0;
-        }
-        ;
+        };
         $startdate = request()->filled('startdate') ? Carbon::parse(request()->input('startdate'))->startOfDay() : Carbon::now()->startOfMonth();
 
         $endate = request()->filled('enddate') ? Carbon::parse(request()->input('enddate'))->endOfDay() : Carbon::now()->endOfMonth();
@@ -427,7 +424,7 @@ class TargetController extends Controller
             ->groupBy('i_n_v1_s.ItemCode')
             ->groupBy('i_n_v1_s.DocDate')
             ->groupBy('invoices.DocDate')
-           
+
             ->select(
                 'i_n_v1_s.ItemCode',
                 'invoices.DocDate',
@@ -438,18 +435,18 @@ class TargetController extends Controller
             );
         // Invoices End
 
-      //  Credit-Notes start
-            $validCreditNotes  = DB::connection("tenant")->table('o_r_i_n_s')->where('CANCELED', "=", 'N')->select('id', 'SlpCode', 'DocDate')->whereBetween('DocDate', [
+        //  Credit-Notes start
+        $validCreditNotes  = DB::connection("tenant")->table('o_r_i_n_s')->where('CANCELED', "=", 'N')->select('id', 'SlpCode', 'DocDate')->whereBetween('DocDate', [
+            $startdate,
+            $endate,
+        ])
+            ->whereBetween('DocDate', [
                 $startdate,
                 $endate,
-            ])
-                ->whereBetween('DocDate', [
-                    $startdate,
-                    $endate,
-                ]);
-    
+            ]);
 
-            $creditNotelines  = DB::connection("tenant")->table('r_i_n1_s')
+
+        $creditNotelines  = DB::connection("tenant")->table('r_i_n1_s')
             ->whereBetween('r_i_n1_s.DocDate', [
                 $startdate,
                 $endate,
@@ -526,12 +523,12 @@ class TargetController extends Controller
                 DB::connection("tenant")->raw("COALESCE(ROUND(SUM(creditNotes.CreditNoteQuantity), 2), 0) AS CreditNoteQuantity")
 
             )
-        ->get();
+            ->get();
         //     array_push($res, $target_row);
         // }
         //  return ($target_row);
 
-       // ->toSql();
+        // ->toSql();
         // $sql =  Str::replaceArray('?', $target_row->getBindings(), $target_row->toSql());
         // Log::info($sql);
         //     // Your Eloquent query executed by using get()
@@ -545,29 +542,46 @@ class TargetController extends Controller
     public function getEmployeesTargets($id)
     {
 
-        $user = User::where('id', Auth::user()->id)->with('oudg')->first();
+        $user = User::where('id', Auth::user()->id)
+            ->with(['oudg' => function ($query) {
+                $query->select('id', 'SalePerson');
+            }])
+            ->select('SUPERUSER', 'id')
+            ->first();
 
         try {
-            $target_row = Targets::findorFail($id);
+            $target_row = Targets::find($id);
 
-            $sales_employees = TargetSalesEmp::where('target_setup_id', $target_row['target_setup_id'])->with('employees');
+            $sales_employees = TargetSalesEmp::where(
+                'target_setup_id',
+                $target_row['target_setup_id']
+            )
+                ->with('employees');
 
             if (!$user->SUPERUSER) {
                 $slpCode = $user->oudg->SalePerson ?? 0;
                 $sales_employees = $sales_employees->where('SlpCode', $slpCode);
             }
-            ;
+
 
             $sales_employees = $sales_employees->get();
 
-            $target_items = TargetItems::where('target_setup_id', $target_row['target_setup_id'])->get()->pluck('ItemCode')->toArray();
+            $target_items = TargetItems::where(
+                'target_setup_id',
+                $target_row['target_setup_id']
+            )->get()
+                ->pluck('ItemCode')->toArray();
+
+
 
             $sales_employees = $sales_employees->map(function ($employee) use ($target_row, $target_items) {
                 $achievement = $this->slpAchievement($employee['SlpCode'], $target_row['PeriodStart'], $target_row['PeriodEnd'], $target_items);
-                $employee['totalQuantitySold'] = $achievement['totalQuantity'] ?? 0;
-                $employee['totalAmountSold'] = $achievement['totalAmount'] ?? 0;
+                $employee['totalQuantitySold'] = number_format($achievement['totalQuantity'], 2) ?? 0;
+                $employee['totalAmountSold'] = number_format($achievement['totalAmount'], 2) ?? 0;
                 $employee['Tvalue'] = $target_row['Tvalue'] ?? 0;
                 $employee['target_row'] = $target_row;
+                $employee["CrNotelineTotal"] = number_format($achievement['CrNotelineTotal'], 2);
+                $employee["CrNotequantityTotal"] = number_format($achievement['CrNotequantityTotal'], 2);
                 // if ($target_row['TargetType'] == "Q") {
                 //     $employee['achievement_quantity_percentage'] =  ($employee['Tvalue'] && $achievement['totalQuantity']) ? ($achievement['totalQuantity'] / $target_row['Tvalue'] * 100) : 0;
 
@@ -591,31 +605,38 @@ class TargetController extends Controller
 
     public function slpAchievement($slpCode, $periodStart, $periodEnd, $items)
     {
-        $invoices = OINV::where('CANCELED', "=", 'N')
-            ->whereHas('document_lines', function ($query) use ($items) {
-                $query->whereIn('ItemCode', $items);
-            })
-            ->whereBetween('DocDate', [
-                Carbon::parse($periodStart)->startOfDay(),
-                Carbon::parse($periodEnd)->endOfDay(),
-            ])
-            ->where('SlpCode', $slpCode)
-            ->with([
-                'document_lines' => function ($query) use ($items) {
-                    $query->whereIn('ItemCode', $items)
-                        ->select(["id", 'ItemCode', 'DocEntry', 'LineTotal', 'Dscription', 'Price', 'Quantity']);
-                }
-            ])
-            ->select('id', 'SlpCode', 'DocTotal', 'DocNum', 'VatSum', 'DocDate')
-            ->get();
+        $invoices_model = 'Leysco100\Shared\Models\MarketingDocuments\Models\OINV';
+        $creditNotes_model = 'Leysco100\Shared\Models\MarketingDocuments\Models\ORIN';
 
-        $totalAmount = $invoices->sum('DocTotal');
+        $invoices = $this->getvalues($slpCode, $periodStart, $periodEnd, $items, $invoices_model);
+        $creditNotes = $this->getvalues($slpCode, $periodStart, $periodEnd, $items, $creditNotes_model);
 
-        $totalQuantity = $invoices->flatMap(function ($invoice) {
-            return $invoice['document_lines'];
-        })->sum('Quantity');
+        $invoiceTotals = $this->calculateDocumentTotals($invoices);
+        $creditNoteTotals = $this->calculateDocumentTotals($creditNotes); 
 
-        return ['totalQuantity' => $totalQuantity, 'totalAmount' => $totalAmount];
+        return [
+            'totalQuantity' => $invoiceTotals['quantityTotal'],
+            'totalAmount' => $invoiceTotals['lineTotalTotal'],
+            "CrNotelineTotal" => $creditNoteTotals['quantityTotal'],
+            "CrNotequantityTotal" => $creditNoteTotals['lineTotalTotal']
+        ];
+    }
+    private function calculateDocumentTotals($documents)
+    {
+        $lineTotalTotal = 0;
+        $quantityTotal = 0;
+
+        foreach ($documents as $document) {
+            foreach ($document->document_lines as $line) {
+                $lineTotalTotal += $line->LineTotal;
+                $quantityTotal += $line->Quantity;
+            }
+        }
+
+        return [
+            'lineTotalTotal' => $lineTotalTotal,
+            'quantityTotal' => $quantityTotal
+        ];
     }
 
     public function ItemsData()
@@ -630,5 +651,30 @@ class TargetController extends Controller
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
+    }
+
+    public function getvalues($slpCode, $periodStart, $periodEnd, $items, $model)
+    {
+        $data = $model::where('CANCELED', 'N')
+            ->where('SlpCode', $slpCode)
+            // ->whereHas('document_lines', function ($query) use ($items) {
+            //     $query
+            //         ->whereIn('ItemCode', $items);
+            // })
+            ->whereBetween('DocDate', [
+                Carbon::parse($periodStart)->startOfDay(),
+                Carbon::parse($periodEnd)->endOfDay(),
+            ])
+            ->with([
+                'document_lines' => function ($query) use ($items,$slpCode) {
+                    $query->whereIn('ItemCode', $items)
+                        ->where('SlpCode', $slpCode)
+                        ->select('DocEntry', 'LineTotal', 'Quantity');
+                }
+            ])
+            ->select('id', 'DocTotal')
+            ->get();
+
+        return $data;
     }
 }

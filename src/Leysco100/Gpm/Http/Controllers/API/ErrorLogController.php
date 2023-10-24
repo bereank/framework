@@ -11,7 +11,7 @@ use Leysco100\Gpm\Services\NotificationsService;
 use Leysco100\Shared\Services\ApiResponseService;
 
 
-class MobileErrorLogController extends Controller
+class ErrorLogController extends Controller
 {
     // Display a listing of the resource.
     public function index()
@@ -58,8 +58,8 @@ class MobileErrorLogController extends Controller
         //ErrorLog::create($data);
         $recipient = ["john.muchira@leysco.co.ke"];
         $ErrorCode = $request['ErrorCode'] ?? null;
-        $Message = $request['ErrorCode'] ?? null;
-        $AdditionalData = $request['ErrorCode'] ?? null;
+        $Message = $request['Message'] ?? null;
+        $AdditionalData = $request['AdditionalData'] ?? null;
         $AppType =  $request['AppType'] ?? null;
         $BaseURL =  $request['BaseURL'] ?? null;
         $Version = $request['Version'] ?? null;
@@ -72,9 +72,9 @@ class MobileErrorLogController extends Controller
             'Version=>' . $Version;
         $subject = 'Mobile Error Logs';
 
-        Mail::raw($message, function ($mail) use ($recipient, $subject) {
-            $mail->to($recipient)->subject($subject);
-        });
+        // Mail::raw($message, function ($mail) use ($recipient, $subject) {
+        //     $mail->to($recipient)->subject($subject);
+        // });
     }
 
 

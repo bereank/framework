@@ -1,160 +1,29 @@
 <?php
 
-namespace Leysco100\Shared\Services;
+namespace Leysco100\Shared\Traits;
 
 use Gate;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
-use Leysco100\Shared\Models\Administration\Models\OUDG;
-use Leysco100\Shared\Models\Administration\Models\User;
-use Leysco100\Shared\Models\BusinessPartner\Models\OBPL;
-use Leysco100\Shared\Models\Administration\Models\Permission;
 use Leysco100\Shared\Models\Administration\Models\DataOwnerships;
 
-
-/**
- * Service for Marke
- */
-class AuthorizationService
+trait DataOwnerShipTrait
 {
-    /**
-     *  Authorization Response
-     */
-    public function checkIfAuthorize($ObjType, $Action)
+   public static function bootOwnerable()
     {
-
-        $Permission = Permission::where('apdi_id', $ObjType)
-            ->where('Label', $Action)
-            ->pluck('name');
-        abort_if(
-            Gate::denies($Permission),
-            response()
-                ->json(
-                    [
-                        'ResultState' => true,
-                        'ResultCode' => 1043,
-                        'ResultDesc' => "Not Authorized",
-                    ],
-                    200
-                )
-        );
-    }
-
-    public function checkIfSMSisEnable()
-    {
-        return 1;
-    }
-
-    /**
-     * Mobile Menu
-     */
-
-    public function mobileNavBar($userID = null)
-    {
-
-        $userID = $userID ?? Auth::user()->id;
-        $user = User::where('id', $userID)->first();
-        $nav_array = [
-            [
-                "title" => "Home",
-                "key" => "home",
-            ],
-            [
-                "title" => "Targets",
-                "key" => "sales-targets",
-
-            ],
-            [
-                "title" => "Customers",
-                "key" => "outlet",
-            ],
-            [
-                "title" => "Calls",
-                "key" => "call",
-            ],
-            [
-                "title" => "Orders",
-                "key" => "order",
-            ],
-            [
-                "title" => "Sales",
-                "key" => "sales",
-            ],
-            [
-                "title" => "Dispatch",
-                "key" => "assigned-delivery",
-            ],
-            [
-                "title" => "Inventory",
-                "key" => "inventory",
-            ],
-        ];
-        if ($user && $user->SUPERUSER) {
-            $nav_array[] = [
-
-                "title" => "Dispatch",
-                "key" => "clerk",
-
-            ];
+        if (auth()->check()) {  
+            static::addGlobalScope('tenant_id', function (Builder $builder) {
+                if (Auth::user()->type == "super admin") {
+                    return;
+                } else {
+                    return $builder->where('tenant_id', Auth::user()->tenant_id);
+                }
+            });
         }
-        $nav_array[] =
-            [
-                "title" => "Settings",
-                "key" => "setting",
-            ];
-
-        if ($user && $user->SUPERUSER) {
-            $nav_array[] = [
-                "title" => "Gps",
-                "key" => "gps",
-            ];
-        }
-        return  $nav_array;
     }
-
-    public function getCurrentLoginUserBranches($userID = null)
-    {
-        $userID = $userID ?? Auth::user()->id;
-
-        $user = User::where('id', $userID)->first();
-
-        if ($user->SUPERUSER == 1) {
-            return OBPL::orderBy('LocationCode')->get();
-        }
-        $userDefaulf = OUDG::where('id', $user->DfltsGroup)->first();
-
-        $branches = $user->branches;
-        if ($userDefaulf->BPLId) {
-            $branch = OBPL::where('id', $userDefaulf->BPLId)->first();
-            $exists = $user->branches->contains($userDefaulf->BPLId);
-            if (!$exists && $branch) {
-                $branches->push($branch);
-            }
-        }
-
-        return $branches;
-    }
-
-    public function getDefaultCurrentLoginUser()
-    {
-        $user = Auth::user();
-        $userDefaulf = OUDG::where('id', $user->DfltsGroup)->first();
-
-        $branches = $user->branches;
-        if ($userDefaulf->BPLId) {
-            $branch = OBPL::where('id', $userDefaulf->BPLId)->first();
-            $exists = $user->branches->contains($userDefaulf->BPLId);
-            if (!$exists && $branch) {
-                $branches->push($branch);
-            }
-        }
-
-        return $branches;
-    }
-
     public function getDataOwnershipAuth($ObjType, $operation)
     {
         $empID = Auth::user()->EmpID;
@@ -214,10 +83,10 @@ class AuthorizationService
         }
         $expression = "\$udata->company == $operation $operator \$udata->company == 2";
         if (eval("return ($expression);")) {
-            Log::info(["Company9", true]);
+            // Log::info(["Company9", true]);
             $company = $manager->company?->pluck('empID');
             $allowed->push($company);
-            Log::info(["Company", true]);
+            // Log::info(["Company", true]);
         }
         $expression = "\$udata->manager == $operation $operator \$udata->manager == 2";
         if (eval("return ($expression);")) {
@@ -264,7 +133,6 @@ class AuthorizationService
     public function CheckIfActive($ObjType, $empID)
     {
         $data = DataOwnerships::where('ObjType', $ObjType)->where('EmpId', $empID)
-            ->where('Active', 1)
             ->select('Active')->first();
         return $data;
     }

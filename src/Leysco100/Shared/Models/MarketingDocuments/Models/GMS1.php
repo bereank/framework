@@ -57,6 +57,6 @@ class GMS1 extends Model
     }
     public function document()
     {
-        return $this->belongsTo(OGMS::class, 'ScanLogID');
+        return $this->belongsTo(OGMS::class,'id', 'ScanLogID');
     }
 }

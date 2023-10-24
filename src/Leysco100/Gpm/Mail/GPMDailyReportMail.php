@@ -4,12 +4,15 @@ namespace Leysco100\Gpm\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
 use Spatie\Multitenancy\Models\Tenant;
 use Illuminate\Support\Facades\Storage;
 use Leysco100\Shared\Models\MarketingDocuments\Models\GMS1;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OGMS;
 
+use function PHPUnit\Framework\isNull;
 
 class GPMDailyReportMail extends Mailable
 {
@@ -39,25 +42,79 @@ class GPMDailyReportMail extends Mailable
 
                 $totalSync =  number_format(count($allDocument->get()));
                 $totalOpen = number_format(count($allDocument->where('Status', 0)->get()));
-                $totalReleased = number_format(count(OGMS::where('Status', '!=', 0)->get()));
+                $totalReleased = number_format(count(OGMS::where('Status', '!=', 0)
+
+                        ->get()));
 
 
-                $allDocumentYesterday = OGMS::select('id', 'Status', 'GenerationDateTime')->whereDate('GenerationDateTime', $this->date);
+                $allDocumentYesterday = OGMS::select('id', 'Status', 'created_at')
+                        // ->distinct('ExtRefDocNum')
+                        ->whereDate('updated_at', $this->date);
 
                 $totalSyncY = number_format(count($allDocumentYesterday->get()));
-                $totalOpenY = number_format(count($allDocumentYesterday->where('Status', 0)->get()));
-                $totalReleasedY = number_format(count(OGMS::select('id', 'Status', 'GenerationDateTime')->whereDate('GenerationDateTime', $this->date)->where('Status', '!=', 0)->get()));
+                $totalOpenY = number_format(OGMS::select('id', 'Status', 'updated_at')->whereDate('updated_at', $this->date)->where('Status', '!=', 3)
+                        // ->distinct('ExtRefDocNum')
+                        ->count());
 
+                // $totalPendingRelY = number_format(OGMS::select('id', 'Status', 'updated_at')->whereDate('updated_at', $this->date)->where('Status', 1)
 
-                $totalYesterdayScans = GMS1::whereDate('created_at', $this->date)->count();
-                $totalFaildDoesNotExistY = number_format(GMS1::whereDate('created_at', $this->date)->where('Status', 1)->count());
-                $totalFailedDuplicateY = number_format(GMS1::whereDate('created_at', $this->date)->where('Status', 2)->count());
+                //         // ->distinct('ExtRefDocNum')
+                //         ->count());
 
-                $totalSuccessfulReleased = GMS1::whereDate('created_at', $this->date)->where('Status', 0)->where('Released', 1)->count();
+                // $totalFlaggedY =  number_format(OGMS::select('id', 'Status', 'updated_at')->whereDate('updated_at', $this->date)->where('Status', 2)
+                //         // ->distinct('ExtRefDocNum')
+                //         ->count());
 
-                $totalSuccessfulNotReleased = GMS1::whereDate('created_at', $this->date)->where('Status', 0)->where('Released', 0)->count();
+                $totalReleasedY = number_format(OGMS::select('id', 'Status', 'updated_at')
+                        ->whereDate('updated_at', $this->date)->where('Status', 3)
+                        ->where('ScanLogID', '!=', null)
+                        // ->distinct('ExtRefDocNum')
+                        ->count());
+                $totalReleasedbyTargetY = number_format(OGMS::select('id', 'Status', 'updated_at')->whereDate('updated_at', $this->date)
+                        // ->distinct('ExtRefDocNum')
 
-                $totalFlagged = number_format(GMS1::whereDate('created_at', $this->date)->where('Status', 3)->count());
+                        ->where('Status', 3)
+                        ->where('ScanLogID', null)
+                        ->count());
+
+             
+
+                $totalYesterdayScans = GMS1::whereDate('created_at', $this->date)
+                ->with('document', function ($query) {
+                        $query->where('created_at', $this->date);
+                    })
+                ->count();
+
+                $totalFaildDoesNotExistY = number_format(GMS1::whereDate('created_at', $this->date)->where('Status', 1)
+                ->with('document', function ($query) {
+                        $query->where('created_at', $this->date);
+                    })
+                ->count());
+
+                $totalFailedDuplicateY = number_format(GMS1::whereDate('created_at', $this->date)->where('Status', 2)
+                ->with('document', function ($query) {
+                        $query->where('created_at', $this->date);
+                    })
+                ->count());
+
+                $totalSuccessfulReleased = GMS1::whereDate('created_at', $this->date)->where('Status', 0)
+                ->with('document', function ($query) {
+                        $query->where('created_at', $this->date);
+                    })
+                ->where('Released', 1)->count();
+
+                $totalSuccessfulNotReleased = GMS1::whereDate('created_at', $this->date)->where('Status', 0)
+                ->with('document', function ($query) {
+                        $query->where('created_at', $this->date);
+                    })
+                ->where('Released', 0)->count();
+
+                $totalFlagged = number_format(GMS1::whereDate('created_at', $this->date)->where('Status', 3)
+                ->with('document', function ($query) {
+                        $query->where('created_at', $this->date);
+                    })
+                ->count());
+
                 $url =  Storage::path('ScanReport.xlsx');
 
                 $url_2 =  Storage::path('DuplicateReport.xlsx');
@@ -73,6 +130,7 @@ class GPMDailyReportMail extends Mailable
                         'totalOpenY' =>  $totalOpenY,
                         'totalYesterdayScans' => $totalYesterdayScans,
                         'totalReleasedY' => $totalReleasedY,
+                        'totalReleasedbyTargetY' => $totalReleasedbyTargetY,
                         'totalFaildDoesNotExistY' => $totalFaildDoesNotExistY,
                         'totalFailedDuplicateY' => $totalFailedDuplicateY,
                         'totalSuccessfulNotReleased' => $totalSuccessfulNotReleased,
