@@ -26,8 +26,8 @@ class PaymentsController extends Controller
     {
 
         try {
-
-            return (new ApiResponseService())->apiSuccessResponseService();
+            $data = OCRP::find($id);
+            return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
             Log::info($th);
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
