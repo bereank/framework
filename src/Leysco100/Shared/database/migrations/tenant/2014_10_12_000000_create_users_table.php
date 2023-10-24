@@ -28,7 +28,7 @@ class CreateUsersTable extends Migration
             $table->integer('deleted_by')->nullable();
             $table->integer('DfltsGroup')->nullable();
             $table->string('SUPERUSER', 1)->default(1);
-            $table->integer('all_Branches')->default();
+            $table->integer('all_Branches')->default(0);
             $table->rememberToken();
             $table->integer('Department')->nullable();
             $table->integer('CompanyID')
@@ -41,6 +41,7 @@ class CreateUsersTable extends Migration
             $table->integer('useLocalSearch')->default(0)->comment("0=No, 1=Yes");
             $table->string('localUrl')->nullable();
             $table->integer('gate_id')->nullable();
+            $table->timestamp('last_login_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
