@@ -11,10 +11,12 @@ use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OLCT;
 use Leysco100\Shared\Models\Shared\Models\APDI;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 
 class ODLN extends Model
 {
+    use UsesTenantConnection;
     protected $guarded = ['id'];
     protected $table = 'o_d_l_n_s';
 

@@ -17,7 +17,7 @@
         "icon": "mdi-con",
         "Label": "Quotations",
         "link": "/sales/doc/8",
-        "Visible": "N",
+        "Visible": "Y",
         "children": []
       },
       {
@@ -84,6 +84,13 @@
         "Label": "Recurring Transaction Template",
         "link": "/sales/recurrent-templates",
         "Visible": "N",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Payments",
+        "link": "/payments",
+        "Visible": "Y",
         "children": []
       }
     ]
