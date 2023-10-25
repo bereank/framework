@@ -4,10 +4,14 @@ namespace Leysco100\Payments\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Leysco100\Shared\Models\Payments\Models\OCRP;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Payments\Http\Controllers\Controller;
+use Leysco100\Shared\Models\Administration\Models\User;
+use Leysco100\MarketingDocuments\Services\SystemDefaults;
+use Leysco100\MarketingDocuments\Services\DocumentsService;
 
 class PaymentsController extends Controller
 {
@@ -33,14 +37,15 @@ class PaymentsController extends Controller
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
-    public function store(Request $request)
+    public function paymentNotification(Request $request)
     {
+
         // $publicKey = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'public_key.pem');
         // if (!$publicKey) {
         //     die("Unable to load public key");
         // }
         // $message = $request->getContent();
-       
+
         // $signature = hex2bin(bin2hex($request->header('signature')));
 
         // $result = openssl_verify($message, $signature, $publicKey, OPENSSL_ALGO_SHA256);
@@ -61,7 +66,8 @@ class PaymentsController extends Controller
                     $paymentData =   $data['requestPayload']['additionalData']['notificationData'];
                     $payment = [];
                     $payment['ShortCode'] = $paymentData['businessKey'] ?? "";
-                    // $payment[''] = $paymentData['businessKeyType'] ?? "";
+                    $payment['BusinessKey'] = $paymentData['businessKey'] ?? "";
+                    $payment['BusinessKeyType'] = $paymentData['businessKeyType'] ?? "";
                     $payment['MSISDN'] = $paymentData['debitMSISDN'] ?? "";
                     $payment['TransactAmount'] = $paymentData['transactionAmt'] ?? "";
                     $payment['TransactDate'] = $paymentData['transactionDate'] ?? "";
@@ -78,11 +84,43 @@ class PaymentsController extends Controller
             }
         }
 
+        $originatorConversationID = $data['header']['originatorConversationID'] ?? '';
+        $messageID = $data['header']['messageID'] ?? '';
+
         try {
-            $p =   OCRP::create($payment);
-            return (new ApiResponseService())->apiSuccessResponseService($p);
+            $transaction =   OCRP::create($payment);
+
+            $data = [
+                'header' => [
+                    'messageID' => $messageID,
+                    'originatorConversationID' => $originatorConversationID,
+                    'statusCode' => '0',
+                    'statusMessage' => 'Notification received',
+                ],
+                'responsePayload' => [
+                    'transactionInfo' => [
+                        'transactionId' => $transaction->id,
+                    ],
+                ],
+            ];
+
+            return response()->json($data);
         } catch (\Throwable $th) {
-            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+            $data = [
+                'header' => [
+                    'messageID' => $messageID,
+                    'originatorConversationID' => $originatorConversationID,
+                    'statusCode' => '1',
+                    'statusMessage' => $th->getMessage(),
+                ],
+                'responsePayload' => [
+                    'transactionInfo' => [
+                        'transactionId' => $transaction->id,
+                    ],
+                ],
+            ];
+            Log::info($th);
+            return response()->json($data);
         }
     }
     public function update(Request $request, $id)
@@ -96,7 +134,68 @@ class PaymentsController extends Controller
             ]);
             return (new ApiResponseService())->apiSuccessResponseService();
         } catch (\Throwable $th) {
-            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+            return response()->json($data);
+        }
+    }
+
+    public function paymentQuery(Request $request)
+    {
+        $user = User::where('id', 1)->first();
+        Auth::login($user);
+
+        $Numbering = (new DocumentsService())
+            ->getNumSerieByObjectId(218);
+
+        $data =  $request->all();
+
+
+        $messageID = $data['header']['messageID'] ?? '';
+
+        try {
+            $responseData = [
+                "header" => [
+                    "messageID" => $messageID,
+                    "originatorConversationID" => "",
+                    "statusCode" => "0",
+                    "statusMessage" => "Processed Successfully",
+                ],
+                "responsePayload" => [
+                    "transactionInfo" => [
+                        "transactionId" => $Numbering['NextNumber'],
+                        "utilityName" => "Cash Customer",
+                        "customerName" => "",
+                        "amount" => "",
+                        "currency" => "KES",
+                        "billType" => "FIXED",
+                        "billDueDate" => "",
+                    ],
+                ],
+            ];
+            (new SystemDefaults())->updateNextNumberNumberingSeries($Numbering['id']);
+            return response()->json($responseData);
+        } catch (\Throwable $th) {
+            $responseData = [
+                "header" => [
+                    "messageID" => $messageID,
+                    "originatorConversationID" => "",
+                    "statusCode" => "1",
+                    "statusMessage" => $th->getMessage(),
+                ],
+                "responsePayload" => [
+                    "transactionInfo" => [
+                        "transactionId" => $Numbering['NextNumber'],
+                        "utilityName" => "Cash Customer",
+                        "customerName" => "",
+                        "amount" => "",
+                        "currency" => "KES",
+                        "billType" => "FIXED",
+                        "billDueDate" => "",
+                    ],
+                ],
+            ];
+            (new SystemDefaults())->updateNextNumberNumberingSeries($Numbering['id']);
+            Log::info($th);
+            return response()->json($responseData);
         }
     }
 }
