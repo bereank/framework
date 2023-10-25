@@ -17,15 +17,23 @@ class CreateUDFHelperAction
      * @var string $fieldDescription
      * @var string $fieldType
      * @var int $fieldSize
-     * 
+     * @var string $ObjType
+     *
      */
-    public function __construct(protected string $tableName, protected string $fieldName, protected string $fieldDescription, protected string $fieldType, protected int $fieldSize)
-    {
+    public function __construct(
+        protected string $tableName,
+        protected string $fieldName,
+        protected string $fieldDescription,
+        protected string $fieldType,
+        protected int $fieldSize,
+        protected string $ObjType
+    ) {
         $this->tableName = $tableName;
         $this->fieldName = $fieldName;
         $this->fieldDescription = $fieldDescription;
         $this->fieldType = $fieldType;
         $this->fieldSize = $fieldSize;
+        $this->ObjType = $ObjType;
     }
 
     public function handle()
@@ -40,7 +48,7 @@ class CreateUDFHelperAction
             ], [
                 'FieldDescription' => $this->fieldDescription,
                 'FieldType' => $this->fieldType,
-                'ObjType' => 4,
+                'ObjType' => $this->ObjType,
                 'FieldSize' => $this->fieldSize
             ]);
 
