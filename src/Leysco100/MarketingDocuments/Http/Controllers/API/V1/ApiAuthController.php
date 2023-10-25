@@ -121,6 +121,12 @@ class ApiAuthController extends Controller
     {
         $settings = OADM::first();
         $loginUser = Auth::user();
+
+
+        if(!$loginUser->status){
+            return (new ApiResponseService())->apiFailedResponseService("Your account has been deactivated.Please contact your Admin");
+        }
+       
         $loginUser->gateData = GPMGate::where('id', $loginUser->gate_id)->first();
         $data = [
             'PswdChangeOnReset' =>  $settings->PswdChangeOnReset,
