@@ -7,9 +7,11 @@ use Leysco100\Shared\Models\Administration\Models\TaxGroup;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OUOM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class DLN1 extends Model
 {
+    use UsesTenantConnection;
     protected $guarded = ['id'];
     protected $table = 'd_l_n1_s';
 
