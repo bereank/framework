@@ -16,6 +16,18 @@ use Leysco100\Shared\Models\InventoryAndProduction\Models\OITW;
 
 class MarketingDocumentService
 {
+    public function BasicValidation($data)
+    {
+        /**
+         * 1. Object Type
+         */
+        if (!isset($data['ObjType']) || empty($data['ObjType'])) {
+
+            (new ApiResponseService())->apiSuccessAbortProcessResponse("Object Type is Required");
+        }
+        $data =     $this->headerBasicValidation($data);
+        return $data;
+    }
 
     public function fieldsDefaulting($data)
     {
@@ -611,4 +623,8 @@ class MarketingDocumentService
                  return (new ApiResponseService())->apiFailedResponseService("Process failed, Server Error", $th);
         }
     }
+
+  
+  
+
 }
