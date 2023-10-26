@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 
 use Leysco100\Gpm\Services\DocumentsService;
 use Leysco100\Shared\Jobs\FormSettingUpdate;
+use Leysco100\Shared\Models\CUFD;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Http\Controllers\Controller;
 use Leysco100\Shared\Models\FormSetting\Models\FI100;
@@ -61,10 +62,17 @@ class FormSettingsController extends Controller
             ->where('Location', 1)
             ->where('TabID', null)
             ->get();
+//        $line_table = (new $form->pdi1[0]['ChildTable'])->getTable();
+        $header_table = (new $form->ObjectHeaderTable)->getTable();
+
+        $UserFields = CUFD::where('ObjType', $ObjType)
+            ->where("TableName",$header_table)
+            ->get();
+
         $tabs = FT100::where('FormID', $form->id)->get();
+
         foreach ($tabs as $key => $value) {
             $Fields = FI100::where('TabID', $value->id)->get();
-
             $tableRows = FTR100::where('TabID', $value->id)->get();
             foreach ($tableRows as $key => $tableRow) {
                 $tableRow = (new HideTableRowsFieldsPerDocumentAction($ObjType, $tableRow))->handle();
@@ -119,6 +127,7 @@ class FormSettingsController extends Controller
             'ObjType' => $ObjType,
             'HeaderFields' => $headerFields,
             'FooterFields' => $footerFields,
+            'UserFields' => $UserFields,
             'tabs' => $tabs,
             'DfltSeries' => $documentDefaultSeries,
             'Series' => $Series,
