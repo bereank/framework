@@ -879,6 +879,7 @@ class DocumentController extends Controller
     // saving Attachments
     public function upload(Request $request)
     {
+        return $request->all();
         $ObjType = $request['ObjType'];
         $DocEntry = $request['DocEntry'];
 
