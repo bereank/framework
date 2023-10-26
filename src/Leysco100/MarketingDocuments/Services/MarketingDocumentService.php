@@ -40,7 +40,7 @@ class MarketingDocumentService
         if (!(data_get($data, 'DataSource'))) {
             $data['DataSource'] = 'I';
         }
-        
+
         if ((data_get($data, 'CardCode'))) {
             $customerDetails = OCRD::where('CardCode', $data['CardCode'])->first();
             if (!(data_get($data, 'CardName'))) {
@@ -73,8 +73,10 @@ class MarketingDocumentService
                         $documentLines[$key]['StockPrice'] = $StockPrice;
                     }
                     if (data_get($line, 'Quantity')) {
-                        $Weight1 = $itemDetails->SWeight1 * $line['Quantity'];
-                        $documentLines[$key]['Weight1'] = $Weight1;
+                        if ($itemDetails->SWeight1) {
+                            $Weight1 = $itemDetails->SWeight1 * $line['Quantity'];
+                            $documentLines[$key]['Weight1'] = $Weight1;
+                        }
                     }
                 }
                 if (!(data_get($line, 'WhsCode'))) {
