@@ -38,8 +38,6 @@ class DocumentFormSettings extends Command
         $allTableData = FT100::query()->truncate();
         $allTabsData = FTR100::query()->truncate();
 
-        dd("Done truncating");
-
         // Form Settings
         $allDocuments = APDI::get();
         foreach ($allDocuments as $key => $form) {

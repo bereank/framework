@@ -2,25 +2,28 @@
 
 namespace Leysco100\Administration\Console\Setup;
 
-use App\Domains\Administration\Jobs\CreateMenuForUser;
-use App\Domains\Administration\Models\User;
 use Illuminate\Console\Command;
+use Leysco100\Shared\Models\Administration\Jobs\CreateMenuForUser;
+use Leysco100\Shared\Models\Administration\Models\User;
+use Spatie\Multitenancy\Commands\Concerns\TenantAware;
 
 class CreateUserFormSettings extends Command
 {
+    use TenantAware;
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'command:user-form-settings {users}';
+    protected $signature = 'leysco100:administration:create-user-form-settings {users} {--tenant=*}';
+
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Create User Form Settings';
 
     /**
      * Execute the console command.

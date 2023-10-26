@@ -33,7 +33,7 @@ class CreateMenuForUser implements ShouldQueue
      */
     public function handle()
     {
-        $menuJsonString = file_get_contents(base_path('resources/testfiles/formsettings/menu_items.json'));
+        $menuJsonString = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'menu_items.json');
         $menuitems = json_decode($menuJsonString, true);
         foreach ($menuitems as $key => $item1) {
             $menu1 = FM100::create([

@@ -891,6 +891,12 @@ class DocumentController extends Controller
         $TargetTables = APDI::with('pdi1')
             ->where('ObjectID', $ObjType)
             ->first();
+
+        if (!$TargetTables) {
+            return (new ApiResponseService())
+                ->apiFailedResponseService("Not found document with objtype " . $ObjType);
+        }
+
         $data = $TargetTables->ObjectHeaderTable::where("id",$DocEntry)
             ->first();
         if (!$data){

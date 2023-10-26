@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Leysco100\Administration\Console\AdministrationInstallCommand;
 use Leysco100\Administration\Console\CreatePermissions;
+use Leysco100\Administration\Console\Setup\CreateUserFormSettings;
 use Leysco100\Administration\Console\Setup\ImportNumberingSeries;
 
 class AdministrationServiceProvider extends ServiceProvider
@@ -31,7 +32,8 @@ class AdministrationServiceProvider extends ServiceProvider
             $this->commands([
                 AdministrationInstallCommand::class,
                 CreatePermissions::class,
-                ImportNumberingSeries::class
+                ImportNumberingSeries::class,
+                CreateUserFormSettings::class
             ]);
         }
 
