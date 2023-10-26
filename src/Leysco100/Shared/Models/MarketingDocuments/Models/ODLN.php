@@ -30,12 +30,10 @@ class ODLN extends Model
     {
         return $this->hasMany(DLN1::class, 'DocEntry');
     }
-
-    public function rows()
+    public function document_lines()
     {
         return $this->hasMany(DLN1::class, 'DocEntry');
     }
-
     public function objecttype()
     {
         return $this->belongsTo(APDI::class, 'ObjType', 'ObjectID');
