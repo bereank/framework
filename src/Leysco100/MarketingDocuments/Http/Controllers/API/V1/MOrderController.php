@@ -129,9 +129,9 @@ class MOrderController extends Controller
     {
         $user = Auth::user();
 
-//        $this->validate($request, [
-//            'CardCode' => 'required|exists:o_c_r_d_s,id',
-//        ]);
+       $this->validate($request, [
+           'CardCode' => 'required|exists:tenant.o_c_r_d_s,id',
+       ]);
 
         $Items = $request['Items'];
 
@@ -367,6 +367,14 @@ class MOrderController extends Controller
                     "Name" => "Sales Quotation",
                     "doctype"=>23
                 ],
+                [
+                    "id" => 6,
+                    "Type" => "ARCreditMemo",
+                    "Name" => "A/R Credit Memo",
+                    "doctype"=>14
+                ],
+                
+
             ];
             return $data;
         } catch (\Throwable $th) {

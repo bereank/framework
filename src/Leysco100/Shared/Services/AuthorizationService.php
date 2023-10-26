@@ -214,10 +214,9 @@ class AuthorizationService
         }
         $expression = "\$udata->company == $operation $operator \$udata->company == 2";
         if (eval("return ($expression);")) {
-            Log::info(["Company9", true]);
+
             $company = $manager->company?->pluck('empID');
             $allowed->push($company);
-            Log::info(["Company", true]);
         }
         $expression = "\$udata->manager == $operation $operator \$udata->manager == 2";
         if (eval("return ($expression);")) {
@@ -264,8 +263,11 @@ class AuthorizationService
     public function CheckIfActive($ObjType, $empID)
     {
         $data = DataOwnerships::where('ObjType', $ObjType)->where('EmpId', $empID)
-            ->where('Active', 1)
             ->select('Active')->first();
+        if (!$data) {
+            $data = new \stdClass;
+            $data->Active = 0;
+        }
         return $data;
     }
     public  function getAllUniqueEmpIds($data, &$empIds)

@@ -3,6 +3,7 @@
 namespace Leysco100\Shared\Models\Administration\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\OUQR;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OALT extends Model
@@ -15,5 +16,14 @@ class OALT extends Model
     public function alt1()
     {
         return $this->hasMany(ALT1::class, 'DocEntry');
+    }
+
+    public function alt2()
+    {
+        return $this->hasMany(ALT2::class, 'DocEntry');
+    }
+    public function saved_query()
+    {
+        return $this->belongsTo(OUQR::class, 'QueryId');
     }
 }

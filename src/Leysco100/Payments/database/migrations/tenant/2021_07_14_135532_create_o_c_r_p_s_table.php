@@ -18,6 +18,9 @@ class CreateOCRPSTable extends Migration
             $table->string('ObjType')->nullable();
             $table->integer('UserSign')->nullable();
             $table->string('OwnerCode')->nullable();
+            $table->string('CardCode')->nullable();
+            $table->string('DocEntry')->nullable();
+            $table->string('DocNum')->nullable();
             $table->string('FirstName')->nullable();
             $table->string('MiddleName')->nullable();
             $table->string('LastName')->nullable();
@@ -35,6 +38,7 @@ class CreateOCRPSTable extends Migration
             $table->string('ExtRef')->nullable()->comment("Used For External Refrence");
             $table->string('ExtRefDocNum')->nullable()->comment("Used For External Refrence Doc Number");
             $table->float('ExtDocTotal', 19, 2)->default(0)->comment("Used For External Doc Total");
+            $table->integer('Status')->nullable();
             $table->string('CompanyID')->nullable();
             $table->timestamps();
         });

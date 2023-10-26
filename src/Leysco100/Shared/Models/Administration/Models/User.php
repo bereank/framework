@@ -47,7 +47,8 @@ class User extends Authenticatable
         'status',
         'useLocalSearch',
         'localUrl',
-        'gate_id'
+        'gate_id',
+        'last_login_at'
     ];
 
     /**
@@ -107,5 +108,5 @@ class User extends Authenticatable
         return $this->belongsTo(OHEM::class, 'owner', 'empID');
     }
 
-  
+
 }

@@ -9,13 +9,13 @@ use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\MarketingDocuments\Jobs\NumberingSeries;
 use Leysco100\Shared\Models\Administration\Models\OADM;
+use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITW;
 
 class MarketingDocumentService
 {
-
     public function BasicValidation($data)
     {
         /**
@@ -26,6 +26,51 @@ class MarketingDocumentService
             (new ApiResponseService())->apiSuccessAbortProcessResponse("Object Type is Required");
         }
         $data =     $this->headerBasicValidation($data);
+        return $data;
+    }
+
+    public function fieldsDefaulting($data)
+    {
+
+        $user_id = Auth::user()->id;
+        $user_data = User::with('oudg')->where('id', $user_id)->first();
+
+        if (!(data_get($data, 'SlpCode'))) {
+            $data['SlpCode'] = $user_data->oudg->SalePerson ?? null;
+        }
+        if (!(data_get($data, 'Ownercode'))) {
+            $data['Ownercode'] = $user_data->EmpID ?? null;
+        }
+        if (!(data_get($data, 'Warehouse'))) {
+            $data['Warehouse'] =  $user_data->oudg->Warehouse ?? null;
+        }
+        if ((data_get($data, 'CardCode'))) {
+            $customerDetails = OCRD::where('CardCode', $data['CardCode'])->first();
+            if (!(data_get($data, 'CardName'))) {
+                if ($customerDetails) {
+                    $data['CardName'] = $customerDetails['CardName'];
+                }
+            }
+        }
+
+        if ($data['document_lines']) {
+            $documentLines = $data['document_lines'];
+            foreach ($documentLines as $key => $line) {
+                if (data_get($line, 'ItemCode')) {
+                    $itemDetails = OITM::where('ItemCode', $line['ItemCode'])->first();
+        
+                    if (!data_get($line, 'ItemName')) {
+                        if ($itemDetails) {
+                            $documentLines[$key]['Dscription'] = $itemDetails['ItemName'];
+                        }
+                    }
+                }
+            }
+        
+            $data['document_lines'] = $documentLines;
+        }
+        
+        
         return $data;
     }
     public function headerBasicValidation($docdata)
@@ -238,7 +283,7 @@ class MarketingDocumentService
             'SlpCode' => $data['SlpCode'], // Sales Employee
             'U_SalePipe' => $data['U_SalePipe'], // Sales Pipe Line
             //                'OwnerCode' => $user->EmpID, //Owner Code
-            'OwnerCode' => $data['OwnerCode'] ? $data['OwnerCode'] :Auth::user()->EmpID, //Owner Code
+            'OwnerCode' => $data['OwnerCode'] ? $data['OwnerCode'] : Auth::user()->EmpID, //Owner Code
             'U_CashMail' => $data['U_CashMail'], //Cash Customer  Email
             'U_CashName' => $data['U_CashName'], //Cash Customer  Name
             'U_CashNo' => $data['U_CashNo'], // Cash Customer No
@@ -284,8 +329,8 @@ class MarketingDocumentService
             'U_NegativeMargin' => $data['U_NegativeMargin'],
             'U_BaseDoc' => $data['U_BaseDoc'],
             'DataSource' => "I",
-            'ExtRef' => $data['saveToDraft'] ? null : "N/A",
-            'ExtRefDocNum' => $data['saveToDraft'] ? null : "N/A",
+            'ExtRef' => $data['saveToDraft'] ? null : "",
+            'ExtRefDocNum' => $data['saveToDraft'] ? null : "",
             'ExtDocTotal' => 0,
         ];
         Log::info([$TargetTables->ObjectHeaderTable]);
@@ -398,7 +443,7 @@ class MarketingDocumentService
 
             $rowdetails = [
                 'DocEntry' => $newDoc->id,
-                'OwnerCode' =>$data['OwnerCode'] ? $data['OwnerCode'] :Auth::user()->EmpID , //Owner Code
+                'OwnerCode' => $data['OwnerCode'] ? $data['OwnerCode'] : Auth::user()->EmpID, //Owner Code
                 'LineNum' => $LineNum, //    Row Number
                 'ItemCode' => $value['ItemCode'] ?? null,
                 'Dscription' =>  $product->Dscription, // Item Description
@@ -570,12 +615,16 @@ class MarketingDocumentService
             //     DB::connection("tenant")->commit();
             //     //            $documentForDirecPostingToSAP = (new DocumentsService())->getDocumentForDirectPostingToSAP($newDoc->ObjType, $newDoc->id);
             //     //            $newDoc->documentForDirecPostingToSAP = $documentForDirecPostingToSAP;
-            //     return (new ApiResponseService())->apiSuccessResponseService($newDoc);
+               return (new ApiResponseService())->apiSuccessResponseService($newDoc);
             // } catch (\Throwable $th) {
             //     //            dd($th);
             //     Log::info($th);
             //     DB::connection("tenant")->rollback();
-            //     return (new ApiResponseService())->apiFailedResponseService("Process failed, Server Error", $th);
+                 return (new ApiResponseService())->apiFailedResponseService("Process failed, Server Error", $th);
         }
     }
+
+  
+  
+
 }

@@ -4,7 +4,6 @@ namespace Leysco100\Payments\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Crypt;
 use Leysco100\Shared\Models\Payments\Models\OCRP;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Payments\Http\Controllers\Controller;
@@ -12,11 +11,14 @@ use Leysco100\Payments\Http\Controllers\Controller;
 class PaymentsController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
 
         try {
-            $data = OCRP::get();
+            $page = $request->input('page', 1);
+            $perPage = $request->input('per_page', 50);
+            $data = OCRP::latest()
+            ->paginate($perPage, ['*'], 'page', $page);
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
@@ -26,62 +28,10 @@ class PaymentsController extends Controller
     {
 
         try {
-
-            return (new ApiResponseService())->apiSuccessResponseService();
+            $data = OCRP::find($id);
+            return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
             Log::info($th);
-            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
-        }
-    }
-    public function store(Request $request)
-    {
-        // $publicKey = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'public_key.pem');
-        // if (!$publicKey) {
-        //     die("Unable to load public key");
-        // }
-        // $message = $request->getContent();
-       
-        // $signature = hex2bin(bin2hex($request->header('signature')));
-
-        // $result = openssl_verify($message, $signature, $publicKey, OPENSSL_ALGO_SHA256);
-
-        // if ($result === 1) {
-        //     return "Signature is valid. Message has not been tampered with.";
-        // } elseif ($result === 0) {
-        //     return "Signature is invalid. Message and signature do not match.";
-        // } else {
-        //     return "An error occurred during signature verification.";
-        // }
-
-        $data =  $request->all();
-
-        if (array_key_exists('requestPayload', $data)) {
-            if (array_key_exists("additionalData", $data['requestPayload'])) {
-                if (array_key_exists("notificationData", $data['requestPayload']['additionalData'])) {
-                    $paymentData =   $data['requestPayload']['additionalData']['notificationData'];
-                    $payment = [];
-                    $payment['ShortCode'] = $paymentData['businessKey'] ?? "";
-                    // $payment[''] = $paymentData['businessKeyType'] ?? "";
-                    $payment['MSISDN'] = $paymentData['debitMSISDN'] ?? "";
-                    $payment['TransactAmount'] = $paymentData['transactionAmt'] ?? "";
-                    $payment['TransactDate'] = $paymentData['transactionDate'] ?? "";
-                    $payment['TransactID'] = $paymentData['transactionID'] ?? "";
-                    $payment['FirstName'] = $paymentData['firstName'] ?? "";
-                    $payment['MiddleName'] = $paymentData['middleName'] ?? "";
-                    $payment['LastName'] = $paymentData['lastName'] ?? "";
-                    $payment['Currency'] = $paymentData['currency'] ?? "";
-                    $payment['Dscription'] = $paymentData['narration'] ?? "";
-                    $payment['TransactType'] = $paymentData['transactionType'] ?? "";
-                    $payment['Balance'] = $paymentData['balance'] ?? "";
-                    $payment['ObjType'] = 217;
-                }
-            }
-        }
-
-        try {
-            $p =   OCRP::create($payment);
-            return (new ApiResponseService())->apiSuccessResponseService($p);
-        } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
@@ -96,7 +46,9 @@ class PaymentsController extends Controller
             ]);
             return (new ApiResponseService())->apiSuccessResponseService();
         } catch (\Throwable $th) {
-            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+            return response()->json($data);
         }
     }
+
+    
 }

@@ -39,6 +39,10 @@ return new class extends Migration
             $table->string('UserSign')->nullable();
             $table->text('History')->nullable();
             $table->string('QCategory')->nullable();
+            $table->boolean('Retry')->default(0);
+            $table->integer('RetryAfter')->nullable();
+            $table->time('MaxRetryTime')->nullable();
+            $table->time('RetryTime')->nullable();
             $table->timestamps();
         });
     }
