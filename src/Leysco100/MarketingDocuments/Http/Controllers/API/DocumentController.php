@@ -879,15 +879,14 @@ class DocumentController extends Controller
     // saving Attachments
     public function upload(Request $request)
     {
-        return $request->all();
-        $ObjType = $request['ObjType'];
-        $DocEntry = $request['DocEntry'];
+        $ObjType = $request->ObjType;
+        $DocEntry = $request->DocEntry;
 
-        if (!$DocEntry && $request['id']){
-            $DocEntry = $request['id'];
+        if (!$DocEntry && $request->id){
+            $DocEntry = $request->id;
         }
 
-        $ExtRefAtcEntry = $request['ExtRefAtcEntry'];
+        $ExtRefAtcEntry = $request->ExtRefAtcEntry;
 
         $TargetTables = APDI::with('pdi1')
             ->where('ObjectID', $ObjType)
