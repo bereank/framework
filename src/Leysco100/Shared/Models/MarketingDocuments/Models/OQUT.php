@@ -21,6 +21,11 @@ class OQUT extends Model
         return $this->belongsTo(OCRD::class, 'CardCode');
     }
 
+    public function BusinessPartner()
+    {
+        return $this->belongsTo(OCRD::class, 'CardCode', 'CardCode');
+    }
+
     public function document_lines()
     {
         return $this->hasMany(QUT1::class, 'DocEntry');

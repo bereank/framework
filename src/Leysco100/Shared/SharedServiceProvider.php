@@ -4,6 +4,7 @@ namespace Leysco100\Shared;
 
 use Illuminate\Support\ServiceProvider;
 use Leysco100\Shared\Console\Setup\CreateDefaultUserCommand;
+use Leysco100\Shared\Console\Setup\DocumentFormSettings;
 use Leysco100\Shared\Console\Setup\InstallSharedPackageCommand;
 
 use Illuminate\Support\Facades\Route;
@@ -20,7 +21,8 @@ class SharedServiceProvider extends ServiceProvider
 
             $this->commands([
                 InstallSharedPackageCommand::class,
-                CreateDefaultUserCommand::class
+                CreateDefaultUserCommand::class,
+                DocumentFormSettings::class
             ]);
          
         }
