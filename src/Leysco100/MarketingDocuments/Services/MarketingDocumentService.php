@@ -120,6 +120,9 @@ class MarketingDocumentService
                 $rowItems = (new $TargetTables->pdi1[0]['ChildTable'])->fill($value);
                 $rowItems->save();
             }
+
+            (new SystemDefaults())->updateNextNumberNumberingSeries($header_data['Series']);
+
             DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService($newDoc);
         } catch (\Throwable $th) {
