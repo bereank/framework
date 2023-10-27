@@ -12,7 +12,7 @@ use Leysco100\Shared\Models\MarketingDocuments\Models\DocsValidation;
 
 class MapApiFieldAction
 {
-  public  function handle($request,$TargetTables)
+  public  function handle($request, $TargetTables)
   {
     $data = $request->all();
 
@@ -64,7 +64,6 @@ class MapApiFieldAction
     foreach ($fields as $key => $field) {
 
       $fieldName = $field['FieldName'];
-      $label = $field['Label'];
       $fieldType = $field['FieldType'];
       $fieldMaxLength = $field['FieldMaxLength'];
       $fieldMinLength = $field['FieldMinLength'];
@@ -74,6 +73,8 @@ class MapApiFieldAction
       $ends_with = $field['EndsWith'] ?? [];
       $size = $field['Size'] ?? '';
       $regex = $field['Regwex'] ?? '';
+      $rfield = $field['RField'];
+      $rtable = $field['RTable'];
 
       $rule = [];
 
@@ -82,6 +83,10 @@ class MapApiFieldAction
       }
       if (isset($isUnique) && $isUnique) {
         $rule[] = 'unique:tenant.' . $table;
+      }
+
+      if (isset($rfield) && isset($rtable)) {
+        $rule[] = 'exists:tenant.' .$rtable. ',' .$rfield;
       }
       if (isset($starts_with) && !empty(array_filter($starts_with))) {
 
@@ -110,7 +115,7 @@ class MapApiFieldAction
       $rules[$fieldName] = implode('|', $rule);
 
       $attributes[$fieldName] = $fieldName;
-
+      Log::info($rules);
       if (array_key_exists($field['FieldName'], $data)) {
         $documentData[$field['FieldName']] = $data[$field['FieldName']];
       }

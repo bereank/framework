@@ -73,7 +73,7 @@ class MarketingDocumentService
                         $documentLines[$key]['StockPrice'] = $StockPrice;
                     }
                     if (data_get($line, 'Quantity')) {
-                        if ($itemDetails->SWeight1) {
+                        if ($itemDetails) {
                             $Weight1 = $itemDetails->SWeight1 * $line['Quantity'];
                             $documentLines[$key]['Weight1'] = $Weight1;
                         }
