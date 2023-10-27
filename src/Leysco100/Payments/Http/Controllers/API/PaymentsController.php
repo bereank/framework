@@ -3,6 +3,7 @@
 namespace Leysco100\Payments\Http\Controllers\API;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Leysco100\Shared\Models\Payments\Models\OCRP;
 use Leysco100\Shared\Services\ApiResponseService;
@@ -13,12 +14,27 @@ class PaymentsController extends Controller
 
     public function index(Request $request)
     {
+        $startdate = request()->filled('startDateTime') ? Carbon::parse(request()->input('startDateTime')) : Carbon::now()->startOfDay();
+
+        $endate = request()->filled('endDateTime') ? Carbon::parse(request()->input('endDateTime')) : Carbon::now()->endOfDay();
+
+        $paginate = request()->filled('paginate') ? request()->input('paginate') : false;
 
         try {
             $page = $request->input('page', 1);
             $perPage = $request->input('per_page', 50);
-            $data = OCRP::latest()
-            ->paginate($perPage, ['*'], 'page', $page);
+
+            $data = OCRP::latest();
+            $data = $data->whereBetween('created_at', [
+                $startdate,
+                $endate,
+            ]);
+            if ($paginate) {
+                $data = $data->paginate($perPage, ['*'], 'page', $page);
+            } else {
+                $data =   $data->get();
+            }
+
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
@@ -44,11 +60,9 @@ class PaymentsController extends Controller
                 'ExtDocTotal' => $request['ExtDocTotal'] ?? "",
                 'ExtRefDocNum' => $request['ExtRefDocNum'] ?? "",
             ]);
-            return (new ApiResponseService())->apiSuccessResponseService();
+            return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
             return response()->json($data);
         }
     }
-
-    
 }

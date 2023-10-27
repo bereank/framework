@@ -4,6 +4,7 @@ namespace Leysco100\Banking;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
+use Leysco100\Banking\Console\BankingInstallCommand;
 
 class BankingServiceProvider extends ServiceProvider
 {
@@ -13,8 +14,13 @@ class BankingServiceProvider extends ServiceProvider
         // Register the command if we are using the application via the CLI
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "config.php" => config_path('banking.php'),
+                __DIR__ . DIRECTORY_SEPARATOR . "config" . 
+                DIRECTORY_SEPARATOR . "config.php" => config_path('banking.php'),
             ], 'config');
+
+            $this->commands([
+                BankingInstallCommand::class,
+            ]);
         }
     }
 
