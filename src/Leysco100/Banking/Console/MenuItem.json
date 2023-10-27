@@ -1,0 +1,137 @@
+[
+    {
+        "icon": "mdi-checkbook",
+        "icon-alt": "mdi-chevron-down",
+        "Label": "Banking",
+        "model": true,
+        "Visible": "N",
+        "children": [
+            {
+                "icon": "mdi-con",
+                "Label": "Incoming Payments",
+                "Visible": "Y",
+                "children": [
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Third Party Payments",
+                        "link": "/payments/incoming/third-party",
+                        "Visible": "Y",
+                        "children": []
+                    },
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Incoming Payments",
+                        "link": "/banking/incoming-payments",
+                        "Visible": "Y",
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "icon": "mdi-con",
+                "Label": "Deposits",
+                "Visible": "N",
+                "children": [
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Deposits",
+                        "link": "/deposits",
+                        "Visible": "Y",
+                        "children": []
+                    },
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Postdated Check Deposit",
+                        "link": "/postdated-checks",
+                        "Visible": "Y",
+                        "children": []
+                    },
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Postdated Credit Voucher",
+                        "link": "/postdated-credit-voucher",
+                        "Visible": "Y",
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "icon": "mdi-con",
+                "Label": "Outgoing Payments",
+                "Visible": "N",
+                "children": [
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Outgoing Payments",
+                        "link": "/outgoing-payments",
+                        "Visible": "Y",
+                        "children": [
+                            {
+                                "icon": "mdi-con",
+                                "Label": "On Vendor|Customers",
+                                "link": "/banking/outgoing-payments/on-customer-vendor",
+                                "Visible": "Y",
+                                "children": []
+                            },
+                            {
+                                "icon": "mdi-con",
+                                "Label": "On Account",
+                                "link": "/banking/outgoing-payments/on-account",
+                                "Visible": "Y",
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Checks for Payment",
+                        "link": "/checks-for-payment",
+                        "Visible": "Y",
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "icon": "mdi-con",
+                "Label": "Bank Statements and Ext Reconciliation",
+                "Visible": "N",
+                "children": [
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Reconciliation",
+                        "link": "/reconciliation",
+                        "Visible": "Y",
+                        "children": []
+                    },
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Manual Reconciliation",
+                        "link": "/manual-reconciliation",
+                        "Visible": "Y",
+                        "children": []
+                    },
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Previous Ext Reconciliation",
+                        "link": "/previous-external-reconciliation",
+                        "Visible": "Y",
+                        "children": []
+                    },
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Check and Restore Pre Ext Reconciliation",
+                        "link": "/restore-previous-external-reconciliation",
+                        "Visible": "Y",
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "icon": "mdi-con",
+                "Label": "Banking Reports",
+                "Visible": "N",
+                "children": []
+            }
+        ]
+    }
+]
