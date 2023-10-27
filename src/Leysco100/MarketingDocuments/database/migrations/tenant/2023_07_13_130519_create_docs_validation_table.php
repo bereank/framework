@@ -30,6 +30,8 @@ class CreateDocsValidationTable extends Migration
             $table->string('Regex')->nullable();
             $table->boolean('RtrnOnCreate')->nullable()->default(1);
             $table->boolean('RtrnOnGet')->nullable()->default(1);
+            $table->string('RTable', 50)->nullable();
+            $table->string('RField', 50)->nullable();
             $table->timestamps();
         });
     }
