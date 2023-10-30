@@ -396,30 +396,51 @@ class GPMMobileAPPApiController extends Controller
 
         //If the document is not in Open State or Not Confirmed
         if (($record->Status != 0) && ($record->Status != 1)) {
-            $newRecord->update([
-                'Status' => 2,
-                'ScanLogID' => $record->id,
-            ]);
 
-            // Mail::to($emails)->send(new GPMNotificationMail($newRecord->id));
-            // email notification as a job
-            dispatch(new SendEmailJob($emails, $newRecord->id));
-            return response()
-                ->json(
-                    [
-                        'message' => "Duplicate Scan",
-                        'resultCode' => 1500,
-                        'BackUpMode' => 0,
-                        'type' => 'duplicate',
-                        'docnum' => (string)$DocNum ?? '0',
-                        'ScanLogId' => $newRecord->id,
-                        'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
-                        'errors' => [
-                            'record' => 'Discrepancy Noted- Don’t Release Goods',
+            if ($record->Status == 4) {
+                $newRecord->update([
+                    'Status' => 4,
+                    'ScanLogID' => $record->id,
+                ]);
+                return response()
+                    ->json(
+                        [
+                            'message' => "The document has been Cancelled",
+                            'resultCode' => 1500,
+                            'BackUpMode' => 0,
+                            'type' => 'duplicate',
+                            'docnum' => (string)$DocNum ?? '0',
+                            'ScanLogId' => $newRecord->id,
+                            'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
+                            'errors' => [
+                                'record' => 'Discrepancy Noted- Don’t Release Goods',
+                            ],
                         ],
-                    ],
-                    200
-                );
+                        200
+                    );
+            } else {
+                $newRecord->update([
+                    'Status' => 2,
+                    'ScanLogID' => $record->id,
+                ]);
+                dispatch(new SendEmailJob($emails, $newRecord->id));
+                return response()
+                    ->json(
+                        [
+                            'message' => "Duplicate Scan",
+                            'resultCode' => 1500,
+                            'BackUpMode' => 0,
+                            'type' => 'duplicate',
+                            'docnum' => (string)$DocNum ?? '0',
+                            'ScanLogId' => $newRecord->id,
+                            'resultDesc' => 'Discrepancy Noted- Don’t Release Goods',
+                            'errors' => [
+                                'record' => 'Discrepancy Noted- Don’t Release Goods',
+                            ],
+                        ],
+                        200
+                    );
+            }
         }
 
         $newRecord->update([
@@ -655,13 +676,18 @@ class GPMMobileAPPApiController extends Controller
     {
 
         try {
-            $data = OGMS::findOrFail($id);
+            if (!$request['BackUpMode']) {
+                $data = OGMS::findOrFail($id);
 
+                GMS1::where('id', $data->ScanLogID)->update([
+                    'Status' => 4
+                ]);
 
-            $data->update([
-                "Comment" => $request['Comment'],
-                'Status' => 2,
-            ]);
+                $data->update([
+                    "Comment" => $request['Comment'],
+                    'Status' => 4,
+                ]);
+            }
             if ($request['BackUpMode'] == 1) {
                 $data = BackUpModeLines::where('BaseEntry', $id)->firstOrFail();
                 $data->where('id', $id)
