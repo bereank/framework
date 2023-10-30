@@ -3,6 +3,8 @@
 namespace Leysco100\Payments\Http\Controllers\API;
 
 use Illuminate\Http\Request;
+
+use Spatie\Crypto\Rsa\PublicKey;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Shared\Models\Payments\Models\OCRP;
@@ -18,25 +20,26 @@ class PaymentsProcessingController extends Controller
         $user = User::where('id', 1)->first();
         Auth::login($user);
 
+        $path = __DIR__ . '/../../../resources/public_key.pem';
+        $publicKey = file_get_contents($path);
+        $publicKey = openssl_pkey_get_public($publicKey);
+
+        $signature = $request->header('signature');
+
+        $isVerified = openssl_verify(json_encode($request->all(), true), $signature, $publicKey);
+
+        if (!$isVerified) {
+            Log::info('Signature Not valid'. $isVerified);
+            // return response()
+            //     ->json([
+            //         'ResultState' => false,
+            //         'ResultCode' => 1500,
+            //         'ResultDesc' => "Signature Not valid",
+            //     ], 500);
+        }
+
         $Numbering = (new DocumentsService())
             ->getNumSerieByObjectId(218);
-        // $publicKey = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'public_key.pem');
-        // if (!$publicKey) {
-        //     die("Unable to load public key");
-        // }
-        // $message = $request->getContent();
-
-        // $signature = hex2bin(bin2hex($request->header('signature')));
-
-        // $result = openssl_verify($message, $signature, $publicKey, OPENSSL_ALGO_SHA256);
-
-        // if ($result === 1) {
-        //     return "Signature is valid. Message has not been tampered with.";
-        // } elseif ($result === 0) {
-        //     return "Signature is invalid. Message and signature do not match.";
-        // } else {
-        //     return "An error occurred during signature verification.";
-        // }
 
         $data =  $request->all();
 
