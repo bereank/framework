@@ -51,6 +51,9 @@ class OGMS extends Model
         if ($this->Status == 3) {
             return "Released";
         }
+        if ($this->Status == 4) {
+            return "Cancelled";
+        }
 
     }
     public function getOriginAttribute()

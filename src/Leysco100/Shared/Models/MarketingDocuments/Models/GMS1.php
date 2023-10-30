@@ -44,6 +44,10 @@ class GMS1 extends Model
         if ($this->Status == 2) {
             return "Duplicate";
         }
+
+        if ($this->Status == 4) {
+            return "Cancelled";
+        }
     }
 
 
@@ -57,6 +61,6 @@ class GMS1 extends Model
     }
     public function document()
     {
-        return $this->belongsTo(OGMS::class,'id', 'ScanLogID');
+        return $this->belongsTo(OGMS::class, 'id', 'ScanLogID');
     }
 }
