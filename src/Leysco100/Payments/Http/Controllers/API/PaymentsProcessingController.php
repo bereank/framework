@@ -17,6 +17,7 @@ class PaymentsProcessingController extends Controller
 {
     public function kcbPaymentNotification(Request $request)
     {
+        Log::info([$request->all(),$request->header('signature')]);
         $user = User::where('id', 1)->first();
         Auth::login($user);
 
@@ -29,19 +30,27 @@ class PaymentsProcessingController extends Controller
         $isVerified = openssl_verify(json_encode($request->all(), true), $signature, $publicKey);
 
         if (!$isVerified) {
-            Log::info('Signature Not valid'. $isVerified);
-            // return response()
-            //     ->json([
-            //         'ResultState' => false,
-            //         'ResultCode' => 1500,
-            //         'ResultDesc' => "Signature Not valid",
-            //     ], 500);
+            Log::info('Signature Not valid' . $isVerified);
+            $data = [
+                'header' => [
+                    'messageID' => "",
+                    'originatorConversationID' => "",
+                    'statusCode' => '1',
+                    'statusMessage' => "Signature Not valid",
+                ],
+                'responsePayload' => [
+                    'transactionInfo' => [
+                        'transactionId' => "",
+                    ],
+                ],
+            ];
+            //  return response()->json($data);
         }
 
         $Numbering = (new DocumentsService())
             ->getNumSerieByObjectId(218);
 
-        $data =  $request->all();
+        $data = $request->all();
 
         if (array_key_exists('requestPayload', $data)) {
             if (array_key_exists("additionalData", $data['requestPayload'])) {
@@ -90,6 +99,7 @@ class PaymentsProcessingController extends Controller
             (new SystemDefaults())->updateNextNumberNumberingSeries($Numbering['id']);
             return response()->json($data);
         } catch (\Throwable $th) {
+            Log::error('Logging Query Error'. $th->getMessage());
             $data = [
                 'header' => [
                     'messageID' => $messageID,
@@ -103,15 +113,41 @@ class PaymentsProcessingController extends Controller
                     ],
                 ],
             ];
-            Log::info($th);
             return response()->json($data);
         }
     }
     public function kcbPaymentQuery(Request $request)
     {
+        Log::info("____________PAYMENT QUERY _______________________");
+        Log::info([json_encode($request->all(), true),gettype(json_encode($request->all(), true))]);
         $user = User::where('id', 1)->first();
         Auth::login($user);
 
+        $path = __DIR__ . '/../../../resources/public_key.pem';
+        $publicKey = file_get_contents($path);
+        $publicKey = openssl_pkey_get_public($publicKey);
+
+        $signature = $request->header('signature');
+
+        $isVerified = openssl_verify(json_encode($request->all(), true), $signature, $publicKey);
+
+        if (!$isVerified) {
+            Log::info('Signature Not valid' . $isVerified);
+            $data = [
+                'header' => [
+                    'messageID' => "",
+                    'originatorConversationID' => "",
+                    'statusCode' => '1',
+                    'statusMessage' => "Signature Not valid",
+                ],
+                'responsePayload' => [
+                    'transactionInfo' => [
+                        'transactionId' => "",
+                    ],
+                ],
+            ];
+            //return response()->json($data);
+        }
         $Numbering = (new DocumentsService())
             ->getNumSerieByObjectId(218);
 
@@ -143,6 +179,7 @@ class PaymentsProcessingController extends Controller
             (new SystemDefaults())->updateNextNumberNumberingSeries($Numbering['id']);
             return response()->json($responseData);
         } catch (\Throwable $th) {
+            Log::error('Logging Query Error'. $th->getMessage());
             $responseData = [
                 "header" => [
                     "messageID" => $messageID,
@@ -163,7 +200,7 @@ class PaymentsProcessingController extends Controller
                 ],
             ];
             (new SystemDefaults())->updateNextNumberNumberingSeries($Numbering['id']);
-            Log::info($th);
+           
             return response()->json($responseData);
         }
     }
