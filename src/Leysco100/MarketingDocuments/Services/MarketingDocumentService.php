@@ -108,14 +108,16 @@ class MarketingDocumentService
 
     public function createDoc($data, $TargetTables, $ObjType)
     {
-        Log::info($data);
+        DB::connection("tenant")->beginTransaction();
         try {
+
             $header_data = $data['header_data'];
             $header_data['ObjType'] = $ObjType;
             $newDoc =  (new $TargetTables->ObjectHeaderTable)->fill($header_data);
             $newDoc->save();
-
+            Log::info($newDoc);
             foreach ($data['document_lines'] as $key => $value) {
+                Log::info($value);
                 $value['DocEntry'] = $newDoc->id;
                 $rowItems = (new $TargetTables->pdi1[0]['ChildTable'])->fill($value);
                 $rowItems->save();
@@ -126,8 +128,10 @@ class MarketingDocumentService
             DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService($newDoc);
         } catch (\Throwable $th) {
+            Log::error($th->getMessage());
             DB::connection("tenant")->rollback();
-            return (new ApiResponseService())->apiFailedResponseService("Process failed, Server Error", $th);
+            return (new ApiResponseService())
+                ->apiFailedResponseService("Process failed, Server Error", $th->getMessage());
         }
     }
 }
