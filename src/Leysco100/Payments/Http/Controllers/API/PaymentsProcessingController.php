@@ -2,8 +2,10 @@
 
 namespace Leysco100\Payments\Http\Controllers\API;
 
-use Illuminate\Http\Request;
+use Carbon\Carbon;
 
+
+use Illuminate\Http\Request;
 use Spatie\Crypto\Rsa\PublicKey;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -17,13 +19,14 @@ class PaymentsProcessingController extends Controller
 {
     public function kcbPaymentNotification(Request $request)
     {
-        Log::info([$request->all(),$request->header('signature')]);
+        
+        Log::info([$request->all(), $request->header('signature')]);
         $user = User::where('id', 1)->first();
         Auth::login($user);
 
         $path = __DIR__ . '/../../../resources/public_key.pem';
-        $publicKey = file_get_contents($path);
-        $publicKey = openssl_pkey_get_public($publicKey);
+        $file = file_get_contents($path);
+        $publicKey = openssl_pkey_get_public($file);
 
         $signature = $request->header('signature');
 
@@ -56,13 +59,16 @@ class PaymentsProcessingController extends Controller
             if (array_key_exists("additionalData", $data['requestPayload'])) {
                 if (array_key_exists("notificationData", $data['requestPayload']['additionalData'])) {
                     $paymentData =   $data['requestPayload']['additionalData']['notificationData'];
+
+                    $transactionDate = Carbon::parse($paymentData['transactionDate']);
+
                     $payment = [];
                     $payment['ShortCode'] = $paymentData['businessKey'] ?? "";
                     $payment['BusinessKey'] = $paymentData['businessKey'] ?? "";
                     $payment['BusinessKeyType'] = $paymentData['businessKeyType'] ?? "";
                     $payment['MSISDN'] = $paymentData['debitMSISDN'] ?? "";
                     $payment['TransactAmount'] = $paymentData['transactionAmt'] ?? "";
-                    $payment['TransactDate'] = $paymentData['transactionDate'] ?? "";
+                    $payment['TransactDate'] = $transactionDate ?? "";
                     $payment['TransactID'] = $paymentData['transactionID'] ?? "";
                     $payment['FirstName'] = $paymentData['firstName'] ?? "";
                     $payment['MiddleName'] = $paymentData['middleName'] ?? "";
@@ -99,7 +105,7 @@ class PaymentsProcessingController extends Controller
             (new SystemDefaults())->updateNextNumberNumberingSeries($Numbering['id']);
             return response()->json($data);
         } catch (\Throwable $th) {
-            Log::error('Logging Query Error'. $th->getMessage());
+            Log::error('Logging Query Error' . $th->getMessage());
             $data = [
                 'header' => [
                     'messageID' => $messageID,
@@ -109,7 +115,7 @@ class PaymentsProcessingController extends Controller
                 ],
                 'responsePayload' => [
                     'transactionInfo' => [
-                        'transactionId' => $transaction->id,
+                        'transactionId' => "0001",
                     ],
                 ],
             ];
@@ -119,7 +125,7 @@ class PaymentsProcessingController extends Controller
     public function kcbPaymentQuery(Request $request)
     {
         Log::info("____________PAYMENT QUERY _______________________");
-        Log::info([json_encode($request->all(), true),gettype(json_encode($request->all(), true))]);
+        Log::info([json_encode($request->all(), true), gettype(json_encode($request->all(), true))]);
         $user = User::where('id', 1)->first();
         Auth::login($user);
 
@@ -179,7 +185,7 @@ class PaymentsProcessingController extends Controller
             (new SystemDefaults())->updateNextNumberNumberingSeries($Numbering['id']);
             return response()->json($responseData);
         } catch (\Throwable $th) {
-            Log::error('Logging Query Error'. $th->getMessage());
+            Log::error('Logging Query Error' . $th->getMessage());
             $responseData = [
                 "header" => [
                     "messageID" => $messageID,
@@ -200,7 +206,7 @@ class PaymentsProcessingController extends Controller
                 ],
             ];
             (new SystemDefaults())->updateNextNumberNumberingSeries($Numbering['id']);
-           
+
             return response()->json($responseData);
         }
     }
