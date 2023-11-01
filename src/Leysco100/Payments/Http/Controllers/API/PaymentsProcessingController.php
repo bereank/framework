@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use App\Domains\Marketing\Models\ORCP;
 use Leysco100\Shared\Models\Payments\Models\OCRP;
 use Leysco100\Payments\Http\Controllers\Controller;
 use Leysco100\Shared\Models\Administration\Models\User;
@@ -128,7 +127,7 @@ class PaymentsProcessingController extends Controller
     {
         Log::info("____________PAYMENT QUERY _______________________");
         Log::info([json_encode($request->all(), true), gettype(json_encode($request->all(), true))]);
-       
+
         $user = User::where('id', 1)->first();
         Auth::login($user);
 
@@ -220,7 +219,16 @@ class PaymentsProcessingController extends Controller
         Log::info($request->all());
 
         $this->eqbAuth($request);
-
+        if (!Auth::check()) {
+            $data =   [
+                "amount" => 0,
+                "billNumber" => "",
+                "billName" => "",
+                "description" => "Invalid Credentials",
+                "type" => "1"
+            ];
+            return response()->json($data);
+        }
         if (empty($request['account'])) {
             return response()->json([
                 "amount" => 0,
@@ -267,16 +275,25 @@ class PaymentsProcessingController extends Controller
         Log::info($request->all());
 
         $this->eqbAuth($request);
-
+        if (!Auth::check()) {
+            $data =   [
+                "amount" => 0,
+                "billNumber" => "",
+                "billName" => "",
+                "description" => "Invalid Credentials",
+                "type" => "1"
+            ];
+            return response()->json($data);
+        }
         try {
             $Numbering = (new DocumentsService())
                 ->getNumSerieByObjectId(218);
 
             $paymentData =  $request->all();
 
-            $exists = ORCP::where('BankRefNo', $paymentData['bankreference'])->exists();
+            $exists = OCRP::where('BankRefNo', $paymentData['bankreference'])->exists();
 
-            if (!$exists) {
+            if ($exists) {
                 return response()->json([
                     "responseCode" => "OK",
                     "responseMessage" => "DUPLICATE TRANSACTION"
@@ -347,6 +364,8 @@ class PaymentsProcessingController extends Controller
                     "type" => "1"
                 ];
                 return response()->json($data);
+            } else {
+                Auth::login($user);
             }
         } catch (\Throwable $th) {
             Log::info($th->getMessage());
