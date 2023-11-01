@@ -6,7 +6,6 @@ use Carbon\Carbon;
 
 
 use Illuminate\Http\Request;
-use Spatie\Crypto\Rsa\PublicKey;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -26,7 +25,7 @@ class PaymentsProcessingController extends Controller
         $user = User::where('id', 1)->first();
         Auth::login($user);
 
-        $path = __DIR__ . '/../../../resources/public_key.pem';
+        $path = __DIR__ . '/../../../resources/kcb_uat_publickey.pem';
         $file = file_get_contents($path);
         $publicKey = openssl_pkey_get_public($file);
 
@@ -128,6 +127,7 @@ class PaymentsProcessingController extends Controller
     {
         Log::info("____________PAYMENT QUERY _______________________");
         Log::info([json_encode($request->all(), true), gettype(json_encode($request->all(), true))]);
+       
         $user = User::where('id', 1)->first();
         Auth::login($user);
 
