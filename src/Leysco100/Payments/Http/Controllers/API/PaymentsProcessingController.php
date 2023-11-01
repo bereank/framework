@@ -241,7 +241,7 @@ class PaymentsProcessingController extends Controller
 
         try {
             $data = [
-                "amount" => "1.0",
+                "amount" => "0.0",
                 "billName" => "Test_Account_1",
                 "billNumber" => "10192",
                 "billerCode" => "102345",
