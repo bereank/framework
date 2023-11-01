@@ -40,6 +40,7 @@ class CreateOCRPSTable extends Migration
             $table->string('ExtRefDocNum')->nullable()->comment("Used For External Refrence Doc Number");
             $table->float('ExtDocTotal', 19, 2)->default(0)->comment("Used For External Doc Total");
             $table->integer('Status')->nullable();
+            $table->integer('Source')->nullable();
             $table->string('CompanyID')->nullable();
             $table->timestamps();
         });
