@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Spatie\Crypto\Rsa\PublicKey;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use App\Domains\Marketing\Models\ORCP;
 use Leysco100\Shared\Models\Payments\Models\OCRP;
 use Leysco100\Payments\Http\Controllers\Controller;
 use Leysco100\Shared\Models\Administration\Models\User;
@@ -19,7 +21,7 @@ class PaymentsProcessingController extends Controller
 {
     public function kcbPaymentNotification(Request $request)
     {
-        
+
         Log::info([$request->all(), $request->header('signature')]);
         $user = User::where('id', 1)->first();
         Auth::login($user);
@@ -78,7 +80,7 @@ class PaymentsProcessingController extends Controller
                     $payment['TransactType'] = $paymentData['transactionType'] ?? "";
                     $payment['Balance'] = $paymentData['balance'] ?? "";
                     $payment['DocNum'] =  $Numbering['NextNumber'];
-                    $payment['ObjType'] = 217;
+                    $payment['ObjType'] = 218;
                 }
             }
         }
@@ -213,54 +215,147 @@ class PaymentsProcessingController extends Controller
 
     public function  eqbValidation(Request $request)
     {
+        Log::info("____________EQB VALIDATION  _______________________");
+        Log::info($request->all());
 
-        if (Auth::attempt([
-            'email' => $request->username,
-            'password' => $request->password
-        ])) {
-            $data = [
-                "amount" => "230.0",
-                "billName" => "Test_Account_3",
-                "billNumber" => "33333333",
-                "billerCode" => "123456",
-                "createdOn" => "2016-12-20",
-                "currencyCode" => "KES",
-                "customerName" => "Test_Account_3",
-                "customerRefNumber" => "33333333",
-                "description" => "subscription fees",
-                "dueDate" => "2016-12-21",
-                "expiryDate" => "2016-12-29",
-                "Remarks" => "Fees",
-                "type" => "1"
-            ];
-            $invalidRes =     [
+        $this->eqbAuth($request);
+
+        if (empty($request['account'])) {
+            return response()->json([
                 "amount" => 0,
                 "billNumber" => "null",
                 "billName" => "null",
                 "description" => "bill number not found",
                 "type" => "1"
+            ]);
+        }
+
+        try {
+            $data = [
+                "amount" => "1.0",
+                "billName" => "Test_Account_1",
+                "billNumber" => "10192",
+                "billerCode" => "102345",
+                "createdOn" => "2023-11-01",
+                "currencyCode" => "KES",
+                "customerName" => "Test_Account_1",
+                "customerRefNumber" => "10192",
+                "description" => "buy goods",
+                "dueDate" => "2023-11-01",
+                "expiryDate" => "2023-11-01",
+                "Remarks" => "purchase",
+                "type" => "1"
             ];
-            return $data;
-        } else {
-            return response()->json('Auth Failed');
+            return response()->json([$data]);
+        } catch (\Throwable $th) {
+            Log::error('Validation Error' . $th->getMessage());
+            return response()->json([
+                "amount" => 0,
+                "billNumber" => "null",
+                "billName" => "null",
+                "description" => $th->getMessage(),
+                "type" => "1"
+            ]);
         }
     }
 
     public function eqbPaymentNotification(Request $request)
     {
 
-        // "username": "Equity",
-        // "password": "3pn!Ty@zoi9",
-        // "billNumber": "123456",
-        // "billAmount": "100",
-        // "CustomerRefNumber": "123456",
-        // "bankreference": "20170101100003485481",
-        // "tranParticular": "BillPayment",
-        // "paymentMode": "cash",
-        // "transactionDate": "01-01-2017 00:00:00",
-        // "phonenumber": "254765555136",
-        // "debitaccount": "0170100094903",
-        // "debitcustname": "HERMAN GITAU NYOTU"
+        Log::info("____________EQB PAYMENT NOTIFICATION  _______________________");
+        Log::info($request->all());
 
+        $this->eqbAuth($request);
+
+        try {
+            $Numbering = (new DocumentsService())
+                ->getNumSerieByObjectId(218);
+
+            $paymentData =  $request->all();
+
+            $exists = ORCP::where('BankRefNo', $paymentData['bankreference'])->exists();
+
+            if (!$exists) {
+                return response()->json([
+                    "responseCode" => "OK",
+                    "responseMessage" => "DUPLICATE TRANSACTION"
+                ]);
+            }
+
+            $payment = [];
+
+            $payment['BusinessKey'] = $paymentData['billNumber'] ?? "";
+            $payment['TransactAmount'] = $paymentData['billAmount'] ?? "";
+            $payment['FirstName'] = $paymentData['debitcustname'] ?? "";
+            $payment['MSISDN'] = $paymentData['phonenumber'] ?? "";
+            $payment['Dscription'] = $paymentData['tranParticular'] ?? "";
+            $payment['TransactDate'] = $paymentData['transactionDate'] ?? "";
+            $payment['TransactType'] = $paymentData['paymentMode'] ?? "";
+            $payment['CardCode'] = $paymentData['CustomerRefNumber'] ?? "";
+            $payment['debitAccNo'] = $paymentData['debitaccount'] ?? "";
+            $payment['BankRefNo'] = $paymentData['bankreference'] ?? "";
+            $payment['DocNum'] =  $Numbering['NextNumber'];
+            $payment['ObjType'] = 218;
+
+            $transaction =   OCRP::create($payment);
+
+            (new SystemDefaults())->updateNextNumberNumberingSeries($Numbering['id']);
+
+            return response()->json([
+                "responseCode" => "OK",
+                "responseMessage" => "SUCCESSFUL"
+            ]);
+        } catch (\Throwable $th) {
+            Log::error('Payment Notification Error' . $th->getMessage());
+            return response()->json([
+                "responseCode" => "OK",
+                "responseMessage" => $th->getMessage()
+            ]);
+        }
+    }
+
+    public function eqbAuth($request)
+    {
+        try {
+            $request->validate([
+                'username' => 'required',
+                'password' => 'required',
+            ]);
+
+            $user = User::where('email', $request->username)
+                ->orWhere('name', $request->username)->first();
+
+            if (!$user) {
+                $data =   [
+                    "amount" => 0,
+                    "billNumber" => "",
+                    "billName" => "",
+                    "description" => "UserName Does Not Exist",
+                    "type" => "1"
+                ];
+                return response()->json($data);
+            }
+            $check = !Hash::check($request->password, $user->password);
+            if ($check) {
+                $data =   [
+                    "amount" => 0,
+                    "billNumber" => "",
+                    "billName" => "",
+                    "description" => "Invalid Password",
+                    "type" => "1"
+                ];
+                return response()->json($data);
+            }
+        } catch (\Throwable $th) {
+            Log::info($th->getMessage());
+            $data =   [
+                "amount" => 0,
+                "billNumber" => "",
+                "billName" => "",
+                "description" => $th->getMessage(),
+                "type" => "1"
+            ];
+            return response()->json($data);
+        }
     }
 }
