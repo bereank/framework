@@ -79,6 +79,7 @@ class PaymentsProcessingController extends Controller
                     $payment['TransactType'] = $paymentData['transactionType'] ?? "";
                     $payment['Balance'] = $paymentData['balance'] ?? "";
                     $payment['DocNum'] =  $Numbering['NextNumber'];
+                    $payment['Source'] = 1;
                     $payment['ObjType'] = 218;
                 }
             }
@@ -295,6 +296,7 @@ class PaymentsProcessingController extends Controller
             $payment['debitAccNo'] = $paymentData['debitaccount'] ?? "";
             $payment['BankRefNo'] = $paymentData['bankreference'] ?? "";
             $payment['DocNum'] =  $Numbering['NextNumber'];
+            $payment['Source'] = 2;
             $payment['ObjType'] = 218;
 
             $transaction =   OCRP::create($payment);
