@@ -299,7 +299,7 @@ class PaymentsProcessingController extends Controller
                     "responseMessage" => "DUPLICATE TRANSACTION"
                 ]);
             }
-
+            $transactionDate = Carbon::parse( $paymentData['transactionDate'] );
             $payment = [];
 
             $payment['BusinessKey'] = $paymentData['billNumber'] ?? "";
@@ -307,7 +307,7 @@ class PaymentsProcessingController extends Controller
             $payment['FirstName'] = $paymentData['debitcustname'] ?? "";
             $payment['MSISDN'] = $paymentData['phonenumber'] ?? "";
             $payment['Dscription'] = $paymentData['tranParticular'] ?? "";
-            $payment['TransactDate'] = $paymentData['transactionDate'] ?? "";
+            $payment['TransactDate'] = $transactionDate ?? "";
             $payment['TransactType'] = $paymentData['paymentMode'] ?? "";
             $payment['CardCode'] = $paymentData['CustomerRefNumber'] ?? "";
             $payment['debitAccNo'] = $paymentData['debitaccount'] ?? "";
