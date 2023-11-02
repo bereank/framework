@@ -73,7 +73,7 @@ class MarketingDocumentService
         }
 
         // Document lines defaulting
-        if ($data['document_lines']) {
+        if (array_key_exists('document_lines', $data) && !empty($data['document_lines'])) {
             $documentLines = $data['document_lines'];
             foreach ($documentLines as $key => $line) {
                 $lineNum =   $key;
@@ -99,7 +99,7 @@ class MarketingDocumentService
                     if ($user_data->oudg->Warehouse) {
                         $documentLines[$key]['WhsCode'] =  $user_data->oudg->Warehouse;
                     } else {
-                        if ($itemDetails) {
+                        if (isset($itemDetails) && $itemDetails) {
                             $documentLines[$key]['WhsCode'] = $itemDetails['DfltWH'];
                         }
                     }
@@ -122,61 +122,63 @@ class MarketingDocumentService
     }
     public function validateFields($docData, $ObjType)
     {
+
         $TargetTables = APDI::with('pdi1')
             ->where('ObjectID', $ObjType)
             ->first();
 
         if (!$TargetTables) {
             return (new ApiResponseService())
-                ->apiFailedResponseService("Not found document with objtype " . $ObjType);
+                ->apiSuccessAbortProcessResponse("Not found document with objtype " . $ObjType);
         }
 
         if (empty($docData['CardCode']) && $ObjType != 205) {
             return (new ApiResponseService())
-                ->apiFailedResponseService("Customer is Required");
+                ->apiSuccessAbortProcessResponse("Customer is Required");
         } else {
             $customerDetails = OCRD::where('CardCode', $docData['CardCode'])->first();
 
             if (!$customerDetails) {
                 return (new ApiResponseService())
-                    ->apiFailedResponseService("Customer Does Not Exist");
+                    ->apiSuccessAbortProcessResponse("Customer Does Not Exist");
             }
         }
 
 
-        if ($docData['DiscPrcnt'] > 100) {
+        if (array_key_exists('DiscPrcnt', $docData) && $docData['DiscPrcnt'] > 100) {
             return (new ApiResponseService())
-                ->apiFailedResponseService("Invalid Discount Percentage");
+                ->apiSuccessAbortProcessResponse("Invalid Discount Percentage");
         }
 
         if (!$docData['DocDueDate'] && $ObjType != 205) {
             return (new ApiResponseService())
-                ->apiFailedResponseService("Delivery Date Required");
+                ->apiSuccessAbortProcessResponse("Delivery Date Required");
         }
 
         if ($ObjType == 205) {
             if (!$docData['ReqType']) {
                 return (new ApiResponseService())
-                    ->apiFailedResponseService("Request Type is required");
+                    ->apiSuccessAbortProcessResponse("Request Type is required");
             }
 
             if (!$docData['Requester']) {
                 return (new ApiResponseService())
-                    ->apiFailedResponseService("Requester is required");
+                    ->apiSuccessAbortProcessResponse("Requester is required");
             }
 
             if (!$docData['ReqDate']) {
                 return (new ApiResponseService())
-                    ->apiFailedResponseService("Required date is required");
+                    ->apiSuccessAbortProcessResponse("Required date is required");
             }
         }
 
-        if (count($docData['document_lines']) <= 0) {
-            (new ApiResponseService())->apiSuccessAbortProcessResponse("Items is required");
-        }
-        $this->documentRowValidation($docData, $ObjType);
+        if (!array_key_exists('document_lines', $docData) || count($docData['document_lines']) <= 0) {
+            return (new ApiResponseService())->apiSuccessAbortProcessResponse("Items is required");
+        } else {
+            $this->documentRowValidation($docData, $ObjType);
 
-        return $docData;
+            return $docData;
+        }
     }
 
 
@@ -190,19 +192,44 @@ class MarketingDocumentService
 
         foreach ($document_lines as $key => $value) {
 
-            if ($value['Quantity'] <= 0) {
+            if (!isset($value['Dscription'])) {
                 return (new ApiResponseService())
-                    ->apiFailedResponseService("Invalid quantity   for item:" . $value['Dscription']);
+                    ->apiSuccessAbortProcessResponse("Dscription id Required for item:");
             }
 
-            if ($value['Price'] < 0) {
-                return (new ApiResponseService())
-                    ->apiFailedResponseService("Invalid price for item:" . $value['Dscription']);
+            /**
+             * Item VALIDATIONS
+             */
+
+            if ($docData['DocType'] == "I") {
+                if (!isset($value["ItemCode"])) {
+                    return (new ApiResponseService())->apiSuccessAbortProcessResponse("Item Is Required !");
+                }
+                $product = OITM::Where('ItemCode', $value['ItemCode'])
+                    ->first();
+                if (!$product) {
+                    return (new ApiResponseService())->apiSuccessAbortProcessResponse("Items Does Not Exist");
+                }
+
+                if (array_key_exists('DiscPrcnt', $value) && $value['DiscPrcnt'] > 0 && $product->QryGroup61 == "Y") {
+                    return (new ApiResponseService())->apiSuccessAbortProcessResponse("Following Item Does not allow discount:" . $value['Dscription']);
+                }
             }
 
-            if (!$value['WhsCode']) {
+            if (!isset($value['Quantity']) || $value['Quantity'] <= 0) {
                 return (new ApiResponseService())
-                    ->apiFailedResponseService("Warehouse Required");
+                    ->apiSuccessAbortProcessResponse("Invalid quantity   for item:" . $value['Dscription'] ?? "");
+            }
+
+            if (!isset($value['Price']) || $value['Price'] < 0) {
+                return (new ApiResponseService())
+                    ->apiSuccessAbortProcessResponse("Invalid price for item:" . $value['Dscription'] ?? "");
+            }
+
+
+            if (!isset($value['WhsCode'])) {
+                return (new ApiResponseService())
+                    ->apiSuccessAbortProcessResponse("Warehouse (WhsCode) Required for item:");
             }
 
             /**
@@ -222,31 +249,17 @@ class MarketingDocumentService
 
             $checkStockAvailabilty = false;
 
-            if (($ObjType == 13 && $docData['BaseType'] != 15) || $ObjType == 15) {
-                $checkStockAvailabilty = true;
-            }
-
-            /**
-             * Item VALIDATIONS
-             */
-
-            if ($docData['DocType'] == "I") {
-                $product = OITM::Where('ItemCode', $value['ItemCode'])
-                    ->first();
-                if (!$product) {
-                    (new ApiResponseService())->apiSuccessAbortProcessResponse("Items Required");
-                }
-
-                if (array_key_exists('DiscPrcnt', $value) && $value['DiscPrcnt'] > 0 && $product->QryGroup61 == "Y") {
-                    (new ApiResponseService())->apiSuccessAbortProcessResponse("Following Item Does not allow discount:" . $value['Dscription']);
+            if (isset($docData['BaseType'])) {
+                if (($ObjType == 13 && $docData['BaseType'] != 15) || $ObjType == 15) {
+                    $checkStockAvailabilty = true;
                 }
             }
 
             if (array_key_exists('DiscPrcnt', $value) && $value['DiscPrcnt'] > 100) {
-                (new ApiResponseService())->apiSuccessAbortProcessResponse("Invalid Discount Percentage");
+                return (new ApiResponseService())->apiSuccessAbortProcessResponse("Invalid Discount Percentage");
             }
             if (!isset($value['TaxCode'])) {
-                (new ApiResponseService())
+                return (new ApiResponseService())
                     ->apiSuccessAbortProcessResponse("Select Tax Code for item " . $value['ItemCode'] ?? "");
             }
             // If Not Sales Order the Inventory Quantities should be Greater
@@ -260,7 +273,7 @@ class MarketingDocumentService
 
                     if (!$inventoryDetails || $inventoryDetails->OnHand < $value['Quantity']) {
                         return (new ApiResponseService())
-                            ->apiFailedResponseService("Insufficient stock for item:" . $value['Dscription']);
+                            ->apiSuccessAbortProcessResponse("Insufficient stock for item:" . $value['Dscription']);
                     }
                 }
             }
@@ -297,12 +310,12 @@ class MarketingDocumentService
                 'CntctCode' => $data['CntctCode']  ?? null, //Contact Person
                 'AgrNo' => $data['AgrNo']  ?? null,
                 'LicTradNum' => $data['LicTradNum']  ?? null,
-                'BaseEntry' => $data['BaseEntry'] ? $data['BaseEntry'] : null, //BaseKey
+                'BaseEntry' => $data['BaseEntry'] ?? null, //BaseKey
                 'BaseType' => $data['BaseType'] ?? "1", //BaseKey
                 'UserSign' => $data['UserSign'] ?? null,
-                'Ref2' => $data['Ref2'] ? $data['Ref2'] : null, // Ref2
-                'GroupNum' => $data['GroupNum'] ? $data['GroupNum'] : null, //[Price List]
-                'ToWhsCode' => $data['ToWhsCode'] ? $data['ToWhsCode'] : null, //To Warehouse Code
+                'Ref2' => $data['Ref2'] ?? null, // Ref2
+                'GroupNum' => $data['GroupNum'] ?? null, //[Price List]
+                'ToWhsCode' => $data['ToWhsCode'] ?? null, //To Warehouse Code
                 //SeriesDocument
                 'DiscPrcnt' => $data['DiscPrcnt'] ?? 0, //Discount Percentages
                 'DiscSum' => $data['DiscSum']  ?? null, // Discount Sum
@@ -393,7 +406,7 @@ class MarketingDocumentService
             Log::error($th->getMessage());
             DB::connection("tenant")->rollback();
             return (new ApiResponseService())
-                ->apiFailedResponseService("Process failed, Server Error", $th->getMessage());
+                ->apiSuccessAbortProcessResponse("Process failed, Server Error" . $th->getMessage());
         }
     }
 }

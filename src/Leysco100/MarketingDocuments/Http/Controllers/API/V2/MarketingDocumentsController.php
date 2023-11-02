@@ -8,11 +8,8 @@ use Illuminate\Support\Facades\Validator;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Services\AuthorizationService;
-use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
 use Leysco100\Shared\Models\Administration\Models\EOTS;
 use Leysco100\Shared\Models\Administration\Models\User;
-use Leysco100\MarketingDocuments\Actions\MapApiFieldAction;
-use Leysco100\MarketingDocuments\Services\DocumentsService;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;
 use Leysco100\MarketingDocuments\Services\MarketingDocumentService;
 
@@ -148,12 +145,12 @@ class MarketingDocumentsController extends Controller
         }
 
         // Step 2: Default Fields
-        $defaulted_data = (new MarketingDocumentService())->fieldsDefaulting($request);
+        $defaulted_data = (new MarketingDocumentService())->fieldsDefaulting($request->all());
 
         // Step 3: Validate Document Fields
         $validatedFields  = (new MarketingDocumentService())->validateFields($defaulted_data,$request['ObjType']);
 
-        // return    $validatedFields;
+        
         // $validatedFields = (new MapApiFieldAction())->handle($defaulted_data, $TargetTables);
 
         // Step 4: Create Document
