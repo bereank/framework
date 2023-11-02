@@ -30,7 +30,7 @@
 | :--- | ----: |
 | Total Scans | {{$summaryReport['totalYesterdayScans']}} |
 | Total Successfull Released Documents| {{$summaryReport['totalSuccessfulReleased']}}
-| Total Successfull Not Yet Released Documents | {{$summaryReport['totalSuccessfulNotReleased']}} |
+| Total Successfull (Cancelled Documents) | {{$summaryReport['totalSuccessfulNotReleased']}} |
 | Total Does Not Exist Scans | {{$summaryReport['totalFaildDoesNotExistY']}} |
 | Total Duplicate Scans | {{$summaryReport['totalFailedDuplicateY']}} |
 | Total Cancelled Scans | {{$summaryReport['totalCancelledLogs']}} |

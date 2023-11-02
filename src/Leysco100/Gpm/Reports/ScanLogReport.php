@@ -47,6 +47,10 @@ class ScanLogReport implements FromCollection, WithHeadings, WithMapping, Should
             if ($value->Released == 1) {
                 $value->ReleaseDesc = "Released";
             }
+            if ($value->Released == 0 && $value->Status == 0) {
+                $value->ResultDesc = "Successfull (Cancelled)";
+                $value->ReleaseDesc = "Not Released";
+            }
         }
         return $scan_log_report;
     }

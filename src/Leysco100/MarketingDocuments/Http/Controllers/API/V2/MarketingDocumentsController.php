@@ -134,6 +134,10 @@ class MarketingDocumentsController extends Controller
             'ObjType' => 'required',
         ]);
 
+        if ($validator->fails()) {
+            return (new ApiResponseService())->apiSuccessAbortProcessResponse($validator->errors());
+        }
+
         $TargetTables = APDI::with('pdi1')
             ->where('ObjectID', $request['ObjType'])
             ->first();
@@ -143,14 +147,14 @@ class MarketingDocumentsController extends Controller
                 ->apiFailedResponseService("Not found document with objtype " . $request['ObjType']);
         }
 
-        if ($validator->fails()) {
-            return (new ApiResponseService())->apiSuccessAbortProcessResponse($validator->errors());
-        }
         // Step 2: Default Fields
         $defaulted_data = (new MarketingDocumentService())->fieldsDefaulting($request);
 
         // Step 3: Validate Document Fields
-        $validatedFields = (new MapApiFieldAction())->handle($defaulted_data, $TargetTables);
+        $validatedFields  = (new MarketingDocumentService())->validateFields($defaulted_data,$request['ObjType']);
+
+        // return    $validatedFields;
+        // $validatedFields = (new MapApiFieldAction())->handle($defaulted_data, $TargetTables);
 
         // Step 4: Create Document
         return (new MarketingDocumentService())->createDoc($validatedFields, $TargetTables, $request['ObjType']);
