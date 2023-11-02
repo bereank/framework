@@ -33,7 +33,7 @@ class MItemController extends Controller
         $search = \Request::get('filter');
         $all = \Request::get('all');
         $data = OITM::select('id', 'ItemName', 'ItemCode', 'UgpEntry',
-         'SUoMEntry', 'OnHand','frozenFor')
+         'SUoMEntry','VatGourpSa', 'OnHand','frozenFor')
             ->where(function ($q) use ($search) {
                 if ($search) {
                     $q->where('ItemCode', 'LIKE', "%$search%")

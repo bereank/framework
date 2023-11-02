@@ -19,6 +19,8 @@ return new class extends Migration
             $table->integer('Location')->nullable();
             $table->string('ColName', 30)->nullable();
             $table->boolean('Link')->default(0);
+            $table->integer('QueryId')->nullable();
+            $table->string('QName', 30)->nullable();
             $table->timestamps();
         });
     }

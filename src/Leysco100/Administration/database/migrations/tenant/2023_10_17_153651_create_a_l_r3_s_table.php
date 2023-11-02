@@ -21,6 +21,8 @@ return new class extends Migration
             $table->string('Value', 254)->nullable();
             $table->string('ObjType', 20)->nullable();
             $table->string('KeyStr', 254)->nullable();
+            $table->integer('QueryId')->nullable();
+            $table->string('QName', 30)->nullable();
             $table->timestamps();
         });
     }
