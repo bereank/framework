@@ -78,7 +78,7 @@ class DublicateScanLogs implements FromCollection, WithHeadings, WithMapping, Sh
             $scan_log->gates->Name ?? "",
             $scan_log->creator->name ?? "",
             $scan_log->Phone ?? "N/A",
-            $scan_log->objecttype->DocumentName,
+            $scan_log->objecttype->DocumentName??"N/A",
             $scan_log->DocNum,
             $scan_log->ResultDesc,
             $scan_log->created_at,
