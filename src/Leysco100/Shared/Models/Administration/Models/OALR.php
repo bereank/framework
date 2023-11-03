@@ -21,10 +21,8 @@ class OALR extends Model
         return $this->belongsTo(User::class, 'UserSign');
     }
 
-    public function template()
+    public function alert_template()
     {
         return $this->belongsTo(OALT::class, 'TCode');
     }
-
-    
 }

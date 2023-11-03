@@ -22,6 +22,22 @@ class OALT extends Model
     {
         return $this->hasMany(ALT2::class, 'DocEntry');
     }
+    public function alt4()
+    {
+        return $this->hasMany(ALT4::class, 'DocEntry');
+    }
+    public function alt3()
+    {
+        return $this->hasMany(ALT3::class, 'DocEntry');
+    }
+    public function alt5()
+    {
+        return $this->hasOne(ALT5::class, 'DocEntry');
+    }
+    public function alt6()
+    {
+        return $this->hasMany(ALT6::class, 'AlertId');
+    }
     public function saved_query()
     {
         return $this->belongsTo(OUQR::class, 'QueryId');
