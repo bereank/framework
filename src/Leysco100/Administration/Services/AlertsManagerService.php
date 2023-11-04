@@ -66,7 +66,7 @@ class AlertsManagerService
     {
 
         $currentTime = Carbon::now();
-        $Next = $currentTime->addHours($FrqncyIntr);
+        $Next = $currentTime->setTime($currentTime->hour, 0, 0)->addHours($FrqncyIntr);
         $NextTime = $Next->format('H:i');
         $NextDay = $Next->format('Y-m-d');
         $Time = Carbon::now()->format('H:i');
