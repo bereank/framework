@@ -3,11 +3,16 @@
 namespace Leysco100\Administration\Http\Controllers\Setup\Inventory;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Leysco100\Administration\Http\Controllers\Controller;
-use Leysco100\Shared\Models\InventoryAndProduction\Models\OWHS;
+use Illuminate\Support\Facades\Auth;
+use Leysco100\Shared\Models\Finance\Models\ACP10;
 use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Administration\Http\Controllers\Controller;
+use Leysco100\Shared\Models\Finance\Models\ChartOfAccount;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OBSL;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OITW;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OWHS;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\WHS1;
 
 class WarehouseController extends Controller
 {
@@ -19,15 +24,15 @@ class WarehouseController extends Controller
     public function index()
     {
         try {
-            $user = Auth::user();
-            $BPLId = \Request::get('branchID');
-            $data = OWHS::where(function ($q) use ($BPLId) {
-                if ($BPLId) {
-                    $q->where('BPLId', $BPLId)
-                        ->orWhereIn('WhsCode', ['L001', 'IMPGIT']);
-                }
-            })->get();
-
+            // $user = Auth::user();
+            // $BPLId = \Request::get('branchID');
+            // $data = OWHS::where(function ($q) use ($BPLId) {
+            //     if ($BPLId) {
+            //         $q->where('BPLId', $BPLId)
+            //             ->orWhereIn('WhsCode', ['L001', 'IMPGIT']);
+            //     }
+            // })->get();
+            $data = OWHS::get();
             return (new ApiResponseService())
                 ->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
@@ -67,7 +72,21 @@ class WarehouseController extends Controller
             $newWaharehouse = OWHS::create([
                 'WhsCode' => $request['WhsCode'],
                 'WhsName' => $request['WhsName'],
+                'BinActivat' => $request['BinActivat'],
             ]);
+
+            if ($newWaharehouse->BinActivat) {
+                $details = [
+                    'BinSeptor' => $request['BinSeptor'],
+                    'DftBinEnfd' => $request['DftBinEnfd'],
+                    'AutoIssMtd' => $request['AutoIssMtd'],
+                    'AutoRecvMd' => $request['AutoRecvMd'],
+                    'RecvMaxWT' => $request['RecvMaxWT'],
+                    'RecBinEnab' => $request['RecBinEnab'],
+                    'RecvMaxQty' => $request['RecvMaxQty'],
+                ];
+                OWHS::where('id', $newWaharehouse->id)->update($details);
+            }
 
             foreach ($request['document_lines'] as $key => $value) {
                 $oacp = ACP10::where('PrdCtgyCode', 1)
@@ -152,9 +171,23 @@ class WarehouseController extends Controller
         try {
             $details = [
                 'WhsName' => $request['WhsName'],
+                'BinActivat' => $request['BinActivat'],
             ];
-            OWHS::where('id', $id)->update($details);
-
+            
+            $warehouse =  OWHS::where('id', $id)->update($details);
+            //bin location data 
+            if ($warehouse->BinActivat) {
+                $details = [
+                    'BinSeptor' => $request['BinSeptor'],
+                    'DftBinEnfd' => $request['DftBinEnfd'],
+                    'AutoIssMtd' => $request['AutoIssMtd'],
+                    'AutoRecvMd' => $request['AutoRecvMd'],
+                    'RecvMaxWT' => $request['RecvMaxWT'],
+                    'RecBinEnab' => $request['RecBinEnab'],
+                    'RecvMaxQty' => $request['RecvMaxQty'],
+                ];
+                OWHS::where('id', $id)->update($details);
+            }
             foreach ($request['whs1'] as $key => $value) {
                 $listdetals = [
                     'AcctCode' => $value['AcctCode'],
@@ -180,7 +213,7 @@ class WarehouseController extends Controller
      */
     public function destroy($id)
     {
-        $data = Warehouse::findOrFail($id);
+        $data = OWHS::findOrFail($id);
         $data->delete();
     }
 }
