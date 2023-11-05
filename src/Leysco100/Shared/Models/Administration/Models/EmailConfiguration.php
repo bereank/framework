@@ -10,7 +10,6 @@ use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 class EmailConfiguration extends Model
 {
     use HasFactory, UsesTenantConnection;
-    //numbering series
     protected $guarded = ['id'];
  
     public function creator()

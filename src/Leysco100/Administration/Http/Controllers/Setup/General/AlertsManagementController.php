@@ -49,7 +49,7 @@ class AlertsManagementController extends Controller
      */
     public function store(Request $request)
     {
-        Log::info($request);
+     
         try {
             $validatedData = $request->validate([
                 'Code' => 'nullable|string',
@@ -116,6 +116,7 @@ class AlertsManagementController extends Controller
             //     'CompanyID' => $request['CompanyID'] ?? null,
             // ]);
             if ($request['alt1']) {
+
                 foreach ($request['alt1'] as $user) {
                     ALT1::create([
                         'DocEntry' => $data->id,
@@ -209,10 +210,9 @@ class AlertsManagementController extends Controller
             if ($alertData) {
                 $alertData->alt4 = $alertData->alt4->map->only('QueryId');
                 $alertData->alt6 = $alertData->alt6->map->only('QueryId');
-                Log::info($alertData->alt4);
             }
 
-            Log::info($alertData);
+
             return (new ApiResponseService())->apiSuccessResponseService($alertData);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
@@ -276,15 +276,21 @@ class AlertsManagementController extends Controller
             ]);
 
             if (array_key_exists('alt1',  $validatedData)) {
+
                 $existing = ALT1::where('DocEntry', $id)->pluck('UserSign');
+
                 $updated = collect($request['alt1'])->pluck('UserSign');
+
                 $removed = $existing->diff($updated);
+
                 foreach ($request['alt1'] as $user) {
-                    $user_exists =     ALT1::where('UserSign', $user['UserSign'])->first();
+                
+                    $user_exists =     ALT1::where('DocEntry', $id)->where('UserSign', $user['UserSign'])->first();
+
                     if ($user_exists) {
-                        ALT1::where('UserSign', $user['UserSign'])->update(
+                        ALT1::where('UserSign', $user['UserSign'])->where('DocEntry', $id)->update(
                             [
-                                'DocEntry' => $id,
+                                'DocEntry' =>  $id,
                                 'UserSign' =>  $user['UserSign'],
                                 'Code' =>  $request['Code'] ?? null,
                                 'SendIntrnl' =>  $user['SendIntrnl'] ?? false,
@@ -308,19 +314,22 @@ class AlertsManagementController extends Controller
                     }
                 }
                 foreach ($removed as $remvd) {
-                    ALT1::where('UserSign', $remvd)->delete();
+                    ALT1::where('DocEntry', $id)->where('UserSign', $remvd)->delete();
                 }
             }
 
 
             if (array_key_exists('alt2',  $validatedData)) {
                 $existing = ALT2::where('DocEntry', $id)->pluck('GroupId');
+                
                 $updated = collect($request['alt2'])->pluck('GroupId');
-                $removed = $existing->diff($updated);
+                
+                $removed = $existing->diff($updated);   
+
                 foreach ($request['alt2'] as $group) {
-                    $group_exists =     ALT2::where('GroupId', $group['GroupId'])->first();
+                    $group_exists =     ALT2::where('DocEntry', $id)->where('GroupId', $group['GroupId'])->first();
                     if ($group_exists) {
-                        ALT2::where('GroupId', $group['GroupId'])->update(
+                        ALT2::where('GroupId', $group['GroupId'])->where('DocEntry', $id)->update(
                             [
                                 'DocEntry' => $id,
                                 'GroupId' => $group['GroupId'],
@@ -346,7 +355,7 @@ class AlertsManagementController extends Controller
                     }
                 }
                 foreach ($removed as $remvd) {
-                    ALT2::where('GroupId', $remvd)->delete();
+                    ALT2::where('DocEntry', $id)->where('GroupId', $remvd)->delete();
                 }
             }
 
@@ -361,10 +370,10 @@ class AlertsManagementController extends Controller
                 $removed = $existing->diff($updated);
 
                 foreach ($request['alt4'] as $QueryId) {
-                    $query_exists =  ALT4::where('QueryId', $QueryId)->first();
+                    $query_exists =  ALT4::where('QueryId', $QueryId)->where('DocEntry', $id)->first();
 
                     if ($query_exists) {
-                        ALT4::where('QueryId', $QueryId)->update(
+                        ALT4::where('QueryId', $QueryId)->where('DocEntry', $id)->update(
                             [
                                 'DocEntry' => $id,
                                 'QueryId' => $QueryId,
@@ -383,13 +392,13 @@ class AlertsManagementController extends Controller
                     }
                 }
                 foreach ($removed as $remvd) {
-                    ALT4::where('QueryId', $remvd)->delete();
+                    ALT4::where('DocEntry', $id)->where('QueryId', $remvd)->delete();
                 }
             }
             //alert mail template
             if (array_key_exists('alt5',  $validatedData)) {
                 Log::info($request['alt5']);
-                $alert_template =   ALT5::where('DocEntry', $id)->update(
+                $alert_template =   ALT5::where('DocEntry', $id)->where('DocEntry', $id)->update(
                     [
                         'DocEntry' => $id,
                         'UserSign' => Auth::user()->id,
@@ -411,7 +420,7 @@ class AlertsManagementController extends Controller
                 foreach ($request['alt6'] as $atchmt_query) {
                     $query_exists =  ALT6::where('QueryId',  $atchmt_query)->first();
                     if ($query_exists) {
-                        ALT6::where('QueryId', $id)->update(
+                        ALT6::where('QueryId', $id)->where('DocEntry', $id)->update(
                             [
                                 'DocEntry' => $alert_template->id ?? null,
                                 'UserSign' => Auth::user()->id,
@@ -431,7 +440,7 @@ class AlertsManagementController extends Controller
                     }
                 }
                 foreach ($removed as $remvd) {
-                    ALT6::where('QueryId', $remvd)->delete();
+                    ALT6::where('DocEntry', $id)->where('QueryId', $remvd)->delete();
                 }
             }
             return (new ApiResponseService())->apiSuccessResponseService("Updated Successfully !!");

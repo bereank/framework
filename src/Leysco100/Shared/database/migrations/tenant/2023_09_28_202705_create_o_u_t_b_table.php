@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('o_u_t_b', function (Blueprint $table) {
             $table->id();
-            $table->integer('CufdID');
-            $table->integer('ObjType');
+            $table->integer('ObjectType');
             $table->string('TableName')->nullable();
             $table->string('Descr')->nullable();
             $table->string('TableID')->nullable();
