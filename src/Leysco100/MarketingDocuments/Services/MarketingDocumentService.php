@@ -16,6 +16,7 @@ use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITW;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
 
 class MarketingDocumentService
 {
@@ -122,6 +123,28 @@ class MarketingDocumentService
     }
     public function validateFields($docData, $ObjType)
     {
+        //If Base Type Exist
+        if ($docData['BaseType'] && $docData['BaseEntry']) {
+            $generalSettings = OADM::where('id', 1)->value('copyToUnsyncDocs');
+            $BaseTables = APDI::with('pdi1')
+                ->where('ObjectID', $docData['BaseType'])
+                ->first();
+            $baseDocHeader = $BaseTables->ObjectHeaderTable::where('id', $docData['BaseEntry'])
+                ->first();
+            $docData['CardCode'] = $baseDocHeader->CardCode;
+            if ($generalSettings == 1 && $baseDocHeader->ExtRef == null) {
+                return (new ApiResponseService())
+                    ->apiFailedResponseService("Copy to is Disable for Documents Pending syncing ");
+            }
+            if ($baseDocHeader->DocStatus == "C") {
+                return (new ApiResponseService())
+                    ->apiFailedResponseService("Copying to not Possible, Base Document is closed");
+            }
+        }
+
+        $ObjType = (int) $docData['ObjType'];
+
+        $docData['saveToDraft']  = false;
 
         $TargetTables = APDI::with('pdi1')
             ->where('ObjectID', $ObjType)
@@ -130,6 +153,15 @@ class MarketingDocumentService
         if (!$TargetTables) {
             return (new ApiResponseService())
                 ->apiSuccessAbortProcessResponse("Not found document with objtype " . $ObjType);
+        }
+        /**
+         * Check if The Item has External Approval
+         */
+        if ($TargetTables->hasExtApproval == 1) {
+            $docData['saveToDraft'] = true;
+            $TargetTables = APDI::with('pdi1')
+                ->where('ObjectID', 112)
+                ->first();
         }
 
         if (empty($docData['CardCode']) && $ObjType != 205) {
@@ -277,6 +309,30 @@ class MarketingDocumentService
                     }
                 }
             }
+
+            //Serial Number Validations
+            if ($product->ManSerNum == "Y") {
+                if ($value['ObjType'] == 14 || $value['ObjType'] == 16 || $docData['saveToDraft'] = true) {
+                    if (!isset($value['SerialNumbers']) || $value['Quantity'] != count($value['SerialNumbers'])) {
+                        return (new ApiResponseService())
+                            ->apiFailedResponseService("Serial number required  for item:" . $value['Dscription']);
+                    }
+                }
+
+                if ($value['ObjType'] == 15) {
+                    if (!isset($value['SerialNumbers']) || $value['Quantity'] != count($value['SerialNumbers'])) {
+                        return (new ApiResponseService())
+                            ->apiFailedResponseService("Serial number required  for item:" . $value['Dscription']);
+                    }
+                }
+
+                if ($value['ObjType'] == 13 && $value['BaseType'] != 15) {
+                    if (!isset($value['SerialNumbers']) || $value['Quantity'] != count($value['SerialNumbers'])) {
+                        return (new ApiResponseService())
+                            ->apiFailedResponseService("Serial number required  for item:" . $value['Dscription']);
+                    }
+                }
+            }
         }
     }
 
@@ -284,8 +340,16 @@ class MarketingDocumentService
     public function createDoc($data, $TargetTables, $ObjType)
     {
         DB::connection("tenant")->beginTransaction();
-        try {
+        //If Base Type Exist
+        if ($data['BaseType'] && $data['BaseEntry']) {
+            $BaseTables = APDI::with('pdi1')
+                ->where('ObjectID', $data['BaseType'])
+                ->first();
 
+            $baseDocHeader = $BaseTables->ObjectHeaderTable::where('id', $data['BaseEntry'])
+                ->first();
+        }
+        try {
             $NewDocDetails = [
                 'ObjType' => $data['ObjType']  ?? null,
                 'DocType' => $data['DocType']  ?? null,
@@ -335,6 +399,9 @@ class MarketingDocumentService
             $newDoc = new $TargetTables->ObjectHeaderTable(array_filter($NewDocDetails));
 
             $newDoc->save();
+
+            // Document Rows
+            $documentRows = [];
             foreach ($data['document_lines'] as $key => $value) {
                 $LineNum = $key;
                 $rowdetails = [
@@ -395,12 +462,51 @@ class MarketingDocumentService
                     'Weight1' => $data['Weight1'] ?? 0,
 
                 ];
+
+                $rowItems = new $TargetTables->pdi1[0]['ChildTable']($rowdetails);
+                $rowItems->save();
+                if ($data['DocType'] == "I" && $value['ManSerNum'] == "Y") {
+                    $saveSerialDetails = false;
+                    if ($data['ObjType'] == 14 || $data['ObjType'] == 16 || $data['ObjType'] == 17) {
+                        $saveSerialDetails = true;
+                    }
+                    if ($data['ObjType'] == 15) {
+                        $saveSerialDetails = true;
+                    }
+                    if ($data['ObjType'] == 13 && $data['BaseType'] != 15) {
+                        $saveSerialDetails = true;
+                    }
+                    if ($saveSerialDetails) {
+                        foreach ($value['SerialNumbers'] as $key => $serial) {
+                            $LineNum = $key;
+                            SRI1::create([
+                                "ItemCode" => $value['ItemCode'],
+                                "SysSerial" => $serial['SysNumber'] ?? $serial['SysSerial'],
+                                "LineNum" => $rowItems->id,
+                                "BaseType" => $value['saveToDraft'] ? 112 : $ObjType,
+                                "BaseEntry" => $newDoc->id,
+                                "CardCode" => $data['CardCode'],
+                                "CardName" => $data['CardName'],
+                                "WhsCode" => $value['WhsCode'],
+                                "ItemName" => $data['Dscription'],
+                            ]);
+                        }
+                    }
+                }
+
+                if ($data['BaseType'] && $data['BaseEntry']) {
+                    $baseDocHeader->update([
+                        'DocStatus' => "C",
+                    ]);
+                }
+                array_push($documentRows, $rowItems);
             }
-            $rowItems = new $TargetTables->pdi1[0]['ChildTable']($rowdetails);
-            $rowItems->save();
+            Log::info([$documentRows]);
+
             (new SystemDefaults())->updateNextNumberNumberingSeries($data['Series']);
 
             DB::connection("tenant")->commit();
+
             return (new ApiResponseService())->apiSuccessResponseService($newDoc);
         } catch (\Throwable $th) {
             Log::error($th->getMessage());
