@@ -2,6 +2,7 @@
 
 namespace Leysco100\MarketingDocuments\Http\Controllers\API\V2;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -25,13 +26,19 @@ class MarketingDocumentsController extends Controller
         $docNum = \Request::get('docNum');
         $page = $request->input('page', 1);
         $perPage = $request->input('per_page', 50);
+
+        $StartDate = request()->filled('StartDate') ? Carbon::parse(request()->input('StartDate'))->startOfDay() : Carbon::now()->startOfMonth();
+
+        $EndDate = request()->filled('EndDate') ? Carbon::parse(request()->input('EndDate'))->endOfDay() : Carbon::now()->endOfMonth();
+
         $user = User::where('id', Auth::user()->id)->with('oudg')->first();
+
         $tableObjType = $ObjType;
         if ($isDoc == 0) {
             $tableObjType = 112;
         }
-        $StartDate = $request['StartDate'];
-        $EndDate = $request['EndDate'];
+
+
         $DocumentTables = APDI::with('pdi1')
             ->where('ObjectID', $tableObjType)
             ->first();
@@ -148,9 +155,9 @@ class MarketingDocumentsController extends Controller
         $defaulted_data = (new MarketingDocumentService())->fieldsDefaulting($request->all());
 
         // Step 3: Validate Document Fields
-        $validatedFields  = (new MarketingDocumentService())->validateFields($defaulted_data,$request['ObjType']);
+        $validatedFields  = (new MarketingDocumentService())->validateFields($defaulted_data, $request['ObjType']);
 
-        
+
         // $validatedFields = (new MapApiFieldAction())->handle($defaulted_data, $TargetTables);
 
         // Step 4: Create Document
