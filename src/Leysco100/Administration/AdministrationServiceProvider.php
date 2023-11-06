@@ -4,10 +4,11 @@ namespace Leysco100\Administration;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Leysco100\Administration\Console\AdministrationInstallCommand;
 use Leysco100\Administration\Console\CreatePermissions;
-use Leysco100\Administration\Console\Setup\CreateUserFormSettings;
+use Leysco100\Administration\Console\BinFieldActivationCommand;
 use Leysco100\Administration\Console\Setup\ImportNumberingSeries;
+use Leysco100\Administration\Console\AdministrationInstallCommand;
+use Leysco100\Administration\Console\Setup\CreateUserFormSettings;
 
 class AdministrationServiceProvider extends ServiceProvider
 {
@@ -33,7 +34,8 @@ class AdministrationServiceProvider extends ServiceProvider
                 AdministrationInstallCommand::class,
                 CreatePermissions::class,
                 ImportNumberingSeries::class,
-                CreateUserFormSettings::class
+                CreateUserFormSettings::class,
+                BinFieldActivationCommand::class,
             ]);
         }
 
