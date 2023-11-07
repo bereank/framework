@@ -902,11 +902,16 @@ class DocumentController extends Controller
         if (!$data){
             return (new ApiResponseService())->apiFailedResponseService("Error Document not found");
         }
-        try {
-            if ($request['files']) {
+
+        if (isset($request['files'])){
+            try {
                 $attachment = new OATC();
                 $attachment->ExtRef = $ExtRefAtcEntry;
                 $attachment->save();
+
+                $data->update([
+                    "AtcEntry" => $attachment->id
+                ]);
                 foreach ($request['files'] as $key => $value) {
                     $fileUpload = new ATC1();
                     $fileUpload->AbsEntry = $attachment->id;
@@ -919,15 +924,13 @@ class DocumentController extends Controller
                     $fileUpload->UsrID = Auth::user()->id;
                     $fileUpload->save();
                 }
+                return (new ApiResponseService())->apiSuccessResponseService("Uploaded Successfully");
+            } catch (\Throwable $th) {
+                Log::info($th);
+                return (new ApiResponseService())->apiFailedResponseService("Error uploading attachment");
             }
-            $data->update([
-                "AtcEntry" => $attachment->id
-            ]);
-            return (new ApiResponseService())->apiSuccessResponseService("Uploaded Successfully");
-        } catch (\Throwable $th) {
-            Log::info($th);
-            return (new ApiResponseService())->apiFailedResponseService("Error Uploading attachments");
         }
+        return (new ApiResponseService())->apiFailedResponseService("No attachment files found");
     }
 
     //UpdateDocument
