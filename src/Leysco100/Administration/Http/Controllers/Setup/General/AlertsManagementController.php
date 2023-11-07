@@ -71,7 +71,7 @@ class AlertsManagementController extends Controller
                 $request['ExecTime'],
                 $request['ExecDaY']
             );
-            $data =   OALT::create([
+            $alert_data =   OALT::create([
                 'Code' =>  $request['Code'],
                 'Name' => $request['Name'],
                 'Type' => $request['Type'],
@@ -97,29 +97,12 @@ class AlertsManagementController extends Controller
                 'History' =>  $request['History'] ?? null,
                 'QCategory' =>  $request['QCategory'] ?? null,
             ]);
-            // OALR::create([
-            //     'Code' =>  $data->id,
-            //     'Type' =>  $request['Type'] ?? null,
-            //     'Priority' =>  $request['Priority'] ?? null,
-            //     'TCode' =>  $request['TCode'] ?? null,
-            //     'Subject' =>  $request['Subject'] ?? null,
-            //     'UserText' =>  $request['UserText'] ?? null,
-            //     'DataCols' =>  $request['DataCols'] ?? null,
-            //     'DataParams' =>  $request['DataParams'] ?? null,
-            //     'MsgData' =>  $request['MsgData'] ?? null,
-            //     'DraftEntry' => $request['DraftEntry'] ?? null,
-            //     'UserSign' => $request['UserSign'] ?? null,
-            //     'Attachment' =>  $request['Attachment'] ?? null,
-            //     'DataSource' =>  $request['DataSource'] ?? null,
-            //     'AtcEntry' =>  $request['AtcEntry'] ?? null,
-            //     'AltType' =>  $request['AltType'] ?? null,
-            //     'CompanyID' => $request['CompanyID'] ?? null,
-            // ]);
+        
             if ($request['alt1']) {
 
                 foreach ($request['alt1'] as $user) {
                     ALT1::create([
-                        'DocEntry' => $data->id,
+                        'DocEntry' => $alert_data->id,
                         'Code' =>  $request['Code'] ?? null,
                         'SendIntrnl' =>  $user['SendIntrnl'] ?? false,
                         'SendEMail' =>  $user['SendEMail'] ?? false,
@@ -132,7 +115,7 @@ class AlertsManagementController extends Controller
             if ($request['alt2']) {
                 foreach ($request['alt2'] as $Group) {
                     ALT2::create([
-                        'DocEntry' => $data->id,
+                        'DocEntry' => $alert_data->id,
                         'Code' =>  $request['Code'] ?? null,
                         'SendIntrnl' =>  $Group['SendIntrnl'] ?? false,
                         'SendEMail' =>  $Group['SendEMail'] ?? false,
@@ -145,7 +128,7 @@ class AlertsManagementController extends Controller
             if ($request['alt4']) {
                 foreach ($request['alt4'] as $id) {
                     ALT4::create([
-                        'DocEntry' => $data->id,
+                        'DocEntry' => $alert_data->id,
                         'UserSign' => Auth::user()->id,
                         'QueryId' =>  $id ?? null
                     ]);
@@ -154,7 +137,7 @@ class AlertsManagementController extends Controller
             if ($request['alt5']) {
                 $alert_template =  ALT5::create(
                     [
-                        'DocEntry' => $data->id,
+                        'DocEntry' => $alert_data->id,
                         'UserSign' => Auth::user()->id,
                         'tempSubject' => $request['alt5']['tempSubject'] ?? null,
                         'tempTitle' => $request['alt5']['tempTitle'] ?? null,
@@ -167,9 +150,9 @@ class AlertsManagementController extends Controller
                 foreach ($request['alt6'] as $atchmt_query) {
                     ALT6::create(
                         [
-                            'DocEntry' => $alert_template->id ?? null,
+                            'DocEntry' => $alert_template->id,
                             'UserSign' => Auth::user()->id,
-                            'AlertId' =>  $id,
+                            'AlertId' =>  $alert_data->id,
                             'QueryId' =>  $atchmt_query,
                         ]
                     );
@@ -398,7 +381,7 @@ class AlertsManagementController extends Controller
             //alert mail template
             if (array_key_exists('alt5',  $validatedData)) {
                 Log::info($request['alt5']);
-                $alert_template =   ALT5::where('DocEntry', $id)->where('DocEntry', $id)->update(
+                $alert_template =   ALT5::where('DocEntry', $id)->update(
                     [
                         'DocEntry' => $id,
                         'UserSign' => Auth::user()->id,
@@ -418,11 +401,12 @@ class AlertsManagementController extends Controller
                 $removed = $existing->diff($updated);
 
                 foreach ($request['alt6'] as $atchmt_query) {
-                    $query_exists =  ALT6::where('QueryId',  $atchmt_query)->first();
-                    if ($query_exists) {
-                        ALT6::where('QueryId', $id)->where('DocEntry', $id)->update(
+                    $query_exists =  ALT6::where('QueryId',  $atchmt_query)->where('AlertId', $id)->first();
+                    $alert_template =   ALT5::where('DocEntry', $id)->first();
+                    if ($query_exists) {   
+                        ALT6::where('QueryId', $atchmt_query)->where('AlertId', $id)->update(
                             [
-                                'DocEntry' => $alert_template->id ?? null,
+                                'DocEntry' => $alert_template->id,
                                 'UserSign' => Auth::user()->id,
                                 'AlertId' =>  $id,
                                 'QueryId' =>  $atchmt_query,
@@ -431,7 +415,7 @@ class AlertsManagementController extends Controller
                     } else {
                         ALT6::create(
                             [
-                                'DocEntry' => $alert_template->id ?? null,
+                                'DocEntry' => $alert_template->id,
                                 'UserSign' => Auth::user()->id,
                                 'AlertId' =>  $id,
                                 'QueryId' =>  $atchmt_query,
@@ -440,7 +424,7 @@ class AlertsManagementController extends Controller
                     }
                 }
                 foreach ($removed as $remvd) {
-                    ALT6::where('DocEntry', $id)->where('QueryId', $remvd)->delete();
+                    ALT6::where('AlertId', $id)->where('QueryId', $remvd)->delete();
                 }
             }
             return (new ApiResponseService())->apiSuccessResponseService("Updated Successfully !!");

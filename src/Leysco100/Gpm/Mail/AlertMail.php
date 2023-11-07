@@ -2,13 +2,11 @@
 
 namespace Leysco100\Gpm\Mail;
 
-use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Leysco100\Shared\Models\OUQR;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
@@ -16,7 +14,6 @@ use Leysco100\Gpm\Reports\AlertScanReport;
 use Leysco100\Shared\Models\Administration\Models\ALR2;
 use Leysco100\Shared\Models\Administration\Models\ALT3;
 use Leysco100\Shared\Models\Administration\Models\OALR;
-use Leysco100\Shared\Models\Administration\Models\Role;
 
 class AlertMail extends Mailable
 {
@@ -41,22 +38,24 @@ class AlertMail extends Mailable
      */
     public function build()
     {
-        $alert =   OALR::with('alert_template.alt5', 'alert_template.alt6.saved_query')->where('id', $this->id)->first();
+        $alert = OALR::with('alert_template.alt5', 'alert_template.alt6.saved_query')->where('id', $this->id)->first();
+        $attachments = [];
 
+        if ($alert) {
 
-        $attachmants = [];
-        foreach ($alert->alert_template->alt6 as  $query) {
-            $r =   $this->processQuery($query->saved_query->QString);
-            Excel::store(new AlertScanReport($r), 'AlertReport' . $query->id . '.xlsx');
-            $attch =  Storage::path('AlertReport' . $query->id . '.xlsx');
-            $attachmants[] = $attch;
-        }
+            foreach ($alert->alert_template->alt6 as $query) {
+                $QueryRes = $this->processQuery($query->saved_query->QString);
 
-
-        if (!$alert) {
+                if ($QueryRes) {
+                    $fileName = $query->saved_query->QName . $query->id . '.xlsx';
+                    Excel::store(new AlertScanReport($QueryRes), $fileName);
+                    $attachmentPath = Storage::path($fileName);
+                    $attachments[] = $attachmentPath;
+                }
+            }
+        } else {
             exit;
         }
-
 
         $data = ALR2::where('Code', $this->id)
             ->with(['lines' => function ($query) {
@@ -67,7 +66,7 @@ class AlertMail extends Mailable
 
         $tempBody =  $this->process($alert->alert_template->alt5->tempBody);
 
-        Log::info(nl2br($tempBody));
+        // Log::info(nl2br($tempBody));
 
         $mail = $this->subject($alert->alert_template->alt5->tempSubject)
             ->markdown('gpm::alertNotification')
@@ -75,7 +74,7 @@ class AlertMail extends Mailable
             ->with('tempBody', nl2br($tempBody))
             ->with('template', $alert->alert_template->alt5);
 
-        foreach ($attachmants as $attachment) {
+        foreach ($attachments as $attachment) {
             $mail->attach($attachment);
         }
 
@@ -104,9 +103,7 @@ class AlertMail extends Mailable
                 'data' => $formattedResult
             ];
         }
-        // Log::info($results);
-
-
+    
         return $results;
     }
 
