@@ -8,16 +8,24 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
-use Leysco100\Gpm\Services\DocumentsService;
-use Leysco100\MarketingDocuments\Jobs\NumberingSeries;
-use Leysco100\MarketingDocuments\Services\DatabaseValidationServices;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Services\AuthorizationService;
 use Leysco100\Inventory\Http\Controllers\Controller;
+use Leysco100\MarketingDocuments\Jobs\NumberingSeries;
 use Leysco100\Shared\Models\Administration\Models\EOTS;
 use Leysco100\Shared\Models\Administration\Models\OADM;
+use Leysco100\Shared\Models\Administration\Models\User;
+use Leysco100\MarketingDocuments\Services\DocumentsService;
+use Leysco100\Shared\Models\MarketingDocuments\Models\OATS;
+use Leysco100\Shared\Models\MarketingDocuments\Models\OWDD;
+use Leysco100\Shared\Models\MarketingDocuments\Models\WDD1;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITW;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OSRN;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
+use Leysco100\MarketingDocuments\Services\DatabaseValidationServices;
+use Leysco100\Shared\Models\MarketingDocuments\Services\GeneralDocumentValidationService;
 
 
 
