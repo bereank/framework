@@ -2,19 +2,22 @@
 
 namespace Leysco100\Shared;
 
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Leysco100\Shared\Console\Setup\CreateDefaultUserCommand;
 use Leysco100\Shared\Console\Setup\DocumentFormSettings;
+use Leysco100\Shared\Console\Setup\ProcessAlertsCommand;
+
+use Leysco100\Shared\Console\Setup\RestartAlertsCommand;
+use Leysco100\Shared\Console\Setup\CreateDefaultUserCommand;
 use Leysco100\Shared\Console\Setup\InstallSharedPackageCommand;
 
-use Illuminate\Support\Facades\Route;
 class SharedServiceProvider extends ServiceProvider
 {
     public function register()
     {
 
-          // Register the command if we are using the application via the CLI
-          if ($this->app->runningInConsole()) {
+        // Register the command if we are using the application via the CLI
+        if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__ . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "config.php" => config_path('gpm.php'),
             ], 'config');
@@ -22,11 +25,11 @@ class SharedServiceProvider extends ServiceProvider
             $this->commands([
                 InstallSharedPackageCommand::class,
                 CreateDefaultUserCommand::class,
-                DocumentFormSettings::class
+                DocumentFormSettings::class,
+                ProcessAlertsCommand::class,
+                RestartAlertsCommand::class
             ]);
-         
         }
-      
     }
 
     public function boot()
@@ -37,7 +40,6 @@ class SharedServiceProvider extends ServiceProvider
          */
         $this->loadMigrationsFrom(__DIR__ . '/database/migrations/tenant');
         $this->registerRoutes();
-   
     }
 
 

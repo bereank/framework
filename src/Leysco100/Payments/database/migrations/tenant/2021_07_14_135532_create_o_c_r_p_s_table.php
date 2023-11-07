@@ -30,15 +30,17 @@ class CreateOCRPSTable extends Migration
             $table->string('Balance')->nullable();
             $table->string('Currency')->nullable();
             $table->string('MSISDN')->nullable();
-            $table->string('RefNum')->nullable();
+            $table->string('BankRefNo')->nullable();
             $table->string('Dscription')->nullable();
             $table->string('TransactType')->nullable();
             $table->string('BusinessKey')->nullable();
             $table->string('BusinessKeyType')->nullable();
+            $table->string('debitAccNo')->nullable();
             $table->string('ExtRef')->nullable()->comment("Used For External Refrence");
             $table->string('ExtRefDocNum')->nullable()->comment("Used For External Refrence Doc Number");
             $table->float('ExtDocTotal', 19, 2)->default(0)->comment("Used For External Doc Total");
             $table->integer('Status')->nullable();
+            $table->integer('Source')->nullable();
             $table->string('CompanyID')->nullable();
             $table->timestamps();
         });

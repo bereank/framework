@@ -4,6 +4,8 @@ namespace Leysco100\Gpm\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Leysco100\Gpm\Http\Controllers\Controller;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
@@ -20,15 +22,28 @@ class GateController extends Controller
 
     public function index()
     {
-//         $ObjType = 302;
-//         $TargetTables = APDI::with('pdi1')
-//         ->where('ObjectID', $ObjType)
-//         ->first();
-//    (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'read');
+        $ObjType = 302;
+        $user = Auth::user();
+        //         $TargetTables = APDI::with('pdi1')
+        //         ->where('ObjectID', $ObjType)
+        //         ->first();
+        //    (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'read');
         try {
-            $data = GPMGate::get();
+            // $ownerData = [];
+            // $dataOwnership = (new AuthorizationService())->CheckIfActive($ObjType, $user->EmpID);
+            // if ($dataOwnership) {
+            //     $ownerData =  (new AuthorizationService())->getDataOwnershipAuth($ObjType, 1);
+            // }
+
+            $data = GPMGate::with('ohem')
+                ->with('location')
+                // ->when($dataOwnership, function ($query) use ($ownerData) {
+                //     return $query->whereIn('OwnerCode', $ownerData);
+                // })
+                ->get();
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
+            Log::info($th);
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
@@ -38,26 +53,22 @@ class GateController extends Controller
      */
     public function store(Request $request)
     {
-//         $ObjType = 302;
-//         $TargetTables = APDI::with('pdi1')
-//         ->where('ObjectID', $ObjType)
-//         ->first();
-//    (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'create');
+        //         $ObjType = 302;
+        //         $TargetTables = APDI::with('pdi1')
+        //         ->where('ObjectID', $ObjType)
+        //         ->first();
+        //    (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'create');
         try {
             $data = GPMGate::create([
-                'location_id' => 1,
+                'location_id' => $request['location_id'] ?? null,
                 'Name' => $request['Name'],
                 'Address' => $request['Address'],
                 'Longitude' => $request['Longitude'],
                 'Latitude' => $request['Latitude'],
+                'OwnerCode' => $request['OwnerCode']
             ]);
 
-            foreach( $request['userSigns'] as $user ){
-                $data = NotifyUser::FirstorCreate([
-                    'gate_id' => $data->id,
-                    'UserSign' => $user
-                ]);
-            }
+
 
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
@@ -70,21 +81,15 @@ class GateController extends Controller
      */
     public function show($id)
     {
-//         $ObjType = 302;
-//         $TargetTables = APDI::with('pdi1')
-//         ->where('ObjectID', $ObjType)
-//         ->first();
-//    (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'read');
+        //         $ObjType = 302;
+        //         $TargetTables = APDI::with('pdi1')
+        //         ->where('ObjectID', $ObjType)
+        //         ->first();
+        //    (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'read');
         try {
-            $gate = GPMGate::with('notify_users')->where('id', $id)->first();
+            $gate = GPMGate::with('location')->where('id', $id)->first();
 
-            if ($gate) {
-                $userSigns = $gate->notify_users->pluck('UserSign');
-        
-                $gate->userSigns = $userSigns;
-            }
-            
-          
+
             return (new ApiResponseService())->apiSuccessResponseService($gate);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
@@ -96,11 +101,12 @@ class GateController extends Controller
      */
     public function update(Request $request, $id)
     {
-//         $ObjType = 302;
-//         $TargetTables = APDI::with('pdi1')
-//         ->where('ObjectID', $ObjType)
-//         ->first();
-//    (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'update');
+
+        //         $ObjType = 302;
+        //         $TargetTables = APDI::with('pdi1')
+        //         ->where('ObjectID', $ObjType)
+        //         ->first();
+        //    (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'update');
         try {
             $gate = GPMGate::findOrFail($id);
             $gate->update([
@@ -108,19 +114,10 @@ class GateController extends Controller
                 'Address' => $request['Address'],
                 'Longitude' => $request['Longitude'],
                 'Latitude' => $request['Latitude'],
+                'OwnerCode' => $request['OwnerCode'],
+                'location_id' => $request['location_id'] ?? null
             ]);
-            $users= NotifyUser::where('gate_id',$id)->pluck('UserSign')->toArray();
-        
-            $new= $request['userSigns'] ;
-            $diff= array_diff($users,$new);
-           
-            NotifyUser::whereIn('UserSign',$diff)->delete();
-            foreach( $request['userSigns'] as $user ){
-              NotifyUser::FirstorCreate([
-                    'gate_id' => $gate->id,
-                    'UserSign' => $user
-                ]);
-            }
+
             return (new ApiResponseService())->apiSuccessResponseService($gate);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());

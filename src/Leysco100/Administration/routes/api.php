@@ -16,6 +16,7 @@ use Leysco100\Administration\Http\Controllers\Setup\Inventory\UoMGroupController
 use Leysco100\Administration\Http\Controllers\Setup\Financials\CurrencyController;
 use Leysco100\Administration\Http\Controllers\Setup\Financials\TaxGroupController;
 use Leysco100\Administration\Http\Controllers\Setup\Inventory\ItemGroupController;
+use Leysco100\Administration\Http\Controllers\Setup\Inventory\WarehouseController;
 use Leysco100\Administration\Http\Controllers\Setup\General\UserDefaultsController;
 use Leysco100\Administration\Http\Controllers\Setup\Financials\CreditCardController;
 use Leysco100\Administration\Http\Controllers\Setup\General\SalesEmployeeController;
@@ -33,7 +34,7 @@ use Leysco100\Administration\Http\Controllers\SystemInit\Authorization\DataOwner
 use Leysco100\Administration\Http\Controllers\SystemInit\CompanyDetails\CompanyDetailsController;
 use Leysco100\Administration\Http\Controllers\SystemInit\GeneralSettings\GeneralSettingsController;
 use Leysco100\Administration\Http\Controllers\Setup\Financials\GLDetermination\GLAccountDeterminationController;
-
+use Leysco100\Administration\Http\Controllers\Setup\Inventory\BinLocationsController;
 
 Route::get('activeGLaccounts', [ChartOfAccountController::class, 'fetchActiveAccounts']);
 Route::get('taxgroups/{Type}', [TaxGroupController::class, 'TaxGroupType']);
@@ -43,11 +44,11 @@ Route::get('taxgroups/{Type}', [TaxGroupController::class, 'TaxGroupType']);
 // Route::delete('territory/{TerritoryID}/{Employee}', [SalesEmployeeController::class, 'removeFromRegion']);
 // Route::post('employee/addNewRegion', [SalesEmployeeController::class, 'addNewRegion']);
 // Route::post('uploadGLAccounts', [ChartOfAccountController::class, 'importGLAccount']);
- Route::post('documentnumbering/updateseries', [DocNumberingController::class, 'updatingSeries']);
- Route::post('documentnumbering/createseries', [DocNumberingController::class, 'creatingSeries']);
- Route::post('documentnumbering/set-default-current-user', [DocNumberingController::class, 'setDefaultCurrentUser']);
- Route::post('documentnumbering/set-default-all-users', [DocNumberingController::class, 'setDefaultForAllUsers']);
- Route::post('documentnumbering/set-default-selected-users', [DocNumberingController::class, 'setDefaultForSelectedUsers']);
+Route::post('documentnumbering/updateseries', [DocNumberingController::class, 'updatingSeries']);
+Route::post('documentnumbering/createseries', [DocNumberingController::class, 'creatingSeries']);
+Route::post('documentnumbering/set-default-current-user', [DocNumberingController::class, 'setDefaultCurrentUser']);
+Route::post('documentnumbering/set-default-all-users', [DocNumberingController::class, 'setDefaultForAllUsers']);
+Route::post('documentnumbering/set-default-selected-users', [DocNumberingController::class, 'setDefaultForSelectedUsers']);
 // Route::post('territory/{TerritoryID}/{EmployeeID}', [SalesEmployeeController::class, 'addEmployeeToRegion']);
 
 
@@ -56,12 +57,27 @@ Route::get('taxgroups/{Type}', [TaxGroupController::class, 'TaxGroupType']);
 // //Inventory
 // Route::post('itemsproperty_desc', [ItemPropertyController::class, 'itemDesc']);
 // // Permission
- Route::get('authorization/check-if-permitted/{ObjectCode}', [PermissionController::class, 'checkIfCurrentUserIsPermitted']);
+Route::get('authorization/check-if-permitted/{ObjectCode}', [PermissionController::class, 'checkIfCurrentUserIsPermitted']);
 Route::post('authorization/assign-permission-to-user', [PermissionController::class, 'assignPermissionToUser']);
 Route::post('authorization/assign-permission-to-role', [PermissionController::class, 'assignPermissionToRole']);
 Route::get('users/auth/{userID}', [UserController::class, 'show']);
 Route::get('users/{userID}/{ObjectType}', [UserController::class, 'fetchGroupPermission']);
 Route::apiResources(['permissions' => PermissionController::class]);
+
+//alerts
+Route::get('getAlert/{id}', [AlertsManagementController::class, 'getAlert']);
+
+Route::get('alert/variables', [AlertsManagementController::class, 'getAlertVariables']);
+Route::post('alert/variable/create', [AlertsManagementController::class, 'createAlertVariables']);
+Route::get('alert/variable/show/{id}', [AlertsManagementController::class, 'showAlertVariable']);
+Route::put('alert/variable/edit/{id}', [AlertsManagementController::class, 'editAlertVariable']);
+
+Route::get('alerts/mail_template/show/{id}', [AlertsManagementController::class, 'AlertTemplate']);
+
+// BIN LOCATIONS
+Route::get('bin-locations/fields', [BinLocationsController::class, 'getBinLocFields']);
+Route::post('bin-locations/fields/create', [BinLocationsController::class, 'storeBinLocFields']);
+
 
 // //Users
 // Route::get('users/get-user-defaults', [UserController::class, 'fetchDefaultsForCurrentUser']);
@@ -91,7 +107,7 @@ Route::apiResources(['employee-master-data' => EmployeeController::class]);
 Route::apiResources(['drivers' => DriverController::class]);
 Route::apiResources(['itemgroup' => ItemGroupController::class]);
 // Route::apiResources(['warehousetype' => WarehouseTypeConntroller::class]);
-// Route::apiResources(['warehouse' => WarehouseController::class]);
+//Route::apiResources(['warehouse' => WarehouseController::class]);
 Route::apiResources(['shippingtype' => ShippingTypeController::class]);
 Route::apiResources(['uomgroup' => UoMGroupController::class]);
 Route::apiResources(['uom' => UoMController::class]);
@@ -101,14 +117,14 @@ Route::apiResources(['itemsproperty' => ItemPropertyController::class]);
 Route::apiResources(['currency' => CurrencyController::class]);
 Route::apiResources(['chartofaccounts' => ChartOfAccountController::class]);
 Route::apiResources(['taxgroup' => TaxGroupController::class]);
- Route::apiResources(['credit-card' => CreditCardController::class]);
+Route::apiResources(['credit-card' => CreditCardController::class]);
 Route::apiResources(['country' => CountryController::class]);
 Route::apiResources(['bp_properties' => BPPropertiesController::class]);
 // Route::apiResources(['paymentterm' => PaymentTermsController::class]);
 Route::apiResources(['bp_groups' => BPGroupController::class]);
 Route::apiResources(['bank' => BankController::class]);
 Route::apiResources(['house_bank' => HouseBankController::class]);
- Route::apiResources(['documentnumbering' => DocNumberingController::class]);
+Route::apiResources(['documentnumbering' => DocNumberingController::class]);
 Route::apiResources(['vehicles' => VehicleController::class]);
 Route::put('/settings/password_rest_change', [GeneralSettingsController::class, 'updatePswdChangOnReset']);
 Route::apiResources(['alerts' => AlertsManagementController::class]);

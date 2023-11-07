@@ -2,48 +2,47 @@
 
 namespace Leysco100\MarketingDocuments\Services;
 
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Shared\Services\CommonService;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\MarketingDocuments\Jobs\NumberingSeries;
+use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
 use Leysco100\Shared\Models\Administration\Models\OADM;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITW;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
 
 class MarketingDocumentService
 {
-    public function BasicValidation($data)
-    {
-        /**
-         * 1. Object Type
-         */
-        if (!isset($data['ObjType']) || empty($data['ObjType'])) {
-
-            (new ApiResponseService())->apiSuccessAbortProcessResponse("Object Type is Required");
-        }
-        $data =     $this->headerBasicValidation($data);
-        return $data;
-    }
-
     public function fieldsDefaulting($data)
     {
 
+        // Document header defaulting
         $user_id = Auth::user()->id;
         $user_data = User::with('oudg')->where('id', $user_id)->first();
 
         if (!(data_get($data, 'SlpCode'))) {
             $data['SlpCode'] = $user_data->oudg->SalePerson ?? null;
         }
-        if (!(data_get($data, 'Ownercode'))) {
-            $data['Ownercode'] = $user_data->EmpID ?? null;
+        if (!(data_get($data, 'OwnerCode'))) {
+            $data['OwnerCode'] = $user_data->EmpID ?? null;
         }
-        if (!(data_get($data, 'Warehouse'))) {
-            $data['Warehouse'] =  $user_data->oudg->Warehouse ?? null;
+        if (!(data_get($data, 'DocDate'))) {
+            $data['DocDate'] =  Carbon::now()->format('Y-m-d');
         }
+        if (!(data_get($data, 'UserSign'))) {
+            $data['UserSign'] =   $user_data->id;
+        }
+        if (!(data_get($data, 'DataSource'))) {
+            $data['DataSource'] = 'I';
+        }
+
         if ((data_get($data, 'CardCode'))) {
             $customerDetails = OCRD::where('CardCode', $data['CardCode'])->first();
             if (!(data_get($data, 'CardName'))) {
@@ -52,151 +51,87 @@ class MarketingDocumentService
                 }
             }
         }
+        if (!(data_get($data, 'DocNum'))) {
+            $Numbering = (new DocumentsService())
+                ->getNumSerieByObjectId($data['ObjType']);
+            $data['DocNum'] = $Numbering['NextNumber'];
+            $data['Series'] = $Numbering['id'];
+        }
 
-        if ($data['document_lines']) {
+        /**
+         * Mapping Req Name
+         */
+
+        if ($data['ObjType'] == 205) {
+            if ($data['ReqType'] == 12) {
+                $data['ReqName']  = User::where('id', $data['Requester'])->value('name');
+            }
+
+            if ($data['ReqType'] == 171) {
+                $employee = OHEM::where('id', $data['Requester'])->first();
+                $data['ReqName']  = $employee->firstName . " " . $employee->lastName;
+            }
+        }
+
+        // Document lines defaulting
+        if (array_key_exists('document_lines', $data) && !empty($data['document_lines'])) {
             $documentLines = $data['document_lines'];
             foreach ($documentLines as $key => $line) {
+                $lineNum =   $key;
                 if (data_get($line, 'ItemCode')) {
                     $itemDetails = OITM::where('ItemCode', $line['ItemCode'])->first();
-        
-                    if (!data_get($line, 'ItemName')) {
+                    if (!data_get($line, 'Dscription')) {
                         if ($itemDetails) {
-                            $documentLines[$key]['Dscription'] = $itemDetails['ItemName'];
+                            $documentLines[$key]['Dscription'] = $itemDetails['Dscription'];
+                        }
+                    }
+                    if ($itemDetails) {
+                        $StockPrice = $itemDetails->AvgPrice;
+                        $documentLines[$key]['StockPrice'] = $StockPrice;
+                    }
+                    if (data_get($line, 'Quantity')) {
+                        if ($itemDetails) {
+                            $Weight1 = $itemDetails->SWeight1 * $line['Quantity'];
+                            $documentLines[$key]['Weight1'] = $Weight1;
                         }
                     }
                 }
+                if (!(data_get($line, 'WhsCode'))) {
+                    if ($user_data->oudg->Warehouse) {
+                        $documentLines[$key]['WhsCode'] =  $user_data->oudg->Warehouse;
+                    } else {
+                        if (isset($itemDetails) && $itemDetails) {
+                            $documentLines[$key]['WhsCode'] = $itemDetails['DfltWH'];
+                        }
+                    }
+                }
+                if (!(data_get($line, 'LineNum'))) {
+                    $documentLines[$key]['LineNum'] = ++$lineNum;
+                }
+                if (!(data_get($line, 'SlpCode'))) {
+                    $documentLines[$key]['SlpCode'] = $user_data->oudg->SalePerson ?? null;
+                }
+                if (!(data_get($line, 'OwnerCode'))) {
+                    $documentLines[$key]['OwnerCode'] = $user_data->EmpID ?? null;
+                }
             }
-        
             $data['document_lines'] = $documentLines;
         }
-        
-        
+
+
         return $data;
     }
-    public function headerBasicValidation($docdata)
+    public function validateFields($docData, $ObjType)
     {
-
-
-        //1. Customer Code
-        $ObjType = $docdata['ObjType'] ?? null;
-        $CardCode = $docdata['CardCode'] ?? null;
-
-        //
-        if ($docdata['BaseType'] && $docdata['BaseEntry']) {
-            $baseDocument = (new CommonService())->getSingleDocumentDetails($docdata['BaseType'], $docdata['BaseEntry']);
-            if (!$baseDocument) {
-                (new ApiResponseService())->apiSuccessAbortProcessResponse("Base Document Doest Not exist");
-            }
-            $CardCode = $baseDocument->CardCode;
-        }
-
-        /**
-         * If the Document is not Purchase headerdata
-         */
-        if ($ObjType != 205) {
-            $businessPartner = OCRD::with('octg')->where('CardCode', $CardCode)->first();
-            /**
-             * Check if Customer Exist in the Database
-             */
-            if (!$businessPartner) {
-                (new ApiResponseService())->apiSuccessAbortProcessResponse("Customer is Required");
-            }
-            $docdata['CardName'] =  $businessPartner['CardName'];
-            $paymentTerms = $businessPartner->octg;
-        }
-
-        if ($ObjType == 205) {
-            if (!$docdata['ReqType']) {
-                (new ApiResponseService())->apiSuccessAbortProcessResponse("headerdata Type is required");
-            }
-
-            if (!$docdata['headerdataer']) {
-                (new ApiResponseService())->apiSuccessAbortProcessResponse("headerdataer is required");
-            }
-
-            if (!$docdata['ReqDate']) {
-                (new ApiResponseService())->apiSuccessAbortProcessResponse("Specify Required date");
-            }
-        }
-
-        if ($docdata['DiscPrcnt'] > 100) {
-            (new ApiResponseService())->apiSuccessAbortProcessResponse("Invalid Discount Percentage");
-        }
-
-        /**
-         * Validating Payments if the customer is cash Customer
-         */
-        if ($ObjType == 13 && $docdata["payments"]) {
-            foreach ($docdata['payments'] as $paymentData) {
-                //               $paymentData = $docdata['payments'][0] ?? null;
-                if ($paymentTerms) {
-                    if ($ObjType == 13 && $paymentTerms->ExtraDays == 0 && $paymentTerms->ExtraMonth == 0) {
-                        if (!$docdata['payments']) {
-                            (new ApiResponseService())->apiSuccessAbortProcessResponse("Payment details is Required");
-                        }
-
-                        if ($docdata['DocTotal'] > $paymentData['TotalPaid']) {
-                            (new ApiResponseService())->apiSuccessAbortProcessResponse("Invoice & Receipt Must be paid Exactly");
-                        }
-
-                        if (!$paymentData['CashAcct'] && $paymentData['CashSum'] > 0) {
-                            (new ApiResponseService())->apiSuccessAbortProcessResponse("Cash GL Is required");
-                        }
-
-                        if (!isset($paymentData['CheckAcct']) && $paymentData['CheckSum'] > 0) {
-                            if (!isset($paymentData['CheckAcct'])) {
-                                (new ApiResponseService())->apiSuccessAbortProcessResponse("Checks GL Is required");
-                            }
-                        }
-
-                        if ($paymentData['TrsfrSum'] > 0) {
-                            if (!isset($paymentData['TrsfrRef'])) {
-                                (new ApiResponseService())->apiSuccessAbortProcessResponse('EOH Error - indicate the Bank Transfer/M-Pesa Reference');
-                            }
-
-                            if (!isset($paymentData['TrsfrAcct'])) {
-                                (new ApiResponseService())->apiSuccessAbortProcessResponse('Account for bank transfer has not been defined');
-                            }
-                        }
-
-                        if ($docdata['DocTotal'] < $paymentData['TotalPaid']) {
-                            (new ApiResponseService())->apiSuccessAbortProcessResponse("Payment Amount is greater than invoice amount");
-                        }
-                    }
-                }
-
-                if ($paymentData) {
-                    if ($docdata['DocTotal'] < $paymentData['TotalPaid']) {
-                        (new ApiResponseService())->apiSuccessAbortProcessResponse("Payment Amount is greater than invoice amount");
-                    }
-                    if (!$paymentData['CashAcct'] && $paymentData['CashSum'] > 0) {
-                        (new ApiResponseService())->apiSuccessAbortProcessResponse("Cash GL Is required");
-                    }
-
-                    if (!$paymentData['CashAcct'] && $paymentData['CashSum'] > 0) {
-                        (new ApiResponseService())->apiSuccessAbortProcessResponse("Cash GL Is required");
-                    }
-
-                    if (count($paymentData['rct3']) > 0) {
-                        foreach ($paymentData['rct3'] as $key => $rct3) {
-                            if (!isset($rct3['CreditCard'])) {
-                                (new ApiResponseService())->apiSuccessAbortProcessResponse("Credit Card Required");
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         //If Base Type Exist
-        if ($docdata['BaseType'] && $docdata['BaseEntry']) {
+        if ($docData['BaseType'] && $docData['BaseEntry']) {
             $generalSettings = OADM::where('id', 1)->value('copyToUnsyncDocs');
             $BaseTables = APDI::with('pdi1')
-                ->where('ObjectID', $docdata['BaseType'])
+                ->where('ObjectID', $docData['BaseType'])
                 ->first();
-            $baseDocHeader = $BaseTables->ObjectHeaderTable::where('id', $docdata['BaseEntry'])
+            $baseDocHeader = $BaseTables->ObjectHeaderTable::where('id', $docData['BaseEntry'])
                 ->first();
-            $CardCode = $baseDocHeader->CardCode;
+            $docData['CardCode'] = $baseDocHeader->CardCode;
             if ($generalSettings == 1 && $baseDocHeader->ExtRef == null) {
                 return (new ApiResponseService())
                     ->apiFailedResponseService("Copy to is Disable for Documents Pending syncing ");
@@ -207,424 +142,377 @@ class MarketingDocumentService
             }
         }
 
-        //If Base Type Exist
-        if ($docdata['BaseType'] && $docdata['BaseEntry']) {
-            $BaseTables = APDI::with('pdi1')
-                ->where('ObjectID', $docdata['BaseType'])
-                ->first();
+        $ObjType = (int) $docData['ObjType'];
 
-            $baseDocHeader = $BaseTables->ObjectHeaderTable::where('id', $docdata['BaseEntry'])
-                ->first();
-            $CardCode = $baseDocHeader->CardCode;
-        }
+        $docData['saveToDraft']  = false;
 
-        $customerDetails = OCRD::where('CardCode', $CardCode)->first();
+        $TargetTables = APDI::with('pdi1')
+            ->where('ObjectID', $ObjType)
+            ->first();
 
-        if (!$customerDetails && $ObjType != 205) {
+        if (!$TargetTables) {
             return (new ApiResponseService())
-                ->apiFailedResponseService("Customer Required");
+                ->apiSuccessAbortProcessResponse("Not found document with objtype " . $ObjType);
         }
-
-        if (count($docdata['document_lines']) <= 0) {
-            (new ApiResponseService())->apiSuccessAbortProcessResponse("Items is required");
-        }
-
-        $docdata = $this->linesBasicValidation($docdata);
-
-        return $docdata;
-    }
-
-
-
-    public function linesBasicValidation($docdata)
-    {
         /**
-         * Rows Validation
+         * Check if The Item has External Approval
          */
-        foreach ($docdata['document_lines'] as $key => $value) {
+        if ($TargetTables->hasExtApproval == 1) {
+            $docData['saveToDraft'] = true;
+            $TargetTables = APDI::with('pdi1')
+                ->where('ObjectID', 112)
+                ->first();
+        }
+
+        if (empty($docData['CardCode']) && $ObjType != 205) {
+            return (new ApiResponseService())
+                ->apiSuccessAbortProcessResponse("Customer is Required");
+        } else {
+            $customerDetails = OCRD::where('CardCode', $docData['CardCode'])->first();
+
+            if (!$customerDetails) {
+                return (new ApiResponseService())
+                    ->apiSuccessAbortProcessResponse("Customer Does Not Exist");
+            }
+        }
+
+
+        if (array_key_exists('DiscPrcnt', $docData) && $docData['DiscPrcnt'] > 100) {
+            return (new ApiResponseService())
+                ->apiSuccessAbortProcessResponse("Invalid Discount Percentage");
+        }
+
+        if (!$docData['DocDueDate'] && $ObjType != 205) {
+            return (new ApiResponseService())
+                ->apiSuccessAbortProcessResponse("Delivery Date Required");
+        }
+
+        if ($ObjType == 205) {
+            if (!$docData['ReqType']) {
+                return (new ApiResponseService())
+                    ->apiSuccessAbortProcessResponse("Request Type is required");
+            }
+
+            if (!$docData['Requester']) {
+                return (new ApiResponseService())
+                    ->apiSuccessAbortProcessResponse("Requester is required");
+            }
+
+            if (!$docData['ReqDate']) {
+                return (new ApiResponseService())
+                    ->apiSuccessAbortProcessResponse("Required date is required");
+            }
+        }
+
+        if (!array_key_exists('document_lines', $docData) || count($docData['document_lines']) <= 0) {
+            return (new ApiResponseService())->apiSuccessAbortProcessResponse("Items is required");
+        } else {
+            $this->documentRowValidation($docData, $ObjType);
+
+            return $docData;
+        }
+    }
+
+
+
+    /**
+     * Validating Document Row
+     */
+    public function documentRowValidation($docData, $ObjType)
+    {
+        $document_lines = $docData['document_lines'];
+
+        foreach ($document_lines as $key => $value) {
+
+            if (!isset($value['Dscription'])) {
+                return (new ApiResponseService())
+                    ->apiSuccessAbortProcessResponse("Dscription id Required for item:");
+            }
+
             /**
-             * OTHER VALIDATIONS
+             * Item VALIDATIONS
              */
-            if ($docdata['DocType'] == "I") {
+
+            if ($docData['DocType'] == "I") {
+                if (!isset($value["ItemCode"])) {
+                    return (new ApiResponseService())->apiSuccessAbortProcessResponse("Item Is Required !");
+                }
                 $product = OITM::Where('ItemCode', $value['ItemCode'])
                     ->first();
-                $value['TaxCode'] = $product->VatGourpSa;
-
                 if (!$product) {
-                    (new ApiResponseService())->apiSuccessAbortProcessResponse("Items Required");
+                    return (new ApiResponseService())->apiSuccessAbortProcessResponse("Items Does Not Exist");
+                }
+
+                if (array_key_exists('DiscPrcnt', $value) && $value['DiscPrcnt'] > 0 && $product->QryGroup61 == "Y") {
+                    return (new ApiResponseService())->apiSuccessAbortProcessResponse("Following Item Does not allow discount:" . $value['Dscription']);
                 }
             }
-            if (isset($value['DiscPrcnt'])) {
-                if ($value['DiscPrcnt'] > 100) {
-                    (new ApiResponseService())->apiSuccessAbortProcessResponse("Invalid Discount Percentage");
+
+            if (!isset($value['Quantity']) || $value['Quantity'] <= 0) {
+                return (new ApiResponseService())
+                    ->apiSuccessAbortProcessResponse("Invalid quantity   for item:" . $value['Dscription'] ?? "");
+            }
+
+            if (!isset($value['Price']) || $value['Price'] < 0) {
+                return (new ApiResponseService())
+                    ->apiSuccessAbortProcessResponse("Invalid price for item:" . $value['Dscription'] ?? "");
+            }
+
+
+            if (!isset($value['WhsCode'])) {
+                return (new ApiResponseService())
+                    ->apiSuccessAbortProcessResponse("Warehouse (WhsCode) Required for item:");
+            }
+
+            /**
+             * Mapping Req Name
+             */
+
+            if ($ObjType == 205) {
+                if ($docData['ReqType'] == 12) {
+                    $ReqName = User::where('id', $docData['Requester'])->value('name');
                 }
-                if ($value['DiscPrcnt'] > 0 && $product->QryGroup61 == "Y") {
-                    (new ApiResponseService())->apiSuccessAbortProcessResponse("Following Item Does not allow discount:");
+
+                if ($docData['ReqType'] == 171) {
+                    $employee = OHEM::where('id', $docData['Requester'])->first();
+                    $ReqName = $employee->firstName . " " . $employee->lastName;
+                }
+            }
+
+            $checkStockAvailabilty = false;
+
+            if (isset($docData['BaseType'])) {
+                if (($ObjType == 13 && $docData['BaseType'] != 15) || $ObjType == 15) {
+                    $checkStockAvailabilty = true;
+                }
+            }
+
+            if (array_key_exists('DiscPrcnt', $value) && $value['DiscPrcnt'] > 100) {
+                return (new ApiResponseService())->apiSuccessAbortProcessResponse("Invalid Discount Percentage");
+            }
+            if (!isset($value['TaxCode'])) {
+                return (new ApiResponseService())
+                    ->apiSuccessAbortProcessResponse("Select Tax Code for item " . $value['ItemCode'] ?? "");
+            }
+            // If Not Sales Order the Inventory Quantities should be Greater
+
+            if ($checkStockAvailabilty) {
+
+                if ($product->InvntItem == "Y") {
+                    $inventoryDetails = OITW::where('ItemCode',  $value['ItemCode'])
+                        ->where('WhsCode', $value['WhsCode'])
+                        ->first();
+
+                    if (!$inventoryDetails || $inventoryDetails->OnHand < $value['Quantity']) {
+                        return (new ApiResponseService())
+                            ->apiSuccessAbortProcessResponse("Insufficient stock for item:" . $value['Dscription']);
+                    }
+                }
+            }
+
+            //Serial Number Validations
+            if ($product->ManSerNum == "Y") {
+                if ($value['ObjType'] == 14 || $value['ObjType'] == 16 || $docData['saveToDraft'] = true) {
+                    if (!isset($value['SerialNumbers']) || $value['Quantity'] != count($value['SerialNumbers'])) {
+                        return (new ApiResponseService())
+                            ->apiFailedResponseService("Serial number required  for item:" . $value['Dscription']);
+                    }
+                }
+
+                if ($value['ObjType'] == 15) {
+                    if (!isset($value['SerialNumbers']) || $value['Quantity'] != count($value['SerialNumbers'])) {
+                        return (new ApiResponseService())
+                            ->apiFailedResponseService("Serial number required  for item:" . $value['Dscription']);
+                    }
+                }
+
+                if ($value['ObjType'] == 13 && $value['BaseType'] != 15) {
+                    if (!isset($value['SerialNumbers']) || $value['Quantity'] != count($value['SerialNumbers'])) {
+                        return (new ApiResponseService())
+                            ->apiFailedResponseService("Serial number required  for item:" . $value['Dscription']);
+                    }
                 }
             }
         }
-        return $docdata;
     }
 
-    public function createDoc($data, $TargetTables)
+
+    public function createDoc($data, $TargetTables, $ObjType)
     {
-        $user = Auth::user();
-        $NewDocDetails = [
-            'ObjType' => $data['ObjType'],
-            'DocType' => $data['DocType'],
-            'DocNum' =>  $data['DocNum'],
-            'Series' => $data['Series'],
-            'CardCode' => $data['CardCode'] ? $data['CardCode'] : null,
-            'Requester' => $data['Requester'],
-            'ReqName' =>  $data['ReqName'],
-            'ReqType' => $data['ReqType'],
-            'Department' => $data['Department'],
-            'CardName' => $data['CardName'] ? $data['CardName'] : null,
-            'SlpCode' => $data['SlpCode'], // Sales Employee
-            'U_SalePipe' => $data['U_SalePipe'], // Sales Pipe Line
-            //                'OwnerCode' => $user->EmpID, //Owner Code
-            'OwnerCode' => $data['OwnerCode'] ? $data['OwnerCode'] : Auth::user()->EmpID, //Owner Code
-            'U_CashMail' => $data['U_CashMail'], //Cash Customer  Email
-            'U_CashName' => $data['U_CashName'], //Cash Customer  Name
-            'U_CashNo' => $data['U_CashNo'], // Cash Customer No
-            'U_IDNo' => $data['U_IDNo'], // Id no
-            'NumAtCard' => $data['NumAtCard'] ? $data['NumAtCard'] : null,
-            'CurSource' => $data['CurSource'],
-            'DocTotal' => $data['DocTotal'],
-            'VatSum' => $data['VatSum'] ?? 0,
-            'DocDate' => $data['DocDate'], //PostingDate
-            'TaxDate' => $data['TaxDate'], //Document Date
-            'DocDueDate' => $data['DocDueDate'], // Delivery Date
-            'ReqDate' => $data['DocDueDate'],
-            'CntctCode' => $data['CntctCode'], //Contact Person
-            'AgrNo' => $data['AgrNo'],
-            'LicTradNum' => $data['LicTradNum'],
-            'BaseEntry' => $data['BaseEntry'] ? $data['BaseEntry'] : null, //BaseKey
-            'BaseType' => $data['BaseType'] ? $data['BaseType'] : null, //BaseKey
-            'UserSign' => $user->id,
-            //Inventory Transaction Values
-            'Ref2' => $data['Ref2'] ? $data['Ref2'] : null, // Ref2
-            'GroupNum' => $data['GroupNum'] ? $data['GroupNum'] : null, //[Price List]
-            'ToWhsCode' => $data['ToWhsCode'] ? $data['ToWhsCode'] : null, //To Warehouse Code
-            //SeriesDocument
-            'DiscPrcnt' => $data['DiscPrcnt'] ?? 0, //Discount Percentages
-            'DiscSum' => $data['DiscSum'], // Discount Sum
-            'BPLId' => $data['BPLId'],
-            'U_SaleType' => $data['U_SaleType'], // Sale Type
-            'Comments' => $data['Comments'], //comments
-            'NumAtCard2' => $data['NumAtCard2'],
-            'JrnlMemo' => $data['JrnlMemo'], // Journal Remarks
-            'UseShpdGd' => $data['UseShpdGd'] ?? "N",
-            'Rounding' => $data['Rounding'] ?? "N",
-            'RoundDif' => $data['RoundDif'] ?? 0,
-            'U_ServiceCall' => $data['U_ServiceCall'],
-            'U_DemoLocation' => $data['U_DemoLocation'],
-            'U_Technician' => $data['U_Technician'],
-            'U_Location' => $data['U_Location'],
-            'U_MpesaRefNo' => $data['U_MpesaRefNo'],
-            'U_PCash' => $data['U_PCash'],
-            'U_transferType' => $data['U_transferType'],
-            'U_SSerialNo' => $data['U_SSerialNo'],
-            'U_TypePur' => $data['U_TypePur'],
-            'U_NegativeMargin' => $data['U_NegativeMargin'],
-            'U_BaseDoc' => $data['U_BaseDoc'],
-            'DataSource' => "I",
-            'ExtRef' => $data['saveToDraft'] ? null : "",
-            'ExtRefDocNum' => $data['saveToDraft'] ? null : "",
-            'ExtDocTotal' => 0,
-        ];
-        Log::info([$TargetTables->ObjectHeaderTable]);
-        $newDoc = new $TargetTables->ObjectHeaderTable(array_filter($NewDocDetails));
-        Log::info(gettype($newDoc));
-        $newDoc->save();
+        DB::connection("tenant")->beginTransaction();
+        //If Base Type Exist
+        if ($data['BaseType'] && $data['BaseEntry']) {
+            $BaseTables = APDI::with('pdi1')
+                ->where('ObjectID', $data['BaseType'])
+                ->first();
 
-        $documentRows = [];
-
-        foreach ($data['document_lines'] as $key => $value) {
-            $LineNum = $key;
-            //$Dscription = $value['Dscription'];
-            $StockPrice = 0;
-            $Weight1 = 0;
-            $ItemCode = $value['ItemCode'] ?? null;
-            if ($data['DocType'] == "I") {
-                $product = OITM::Where('ItemCode', $value['ItemCode'])
-                    ->first();
-
-                if (!$product) {
-                    return (new ApiResponseService())
-                        ->apiFailedResponseService("Items Required");
-                }
-                $ItemCode = $product->ItemCode;
-                if (!$ItemCode) {
-                    return (new ApiResponseService())
-                        ->apiFailedResponseService("Items Required");
-                }
-
-                // if (!$value['WhsCode']) {
-                //     return (new ApiResponseService())
-                //         ->apiFailedResponseService("Warehouse Required");
-                // }
-
-                //                    return $BaseTables;
-
-                // If Not Sales Order the Inventory Quantities should be Greater
-
-                // if ($data['checkStockAvailabilty']) {
-
-                //     if ($product->InvntItem == "Y") {
-                //         $inventoryDetails = OITW::where('ItemCode', $ItemCode)
-                //             ->where('WhsCode', $value['WhsCode'])
-                //             ->first();
-
-                //         if (!$inventoryDetails || $inventoryDetails->OnHand < $value['Quantity']) {
-                //             return (new ApiResponseService())
-                //                 ->apiFailedResponseService("Insufficient stock for item:" . $value['Dscription']);
-                //         }
-                //     }
-                // }
-
-                //Serial Number Validations
-                //                    if ($product->ManSerNum == "Y" && $data['ObjType'] != 17) {
-                if ($product->ManSerNum == "Y") {
-                    if ($data['ObjType'] == 14 || $data['ObjType'] == 16 || $saveToDraft = true) {
-                        if (!isset($value['SerialNumbers']) || $value['Quantity'] != count($value['SerialNumbers'])) {
-                            return (new ApiResponseService())
-                                ->apiFailedResponseService("Serial number required  for item:" . $value['Dscription']);
-                        }
-                    }
-
-                    if ($data['ObjType'] == 15) {
-                        if (!isset($value['SerialNumbers']) || $value['Quantity'] != count($value['SerialNumbers'])) {
-                            return (new ApiResponseService())
-                                ->apiFailedResponseService("Serial number required  for item:" . $value['Dscription']);
-                        }
-                    }
-
-                    if ($data['ObjType'] == 13 && $data['BaseType'] != 15) {
-                        if (!isset($value['SerialNumbers']) || $value['Quantity'] != count($value['SerialNumbers'])) {
-                            return (new ApiResponseService())
-                                ->apiFailedResponseService("Serial number required  for item:" . $value['Dscription']);
-                        }
-                    }
-                }
-
-                if ($value['Quantity'] <= 0) {
-                    return (new ApiResponseService())
-                        ->apiFailedResponseService("Invalid quantity   for item:" . $value['Dscription']);
-                }
-
-                if ($value['Price'] < 0) {
-                    return (new ApiResponseService())
-                        ->apiFailedResponseService("Invalid price for item:" . $value['Dscription']);
-                }
-
-                /**
-                 * Stock Price
-                 */
-
-                $StockPrice = $product->AvgPrice;
-
-                //Weight1
-                $Weight1 = $product->SWeight1 * $value['Quantity'];
-            }
-
-
-            if ($data['DocType'] == "I") {
-                if (!isset($value['ItemCode'])) {
-                    return (new ApiResponseService())
-                        ->apiFailedResponseService("Item Details");
-                }
-            }
-
-            $copiedFromObjType = $value['copiedFromObjType'] ?? null;
-            $copiedFromBaseRef = $value['copiedFromBaseRef'] ?? null;
-            $copiedFromBaseEntry = $value['copiedFromBaseEntry'] ?? null;
-            $copiedFromBaseLine = $value['copiedFromBaseLine'] ?? null;
-
-            $rowdetails = [
-                'DocEntry' => $newDoc->id,
-                'OwnerCode' => $data['OwnerCode'] ? $data['OwnerCode'] : Auth::user()->EmpID, //Owner Code
-                'LineNum' => $LineNum, //    Row Number
-                'ItemCode' => $value['ItemCode'] ?? null,
-                'Dscription' =>  $product->Dscription, // Item Description
-                'SerialNum' => $value['SerialNum'] ?? NULL, //    Serial No.
-                'Quantity' => $value['Quantity'] ?? 1, //    Quantity
-                'DelivrdQty' => $value['DelivrdQty'] ?? NULL, //    Delivered Qty
-                'InvQty' => $value['InvQty'] ?? NULL, //   Qty(Inventory UoM)
-                'OpenInvQty' => $value['OpenInvQty'] ?? NULL,  //Open Inv. Qty ------
-                'PackQty' => $value['PackQty'] ?? NULL,  //    No. of Packages
-                'Price' => $value['Price'] ?? 0, //    Price After Discount
-                'DiscPrcnt' => $value['DiscPrcnt'] ?? 0, //    Discount %
-                'Rate' => array_key_exists('Rate', $value) ? $value['Rate'] : 0, //    Rate
-                'TaxCode' => array_key_exists('TaxCode', $value) ? $value['TaxCode'] : null, //    Tax Code
-                'PriceAfVAT' => $value['PriceAfVAT'] ?? 0, //       Gross Price after Discount
-                'PriceBefDi' => $value['PriceBefDi'] ?? 0, // Unit Price
-                'LineTotal' => $value['LineTotal'] ?? $value['Price'], //    Total (LC)
-                'WhsCode' => $value['WhsCode'] ?? null, //    Warehouse Code
-                'ShipDate' => array_key_exists('ShipDate', $value) ? $value['ShipDate'] : null, //    Del. Date
-                'SlpCode' => $data['SlpCode'], //    Sales Employee
-                'Commission' => array_key_exists('Commission', $value) ? $value['Commission'] : null, //    Comm. %
-                'AcctCode' => array_key_exists('AcctCode', $value) ? $value['AcctCode'] : null, //    G/L Account
-                'OcrCode' => $value['OcrCode'] ?? NULL,  //    Dimension 1
-                'OcrCode2' => $value['OcrCode2'] ?? NULL, //    Dimension 2
-                'OcrCode3' => $value['OcrCode3'] ?? NULL,  //    Dimension 3
-                'OcrCode4' => $value['OcrCode4'] ?? null, //    Dimension 4
-                'OcrCode5' => $value['OcrCode5'] ?? null, //    Dimension 5
-                'CogsOcrCod' => $value['OcrCode'] ?? NULL,
-                'CogsOcrCo2' => $value['OcrCode2'] ?? NULL,
-                'CogsOcrCo3' => $value['OcrCode3'] ?? NULL,
-                'CogsOcrCo4' => $value['OcrCode4'] ?? null,
-                'CogsOcrCo5' => $value['OcrCode5'] ?? null,
-
-                'BaseType' => $data['BaseType'] ?? $copiedFromObjType, //    Base Type
-                'BaseRef' => $data['BaseRef'] ?? $copiedFromBaseRef, //    Base Ref.
-                'BaseEntry' => $data['BaseEntry'] ?? $copiedFromBaseEntry, //    Base Key
-                'BaseLine' => $value['BaseLine'] ?? $copiedFromBaseLine, //    Base Row
-                'VatSum' => $value['VatSum'] ?? 0, //    Tax Amount (LC)
-
-                'UomCode' => $value['UomCode'] ?? null, //    UoM Code
-                'unitMsr' => array_key_exists('unitMsr', $value) ? $value['unitMsr'] : null, //    UoM Name
-                'NumPerMsr' => array_key_exists('NumPerMsr', $value) ? $value['NumPerMsr'] : null, //    Items per Unit
-                'GTotal' => $value['GTotal'] ?? 0, //    Gross Total
-
-                //Inventory Transaction  Value
-                'PQTReqDate' => $data['ReqDate'],
-                'FromWhsCod' => $value['FromWhsCod'] ?? null, // // From Warehouse Code
-                'BPLId' => $data['BPLId'],
-                'U_StockWhse' => isset($value['U_StockWhse']) ? $value['U_StockWhse'] : null,
-                'WhsName' => isset($value['WhsName']) ? $value['WhsName'] : null,
-                'StockPrice' => $StockPrice,
-                'NoInvtryMv' => $value['NoInv,  utryMv'] ?? "N",
-                'U_Promotion' => $value['U_Promotion'] ?? 'Charged',
-
-                //Weight
-                'Weight1' => $Weight1,
-
+            $baseDocHeader = $BaseTables->ObjectHeaderTable::where('id', $data['BaseEntry'])
+                ->first();
+        }
+        try {
+            $NewDocDetails = [
+                'ObjType' => $data['ObjType']  ?? null,
+                'DocType' => $data['DocType']  ?? null,
+                'DocNum' => $data['DocNum'] ?? null,
+                'Series' => $data['Series']  ?? null,
+                'CardCode' => $data['CardCode'] ?? null,
+                'Requester' => $data['Requester']  ?? null,
+                'ReqName' => $data['ReqName'] ?? null,
+                'ReqType' => $data['ReqType']  ?? null,
+                'Department' => $data['Department']  ?? null,
+                'CardName' => $data['CardName'] ?? null,
+                'SlpCode' => $data['SlpCode']  ?? null,  // Sales Pipe Line
+                'OwnerCode' => $data['OwnerCode']  ?? null, //Owner Code
+                'NumAtCard' => $data['NumAtCard'] ?? null,
+                'CurSource' => $data['CurSource']  ?? null,
+                'DocTotal' => $data['DocTotal']  ?? null,
+                'VatSum' => $data['VatSum'] ?? 0,
+                'DocDate' => $data['DocDate']  ?? null, //PostingDate
+                'TaxDate' => $data['TaxDate']  ?? null, //Document Date
+                'DocDueDate' => $data['DocDueDate']  ?? null, // Delivery Date
+                'ReqDate' => $data['DocDueDate']  ?? null,
+                'CntctCode' => $data['CntctCode']  ?? null, //Contact Person
+                'AgrNo' => $data['AgrNo']  ?? null,
+                'LicTradNum' => $data['LicTradNum']  ?? null,
+                'BaseEntry' => $data['BaseEntry'] ?? null, //BaseKey
+                'BaseType' => $data['BaseType'] ?? "1", //BaseKey
+                'UserSign' => $data['UserSign'] ?? null,
+                'Ref2' => $data['Ref2'] ?? null, // Ref2
+                'GroupNum' => $data['GroupNum'] ?? null, //[Price List]
+                'ToWhsCode' => $data['ToWhsCode'] ?? null, //To Warehouse Code
+                //SeriesDocument
+                'DiscPrcnt' => $data['DiscPrcnt'] ?? 0, //Discount Percentages
+                'DiscSum' => $data['DiscSum']  ?? null, // Discount Sum
+                'BPLId' => $data['BPLId']  ?? null,
+                'Comments' => $data['Comments']  ?? null, //comments
+                'NumAtCard2' => $data['NumAtCard2']  ?? null,
+                'JrnlMemo' => $data['JrnlMemo']  ?? null, // Journal Remarks
+                'UseShpdGd' => $data['UseShpdGd'] ?? "N",
+                'Rounding' => $data['Rounding'] ?? "N",
+                'RoundDif' => $data['RoundDif'] ?? 0,
+                'DataSource' => "I",
+                'ExtRef' => $data['ExtRef'] ?? null,
+                'ExtRefDocNum' => $data['ExtRefDocNum'] ?? null,
+                'ExtDocTotal' => 0,
             ];
 
-            $rowItems = new $TargetTables->pdi1[0]['ChildTable']($rowdetails);
-            $rowItems->save();
+            $newDoc = new $TargetTables->ObjectHeaderTable(array_filter($NewDocDetails));
 
-            //     /**DocType
-            //      * Saving Serial Numbers
-            //      */
+            $newDoc->save();
 
-            //     if ($data['DocType'] == "I" && $product->ManSerNum == "Y") {
-            //         $saveSerialDetails = false;
-            //         if ($request['ObjType'] == 14 || $request['ObjType'] == 16 || $request['ObjType'] == 17) {
-            //             $saveSerialDetails = true;
-            //         }
-            //         if ($request['ObjType'] == 15) {
-            //             $saveSerialDetails = true;
-            //         }
-            //         if ($request['ObjType'] == 13 && $request['BaseType'] != 15) {
-            //             $saveSerialDetails = true;
-            //         }
-            //         if ($saveSerialDetails) {
-            //             foreach ($value['SerialNumbers'] as $key => $serial) {
-            //                 $LineNum = $key;
-            //                 SRI1::create([
-            //                     "ItemCode" => $ItemCode,
-            //                     "SysSerial" => $serial['SysNumber'] ?? $serial['SysSerial'],
-            //                     "LineNum" => $rowItems->id,
-            //                     "BaseType" => $saveToDraft ? 112 : $ObjType,
-            //                     "BaseEntry" => $newDoc->id,
-            //                     "CardCode" => $CardCode,
-            //                     "CardName" => $customerDetails->CardName,
-            //                     "WhsCode" => $value['WhsCode'],
-            //                     "ItemName" => $Dscription,
-            //                 ]);
-            //             }
-            //         }
-            //     }
+            // Document Rows
+            $documentRows = [];
+            foreach ($data['document_lines'] as $key => $value) {
+                $LineNum = $key;
+                $rowdetails = [
+                    'DocEntry' => $newDoc->id,
+                    'OwnerCode' => $data['OwnerCode'], //Owner Code
+                    'LineNum' => $LineNum, //    Row Number
+                    'ItemCode' => $value['ItemCode'] ?? null,
+                    'Dscription' => $value['Dscription'] ?? null, // Item Description
+                    'SerialNum' => $value['SerialNum'] ?? null, //    Serial No.
+                    'Quantity' => $value['Quantity'] ?? 1, //    Quantity
+                    'DelivrdQty' => $value['DelivrdQty'] ?? null, //    Delivered Qty
+                    'InvQty' => $value['InvQty'] ?? null, //   Qty(Inventory UoM)
+                    'OpenInvQty' => $value['OpenInvQty'] ?? null, //Open Inv. Qty ------
+                    'PackQty' => $value['PackQty'] ?? null, //    No. of Packages
+                    'Price' => $value['Price'] ?? 0, //    Price After Discount
+                    'DiscPrcnt' => $value['DiscPrcnt'] ?? 0, //    Discount %
+                    'Rate' => array_key_exists('Rate', $value) ? $value['Rate'] : 0, //    Rate
+                    'TaxCode' => array_key_exists('TaxCode', $value) ? $value['TaxCode'] : null, //    Tax Code
+                    'PriceAfVAT' => $value['PriceAfVAT'] ?? 0, //       Gross Price after Discount
+                    'PriceBefDi' => $value['PriceBefDi'] ?? 0, // Unit Price
+                    'LineTotal' => $value['LineTotal'] ?? $value['Price'], //    Total (LC)
+                    'WhsCode' => $value['WhsCode'] ?? null, //    Warehouse Code
+                    'ShipDate' => array_key_exists('ShipDate', $value) ? $value['ShipDate'] : null, //    Del. Date
+                    'SlpCode' => $data['SlpCode'], //    Sales Employee
+                    'Commission' => array_key_exists('Commission', $value) ? $value['Commission'] : null, //    Comm. %
+                    'AcctCode' => array_key_exists('AcctCode', $value) ? $value['AcctCode'] : null, //    G/L Account
+                    'OcrCode' => $value['OcrCode'] ?? null, //    Dimension 1
+                    'OcrCode2' => $value['OcrCode2'] ?? null, //    Dimension 2
+                    'OcrCode3' => $value['OcrCode3'] ?? null, //    Dimension 3
+                    'OcrCode4' => $value['OcrCode4'] ?? null, //    Dimension 4
+                    'OcrCode5' => $value['OcrCode5'] ?? null, //    Dimension 5
+                    'CogsOcrCod' => $value['OcrCode'] ?? null,
+                    'CogsOcrCo2' => $value['OcrCode2'] ?? null,
+                    'CogsOcrCo3' => $value['OcrCode3'] ?? null,
+                    'CogsOcrCo4' => $value['OcrCode4'] ?? null,
+                    'CogsOcrCo5' => $value['OcrCode5'] ?? null,
 
-            //     if ($request['BaseType'] && $request['BaseEntry']) {
-            //         $baseDocHeader->update([
-            //             'DocStatus' => "C",
-            //         ]);
-            //     }
-            //     array_push($documentRows, $rowItems);
-            // }
+                    'BaseType' => $value['BaseType'] ?? null, //    Base Type
+                    'BaseRef' => $value['BaseRef'] ?? null, //    Base Ref.
+                    'BaseEntry' => $value['BaseEntry'] ?? null, //    Base Key
+                    'BaseLine' => $value['BaseLine'] ?? null, //    Base Row
+                    'VatSum' => $value['VatSum'] ?? 0, //    Tax Amount (LC)
 
-            //Stored Procedure Validations
+                    'UomCode' => $value['UomCode'] ?? null, //    UoM Code
+                    'unitMsr' => array_key_exists('unitMsr', $value) ? $value['unitMsr'] : null, //    UoM Name
+                    'NumPerMsr' => array_key_exists('NumPerMsr', $value) ? $value['NumPerMsr'] : null, //    Items per Unit
+                    'GTotal' => $value['GTotal'] ?? 0, //    Gross Total
 
-            $objectTypePassedToTns = $data['ObjType'];
+                    //Inventory Transaction  Value
+                    'PQTReqDate' => $data['ReqDate'] ?? null,
+                    'FromWhsCod' => $value['FromWhsCod'] ?? null, // // From Warehouse Code
+                    'BPLId' => $data['BPLId'] ?? null,
+                    'WhsName' => isset($value['WhsName']) ? $value['WhsName'] : null,
+                    'StockPrice' => $data['StockPrice'] ?? 0,
+                    'NoInvtryMv' => $value['NoInvtryMv'] ?? "N",
 
-            // if ($TargetTables->ObjectID == 112) {
-            //     $objectTypePassedToTns = 112;
-            // }
+                    //Weight
+                    'Weight1' => $data['Weight1'] ?? 0,
 
-            // $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions($objectTypePassedToTns, "A", $newDoc->id);
-            // if ($storedProcedureResponse) {
-            //     if ($storedProcedureResponse->error != 0) {
-            //         return (new ApiResponseService())->apiFailedResponseService($storedProcedureResponse->error_message);
-            //     }
-            // }
+                ];
 
-            // //Validating Draft using Oringal base type
-            // if ($objectTypePassedToTns == 112) {
-            //     $mockedDataDraftMessage = (new GeneralDocumentValidationService())->draftValidation($newDoc, $documentRows);
-            //     if ($mockedDataDraftMessage) {
-            //         return (new ApiResponseService())->apiFailedResponseService($mockedDataDraftMessage);
-            //     }
-            // }
-            // if ($newDoc->ObjType == 13 && $request['payments']) {
-            //     foreach ($request['payments'] as $payment) {
-            //         $storedProcedureResponse = null;
-            //         if ($saveToDraft) {
-            //             $newPayment = (new BankingDocumentService())->processDraftIncomingPayment($newDoc, $payment);
-            //             $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions(140, "A", $newPayment->id);
-            //         } else {
-            //             $newPayment = (new BankingDocumentService())->processIncomingPayment($newDoc, $payment);
-            //             $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions(24, "A", $newPayment->id);
-            //         }
-            //         if ($storedProcedureResponse) {
-            //             if ($storedProcedureResponse->error != 0) {
-            //                 return (new ApiResponseService())->apiFailedResponseService($storedProcedureResponse->error_message);
-            //             }
-            //         }
-            //     }
-            // }
+                $rowItems = new $TargetTables->pdi1[0]['ChildTable']($rowdetails);
+                $rowItems->save();
+                if ($data['DocType'] == "I" && $value['ManSerNum'] == "Y") {
+                    $saveSerialDetails = false;
+                    if ($data['ObjType'] == 14 || $data['ObjType'] == 16 || $data['ObjType'] == 17) {
+                        $saveSerialDetails = true;
+                    }
+                    if ($data['ObjType'] == 15) {
+                        $saveSerialDetails = true;
+                    }
+                    if ($data['ObjType'] == 13 && $data['BaseType'] != 15) {
+                        $saveSerialDetails = true;
+                    }
+                    if ($saveSerialDetails) {
+                        foreach ($value['SerialNumbers'] as $key => $serial) {
+                            $LineNum = $key;
+                            SRI1::create([
+                                "ItemCode" => $value['ItemCode'],
+                                "SysSerial" => $serial['SysNumber'] ?? $serial['SysSerial'],
+                                "LineNum" => $rowItems->id,
+                                "BaseType" => $value['saveToDraft'] ? 112 : $ObjType,
+                                "BaseEntry" => $newDoc->id,
+                                "CardCode" => $data['CardCode'],
+                                "CardName" => $data['CardName'],
+                                "WhsCode" => $value['WhsCode'],
+                                "ItemName" => $data['Dscription'],
+                            ]);
+                        }
+                    }
+                }
 
-            if ($objectTypePassedToTns != 112) {
-                NumberingSeries::dispatch($data['Series']);
+                if ($data['BaseType'] && $data['BaseEntry']) {
+                    $baseDocHeader->update([
+                        'DocStatus' => "C",
+                    ]);
+                }
+                array_push($documentRows, $rowItems);
             }
+            Log::info([$documentRows]);
 
-            // /**
-            //  * Compare the Document To BaseDocument
-            //  */
-            // (new GeneralDocumentService())->comporeRowToBaseRow($TargetTables->ObjectID, $newDoc->id);
-
-            // $newDoc->newObjType = $objectTypePassedToTns;
-
-            // if ($request['serviceCallId']) {
-            //     $oscl = OSCL::where('id', $request['serviceCallId'])->first();
-
-            //     if ($oscl->customer != $newDoc->CardCode) {
-            //         return (new ApiResponseService())
-            //             ->apiFailedResponseService(" C&G Error - Customer Code/Customer Name on JobCard and Expense Documents should be similar!");
-            //     }
-            //     (new ServiceCallService())->mapServiceCallWithExpenseDocument($objectTypePassedToTns, $newDoc->id, $request['serviceCallId']);
-            // }
-
-            //            dd($saveToDraft);
-            //            if ($saveToDraft == false) {
-            //                (new TransactionInventoryEffectAction())->transactionInventoryEffect($ObjType, $newDoc->id);
-            //            }
             (new SystemDefaults())->updateNextNumberNumberingSeries($data['Series']);
-            //     DB::connection("tenant")->commit();
-            //     //            $documentForDirecPostingToSAP = (new DocumentsService())->getDocumentForDirectPostingToSAP($newDoc->ObjType, $newDoc->id);
-            //     //            $newDoc->documentForDirecPostingToSAP = $documentForDirecPostingToSAP;
-               return (new ApiResponseService())->apiSuccessResponseService($newDoc);
-            // } catch (\Throwable $th) {
-            //     //            dd($th);
-            //     Log::info($th);
-            //     DB::connection("tenant")->rollback();
-                 return (new ApiResponseService())->apiFailedResponseService("Process failed, Server Error", $th);
+
+            DB::connection("tenant")->commit();
+
+            return (new ApiResponseService())->apiSuccessResponseService($newDoc);
+        } catch (\Throwable $th) {
+            Log::error($th->getMessage());
+            DB::connection("tenant")->rollback();
+            return (new ApiResponseService())
+                ->apiSuccessAbortProcessResponse("Process failed, Server Error" . $th->getMessage());
         }
     }
-
-  
-  
-
 }

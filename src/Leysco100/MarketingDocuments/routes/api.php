@@ -158,7 +158,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     //Inventory
     Route::get('get-my-stock', [MInventoryController::class, 'getMyStock']);
-    Route::get('warehouse', [MInventoryController::class, 'getWarehouse']);
+    //Route::get('warehouse', [MInventoryController::class, 'getWarehouse']);
 
     //Orders
     Route::get('order-types', [MOrderController::class, 'getOrderTypes']);

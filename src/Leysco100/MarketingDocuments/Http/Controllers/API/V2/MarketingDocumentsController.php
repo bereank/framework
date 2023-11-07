@@ -2,15 +2,15 @@
 
 namespace Leysco100\MarketingDocuments\Http\Controllers\API\V2;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Services\AuthorizationService;
-use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
 use Leysco100\Shared\Models\Administration\Models\EOTS;
 use Leysco100\Shared\Models\Administration\Models\User;
-use Leysco100\MarketingDocuments\Services\DocumentsService;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;
 use Leysco100\MarketingDocuments\Services\MarketingDocumentService;
 
@@ -26,13 +26,19 @@ class MarketingDocumentsController extends Controller
         $docNum = \Request::get('docNum');
         $page = $request->input('page', 1);
         $perPage = $request->input('per_page', 50);
+
+        $StartDate = request()->filled('StartDate') ? Carbon::parse(request()->input('StartDate'))->startOfDay() : Carbon::now()->startOfMonth();
+
+        $EndDate = request()->filled('EndDate') ? Carbon::parse(request()->input('EndDate'))->endOfDay() : Carbon::now()->endOfMonth();
+
         $user = User::where('id', Auth::user()->id)->with('oudg')->first();
+
         $tableObjType = $ObjType;
         if ($isDoc == 0) {
             $tableObjType = 112;
         }
-        $StartDate = $request['StartDate'];
-        $EndDate = $request['EndDate'];
+
+
         $DocumentTables = APDI::with('pdi1')
             ->where('ObjectID', $tableObjType)
             ->first();
@@ -43,7 +49,7 @@ class MarketingDocumentsController extends Controller
         if ($dataOwnership) {
             $ownerData =  (new AuthorizationService())->getDataOwnershipAuth($ObjType, 1);
         }
-     
+
         try {
             $data = $DocumentTables->ObjectHeaderTable::where('ObjType', $ObjType)
                 ->with('CreatedBy.ohem')
@@ -116,74 +122,45 @@ class MarketingDocumentsController extends Controller
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
+    /**
+     * Store a new marketing document based on the provided request.
+     *
+     * This method validates the request data, performs defaulting of fields, 
+     * validates the document fields, and creates a new marketing document.
+
+     * @param \Illuminate\Http\Request $request
+     *
+     */
     public function store(Request $request)
     {
+        // Step 1: Object Validation
+        $validator = Validator::make($request->all(), [
+            'ObjType' => 'required',
+        ]);
 
+        if ($validator->fails()) {
+            return (new ApiResponseService())->apiSuccessAbortProcessResponse($validator->errors());
+        }
 
-        $data = (new MarketingDocumentService())->BasicValidation($request);
-
-
-        $ObjType = (int) $request['ObjType'];
-
-        $data['saveToDraft'] = false;
         $TargetTables = APDI::with('pdi1')
-            ->where('ObjectID', $ObjType)
+            ->where('ObjectID', $request['ObjType'])
             ->first();
 
         if (!$TargetTables) {
             return (new ApiResponseService())
-                ->apiFailedResponseService("Not found document with objtype " . $ObjType);
+                ->apiFailedResponseService("Not found document with objtype " . $request['ObjType']);
         }
 
-        /**
-         * Handling  Document Numbering
-         */
+        // Step 2: Default Fields
+        $defaulted_data = (new MarketingDocumentService())->fieldsDefaulting($request->all());
 
-        $series = (new DocumentsService())->gettingNumberingSeries($TargetTables->id);
-
-        $data['DocNum'] =  $series['DocNum'];
-        $data['Series'] = $series['Series'];
-        /**
-         * Check if The Item has External Approval
-         */
-        if ($TargetTables->hasExtApproval == 1) {
-            $data['saveToDraft'] = true;
-            $TargetTables = APDI::with('pdi1')
-                ->where('ObjectID', 112)
-                ->first();
-        }
-
-        /**
-         * Check If Authorized
-         */
-        //        (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'write');
-
-        /**
-         * Mapping Req Name
-         */
-
-        $data['ReqName'] = null;
-        if ($ObjType == 205) {
-            if ($request['ReqType'] == 12) {
-                $data['ReqName'] = User::where('id', $request['Requester'])->value('name');
-            }
-
-            if ($request['ReqType'] == 171) {
-                $employee = OHEM::where('id', $request['Requester'])->first();
-                $data['ReqName'] = $employee->firstName . " " . $employee->lastName;
-            }
-        }
-
-        $data['checkStockAvailabilty'] = false;
-
-        if (($ObjType == 13 && $request['BaseType'] != 15) || $ObjType == 15) {
-            $data['checkStockAvailabilty']  = true;
-        }
-
-        // DB::connection("tenant")->beginTransaction();
-        // try {
+        // Step 3: Validate Document Fields
+        $validatedFields  = (new MarketingDocumentService())->validateFields($defaulted_data, $request['ObjType']);
 
 
-        $docData = (new MarketingDocumentService())->createDoc($data, $TargetTables);
+        // $validatedFields = (new MapApiFieldAction())->handle($defaulted_data, $TargetTables);
+
+        // Step 4: Create Document
+        return (new MarketingDocumentService())->createDoc($validatedFields, $TargetTables, $request['ObjType']);
     }
 }

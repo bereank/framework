@@ -2,9 +2,13 @@
 
 namespace Leysco100\Payments\Http\Controllers\API;
 
+use Carbon\Carbon;
+
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Leysco100\Shared\Models\Payments\Models\OCRP;
 use Leysco100\Payments\Http\Controllers\Controller;
 use Leysco100\Shared\Models\Administration\Models\User;
@@ -15,42 +19,56 @@ class PaymentsProcessingController extends Controller
 {
     public function kcbPaymentNotification(Request $request)
     {
+
+        Log::info([$request->all(), $request->header('signature')]);
         $user = User::where('id', 1)->first();
         Auth::login($user);
 
+        $path = __DIR__ . '/../../../resources/kcb_uat_publickey.pem';
+        $file = file_get_contents($path);
+        $publicKey = openssl_pkey_get_public($file);
+
+        $signature = $request->header('signature');
+
+        $isVerified = openssl_verify(json_encode($request->all(), true), $signature, $publicKey);
+
+        if (!$isVerified) {
+            Log::info('Signature Not valid' . $isVerified);
+            $data = [
+                'header' => [
+                    'messageID' => "",
+                    'originatorConversationID' => "",
+                    'statusCode' => '1',
+                    'statusMessage' => "Signature Not valid",
+                ],
+                'responsePayload' => [
+                    'transactionInfo' => [
+                        'transactionId' => "",
+                    ],
+                ],
+            ];
+            //  return response()->json($data);
+        }
+
         $Numbering = (new DocumentsService())
             ->getNumSerieByObjectId(218);
-        // $publicKey = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'public_key.pem');
-        // if (!$publicKey) {
-        //     die("Unable to load public key");
-        // }
-        // $message = $request->getContent();
 
-        // $signature = hex2bin(bin2hex($request->header('signature')));
-
-        // $result = openssl_verify($message, $signature, $publicKey, OPENSSL_ALGO_SHA256);
-
-        // if ($result === 1) {
-        //     return "Signature is valid. Message has not been tampered with.";
-        // } elseif ($result === 0) {
-        //     return "Signature is invalid. Message and signature do not match.";
-        // } else {
-        //     return "An error occurred during signature verification.";
-        // }
-
-        $data =  $request->all();
+        $data = $request->all();
 
         if (array_key_exists('requestPayload', $data)) {
             if (array_key_exists("additionalData", $data['requestPayload'])) {
                 if (array_key_exists("notificationData", $data['requestPayload']['additionalData'])) {
                     $paymentData =   $data['requestPayload']['additionalData']['notificationData'];
+
+                    $transactionDate = Carbon::parse($paymentData['transactionDate']);
+
                     $payment = [];
                     $payment['ShortCode'] = $paymentData['businessKey'] ?? "";
                     $payment['BusinessKey'] = $paymentData['businessKey'] ?? "";
                     $payment['BusinessKeyType'] = $paymentData['businessKeyType'] ?? "";
                     $payment['MSISDN'] = $paymentData['debitMSISDN'] ?? "";
                     $payment['TransactAmount'] = $paymentData['transactionAmt'] ?? "";
-                    $payment['TransactDate'] = $paymentData['transactionDate'] ?? "";
+                    $payment['TransactDate'] = $transactionDate ?? "";
                     $payment['TransactID'] = $paymentData['transactionID'] ?? "";
                     $payment['FirstName'] = $paymentData['firstName'] ?? "";
                     $payment['MiddleName'] = $paymentData['middleName'] ?? "";
@@ -60,7 +78,8 @@ class PaymentsProcessingController extends Controller
                     $payment['TransactType'] = $paymentData['transactionType'] ?? "";
                     $payment['Balance'] = $paymentData['balance'] ?? "";
                     $payment['DocNum'] =  $Numbering['NextNumber'];
-                    $payment['ObjType'] = 217;
+                    $payment['Source'] = 1;
+                    $payment['ObjType'] = 218;
                 }
             }
         }
@@ -87,6 +106,7 @@ class PaymentsProcessingController extends Controller
             (new SystemDefaults())->updateNextNumberNumberingSeries($Numbering['id']);
             return response()->json($data);
         } catch (\Throwable $th) {
+            Log::error('Logging Query Error' . $th->getMessage());
             $data = [
                 'header' => [
                     'messageID' => $messageID,
@@ -96,19 +116,46 @@ class PaymentsProcessingController extends Controller
                 ],
                 'responsePayload' => [
                     'transactionInfo' => [
-                        'transactionId' => $transaction->id,
+                        'transactionId' => "0001",
                     ],
                 ],
             ];
-            Log::info($th);
             return response()->json($data);
         }
     }
     public function kcbPaymentQuery(Request $request)
     {
+        Log::info("____________PAYMENT QUERY _______________________");
+        Log::info([json_encode($request->all(), true), gettype(json_encode($request->all(), true))]);
+
         $user = User::where('id', 1)->first();
         Auth::login($user);
 
+        $path = __DIR__ . '/../../../resources/public_key.pem';
+        $publicKey = file_get_contents($path);
+        $publicKey = openssl_pkey_get_public($publicKey);
+
+        $signature = $request->header('signature');
+
+        $isVerified = openssl_verify(json_encode($request->all(), true), $signature, $publicKey);
+
+        if (!$isVerified) {
+            Log::info('Signature Not valid' . $isVerified);
+            $data = [
+                'header' => [
+                    'messageID' => "",
+                    'originatorConversationID' => "",
+                    'statusCode' => '1',
+                    'statusMessage' => "Signature Not valid",
+                ],
+                'responsePayload' => [
+                    'transactionInfo' => [
+                        'transactionId' => "",
+                    ],
+                ],
+            ];
+            //return response()->json($data);
+        }
         $Numbering = (new DocumentsService())
             ->getNumSerieByObjectId(218);
 
@@ -140,6 +187,7 @@ class PaymentsProcessingController extends Controller
             (new SystemDefaults())->updateNextNumberNumberingSeries($Numbering['id']);
             return response()->json($responseData);
         } catch (\Throwable $th) {
+            Log::error('Logging Query Error' . $th->getMessage());
             $responseData = [
                 "header" => [
                     "messageID" => $messageID,
@@ -160,61 +208,175 @@ class PaymentsProcessingController extends Controller
                 ],
             ];
             (new SystemDefaults())->updateNextNumberNumberingSeries($Numbering['id']);
-            Log::info($th);
+
             return response()->json($responseData);
         }
     }
 
     public function  eqbValidation(Request $request)
     {
+        Log::info("____________EQB VALIDATION  _______________________");
+        Log::info($request->all());
 
-        if (Auth::attempt([
-            'email' => $request->username,
-            'password' => $request->password
-        ])) {
-            $data = [
-                "amount" => "230.0",
-                "billName" => "Test_Account_3",
-                "billNumber" => "33333333",
-                "billerCode" => "123456",
-                "createdOn" => "2016-12-20",
-                "currencyCode" => "KES",
-                "customerName" => "Test_Account_3",
-                "customerRefNumber" => "33333333",
-                "description" => "subscription fees",
-                "dueDate" => "2016-12-21",
-                "expiryDate" => "2016-12-29",
-                "Remarks" => "Fees",
+        $this->eqbAuth($request);
+        if (!Auth::check()) {
+            $data =   [
+                "amount" => 0,
+                "billNumber" => "",
+                "billName" => "",
+                "description" => "Invalid Credentials",
                 "type" => "1"
             ];
-            $invalidRes =     [
+            return response()->json($data);
+        }
+        if (empty($request['account'])) {
+            return response()->json([
                 "amount" => 0,
                 "billNumber" => "null",
                 "billName" => "null",
                 "description" => "bill number not found",
                 "type" => "1"
+            ]);
+        }
+
+        try {
+            $data = [
+                "amount" => "0.0",
+                "billName" => "Test_Account_1",
+                "billNumber" => "10192",
+                "billerCode" => "102345",
+                "createdOn" => "2023-11-01",
+                "currencyCode" => "KES",
+                "customerName" => "Test_Account_1",
+                "customerRefNumber" => "10192",
+                "description" => "buy goods",
+                "dueDate" => "2023-11-01",
+                "expiryDate" => "2023-11-01",
+                "Remarks" => "purchase",
+                "type" => "1"
             ];
-            return $data;
-        } else {
-            return response()->json('Auth Failed');
+            return response()->json([$data]);
+        } catch (\Throwable $th) {
+            Log::error('Validation Error' . $th->getMessage());
+            return response()->json([
+                "amount" => 0,
+                "billNumber" => "null",
+                "billName" => "null",
+                "description" => $th->getMessage(),
+                "type" => "1"
+            ]);
         }
     }
 
     public function eqbPaymentNotification(Request $request)
     {
 
-        // "username": "Equity",
-        // "password": "3pn!Ty@zoi9",
-        // "billNumber": "123456",
-        // "billAmount": "100",
-        // "CustomerRefNumber": "123456",
-        // "bankreference": "20170101100003485481",
-        // "tranParticular": "BillPayment",
-        // "paymentMode": "cash",
-        // "transactionDate": "01-01-2017 00:00:00",
-        // "phonenumber": "254765555136",
-        // "debitaccount": "0170100094903",
-        // "debitcustname": "HERMAN GITAU NYOTU"
+        Log::info("____________EQB PAYMENT NOTIFICATION  _______________________");
+        Log::info($request->all());
 
+        $this->eqbAuth($request);
+        if (!Auth::check()) {
+            $data =   [
+                "amount" => 0,
+                "billNumber" => "",
+                "billName" => "",
+                "description" => "Invalid Credentials",
+                "type" => "1"
+            ];
+            return response()->json($data);
+        }
+        try {
+            $Numbering = (new DocumentsService())
+                ->getNumSerieByObjectId(218);
+
+            $paymentData =  $request->all();
+
+            $exists = OCRP::where('BankRefNo', $paymentData['bankreference'])->exists();
+
+            if ($exists) {
+                return response()->json([
+                    "responseCode" => "OK",
+                    "responseMessage" => "DUPLICATE TRANSACTION"
+                ]);
+            }
+            $transactionDate = Carbon::parse( $paymentData['transactionDate'] );
+            $payment = [];
+
+            $payment['BusinessKey'] = $paymentData['billNumber'] ?? "";
+            $payment['TransactAmount'] = $paymentData['billAmount'] ?? "";
+            $payment['FirstName'] = $paymentData['debitcustname'] ?? "";
+            $payment['MSISDN'] = $paymentData['phonenumber'] ?? "";
+            $payment['Dscription'] = $paymentData['tranParticular'] ?? "";
+            $payment['TransactDate'] = $transactionDate ?? "";
+            $payment['TransactType'] = $paymentData['paymentMode'] ?? "";
+            $payment['CardCode'] = $paymentData['CustomerRefNumber'] ?? "";
+            $payment['debitAccNo'] = $paymentData['debitaccount'] ?? "";
+            $payment['BankRefNo'] = $paymentData['bankreference'] ?? "";
+            $payment['DocNum'] =  $Numbering['NextNumber'];
+            $payment['Source'] = 2;
+            $payment['ObjType'] = 218;
+
+            $transaction =   OCRP::create($payment);
+
+            (new SystemDefaults())->updateNextNumberNumberingSeries($Numbering['id']);
+
+            return response()->json([
+                "responseCode" => "OK",
+                "responseMessage" => "SUCCESSFUL"
+            ]);
+        } catch (\Throwable $th) {
+            Log::error('Payment Notification Error' . $th->getMessage());
+            return response()->json([
+                "responseCode" => "OK",
+                "responseMessage" => $th->getMessage()
+            ]);
+        }
+    }
+
+    public function eqbAuth($request)
+    {
+        try {
+            $request->validate([
+                'username' => 'required',
+                'password' => 'required',
+            ]);
+
+            $user = User::where('email', $request->username)
+                ->orWhere('name', $request->username)->first();
+
+            if (!$user) {
+                $data =   [
+                    "amount" => 0,
+                    "billNumber" => "",
+                    "billName" => "",
+                    "description" => "UserName Does Not Exist",
+                    "type" => "1"
+                ];
+                return response()->json($data);
+            }
+            $check = !Hash::check($request->password, $user->password);
+            if ($check) {
+                $data =   [
+                    "amount" => 0,
+                    "billNumber" => "",
+                    "billName" => "",
+                    "description" => "Invalid Password",
+                    "type" => "1"
+                ];
+                return response()->json($data);
+            } else {
+                Auth::login($user);
+            }
+        } catch (\Throwable $th) {
+            Log::info($th->getMessage());
+            $data =   [
+                "amount" => 0,
+                "billNumber" => "",
+                "billName" => "",
+                "description" => $th->getMessage(),
+                "type" => "1"
+            ];
+            return response()->json($data);
+        }
     }
 }
