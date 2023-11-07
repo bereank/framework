@@ -27,6 +27,6 @@ class AlertScanReport implements FromCollection, WithHeadings, WithMapping, Shou
     }
     public function map($rows_data): array
     {
-        return $this->data['data'];
+        return $rows_data;
     }
 }
