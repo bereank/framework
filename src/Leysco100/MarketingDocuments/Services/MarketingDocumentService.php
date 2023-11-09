@@ -312,21 +312,21 @@ class MarketingDocumentService
 
             //Serial Number Validations
             if ($product->ManSerNum == "Y") {
-                if ($value['ObjType'] == 14 || $value['ObjType'] == 16 || $docData['saveToDraft'] = true) {
+                if ($ObjType == 14 || $ObjType == 16 || $docData['saveToDraft'] = true) {
                     if (!isset($value['SerialNumbers']) || $value['Quantity'] != count($value['SerialNumbers'])) {
                         return (new ApiResponseService())
                             ->apiFailedResponseService("Serial number required  for item:" . $value['Dscription']);
                     }
                 }
 
-                if ($value['ObjType'] == 15) {
+                if ($ObjType == 15) {
                     if (!isset($value['SerialNumbers']) || $value['Quantity'] != count($value['SerialNumbers'])) {
                         return (new ApiResponseService())
                             ->apiFailedResponseService("Serial number required  for item:" . $value['Dscription']);
                     }
                 }
 
-                if ($value['ObjType'] == 13 && $value['BaseType'] != 15) {
+                if ($ObjType == 13 && $value['BaseType'] != 15) {
                     if (!isset($value['SerialNumbers']) || $value['Quantity'] != count($value['SerialNumbers'])) {
                         return (new ApiResponseService())
                             ->apiFailedResponseService("Serial number required  for item:" . $value['Dscription']);
