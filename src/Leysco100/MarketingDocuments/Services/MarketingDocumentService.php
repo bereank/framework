@@ -124,7 +124,7 @@ class MarketingDocumentService
     public function validateFields($docData, $ObjType)
     {
         //If Base Type Exist
-        if ($docData['BaseType'] && $docData['BaseEntry']) {
+        if (isset($docData['BaseType']) && isset($docData['BaseEntry'])) {
             $generalSettings = OADM::where('id', 1)->value('copyToUnsyncDocs');
             $BaseTables = APDI::with('pdi1')
                 ->where('ObjectID', $docData['BaseType'])
@@ -341,7 +341,7 @@ class MarketingDocumentService
     {
         DB::connection("tenant")->beginTransaction();
         //If Base Type Exist
-        if ($data['BaseType'] && $data['BaseEntry']) {
+        if (isset($data['BaseType']) && isset($data['BaseEntry'])) {
             $BaseTables = APDI::with('pdi1')
                 ->where('ObjectID', $data['BaseType'])
                 ->first();
@@ -465,7 +465,7 @@ class MarketingDocumentService
 
                 $rowItems = new $TargetTables->pdi1[0]['ChildTable']($rowdetails);
                 $rowItems->save();
-                if ($data['DocType'] == "I" && $value['ManSerNum'] == "Y") {
+                if ($data['DocType'] == "I" && isset($value['ManSerNum']) && $value['ManSerNum'] == "Y") {
                     $saveSerialDetails = false;
                     if ($data['ObjType'] == 14 || $data['ObjType'] == 16 || $data['ObjType'] == 17) {
                         $saveSerialDetails = true;
@@ -473,7 +473,7 @@ class MarketingDocumentService
                     if ($data['ObjType'] == 15) {
                         $saveSerialDetails = true;
                     }
-                    if ($data['ObjType'] == 13 && $data['BaseType'] != 15) {
+                    if ($data['ObjType'] == 13 && isset($value['BaseType']) && $value['BaseType'] != 15) {
                         $saveSerialDetails = true;
                     }
                     if ($saveSerialDetails) {
@@ -494,7 +494,7 @@ class MarketingDocumentService
                     }
                 }
 
-                if ($data['BaseType'] && $data['BaseEntry']) {
+                if (isset($data['BaseType']) && isset($data['BaseEntry'])) {
                     $baseDocHeader->update([
                         'DocStatus' => "C",
                     ]);
