@@ -2,6 +2,7 @@
 
 namespace Leysco100\Shared\Models\HumanResourse\Models;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
 use Leysco100\Shared\Models\Administration\Models\OUDP;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
@@ -14,15 +15,15 @@ class OHEM extends Model
 
     public function department()
     {
-    return $this->belongsTo(OUDP::class, 'Code', 'dept');
-    } 
+        return $this->belongsTo(OUDP::class, 'Code', 'dept');
+    }
 
     protected $appends = array('full_name');
     public function getFullNameAttribute()
     {
         return "{$this->firstName} {$this->middleName}  {$this->lastName}";
     }
-    
+
     public function managr()
     {
         return $this->belongsTo(OHEM::class, 'manager', "empID");
@@ -36,12 +37,18 @@ class OHEM extends Model
 
     public function subordinates()
     {
-        // return $this->employees()->with(
-        //     ['subordinates' => function ($query) {
-        //         $query->select('id', 'firstName', 'middleName', 'lastName', 'manager', 'empID');
-        //     }]
-        // );
-        return $this->employees();
+        $start = microtime(true);
+        $data = $this->employees()->with(
+            ['subordinates' => function ($query) {
+                $query->select('id', 'firstName', 'middleName', 'lastName', 'manager', 'empID');
+            }]
+
+        );
+        $end = microtime(true);
+        $executionTime = ($end - $start);
+        Log::info("QUERY Execution time: " . $executionTime . " seconds");
+        return $data;
+        //   return $this->employees();
     }
 
     public function peers()
