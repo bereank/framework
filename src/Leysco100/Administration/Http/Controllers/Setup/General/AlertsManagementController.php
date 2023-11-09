@@ -49,7 +49,7 @@ class AlertsManagementController extends Controller
      */
     public function store(Request $request)
     {
-     
+
         try {
             $validatedData = $request->validate([
                 'Code' => 'nullable|string',
@@ -97,7 +97,7 @@ class AlertsManagementController extends Controller
                 'History' =>  $request['History'] ?? null,
                 'QCategory' =>  $request['QCategory'] ?? null,
             ]);
-        
+
             if ($request['alt1']) {
 
                 foreach ($request['alt1'] as $user) {
@@ -178,23 +178,28 @@ class AlertsManagementController extends Controller
                 'alt1.users',
                 'alt2',
                 'alt3',
-                'alt5'
+                'alt4',
+                'alt5',
+                'alt6'
             )
-                ->with(['alt4' => function ($query) {
-                    $query->select('QueryId as id', 'DocEntry', 'QueryId');
-                }])
-                ->with(['alt6' => function ($query) {
-                    $query->select('QueryId as id', 'DocEntry', 'AlertId');
-                }])
                 ->where('id', $id)
                 ->first();
 
-
             if ($alertData) {
-                $alertData->alt4 = $alertData->alt4->map->only('QueryId');
-                $alertData->alt6 = $alertData->alt6->map->only('QueryId');
-            }
+                $alt4 = $alertData->alt4;
+                $alt6 = $alertData->alt6;
 
+                unset($alertData->alt4);
+                unset($alertData->alt6);
+
+                $alertData->alt4 = $alt4->pluck('QueryId')->map(function ($item) {
+                    return (int) $item;
+                });
+
+                $alertData->alt6 = $alt6->pluck('QueryId')->map(function ($item) {
+                    return (int) $item;
+                });
+            }
 
             return (new ApiResponseService())->apiSuccessResponseService($alertData);
         } catch (\Throwable $th) {
@@ -267,7 +272,7 @@ class AlertsManagementController extends Controller
                 $removed = $existing->diff($updated);
 
                 foreach ($request['alt1'] as $user) {
-                
+
                     $user_exists =     ALT1::where('DocEntry', $id)->where('UserSign', $user['UserSign'])->first();
 
                     if ($user_exists) {
@@ -304,10 +309,10 @@ class AlertsManagementController extends Controller
 
             if (array_key_exists('alt2',  $validatedData)) {
                 $existing = ALT2::where('DocEntry', $id)->pluck('GroupId');
-                
+
                 $updated = collect($request['alt2'])->pluck('GroupId');
-                
-                $removed = $existing->diff($updated);   
+
+                $removed = $existing->diff($updated);
 
                 foreach ($request['alt2'] as $group) {
                     $group_exists =     ALT2::where('DocEntry', $id)->where('GroupId', $group['GroupId'])->first();
@@ -403,7 +408,7 @@ class AlertsManagementController extends Controller
                 foreach ($request['alt6'] as $atchmt_query) {
                     $query_exists =  ALT6::where('QueryId',  $atchmt_query)->where('AlertId', $id)->first();
                     $alert_template =   ALT5::where('DocEntry', $id)->first();
-                    if ($query_exists) {   
+                    if ($query_exists) {
                         ALT6::where('QueryId', $atchmt_query)->where('AlertId', $id)->update(
                             [
                                 'DocEntry' => $alert_template->id,

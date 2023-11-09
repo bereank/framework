@@ -58,7 +58,7 @@ class MarketingDocumentsController extends Controller
             if ($ObjType != 205) {
                 $data = $DocumentTables->ObjectHeaderTable::select('id', 'CardCode', 'DocNum', 'CardName', 'ExtRef', 'ExtRefDocNum', 'UserSign', 'SlpCode', 'DataSource', 'DocStatus', 'ObjType', 'OwnerCode', 'DocDate', 'DocTotal', 'created_at')
                     ->where('ObjType', $ObjType)
-                    ->when($dataOwnership->Active, function ($query) use ($ownerData) {
+                    ->when($dataOwnership && $dataOwnership->Active, function ($query) use ($ownerData) {
                         $query->wherein('OwnerCode', $ownerData);
                     })
                     ->with('CreatedBy:name', 'ohem:id,empID,firstName,middleName,lastName')
