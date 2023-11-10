@@ -1,6 +1,6 @@
 <?php
 
-namespace Leysco100\Gpm\Mail;
+namespace Leysco100\Administration\Mail;
 
 use Illuminate\Support\Str;
 use Illuminate\Bus\Queueable;
@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
-use Leysco100\Gpm\Reports\AlertScanReport;
+use Leysco100\Administration\Reports\AlertsReport;
 use Leysco100\Shared\Models\Administration\Models\ALR2;
 use Leysco100\Shared\Models\Administration\Models\ALT3;
 use Leysco100\Shared\Models\Administration\Models\OALR;
@@ -48,7 +48,7 @@ class AlertMail extends Mailable
 
                 if ($QueryRes) {
                     $fileName = $query->saved_query->QName . $query->id . '.xlsx';
-                    Excel::store(new AlertScanReport($QueryRes), $fileName);
+                    Excel::store(new AlertsReport($QueryRes), $fileName);
                     $attachmentPath = Storage::path($fileName);
                     $attachments[] = $attachmentPath;
                 }
@@ -69,7 +69,7 @@ class AlertMail extends Mailable
         // Log::info(nl2br($tempBody));
 
         $mail = $this->subject($alert->alert_template->alt5->tempSubject)
-            ->markdown('gpm::alertNotification')
+            ->markdown('Administration::alertNotification')
             ->with('data', $data)
             ->with('tempBody', nl2br($tempBody))
             ->with('template', $alert->alert_template->alt5);

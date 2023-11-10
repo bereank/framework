@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Leysco100\Administration\Console\CreatePermissions;
 use Leysco100\Administration\Console\BinFieldActivationCommand;
+use Leysco100\Administration\Console\Alerts\ProcessAlertsCommand;
+use Leysco100\Administration\Console\Alerts\RestartAlertsCommand;
 use Leysco100\Administration\Console\Setup\ImportNumberingSeries;
 use Leysco100\Administration\Console\AdministrationInstallCommand;
 use Leysco100\Administration\Console\Setup\CreateUserFormSettings;
@@ -36,6 +38,8 @@ class AdministrationServiceProvider extends ServiceProvider
                 ImportNumberingSeries::class,
                 CreateUserFormSettings::class,
                 BinFieldActivationCommand::class,
+                ProcessAlertsCommand::class,
+                RestartAlertsCommand::class
             ]);
         }
 
@@ -43,6 +47,7 @@ class AdministrationServiceProvider extends ServiceProvider
         //  * Load Migrations And Views
         //  */
         $this->loadMigrationsFrom(__DIR__ . '/database/migrations/tenant');
+        $this->loadViewsFrom(__DIR__ . '/resources/views', 'administration');
         $this->registerRoutes();
     }
 

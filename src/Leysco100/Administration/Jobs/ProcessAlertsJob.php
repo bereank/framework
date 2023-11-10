@@ -1,6 +1,6 @@
 <?php
 
-namespace Leysco100\Shared\Jobs;
+namespace Leysco100\Administration\Jobs;
 
 
 use Carbon\Carbon;
@@ -12,7 +12,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Spatie\Multitenancy\Jobs\TenantAware;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Leysco100\Shared\Jobs\SendAlertEmailJob;
+use Leysco100\Administration\Jobs\SendAlertEmailJob;
 use Leysco100\Shared\Models\Administration\Models\ALR2;
 use Leysco100\Shared\Models\Administration\Models\ALR3;
 use Leysco100\Shared\Models\Administration\Models\OALR;
