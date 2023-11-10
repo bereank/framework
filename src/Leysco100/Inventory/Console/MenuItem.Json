@@ -1,5 +1,4 @@
 [
-
     {
         "icon": "mdi-chart-tree",
         "icon-alt": "mdi-chevron-down",
@@ -93,6 +92,20 @@
                         "icon": "mdi-con",
                         "Label": "Serials Report",
                         "link": "/inventory/report/serial-numbers-report",
+                        "Visible": "Y",
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "icon": "mdi-con",
+                "Label": "Bin Locations",
+                "Visible": "Y",
+                "children": [
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Bin Locations",
+                        "link": "/inventory/bin-locations",
                         "Visible": "Y",
                         "children": []
                     }

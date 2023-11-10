@@ -4,11 +4,13 @@ namespace Leysco100\Administration\Http\Controllers\Setup\Inventory;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Shared\Models\Finance\Models\ACP10;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Administration\Http\Controllers\Controller;
 use Leysco100\Shared\Models\Finance\Models\ChartOfAccount;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OBIN;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OBSL;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITW;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OWHS;
@@ -32,7 +34,13 @@ class WarehouseController extends Controller
             //             ->orWhereIn('WhsCode', ['L001', 'IMPGIT']);
             //     }
             // })->get();
-            $data = OWHS::get();
+
+            $binActive =  request()->filled('binActive') ? request()->input('binActive') : false;
+
+            $data = OWHS::when($binActive, function ($query) use ($binActive) {
+                return $query->where('BinActivat', $binActive);
+            })->with('binlocations')
+                ->get();
             return (new ApiResponseService())
                 ->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
@@ -77,7 +85,7 @@ class WarehouseController extends Controller
 
             if ($newWaharehouse->BinActivat) {
                 $details = [
-                    'BinSeptor' => $request['BinSeptor'],
+                    'BinSeptor' => $request['BinSeptor'] ?? '-',
                     'DftBinEnfd' => $request['DftBinEnfd'],
                     'AutoIssMtd' => $request['AutoIssMtd'],
                     'AutoRecvMd' => $request['AutoRecvMd'],
@@ -86,6 +94,7 @@ class WarehouseController extends Controller
                     'RecvMaxQty' => $request['RecvMaxQty'],
                 ];
                 OWHS::where('id', $newWaharehouse->id)->update($details);
+                $this->createSytbinLoc($request['WhsCode']);
             }
 
             foreach ($request['document_lines'] as $key => $value) {
@@ -165,20 +174,23 @@ class WarehouseController extends Controller
     {
         $this->validate($request, [
             'WhsName' => 'required',
+            'WhsCode' => 'required'
         ]);
 
         DB::connection("tenant")->beginTransaction();
         try {
+            $warehouse = OWHS::find($id);
             $details = [
                 'WhsName' => $request['WhsName'],
                 'BinActivat' => $request['BinActivat'],
             ];
-            
-            $warehouse =  OWHS::where('id', $id)->update($details);
+
+            $warehouse->update($details);
+
             //bin location data 
             if ($warehouse->BinActivat) {
                 $details = [
-                    'BinSeptor' => $request['BinSeptor'],
+                    'BinSeptor' => $request['BinSeptor'] ?? '-',
                     'DftBinEnfd' => $request['DftBinEnfd'],
                     'AutoIssMtd' => $request['AutoIssMtd'],
                     'AutoRecvMd' => $request['AutoRecvMd'],
@@ -187,6 +199,7 @@ class WarehouseController extends Controller
                     'RecvMaxQty' => $request['RecvMaxQty'],
                 ];
                 OWHS::where('id', $id)->update($details);
+                $this->createSytbinLoc($warehouse->WhsCode);
             }
             foreach ($request['whs1'] as $key => $value) {
                 $listdetals = [
@@ -215,5 +228,18 @@ class WarehouseController extends Controller
     {
         $data = OWHS::findOrFail($id);
         $data->delete();
+    }
+
+    public function createSytbinLoc($whscode)
+    {
+        $obin = OBIN::firstorCreate([
+            'SysBin' => 1,
+            'BinCode' => 'SYSTEM-BIN-' . $whscode,
+        ], [
+            'WhsCode' => $whscode,
+            'UserSign' => Auth::user()->id,
+            'ReceiveBin' => 0,
+        ]);
+        $obin->save();
     }
 }

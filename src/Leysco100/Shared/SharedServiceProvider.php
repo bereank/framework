@@ -5,9 +5,6 @@ namespace Leysco100\Shared;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Leysco100\Shared\Console\Setup\DocumentFormSettings;
-use Leysco100\Shared\Console\Setup\ProcessAlertsCommand;
-
-use Leysco100\Shared\Console\Setup\RestartAlertsCommand;
 use Leysco100\Shared\Console\Setup\CreateDefaultUserCommand;
 use Leysco100\Shared\Console\Setup\InstallSharedPackageCommand;
 
@@ -26,8 +23,7 @@ class SharedServiceProvider extends ServiceProvider
                 InstallSharedPackageCommand::class,
                 CreateDefaultUserCommand::class,
                 DocumentFormSettings::class,
-                ProcessAlertsCommand::class,
-                RestartAlertsCommand::class
+                
             ]);
         }
     }

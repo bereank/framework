@@ -6,13 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
-class OBSL extends Model
+class OBAT extends Model
 {
     use UsesTenantConnection;
 
     protected $guarded = ['id'];
-    protected $table = 'o_b_s_l';
-
+    protected $table = 'o_b_a_t';
 
     public function bin_field()
     {

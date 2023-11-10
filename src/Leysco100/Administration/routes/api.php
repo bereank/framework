@@ -78,6 +78,16 @@ Route::get('alerts/mail_template/show/{id}', [AlertsManagementController::class,
 Route::get('bin-locations/fields', [BinLocationsController::class, 'getBinLocFields']);
 Route::post('bin-locations/fields/create', [BinLocationsController::class, 'storeBinLocFields']);
 
+Route::get('bin-locations/sublevel_code', [BinLocationsController::class, 'subLevelsIndex']);
+Route::get('bin-locations/sublevel_code/{id}', [BinLocationsController::class, 'getSubLevel']);
+Route::post('bin-locations/sublevel_code/create', [BinLocationsController::class, 'storeSubLevels']);
+Route::put('bin-locations/sublevel_code/{id}', [BinLocationsController::class, 'editSubLevels']);
+
+Route::get('bin-locations/atrributes', [BinLocationsController::class, 'attributesIndex']);
+Route::get('bin-locations/atrributes/{id}', [BinLocationsController::class, 'getAttribute']);
+Route::post('bin-locations/atrributes/create', [BinLocationsController::class, 'storeAttributes']);
+Route::put('bin-locations/atrributes/{id}', [BinLocationsController::class, 'editAttributes']);
+
 
 // //Users
 // Route::get('users/get-user-defaults', [UserController::class, 'fetchDefaultsForCurrentUser']);
@@ -107,7 +117,7 @@ Route::apiResources(['employee-master-data' => EmployeeController::class]);
 Route::apiResources(['drivers' => DriverController::class]);
 Route::apiResources(['itemgroup' => ItemGroupController::class]);
 // Route::apiResources(['warehousetype' => WarehouseTypeConntroller::class]);
-//Route::apiResources(['warehouse' => WarehouseController::class]);
+Route::apiResources(['warehouse' => WarehouseController::class]);
 Route::apiResources(['shippingtype' => ShippingTypeController::class]);
 Route::apiResources(['uomgroup' => UoMGroupController::class]);
 Route::apiResources(['uom' => UoMController::class]);
