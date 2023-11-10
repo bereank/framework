@@ -1,6 +1,6 @@
 <?php
 
-namespace Leysco100\Shared\Jobs;
+namespace Leysco100\Administration\Jobs;
 
 
 use Illuminate\Bus\Queueable;

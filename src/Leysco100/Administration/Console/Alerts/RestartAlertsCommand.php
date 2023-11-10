@@ -1,6 +1,6 @@
 <?php
 
-namespace Leysco100\Shared\Console\Setup;
+namespace Leysco100\Administration\Console\Alerts;
 
 use Illuminate\Console\Command;
 use Spatie\Multitenancy\Commands\Concerns\TenantAware;
@@ -15,7 +15,7 @@ class RestartAlertsCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'leysco100:shared:restart-alerts-command {--tenant=*}';
+    protected $signature = 'leysco100:administration:restart-alerts-command {--tenant=*}';
 
     /**
      * The console command description.
