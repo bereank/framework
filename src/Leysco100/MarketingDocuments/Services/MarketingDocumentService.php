@@ -309,13 +309,15 @@ class MarketingDocumentService
                     }
                 }
             }
-
+            $value['ManSerNum'] = false;
             //Serial Number Validations
             if ($product->ManSerNum == "Y") {
                 if ($ObjType == 14 || $ObjType == 16 || $docData['saveToDraft'] = true) {
                     if (!isset($value['SerialNumbers']) || $value['Quantity'] != count($value['SerialNumbers'])) {
                         return (new ApiResponseService())
                             ->apiFailedResponseService("Serial number required  for item:" . $value['Dscription']);
+                    } else {
+                        $value['ManSerNum'] = true;
                     }
                 }
 
@@ -323,6 +325,8 @@ class MarketingDocumentService
                     if (!isset($value['SerialNumbers']) || $value['Quantity'] != count($value['SerialNumbers'])) {
                         return (new ApiResponseService())
                             ->apiFailedResponseService("Serial number required  for item:" . $value['Dscription']);
+                    } else {
+                        $value['ManSerNum'] = true;
                     }
                 }
 
@@ -330,6 +334,8 @@ class MarketingDocumentService
                     if (!isset($value['SerialNumbers']) || $value['Quantity'] != count($value['SerialNumbers'])) {
                         return (new ApiResponseService())
                             ->apiFailedResponseService("Serial number required  for item:" . $value['Dscription']);
+                    } else {
+                        $value['ManSerNum'] = true;
                     }
                 }
             }
@@ -466,6 +472,7 @@ class MarketingDocumentService
                 $rowItems = new $TargetTables->pdi1[0]['ChildTable']($rowdetails);
                 $rowItems->save();
                 if ($data['DocType'] == "I" && isset($value['ManSerNum']) && $value['ManSerNum'] == "Y") {
+
                     $saveSerialDetails = false;
                     if ($data['ObjType'] == 14 || $data['ObjType'] == 16 || $data['ObjType'] == 17) {
                         $saveSerialDetails = true;
@@ -478,17 +485,18 @@ class MarketingDocumentService
                     }
                     if ($saveSerialDetails) {
                         foreach ($value['SerialNumbers'] as $key => $serial) {
+                            Log::info(["serials"=>$serial]);
                             $LineNum = $key;
                             SRI1::create([
                                 "ItemCode" => $value['ItemCode'],
                                 "SysSerial" => $serial['SysNumber'] ?? $serial['SysSerial'],
                                 "LineNum" => $rowItems->id,
-                                "BaseType" => $value['saveToDraft'] ? 112 : $ObjType,
+                                "BaseType" => $data['saveToDraft'] ? 112 : $ObjType,
                                 "BaseEntry" => $newDoc->id,
                                 "CardCode" => $data['CardCode'],
                                 "CardName" => $data['CardName'],
                                 "WhsCode" => $value['WhsCode'],
-                                "ItemName" => $data['Dscription'],
+                                "ItemName" => $value['Dscription'],
                             ]);
                         }
                     }
