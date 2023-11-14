@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\ExOrder;
 use App\Models\ExOrderItems;
 use Illuminate\Http\Request;
+use Leysco100\Shared\Models\CUFD;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Shared\Models\Shared\Models\APDI;
@@ -32,13 +33,13 @@ class MOrderController extends Controller
      */
     public function index()
     {
-        
+
         $CardCode = \Request::get('CardCode');
         $data = ORDR::with('outlet:id,CardCode,CardName,Address,frozenFor')
             ->with('CreatedBy:id,name')
             ->with(['document_lines' => function ($query) {
                 $query->with('ItemDetails:id,ItemCode,ItemName')
-                ->select('id','DocEntry', 'Quantity', 'Price', 'LineTotal', 'ItemCode');
+                    ->select('id', 'DocEntry', 'Quantity', 'Price', 'LineTotal', 'ItemCode');
             }])
             ->select('id', 'CardCode', 'DocType', 'DocTotal', 'UserSign', 'created_at', 'WddStatus', 'ExtRef', 'ExtRefDocNum')
             ->where(function ($q) {
@@ -47,7 +48,7 @@ class MOrderController extends Controller
                     $q->where('UserSign', $user->id);
                 }
             })
-          
+
             ->where(function ($q) use ($CardCode) {
                 if ($CardCode) {
                     $q->where('CardCode', $CardCode);
@@ -62,7 +63,7 @@ class MOrderController extends Controller
                 ->where('DocEntry', $value->id)
                 ->orderBy('id', 'desc')
                 ->first();
-        //    $value->OrderedItems = $Items;
+            //    $value->OrderedItems = $Items;
 
             $value->WddStatus = "N";
             $value->ErrorMessage = $checkErrors ? $checkErrors->ErrorMessage : "Pending Sync";
@@ -73,7 +74,7 @@ class MOrderController extends Controller
         }
         return $data;
     }
-   
+
 
     public function ExternalOrder(Request $request)
     {
@@ -129,9 +130,9 @@ class MOrderController extends Controller
     {
         $user = Auth::user();
 
-       $this->validate($request, [
-           'CardCode' => 'required|exists:tenant.o_c_r_d_s,id',
-       ]);
+        $this->validate($request, [
+            'CardCode' => 'required|exists:tenant.o_c_r_d_s,id',
+        ]);
 
         $Items = $request['Items'];
 
@@ -341,7 +342,7 @@ class MOrderController extends Controller
                     "id" => 1,
                     "Type" => "Order",
                     "Name" => "Sales Order",
-                    "doctype"=>17
+                    "doctype" => 17
                 ],
                 [
                     "id" => 2,
@@ -359,23 +360,61 @@ class MOrderController extends Controller
                     "id" => 4,
                     "Type" => "Payments",
                     "Name" => "invoice and Payments",
-                    "doctype"=>13,
+                    "doctype" => 13,
                 ],
                 [
                     "id" => 5,
                     "Type" => "Quotation",
                     "Name" => "Sales Quotation",
-                    "doctype"=>23
+                    "doctype" => 23
                 ],
                 [
                     "id" => 6,
                     "Type" => "ARCreditMemo",
                     "Name" => "A/R Credit Memo",
-                    "doctype"=>14
+                    "doctype" => 211
                 ],
-                
+
 
             ];
+
+
+            foreach ($data as &$item) {
+                $form = APDI::with('pdi1')
+                    ->where('ObjectID', $item['doctype'])
+                    ->first();
+                if (!$form) {
+                    return;
+                }
+
+                $headerTable = (new $form->ObjectHeaderTable)->getTable();
+
+                $userFields = CUFD::where('ObjType', $item['doctype'])
+                    ->where("TableName", $headerTable)
+                    ->select(
+                        "id",
+                        "FieldName",
+                        "FieldDescription",
+                        "NotNull"
+                    )
+                    ->get();
+
+                $line_table = (new $form->pdi1[0]['ChildTable'])->getTable();
+
+                $LineuserFields = CUFD::where('ObjType', $item['doctype'])
+                    ->where("TableName", $line_table)
+                    ->select(
+                        "id",
+                        "FieldName",
+                        "FieldDescription",
+                        "NotNull"
+                    )
+                    ->get();
+
+                $item['HeaderUserFields'] = $userFields;
+
+                $item['LineUserFields'] = $LineuserFields;
+            }
             return $data;
         } catch (\Throwable $th) {
             return $th->getMessage();
