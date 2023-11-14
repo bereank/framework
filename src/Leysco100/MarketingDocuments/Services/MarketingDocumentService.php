@@ -345,6 +345,7 @@ class MarketingDocumentService
 
     public function createDoc($data, $TargetTables, $ObjType)
     {
+
         DB::connection("tenant")->beginTransaction();
         //If Base Type Exist
         if (isset($data['BaseType']) && isset($data['BaseEntry'])) {
@@ -405,7 +406,14 @@ class MarketingDocumentService
             $newDoc = new $TargetTables->ObjectHeaderTable(array_filter($NewDocDetails));
 
             $newDoc->save();
-
+            if (!empty($data['udfs'])) {
+                $headerUDF = [];
+                foreach ($data['udfs'] as $key => $value) {
+                    $headerUDF[$key] = $value;
+                }
+                // Update the model udf's 
+                $newDoc->update($headerUDF);
+            }
             // Document Rows
             $documentRows = [];
             foreach ($data['document_lines'] as $key => $value) {
@@ -471,6 +479,15 @@ class MarketingDocumentService
 
                 $rowItems = new $TargetTables->pdi1[0]['ChildTable']($rowdetails);
                 $rowItems->save();
+
+                $lineUDF = [];
+                if (!empty($value['udfs'])) {
+                    foreach ($value['udfs'] as  $key => $value) {
+                        $lineUDF[$key] = $value;
+                    }
+                    // Update the model udf's 
+                    $rowItems->update($lineUDF);
+                }
                 if ($data['DocType'] == "I" && isset($value['ManSerNum']) && $value['ManSerNum'] == "Y") {
 
                     $saveSerialDetails = false;
@@ -485,7 +502,7 @@ class MarketingDocumentService
                     }
                     if ($saveSerialDetails) {
                         foreach ($value['SerialNumbers'] as $key => $serial) {
-                            Log::info(["serials"=>$serial]);
+                            Log::info(["serials" => $serial]);
                             $LineNum = $key;
                             SRI1::create([
                                 "ItemCode" => $value['ItemCode'],
@@ -509,12 +526,11 @@ class MarketingDocumentService
                 }
                 array_push($documentRows, $rowItems);
             }
-            Log::info([$documentRows]);
 
             (new SystemDefaults())->updateNextNumberNumberingSeries($data['Series']);
 
             DB::connection("tenant")->commit();
-
+            $newDoc['document_lines'] = $documentRows;
             return (new ApiResponseService())->apiSuccessResponseService($newDoc);
         } catch (\Throwable $th) {
             Log::error($th->getMessage());
