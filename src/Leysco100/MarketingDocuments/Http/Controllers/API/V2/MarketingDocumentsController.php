@@ -11,6 +11,7 @@ use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Services\AuthorizationService;
 use Leysco100\Shared\Models\Administration\Models\EOTS;
 use Leysco100\Shared\Models\Administration\Models\User;
+use Leysco100\MarketingDocuments\Actions\MapApiFieldAction;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;
 use Leysco100\MarketingDocuments\Services\MarketingDocumentService;
 
@@ -156,11 +157,10 @@ class MarketingDocumentsController extends Controller
 
         // Step 3: Validate Document Fields
         $validatedFields  = (new MarketingDocumentService())->validateFields($defaulted_data, $request['ObjType']);
-
-
-        // $validatedFields = (new MapApiFieldAction())->handle($defaulted_data, $TargetTables);
-
         // Step 4: Create Document
-        return (new MarketingDocumentService())->createDoc($validatedFields, $TargetTables, $request['ObjType']);
+        $docData = (new MapApiFieldAction())->handle($validatedFields, $TargetTables);
+
+        // Step 5: Create Document
+        return (new MarketingDocumentService())->createDoc($docData, $TargetTables, $request['ObjType']);
     }
 }
