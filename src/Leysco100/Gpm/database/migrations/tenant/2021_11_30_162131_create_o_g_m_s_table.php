@@ -30,6 +30,8 @@ class CreateOGMSTable extends Migration
             $table->longText('LineDetails');
             $table->integer('ScanLogID')->nullable()->comment("Scan Log that realeased the goods");
             $table->string('Comment')->nullable();
+            $table->string('BPLId')->nullable();
+            $table->string('OwnerCode')->nullable();
             $table->timestamps();
         });
     }
