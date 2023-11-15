@@ -508,6 +508,8 @@ class DocumentController extends Controller
             $checkStockAvailabilty = true;
         }
 
+
+
         DB::connection("tenant")->beginTransaction();
         try {
 
@@ -532,13 +534,8 @@ class DocumentController extends Controller
                 'Department' => $request['Department'],
                 'CardName' => $customerDetails ? $customerDetails->CardName : null,
                 'SlpCode' => $request['SlpCode'], // Sales Employee
-                'U_SalePipe' => $request['U_SalePipe'], // Sales Pipe Line
 //                'OwnerCode' => $user->EmpID, //Owner Code
                 'OwnerCode' => $request['OwnerCode'], //Owner Code
-                'U_CashMail' => $request['U_CashMail'], //Cash Customer  Email
-                'U_CashName' => $request['U_CashName'], //Cash Customer  Name
-                'U_CashNo' => $request['U_CashNo'], // Cash Customer No
-                'U_IDNo' => $request['U_IDNo'], // Id no
                 'NumAtCard' => $request['NumAtCard'] ? $request['NumAtCard'] : null,
                 'CurSource' => $request['CurSource'],
                 'DocTotal' => $request['DocTotal'],
@@ -561,24 +558,12 @@ class DocumentController extends Controller
                 'DiscPrcnt' => $request['DiscPrcnt'] ?? 0, //Discount Percentages
                 'DiscSum' => $request['DiscSum'], // Discount Sum
                 'BPLId' => $request['BPLId'],
-                'U_SaleType' => $request['U_SaleType'], // Sale Type
                 'Comments' => $request['Comments'], //comments
                 'NumAtCard2' => $request['NumAtCard2'],
                 'JrnlMemo' => $request['JrnlMemo'], // Journal Remarks
                 'UseShpdGd' => $request['UseShpdGd'] ?? "N",
                 'Rounding' => $request['Rounding'] ?? "N",
                 'RoundDif' => $request['RoundDif'] ?? 0,
-                'U_ServiceCall' => $request['U_ServiceCall'],
-                'U_DemoLocation' => $request['U_DemoLocation'],
-                'U_Technician' => $request['U_Technician'],
-                'U_Location' => $request['U_Location'],
-                'U_MpesaRefNo' => $request['U_MpesaRefNo'],
-                'U_PCash' => $request['U_PCash'],
-                'U_transferType' => $request['U_transferType'],
-                'U_SSerialNo' => $request['U_SSerialNo'],
-                'U_TypePur' => $request['U_TypePur'],
-                'U_NegativeMargin' => $request['U_NegativeMargin'],
-                'U_BaseDoc' => $request['U_BaseDoc'],
                 'DataSource' => "I",
                 'ExtRef' => $saveToDraft ? null : "N/A",
                 'ExtRefDocNum' => $saveToDraft ? null : "N/A",
@@ -588,6 +573,8 @@ class DocumentController extends Controller
             $newDoc = new $TargetTables->ObjectHeaderTable(array_filter($NewDocDetails));
 
             $newDoc->save();
+
+            $newDoc->update($request->UserFields);
 
             $documentRows = [];
 
@@ -902,11 +889,16 @@ class DocumentController extends Controller
         if (!$data){
             return (new ApiResponseService())->apiFailedResponseService("Error Document not found");
         }
-        try {
-            if ($request['files']) {
+
+        if (isset($request['files'])){
+            try {
                 $attachment = new OATC();
                 $attachment->ExtRef = $ExtRefAtcEntry;
                 $attachment->save();
+
+                $data->update([
+                    "AtcEntry" => $attachment->id
+                ]);
                 foreach ($request['files'] as $key => $value) {
                     $fileUpload = new ATC1();
                     $fileUpload->AbsEntry = $attachment->id;
@@ -919,15 +911,13 @@ class DocumentController extends Controller
                     $fileUpload->UsrID = Auth::user()->id;
                     $fileUpload->save();
                 }
+                return (new ApiResponseService())->apiSuccessResponseService("Uploaded Successfully");
+            } catch (\Throwable $th) {
+                Log::info($th);
+                return (new ApiResponseService())->apiFailedResponseService("Error uploading attachment");
             }
-            $data->update([
-                "AtcEntry" => $attachment->id
-            ]);
-            return (new ApiResponseService())->apiSuccessResponseService("Uploaded Successfully");
-        } catch (\Throwable $th) {
-            Log::info($th);
-            return (new ApiResponseService())->apiFailedResponseService("Error Uploading attachments");
         }
+        return (new ApiResponseService())->apiFailedResponseService("No attachment files found");
     }
 
     //UpdateDocument

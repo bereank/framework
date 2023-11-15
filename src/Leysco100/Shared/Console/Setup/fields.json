@@ -353,8 +353,8 @@
     "Location": 1
   },
   {
-    "FieldName": "TotalBeforeDiscount",
-    "Label": "Total Before Discount",
+    "FieldName": "OwnerCode",
+    "Label": "Document Owner",
     "FieldType": "textfield",
     "ColumnWidth": 3,
     "Visible": "Y",
@@ -365,8 +365,8 @@
     "Location": 1
   },
   {
-    "FieldName": "OwnerCode",
-    "Label": "Document Owner",
+    "FieldName": "TotalBeforeDiscount",
+    "Label": "Total Before Discount",
     "FieldType": "textfield",
     "ColumnWidth": 3,
     "Visible": "Y",
@@ -405,7 +405,7 @@
     "FieldName": "DiscPrcnt",
     "Label": "Discount %",
     "FieldType": "textfield",
-    "ColumnWidth": 2,
+    "ColumnWidth": 3,
     "Visible": "Y",
     "Readonly": "N",
     "Required": "N",
@@ -417,7 +417,7 @@
     "FieldName": "DiscSum",
     "Label": "Discount Amount",
     "FieldType": "textfield",
-    "ColumnWidth": 2,
+    "ColumnWidth": 3,
     "Visible": "Y",
     "Readonly": "Y",
     "Required": "N",

@@ -64,29 +64,30 @@ class GeneralDocumentValidationService
                 (new ApiResponseService())->apiSuccessAbortProcessResponse("Customer is Required");
             }
 
-            if (!isset($request['U_CashName'])) {
+
+            if (!isset($request->UserFields['U_CashName'])) {
                 (new ApiResponseService())->apiSuccessAbortProcessResponse("Cash Customer is Required");
             }
 
-            if ($request['U_CashName']) {
-                if (strlen($request['U_CashName']) > 50) {
+            if ($request->UserFields['U_CashName']) {
+                if (strlen($request->UserFields['U_CashName']) > 50) {
                     (new ApiResponseService())->apiSuccessAbortProcessResponse("Cash Customer is incorrect");
                 }
-                $validate_U_CashName = StoredProcedureExternalMethodsAction::ValidateName($request['U_CashName']);
+                $validate_U_CashName = StoredProcedureExternalMethodsAction::ValidateName($request->UserFields['U_CashName']);
                 if (!$validate_U_CashName) {
                     (new ApiResponseService())->apiSuccessAbortProcessResponse("CG - Ensure you have Captured A Valid Cash Customer Name with atleast 2 Names e.g \"Ali Tom\"");
                 }
             }
 
-            if (!isset($request['U_CashNo'])) {
+            if (!isset($request->UserFields['U_CashNo'])) {
                 (new ApiResponseService())->apiSuccessAbortProcessResponse("Customer Phone is Required");
             }
 
-            if ($request['U_CashNo']) {
-                if (strlen($request['U_CashNo']) < 10) {
+            if ($request->UserFields['U_CashNo']) {
+                if (strlen($request->UserFields['U_CashNo']) < 10) {
                     (new ApiResponseService())->apiSuccessAbortProcessResponse("Customer Phone is incorrect");
                 }
-                $validate_U_CashNo = StoredProcedureExternalMethodsAction::ValidateMobileNumber($request['U_CashNo']);
+                $validate_U_CashNo = StoredProcedureExternalMethodsAction::ValidateMobileNumber($request->UserFields['U_CashNo']);
                 if (!$validate_U_CashNo) {
                     (new ApiResponseService())->apiSuccessAbortProcessResponse("CG - Ensure you have Captured A Valid Mobile Phone Number e.g. +2547**123***");
                 }
@@ -96,18 +97,18 @@ class GeneralDocumentValidationService
             //                (new ApiResponseService())->apiSuccessAbortProcessResponse("Customer ID No is Required");
             //            }
 
-            if ($request['U_IDNo']) {
-                if (!is_numeric($request['U_IDNo'])) {
+            if (isset($request->UserFields['U_IDNo'])) {
+                if (!is_numeric($request->UserFields['U_IDNo'])) {
                     (new ApiResponseService())->apiSuccessAbortProcessResponse("Customer ID is incorrect");
                 }
             }
 
-            if (!$request['U_CashMail']) {
-                (new ApiResponseService())->apiSuccessAbortProcessResponse("Customer Email is Required");
-            }
+//            if (!$request->UserFields['U_CashMail']) {
+//                (new ApiResponseService())->apiSuccessAbortProcessResponse("Customer Email is Required");
+//            }
 
-            if ($request['U_CashMail']) {
-                $validate_U_CashMail = StoredProcedureExternalMethodsAction::ValidateEmail($request['U_CashMail']);
+            if (isset($request->UserFields['U_CashMail'])) {
+                $validate_U_CashMail = StoredProcedureExternalMethodsAction::ValidateEmail($request->UserFields['U_CashMail']);
                 if (!$validate_U_CashMail) {
                     (new ApiResponseService())->apiSuccessAbortProcessResponse("CG - Ensure you have Captured A Valid email Adress e.g.\"geff@gmail.com\", or indicate N/A where email does not exist");
                 }

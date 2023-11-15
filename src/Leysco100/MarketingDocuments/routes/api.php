@@ -40,7 +40,7 @@ use Leysco100\MarketingDocuments\Http\Controllers\API\V1\Integrator\IIncomingPay
 // Route::get('pending_recur_trans', [RecurringTransactionsTempController::class, 'pendingTransactions']);
 Route::post('documents', [DocumentController::class, 'store']);
 Route::put('documents', [DocumentController::class, 'updateSingleDocument']);
-Route::put('attachments', [DocumentController::class, 'upload']);
+Route::any('attachments', [DocumentController::class, 'upload']);
 Route::post('documents/{ObjType}', [DocumentController::class, 'getDocData']);
 Route::post('marketing-doc-approvers/{ObjType}/{DocEntry}', [DocumentController::class, 'getDocumentApprovalStatus']);
 // Route::post('marketing-doc-close/{ObjType}/{DocEntry}', [DocumentController::class, 'closeSingleDocument']);

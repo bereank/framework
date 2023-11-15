@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Leysco100\BusinessPartner\Console\BusinessPartnerInstallCommand;
 use Leysco100\MarketingDocuments\Console\MaketingDocumentsInstallCommand;
-
+use Leysco100\MarketingDocuments\Console\MaketingDocumentsUdfsCreateCommand;
 
 
 class MarketingDocumentsServiceProvider extends ServiceProvider
@@ -30,7 +30,8 @@ class MarketingDocumentsServiceProvider extends ServiceProvider
 
 
             $this->commands([
-                MaketingDocumentsInstallCommand::class
+                MaketingDocumentsInstallCommand::class,
+                MaketingDocumentsUdfsCreateCommand::class
             ]);
         }
 
