@@ -1,0 +1,14 @@
+[
+  {
+    "FieldName": "DiscPrcnt",
+    "Label": "Discount %",
+    "FieldType": "textfield",
+    "ColumnWidth": 3,
+    "Visible": "Y",
+    "Readonly": "N",
+    "Required": "N",
+    "data": null,
+    "TabID": null,
+    "Location": 0
+  }
+]

@@ -65,7 +65,7 @@ class FormSettingsController extends Controller
 //        $line_table = (new $form->pdi1[0]['ChildTable'])->getTable();
         $header_table = (new $form->ObjectHeaderTable)->getTable();
 
-        $UserFields = CUFD::where('ObjType', $ObjType)
+        $UDFs = CUFD::where('ObjType', $ObjType)
             ->where("TableName",$header_table)
             ->get();
 
@@ -127,7 +127,7 @@ class FormSettingsController extends Controller
             'ObjType' => $ObjType,
             'HeaderFields' => $headerFields,
             'FooterFields' => $footerFields,
-            'UserFields' => $UserFields,
+            'UDFs' => $UDFs,
             'tabs' => $tabs,
             'DfltSeries' => $documentDefaultSeries,
             'Series' => $Series,
