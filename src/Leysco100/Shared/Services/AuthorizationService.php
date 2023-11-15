@@ -63,6 +63,10 @@ class AuthorizationService
                 "key" => "home",
             ],
             [
+                "title" => "Dashboard",
+                "key" => "dashboard",
+            ],
+            [
                 "title" => "Targets",
                 "key" => "sales-targets",
 
