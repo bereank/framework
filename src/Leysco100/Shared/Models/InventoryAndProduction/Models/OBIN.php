@@ -16,4 +16,14 @@ class OBIN extends Model
     {
         return $this->hasMany(OBSL::class, 'SL1Abs');
     }
+
+    public function warehouse()
+    {
+        return $this->belongsTo(OWHS::class, 'WhsCode', 'WhsCode');
+    }
+
+    public function bin_items()
+    {
+        return $this->hasMany(OIBQ::class, 'BinAbs');
+    }
 }

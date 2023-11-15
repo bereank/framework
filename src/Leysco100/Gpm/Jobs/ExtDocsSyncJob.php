@@ -41,7 +41,7 @@ class ExtDocsSyncJob  implements ShouldQueue, TenantAware
      */
     public function handle()
     {
-       
+
         DB::connection('tenant')->beginTransaction();
         try {
             $data = $this->newRecords;
@@ -65,7 +65,8 @@ class ExtDocsSyncJob  implements ShouldQueue, TenantAware
                         'GenerationDateTime' => Carbon::parse($value['GenerationDateTime'])->format('Y-m-d H:i:s'),
                         'DocTotal' => $value['DocTotal'],
                         'LineDetails' => $value['LineDetails'],
-                        'OwnerCode'=> $value['OwnerCode'] ?? null
+                        'OwnerCode' => $value['OwnerCode'] ?? null,
+                        'BPLId' => $value['BPLId'] ?? null,
                     ]
                 );
                 if ($data->wasRecentlyCreated) {
@@ -75,26 +76,22 @@ class ExtDocsSyncJob  implements ShouldQueue, TenantAware
                     $lineNew = explode('|', $value['LineDetails']);
 
                     $difference = array_diff($lineNew, $lineOld);
-                  
-                    if(!empty($difference)){
+
+                    if (!empty($difference)) {
                         $res = collect($difference)->values()->join('|');
 
                         $result = $data->LineDetails . '|' . $res;
-    
+
                         OGMS::where('ExtRefDocNum', $data->ExtRefDocNum)->update([
                             'LineDetails' => $result
                         ]);
-                    }    
+                    }
                 }
             }
             DB::connection('tenant')->commit();
         } catch (\Throwable $th) {
             DB::connection('tenant')->rollback();
-            Log::info([$th]);
-            // $recipient = OADM::where('id', 2)->value("NotifEmail"); 
-            // $message= 'EXT Syncing Failure'.'
-            //      ' . $th->getMessage();
-            // (new NotificationsService())->sendNotification($message, $recipient);
+            Log::info($th);
         }
     }
 }

@@ -26,4 +26,9 @@ class OWHS extends Model
     {
         return $this->hasMany(WHS1::class, 'WhsCode');
     }
+
+    public function binlocations()
+    {
+        return $this->hasMany(OBIN::class, 'WhsCode', 'WhsCode');
+    }
 }

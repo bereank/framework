@@ -90,6 +90,7 @@ class GUserController extends Controller
                 'type' => $request['type'],
                 'gate_id' => $request['gate_id'],
                 'status' => 1,
+                'EmpID' => $request['EmpID'] ?? null,
 
             ]);
             return (new ApiResponseService())->apiSuccessResponseService("Created Successfully");
@@ -162,7 +163,7 @@ class GUserController extends Controller
                 'name' => $request['name'],
                 'email' => $request['email'],
                 'account' => $request['name'],
-                'DfltsGroup' => $request['DfltsGroup']?? 1,
+                'DfltsGroup' => $request['DfltsGroup'] ?? 1,
                 'phone_number' => $request['phone_number'],
                 //                'SUPERUSER' => $SUPERUSER,
                 'password' => $request["password"] ? Hash::make($request['password']) : $user->password,
@@ -170,6 +171,7 @@ class GUserController extends Controller
                 'type' => $request['type'],
                 'gate_id' => $request['gate_id'],
                 //                'status' => $STATUS,
+                'EmpID' => $request['EmpID'] ?? null,
 
             ]));
             $user->update([
@@ -192,7 +194,7 @@ class GUserController extends Controller
     public function destroy($id)
     {
         $user = User::findOrFail($id);
-        if (!$user){
+        if (!$user) {
             return (new ApiResponseService())->apiFailedResponseService("User $id not found");
         }
         $user->delete();

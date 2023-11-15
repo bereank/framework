@@ -124,7 +124,7 @@ class MarketingDocumentService
     public function validateFields($docData, $ObjType)
     {
         //If Base Type Exist
-        if ($docData['BaseType'] && $docData['BaseEntry']) {
+        if (isset($docData['BaseType']) && isset($docData['BaseEntry'])) {
             $generalSettings = OADM::where('id', 1)->value('copyToUnsyncDocs');
             $BaseTables = APDI::with('pdi1')
                 ->where('ObjectID', $docData['BaseType'])
@@ -309,27 +309,33 @@ class MarketingDocumentService
                     }
                 }
             }
-
+            $value['ManSerNum'] = false;
             //Serial Number Validations
             if ($product->ManSerNum == "Y") {
-                if ($value['ObjType'] == 14 || $value['ObjType'] == 16 || $docData['saveToDraft'] = true) {
+                if ($ObjType == 14 || $ObjType == 16 || $docData['saveToDraft'] = true) {
                     if (!isset($value['SerialNumbers']) || $value['Quantity'] != count($value['SerialNumbers'])) {
                         return (new ApiResponseService())
                             ->apiFailedResponseService("Serial number required  for item:" . $value['Dscription']);
+                    } else {
+                        $value['ManSerNum'] = true;
                     }
                 }
 
-                if ($value['ObjType'] == 15) {
+                if ($ObjType == 15) {
                     if (!isset($value['SerialNumbers']) || $value['Quantity'] != count($value['SerialNumbers'])) {
                         return (new ApiResponseService())
                             ->apiFailedResponseService("Serial number required  for item:" . $value['Dscription']);
+                    } else {
+                        $value['ManSerNum'] = true;
                     }
                 }
 
-                if ($value['ObjType'] == 13 && $value['BaseType'] != 15) {
+                if ($ObjType == 13 && $value['BaseType'] != 15) {
                     if (!isset($value['SerialNumbers']) || $value['Quantity'] != count($value['SerialNumbers'])) {
                         return (new ApiResponseService())
                             ->apiFailedResponseService("Serial number required  for item:" . $value['Dscription']);
+                    } else {
+                        $value['ManSerNum'] = true;
                     }
                 }
             }
@@ -339,9 +345,10 @@ class MarketingDocumentService
 
     public function createDoc($data, $TargetTables, $ObjType)
     {
+
         DB::connection("tenant")->beginTransaction();
         //If Base Type Exist
-        if ($data['BaseType'] && $data['BaseEntry']) {
+        if (isset($data['BaseType']) && isset($data['BaseEntry'])) {
             $BaseTables = APDI::with('pdi1')
                 ->where('ObjectID', $data['BaseType'])
                 ->first();
@@ -399,7 +406,14 @@ class MarketingDocumentService
             $newDoc = new $TargetTables->ObjectHeaderTable(array_filter($NewDocDetails));
 
             $newDoc->save();
-
+            if (!empty($data['udfs'])) {
+                $headerUDF = [];
+                foreach ($data['udfs'] as $key => $value) {
+                    $headerUDF[$key] = $value;
+                }
+                // Update the model udf's 
+                $newDoc->update($headerUDF);
+            }
             // Document Rows
             $documentRows = [];
             foreach ($data['document_lines'] as $key => $value) {
@@ -465,7 +479,17 @@ class MarketingDocumentService
 
                 $rowItems = new $TargetTables->pdi1[0]['ChildTable']($rowdetails);
                 $rowItems->save();
-                if ($data['DocType'] == "I" && $value['ManSerNum'] == "Y") {
+
+                $lineUDF = [];
+                if (!empty($value['udfs'])) {
+                    foreach ($value['udfs'] as  $key => $value) {
+                        $lineUDF[$key] = $value;
+                    }
+                    // Update the model udf's 
+                    $rowItems->update($lineUDF);
+                }
+                if ($data['DocType'] == "I" && isset($value['ManSerNum']) && $value['ManSerNum'] == "Y") {
+
                     $saveSerialDetails = false;
                     if ($data['ObjType'] == 14 || $data['ObjType'] == 16 || $data['ObjType'] == 17) {
                         $saveSerialDetails = true;
@@ -473,40 +497,40 @@ class MarketingDocumentService
                     if ($data['ObjType'] == 15) {
                         $saveSerialDetails = true;
                     }
-                    if ($data['ObjType'] == 13 && $data['BaseType'] != 15) {
+                    if ($data['ObjType'] == 13 && isset($value['BaseType']) && $value['BaseType'] != 15) {
                         $saveSerialDetails = true;
                     }
                     if ($saveSerialDetails) {
                         foreach ($value['SerialNumbers'] as $key => $serial) {
+                            Log::info(["serials" => $serial]);
                             $LineNum = $key;
                             SRI1::create([
                                 "ItemCode" => $value['ItemCode'],
                                 "SysSerial" => $serial['SysNumber'] ?? $serial['SysSerial'],
                                 "LineNum" => $rowItems->id,
-                                "BaseType" => $value['saveToDraft'] ? 112 : $ObjType,
+                                "BaseType" => $data['saveToDraft'] ? 112 : $ObjType,
                                 "BaseEntry" => $newDoc->id,
                                 "CardCode" => $data['CardCode'],
                                 "CardName" => $data['CardName'],
                                 "WhsCode" => $value['WhsCode'],
-                                "ItemName" => $data['Dscription'],
+                                "ItemName" => $value['Dscription'],
                             ]);
                         }
                     }
                 }
 
-                if ($data['BaseType'] && $data['BaseEntry']) {
+                if (isset($data['BaseType']) && isset($data['BaseEntry'])) {
                     $baseDocHeader->update([
                         'DocStatus' => "C",
                     ]);
                 }
                 array_push($documentRows, $rowItems);
             }
-            Log::info([$documentRows]);
 
             (new SystemDefaults())->updateNextNumberNumberingSeries($data['Series']);
 
             DB::connection("tenant")->commit();
-
+            $newDoc['document_lines'] = $documentRows;
             return (new ApiResponseService())->apiSuccessResponseService($newDoc);
         } catch (\Throwable $th) {
             Log::error($th->getMessage());

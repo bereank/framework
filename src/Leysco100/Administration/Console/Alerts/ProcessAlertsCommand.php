@@ -1,9 +1,9 @@
 <?php
 
-namespace Leysco100\Shared\Console\Setup;
+namespace Leysco100\Administration\Console\Alerts;
 
 use Illuminate\Console\Command;
-use Leysco100\Shared\Jobs\ProcessAlertsJob;
+use Leysco100\Administration\Jobs\ProcessAlertsJob;
 use Spatie\Multitenancy\Commands\Concerns\TenantAware;
 use Leysco100\Shared\Models\Administration\Models\OALT;
 
@@ -15,7 +15,7 @@ class ProcessAlertsCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'leysco100:shared:process-alerts-command {--tenant=*}';
+    protected $signature = 'leysco100:administration:process-alerts-command {--tenant=*}';
 
     /**
      * The console command description.
