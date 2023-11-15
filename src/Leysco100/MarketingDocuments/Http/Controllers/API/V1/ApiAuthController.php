@@ -13,6 +13,8 @@ use Leysco100\Shared\Models\Administration\Models\OADM;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;
 use Leysco100\Shared\Models\MarketingDocuments\Models\GPMGate;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OBIN;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OWHS;
 
 
 class ApiAuthController extends Controller
@@ -123,10 +125,32 @@ class ApiAuthController extends Controller
         $loginUser = Auth::user();
 
 
-        if(!$loginUser->status){
+        if (!$loginUser->status) {
             return (new ApiResponseService())->apiFailedResponseService("Your account has been deactivated.Please contact your Admin");
         }
-       
+
+        $default_bin = User::where('id', $loginUser->id)->with('oudg')->first();
+
+        $defaultwarehouse = OWHS::where('id', $default_bin->oudg->Warehouse)
+            ->with(['binlocations' => function ($query) use ($default_bin) {
+                $query->where('id', $default_bin->oudg->DftBinLoc)
+                    ->select(
+                        "id",
+                        "AbsEntry",
+                        "BinCode",
+                        "WhsCode",
+                        "SysBin"
+                    );
+            }])
+            ->select(
+                "id",
+                "WhsCode",
+                "WhsName",
+                "BinActivat",
+                "BinSeptor"
+            )
+            ->first();
+
         $loginUser->gateData = GPMGate::where('id', $loginUser->gate_id)->first();
         $data = [
             'PswdChangeOnReset' =>  $settings->PswdChangeOnReset,
@@ -140,9 +164,10 @@ class ApiAuthController extends Controller
             ],
             'gateMaximumRadius' => 70,
             'userData' => $loginUser,
-           'menuNavigation' => (new AuthorizationService())->mobileNavBar(),
+            'defaultwarehouse' => $defaultwarehouse ?? [],
+            'menuNavigation' => (new AuthorizationService())->mobileNavBar(),
         ];
-       
+
         return response([
             'MaximumAllowedPriceAgeInMin' => 25,
             'isAbleToPostPayment' => 1,
@@ -150,10 +175,10 @@ class ApiAuthController extends Controller
             'checkIfWithinRadius' => 0,
             'menuNavigation' => (new AuthorizationService())->mobileNavBar(),
             'gpsSetttings' => $this->getWorkDays(),
-                'ResultState' => true,
-                'ResultCode' => 1200,
-                'ResultDesc' => "Operation Was Successful",
-                'ResponseData' => $data,
+            'ResultState' => true,
+            'ResultCode' => 1200,
+            'ResultDesc' => "Operation Was Successful",
+            'ResponseData' => $data,
         ]);
     }
 
@@ -162,19 +187,19 @@ class ApiAuthController extends Controller
      */
     public function getWorkDays()
     {
-        try{
-        $worKdays = GpsSetup::with(['workDays:id,gps_setup_id,dayName,start_time,end_time'])
-            ->select('id', 'max_latitude', 'min_latitude', 'max_longitude', 'min_longitude', 'start_time', 'end_time')
-            ->first();
+        try {
+            $worKdays = GpsSetup::with(['workDays:id,gps_setup_id,dayName,start_time,end_time'])
+                ->select('id', 'max_latitude', 'min_latitude', 'max_longitude', 'min_longitude', 'start_time', 'end_time')
+                ->first();
 
-        $weekdays = "1,2,3,4,5,6";
-        if ($worKdays){
-            $worKdays->weekdays = $weekdays;
+            $weekdays = "1,2,3,4,5,6";
+            if ($worKdays) {
+                $worKdays->weekdays = $weekdays;
+            }
+            return $worKdays;
+        } catch (\Throwable $th) {
+            return $th->getMessage();
         }
-        return $worKdays;
-    } catch (\Throwable $th) {
-        return$th->getMessage();
-    }
     }
     public function promptPasswordChange(Request $request)
     {
