@@ -164,7 +164,6 @@ class ApiAuthController extends Controller
             ],
             'gateMaximumRadius' => 70,
             'userData' => $loginUser,
-            'defaultwarehouse' => $defaultwarehouse ?? [],
             'menuNavigation' => (new AuthorizationService())->mobileNavBar(),
         ];
 
@@ -175,6 +174,7 @@ class ApiAuthController extends Controller
             'checkIfWithinRadius' => 0,
             'menuNavigation' => (new AuthorizationService())->mobileNavBar(),
             'gpsSetttings' => $this->getWorkDays(),
+            'defaultwarehouse' => $defaultwarehouse ?? [],
             'ResultState' => true,
             'ResultCode' => 1200,
             'ResultDesc' => "Operation Was Successful",
