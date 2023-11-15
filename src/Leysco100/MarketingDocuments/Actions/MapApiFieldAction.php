@@ -14,10 +14,11 @@ class MapApiFieldAction
     //Header UDF  validation
     $table = (new $TargetTables->ObjectHeaderTable)->getTable();
     $headerUdfs = CUFD::where('TableName', $table)->get();
-
-    if (!$headerUdfs->isEmpty()) {
+    if ($headerUdfs) {
       $documentData = [];
-
+      if (!isset($data['udfs'])) {
+        return (new ApiResponseService())->apiSuccessAbortProcessResponse("UDF is required Field");
+      }
       foreach ($data['udfs'] as $item) {
         foreach ($headerUdfs as $headerUdf) {
           $exists = Arr::has($item, $headerUdf['FieldName']);
@@ -41,8 +42,12 @@ class MapApiFieldAction
     $line_table = (new $TargetTables->pdi1[0]['ChildTable'])->getTable();
     $line_fields = CUFD::where('TableName', $line_table)->get();
 
-    if (!$line_fields->isEmpty()) {
+    if ($line_fields) {
+
       foreach ($data['document_lines'] as &$doc_lines) {
+        if (!isset($doc_lines['udfs'])) {
+          return (new ApiResponseService())->apiSuccessAbortProcessResponse("UDF is required Field");
+        }
         $lineData = [];
 
         foreach ($line_fields as $line_field) {
