@@ -15,4 +15,7 @@ Route::post('payments/incoming/third-party/eqb/validation', [PaymentsProcessingC
 Route::post('payments/incoming/third-party/eqb/notification', [PaymentsProcessingController::class, 'eqbPaymentNotification'])->withoutMiddleware(['auth:sanctum']);
 Route::post('payments/incoming/third-party/eqb/query', [PaymentsProcessingController::class, 'eqbPaymentQuery'])->withoutMiddleware(['auth:sanctum']);
 
+Route::post('/payments/incoming/third-party-lines', [PaymentsController::class, 'incPayLineStore']);
+
+
 Route::apiResources(['payments/incoming/third-party' => PaymentsController::class]);

@@ -63,26 +63,27 @@ class PaymentsProcessingController extends Controller
                     $transactionDate = Carbon::parse($paymentData['transactionDate']);
 
                     $payment = [];
-                    $payment['ShortCode'] = $paymentData['businessKey'] ?? "";
+                    $payment['BusinessShortCode'] = $paymentData['businessKey'] ?? "";
                     $payment['BusinessKey'] = $paymentData['businessKey'] ?? "";
                     $payment['BusinessKeyType'] = $paymentData['businessKeyType'] ?? "";
                     $payment['MSISDN'] = $paymentData['debitMSISDN'] ?? "";
-                    $payment['TransactAmount'] = $paymentData['transactionAmt'] ?? "";
-                    $payment['TransactDate'] = $transactionDate ?? "";
-                    $payment['TransactID'] = $paymentData['transactionID'] ?? "";
+                    $payment['TransAmount'] = $paymentData['transactionAmt'] ?? 0;
+                    $payment['TransTime'] = $transactionDate ?? now();
+                    $payment['TransID'] = $paymentData['transactionID'] ?? "";
                     $payment['FirstName'] = $paymentData['firstName'] ?? "";
                     $payment['MiddleName'] = $paymentData['middleName'] ?? "";
                     $payment['LastName'] = $paymentData['lastName'] ?? "";
                     $payment['Currency'] = $paymentData['currency'] ?? "";
                     $payment['Dscription'] = $paymentData['narration'] ?? "";
                     $payment['TransactType'] = $paymentData['transactionType'] ?? "";
-                    $payment['Balance'] = $paymentData['balance'] ?? "";
+                    $payment['Balance'] = $paymentData['transactionAmt'] ?? 0;
                     $payment['DocNum'] =  $Numbering['NextNumber'];
                     $payment['Source'] = 1;
                     $payment['ObjType'] = 218;
                 }
             }
         }
+
 
         $originatorConversationID = $data['header']['originatorConversationID'] ?? '';
         $messageID = $data['header']['messageID'] ?? '';
@@ -299,20 +300,23 @@ class PaymentsProcessingController extends Controller
                     "responseMessage" => "DUPLICATE TRANSACTION"
                 ]);
             }
-            $transactionDate = Carbon::parse( $paymentData['transactionDate'] );
+            $transactionDate = Carbon::parse($paymentData['transactionDate']);
             $payment = [];
 
             $payment['BusinessKey'] = $paymentData['billNumber'] ?? "";
-            $payment['TransactAmount'] = $paymentData['billAmount'] ?? "";
+            $payment['TransAmount'] = $paymentData['billAmount'] ?? 0;
             $payment['FirstName'] = $paymentData['debitcustname'] ?? "";
             $payment['MSISDN'] = $paymentData['phonenumber'] ?? "";
             $payment['Dscription'] = $paymentData['tranParticular'] ?? "";
-            $payment['TransactDate'] = $transactionDate ?? "";
+            $payment['TransTime'] = $transactionDate ?? now();
             $payment['TransactType'] = $paymentData['paymentMode'] ?? "";
-            $payment['CardCode'] = $paymentData['CustomerRefNumber'] ?? "";
+            $payment['ContactName'] = $paymentData['debitcustname'] ?? "";
             $payment['debitAccNo'] = $paymentData['debitaccount'] ?? "";
-            $payment['BankRefNo'] = $paymentData['bankreference'] ?? "";
+            $payment['TransID'] = $paymentData['bankreference'] ?? "";
             $payment['DocNum'] =  $Numbering['NextNumber'];
+            $payment['BusinessShortCode'] = null;
+            $payment['Balance'] =  $paymentData['billAmount'] ?? 0;
+            $payment['TransID'] =   $paymentData['bankreference'] ?? "";
             $payment['Source'] = 2;
             $payment['ObjType'] = 218;
 

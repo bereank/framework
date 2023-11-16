@@ -18,31 +18,31 @@ class CreateOCRPSTable extends Migration
             $table->string('ObjType')->nullable();
             $table->integer('UserSign')->nullable();
             $table->string('OwnerCode')->nullable();
-            $table->string('CardCode')->nullable();
+            $table->string('ContactName')->nullable();
             $table->string('DocEntry')->nullable();
             $table->string('DocNum')->nullable();
             $table->string('FirstName')->nullable();
             $table->string('MiddleName')->nullable();
             $table->string('LastName')->nullable();
-            $table->string('TransactAmount')->nullable();
-            $table->dateTime('TransactDate')->nullable();
-            $table->string('TransactID')->nullable();
+            $table->string('TransAmount')->nullable();
+            $table->dateTime('TransTime')->nullable();
+            $table->string('TransID')->nullable();
             $table->string('Balance')->nullable();
             $table->string('Currency')->nullable();
             $table->string('MSISDN')->nullable();
-            $table->string('BankRefNo')->nullable();
             $table->string('Dscription')->nullable();
             $table->string('TransactType')->nullable();
             $table->string('BusinessKey')->nullable();
             $table->string('BusinessKeyType')->nullable();
             $table->string('debitAccNo')->nullable();
-            $table->string('ExtRef')->nullable()->comment("Used For External Refrence");
-            $table->string('ExtRefDocNum')->nullable()->comment("Used For External Refrence Doc Number");
-            $table->float('ExtDocTotal', 19, 2)->default(0)->comment("Used For External Doc Total");
-            $table->integer('Status')->nullable();
+            $table->string('BusinessShortCode')->nullable();
+            $table->string('ExtRef')->nullable()->comment("External Refrence");
+            $table->string('ExtRefDocNum')->nullable()->comment("External Refrence Doc Number");
+            $table->integer('RECONSTATUS')->default(0); 
             $table->integer('Source')->nullable();
             $table->string('CompanyID')->nullable();
             $table->timestamps();
+           
         });
     }
 
