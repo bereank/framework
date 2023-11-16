@@ -55,7 +55,7 @@ class InventoryTransactionsController extends Controller
             ->where('ObjectID', $tableObjType)
             ->first();
 
-       // (new AuthorizationService())->checkIfAuthorize($DocumentTables->id, 'read');
+        // (new AuthorizationService())->checkIfAuthorize($DocumentTables->id, 'read');
 
         try {
             $data = $DocumentTables->ObjectHeaderTable::where('ObjType', $ObjType)
@@ -99,7 +99,7 @@ class InventoryTransactionsController extends Controller
             }
 
             return (new ApiResponseService())->apiSuccessResponseService($data);
-        } catch (\Throwable$th) {
+        } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
@@ -150,19 +150,28 @@ class InventoryTransactionsController extends Controller
             /**
              * Handling  Document Numbering
              */
+            if ($request['DocNum'] && $request['Series']) {
+                $DocNum = (new DocumentsService())
+                    ->documentNumberingService(
+                        $request['DocNum'],
+                        $request['Series']
+                    );
+                $doc_number = $DocNum;
+                $Series =    $request['Series'];
+            } else {
+                $DocNum  = (new DocumentsService())
+                    ->getNumSerieByObjectId($request['ObjType']);
+                $doc_number =  $DocNum['NextNumber'];
+                $Series =  $DocNum['id'];
+            }
 
-            $DocNum = (new DocumentsService())
-                ->documentNumberingService(
-                    $request['DocNum'],
-                    $request['Series']
-                );
 
             $NewDocDetails = [
                 'ObjType' => $request['ObjType'],
                 'DocType' => $request['DocType'],
-                'DocNum' => $DocNum,
-                'Series' => $request['Series'],
-//                'ToWhsCode' => $request['ToWhsCode'],
+                'DocNum' => $doc_number ?? null,
+                'Series' => $Series ?? null,
+                //                'ToWhsCode' => $request['ToWhsCode'],
                 'Filler' => $request['FromWhsCod'],
 
                 'SlpCode' => $request['SlpCode'], // Sales Employee
@@ -308,7 +317,7 @@ class InventoryTransactionsController extends Controller
                     'unitMsr' => array_key_exists('unitMsr', $value) ? $value['unitMsr'] : null, //    UoM Name
                     'NumPerMsr' => array_key_exists('NumPerMsr', $value) ? $value['NumPerMsr'] : null, //    Items per Unit
                     'Text' => array_key_exists('Text', $value) ? $value['Text'] : null, //    Item Details
-                    'OwnerCode' => $value['OwnerCode'] ?? null, //    Owner
+
                     'GTotal' => array_key_exists('GTotal', $value) ? $value['GTotal'] : null, //    Gross Total
                     'AgrNo' => array_key_exists('AgrNo', $value) ? $value['AgrNo'] : null, //    Blanket Agreement No.
                     'LinePoPrss' => array_key_exists('LinePoPrss', $value) ? $value['LinePoPrss'] : null, //    Allow Procmnt. Doc.
@@ -390,7 +399,7 @@ class InventoryTransactionsController extends Controller
                 }
             }
             if ($objectTypePassedToTns != 112) {
-                NumberingSeries::dispatch($request['Series']);
+                NumberingSeries::dispatch($Series);
             }
 
             $newDoc->newObjType = $objectTypePassedToTns;
@@ -398,9 +407,9 @@ class InventoryTransactionsController extends Controller
             $documentForDirecPostingToSAP = (new DocumentsService())->getDocumentForDirectPostingToSAP($newDoc->ObjType, $newDoc->id);
             $newDoc->documentForDirecPostingToSAP = $documentForDirecPostingToSAP;
 
-//            return (new ApiResponseService())->apiSuccessResponseService($newDoc);
+            //            return (new ApiResponseService())->apiSuccessResponseService($newDoc);
             return (new ApiResponseService())->apiSuccessResponseService($newDoc);
-        } catch (\Throwable$th) {
+        } catch (\Throwable $th) {
             DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
