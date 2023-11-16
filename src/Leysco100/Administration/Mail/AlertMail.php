@@ -69,7 +69,7 @@ class AlertMail extends Mailable
         // Log::info(nl2br($tempBody));
 
         $mail = $this->subject($alert->alert_template->alt5->tempSubject)
-            ->markdown('Administration::alertNotification')
+            ->markdown('administration::alertNotification')
             ->with('data', $data)
             ->with('tempBody', nl2br($tempBody))
             ->with('template', $alert->alert_template->alt5);

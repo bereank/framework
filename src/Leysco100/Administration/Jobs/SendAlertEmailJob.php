@@ -4,7 +4,6 @@ namespace Leysco100\Administration\Jobs;
 
 
 use Illuminate\Bus\Queueable;
-use Leysco100\Gpm\Mail\AlertMail;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Queue\SerializesModels;
@@ -12,6 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Spatie\Multitenancy\Jobs\TenantAware;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Leysco100\Administration\Mail\AlertMail;
 use Leysco100\Shared\Models\Administration\Models\OALR;
 use Leysco100\Shared\Models\Administration\Models\Role;
 
