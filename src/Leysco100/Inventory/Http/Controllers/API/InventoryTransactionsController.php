@@ -384,12 +384,12 @@ class InventoryTransactionsController extends Controller
                 $objectTypePassedToTns = 112;
             }
 
-            $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions($objectTypePassedToTns, "A", $newDoc->id);
-            if ($storedProcedureResponse) {
-                if ($storedProcedureResponse->error != 0) {
-                    return (new ApiResponseService())->apiFailedResponseService($storedProcedureResponse->error_message);
-                }
-            }
+            // $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions($objectTypePassedToTns, "A", $newDoc->id);
+            // if ($storedProcedureResponse) {
+            //     if ($storedProcedureResponse->error != 0) {
+            //         return (new ApiResponseService())->apiFailedResponseService($storedProcedureResponse->error_message);
+            //     }
+            // }
 
             //Validating Draft using Oringal base type
             if ($objectTypePassedToTns == 112) {
