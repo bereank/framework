@@ -274,10 +274,10 @@ class InventoryTransactionsController extends Controller
                     'LineNum' => $LineNum, //    Row Number
                     'ItemCode' => $ItemCode, //    Item ID from OITM AUTO INCREMENT
                     'Dscription' => $Dscription, // Item Description
-                    'CodeBars' => $value['CodeBars'], //    Bar Code
-                    'SerialNum' => $value['SerialNum'], //    Serial No.
-                    'Quantity' => $value['Quantity'], //    Quantity
-                    'DelivrdQty' => $value['DelivrdQty'], //    Delivered Qty
+                    'CodeBars' => $value['CodeBars']??null, //    Bar Code
+                    'SerialNum' => $value['SerialNum'] ??null, //    Serial No.
+                    'Quantity' => $value['Quantity']??null, //    Quantity
+                    'DelivrdQty' => $value['DelivrdQty']??null,//    Delivered Qty
 
                     'Price' => $AvgPrice, //    Price After Discount
                     'FromWhsCod' => $value['FromWhsCod'],
@@ -292,9 +292,9 @@ class InventoryTransactionsController extends Controller
                     'SlpCode' => $request['SlpCode'], //    Sales Employee
                     'Commission' => array_key_exists('Commission', $value) ? $value['Commission'] : null, //    Comm. %
                     'AcctCode' => array_key_exists('AcctCode', $value) ? $value['AcctCode'] : null, //    G/L Account
-                    'OcrCode' => $value['OcrCode'], //    Dimension 1
-                    'OcrCode2' => $value['OcrCode2'], //    Dimension 2
-                    'OcrCode3' => $value['OcrCode3'], //    Dimension 3
+                    'OcrCode' => $value['OcrCode']??null, //    Dimension 1
+                    'OcrCode2' => $value['OcrCode2']??null, //    Dimension 2
+                    'OcrCode3' => $value['OcrCode3']??null, //    Dimension 3
                     'OcrCode4' => $value['OcrCode4'] ?? null, //    Dimension 4
                     'OcrCode5' => $value['OcrCode5'] ?? null, //    Dimension 5
                     'OpenQty' => array_key_exists('Quantity', $value) ? $value['Quantity'] : null, //    Open Inv. Qty
@@ -323,13 +323,13 @@ class InventoryTransactionsController extends Controller
                     'LinePoPrss' => array_key_exists('LinePoPrss', $value) ? $value['LinePoPrss'] : null, //    Allow Procmnt. Doc.
 
                     //Cogs Values
-                    'CogsOcrCod' => $value['OcrCode'],
-                    'CogsOcrCo2' => $value['OcrCode2'],
-                    'CogsOcrCo3' => $value['OcrCode3'],
+                    'CogsOcrCod' => $value['OcrCode']?? null,
+                    'CogsOcrCo2' => $value['OcrCode2']?? null,
+                    'CogsOcrCo3' => $value['OcrCode3']?? null,
                     'CogsOcrCo4' => $value['OcrCode4'] ?? null,
                     'CogsOcrCo5' => $value['OcrCode5'] ?? null,
                     //Inventory Transaction  Value
-                    'PQTReqDate' => $request['ReqDate'],
+                    'PQTReqDate' => $request['ReqDate']?? null,
 
                     'BPLId' => $request['BPLId'],
                     'U_StockWhse' => isset($value['U_StockWhse']) ? $value['U_StockWhse'] : null,
