@@ -130,27 +130,27 @@ class ApiAuthController extends Controller
         }
 
         $default_bin = User::where('id', $loginUser->id)->with('oudg')->first();
-
-        $defaultwarehouse = OWHS::where('id', $default_bin->oudg->Warehouse)
-            ->with(['binlocations' => function ($query) use ($default_bin) {
-                $query->where('id', $default_bin->oudg->DftBinLoc)
-                    ->select(
-                        "id",
-                        "AbsEntry",
-                        "BinCode",
-                        "WhsCode",
-                        "SysBin"
-                    );
-            }])
-            ->select(
-                "id",
-                "WhsCode",
-                "WhsName",
-                "BinActivat",
-                "BinSeptor"
-            )
-            ->first();
-
+        if ($default_bin->oudg) {
+            $defaultwarehouse = OWHS::where('id', $default_bin->oudg->Warehouse)
+                ->with(['binlocations' => function ($query) use ($default_bin) {
+                    $query->where('id', $default_bin->oudg->DftBinLoc)
+                        ->select(
+                            "id",
+                            "AbsEntry",
+                            "BinCode",
+                            "WhsCode",
+                            "SysBin"
+                        );
+                }])
+                ->select(
+                    "id",
+                    "WhsCode",
+                    "WhsName",
+                    "BinActivat",
+                    "BinSeptor"
+                )
+                ->first();
+        }
         $loginUser->gateData = GPMGate::where('id', $loginUser->gate_id)->first();
         $data = [
             'PswdChangeOnReset' =>  $settings->PswdChangeOnReset,

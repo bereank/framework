@@ -18,11 +18,13 @@ return new class extends Migration
             $table->string('DocEntry')->nullable();
             $table->string('AllocatedAmount')->nullable();
             $table->dateTime('DocDate')->nullable();
+            $table->string('OwnerPhone')->nullable();
+            $table->string('CreditCur')->nullable();
+            $table->string('CrCardNum')->nullable();
+            $table->string('CreditCard')->nullable();
             $table->string('CreditAcct')->nullable();
             $table->string('ObjType')->nullable();
             $table->string('CrTypeCode')->nullable();
-            $table->string('CreditCur')->nullable();
-            $table->string('OwnerPhone')->nullable();	
             $table->timestamps();
         });
     }
