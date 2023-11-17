@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Shared\Models\Finance\Models\ACP10;
 use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\Administration\Models\OUDG;
+use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Administration\Http\Controllers\Controller;
 use Leysco100\Shared\Models\Finance\Models\ChartOfAccount;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OBIN;
@@ -26,8 +28,8 @@ class WarehouseController extends Controller
     public function index()
     {
         try {
-            // $user = Auth::user();
-            // $BPLId = \Request::get('branchID');
+            $user = Auth::user();
+            $BPLId = \Request::get('branchID');
             // $data = OWHS::where(function ($q) use ($BPLId) {
             //     if ($BPLId) {
             //         $q->where('BPLId', $BPLId)
@@ -40,7 +42,14 @@ class WarehouseController extends Controller
             $data = OWHS::when($binActive, function ($query) use ($binActive) {
                 return $query->where('BinActivat', $binActive);
             })->with('binlocations')
-                ->get();
+                ->where(function ($q) use ($BPLId) {
+                    if ($BPLId) {
+                        $q->where('BPLId', $BPLId)
+                            ->orWhereIn('WhsCode', ['L001', 'IMPGIT']);
+                    }
+                })->get();
+
+
             return (new ApiResponseService())
                 ->apiSuccessResponseService($data);
         } catch (\Throwable $th) {

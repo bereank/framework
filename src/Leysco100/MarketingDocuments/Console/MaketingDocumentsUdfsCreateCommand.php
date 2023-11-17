@@ -60,12 +60,12 @@ class MaketingDocumentsUdfsCreateCommand extends Command
         }
 
         $ChildTables = APDI::with('pdi1')->where('DocType', 1)->get();
-        $line_table = (new $table->pdi1[0]['ChildTable'])->getTable();
+       
 
         foreach ($ChildTables as $table) {
             $objType = $table->ObjectID;
+            $line_table = (new $table->pdi1[0]['ChildTable'])->getTable();
             foreach ($childUserFields as $key =>  $userField) {
-
                 $fieldName =  $userField;
                 $fieldDescription =  $userField;
                 $fieldType =  "string";
