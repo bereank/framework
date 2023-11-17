@@ -102,6 +102,11 @@ class MarketingDocumentService
                     } else {
                         if (isset($itemDetails) && $itemDetails) {
                             $documentLines[$key]['WhsCode'] = $itemDetails['DfltWH'];
+                        } else {
+                            $gen_setting = OADM::where('id', 1)->first();
+                            if ($gen_setting) {
+                                $documentLines[$key]['WhsCode'] = $gen_setting->DfltWhs;
+                            }
                         }
                     }
                 }
