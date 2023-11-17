@@ -78,16 +78,19 @@ class PaymentsController extends Controller
             ]);
             $DocDate = Carbon::parse($request['DocDate']);
             $data = CRP1::updateOrCreate([
-                'DocNum' => $request['DocNum'] ?? null,
+                'DocNum' => $request['DocNum'] ?? null, // References ORCT
                 'TransID' => $request['TransID'] ?? null,
-                'DocEntry' => $request['DocEntry'] ?? null,
+                'DocEntry' => $request['DocEntry'] ?? null, // References ORCP
+            ], [
                 'AllocatedAmount' => $request['AllocatedAmount'] ?? null,
                 'DocDate' =>   $DocDate,
                 'CreditAcct' => $request['CreditAcct'] ?? null,
                 'ObjType' => 218,
                 'CrTypeCode' => $request['CrTypeCode'] ?? null,
                 'CreditCur' => $request['CreditCur'] ?? null,
-                'OwnerPhone' => $request[''] ?? null
+                'OwnerPhone' => $request['OwnerPhone'] ?? null,
+                'CrCardNum' =>   $request['CrCardNum'] ?? null,
+                'CreditCard' =>   $request['CreditCard'] ?? null
             ]);
             //UPDATE BALANCES
             $header = OCRP::find($request['DocEntry']);

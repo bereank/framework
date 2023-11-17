@@ -38,7 +38,7 @@ class CreateOCRPSTable extends Migration
             $table->string('BusinessShortCode')->nullable();
             $table->string('ExtRef')->nullable()->comment("External Refrence");
             $table->string('ExtRefDocNum')->nullable()->comment("External Refrence Doc Number");
-            $table->integer('RECONSTATUS')->default(0); 
+            $table->integer('ReconStatus')->default(0); 
             $table->integer('Source')->nullable();
             $table->string('CompanyID')->nullable();
             $table->timestamps();
