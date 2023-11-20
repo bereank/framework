@@ -2,15 +2,17 @@
 
 namespace Leysco100\Shared\Models\InventoryAndProduction\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
+use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Models\Administration\Models\OSLP;
 use Leysco100\Shared\Models\Administration\Models\OUDP;
 use Leysco100\Shared\Models\BusinessPartner\Models\OBPL;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Leysco100\Shared\Models\MarketingDocuments\Models\RDR1;
-use Leysco100\Shared\Models\Shared\Models\APDI;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OLCT;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\WTR1;
 
 class OWTR extends Model
 {
@@ -31,6 +33,10 @@ class OWTR extends Model
     }
 
     public function items()
+    {
+        return $this->hasMany(WTR1::class, 'DocEntry');
+    }
+    public function document_lines()
     {
         return $this->hasMany(WTR1::class, 'DocEntry');
     }
