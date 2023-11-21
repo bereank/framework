@@ -20,7 +20,9 @@ class PaymentsProcessingController extends Controller
     public function kcbPaymentNotification(Request $request)
     {
 
+        Log::info("____________KCB PAYMENT NOTIFICATION _______________________");
         Log::info([$request->all(), $request->header('signature')]);
+
         $user = User::where('id', 1)->first();
         Auth::login($user);
 
