@@ -49,7 +49,7 @@ class PaymentsProcessingController extends Controller
                     ],
                 ],
             ];
-            return response()->json($data);
+          //  return response()->json($data);
         }
 
         $Numbering = (new DocumentsService())
