@@ -49,14 +49,14 @@ class PaymentsProcessingController extends Controller
                     ],
                 ],
             ];
-            //  return response()->json($data);
+            return response()->json($data);
         }
 
         $Numbering = (new DocumentsService())
             ->getNumSerieByObjectId(218);
 
         $data = $request->all();
-
+        $payment = [];
         if (array_key_exists('requestPayload', $data)) {
             if (array_key_exists("additionalData", $data['requestPayload'])) {
                 if (array_key_exists("notificationData", $data['requestPayload']['additionalData'])) {
@@ -64,7 +64,6 @@ class PaymentsProcessingController extends Controller
 
                     $transactionDate = Carbon::parse($paymentData['transactionDate']);
 
-                    $payment = [];
                     $payment['BusinessShortCode'] = $paymentData['businessKey'] ?? "";
                     $payment['BusinessKey'] = $paymentData['businessKey'] ?? "";
                     $payment['BusinessKeyType'] = $paymentData['businessKeyType'] ?? "";
@@ -91,25 +90,43 @@ class PaymentsProcessingController extends Controller
         $messageID = $data['header']['messageID'] ?? '';
 
         try {
-            $transaction =   OCRP::create($payment);
+            if ($payment) {
+                $transaction =   OCRP::create($payment);
 
-            $data = [
-                'header' => [
-                    'messageID' => $messageID,
-                    'originatorConversationID' => $originatorConversationID,
-                    'statusCode' => '0',
-                    'statusMessage' => 'Notification received',
-                ],
-                'responsePayload' => [
-                    'transactionInfo' => [
-                        'transactionId' => $transaction->id,
+                $data = [
+                    'header' => [
+                        'messageID' => $messageID,
+                        'originatorConversationID' => $originatorConversationID,
+                        'statusCode' => '0',
+                        'statusMessage' => 'Notification received',
                     ],
-                ],
-            ];
-            (new SystemDefaults())->updateNextNumberNumberingSeries($Numbering['id']);
-            return response()->json($data);
+                    'responsePayload' => [
+                        'transactionInfo' => [
+                            'transactionId' => $transaction->id,
+                        ],
+                    ],
+                ];
+                (new SystemDefaults())->updateNextNumberNumberingSeries($Numbering['id']);
+                return response()->json($data);
+            } else {
+                Log::info('Error: Request Could not be parsed');
+                $data = [
+                    'header' => [
+                        'messageID' => $messageID,
+                        'originatorConversationID' => $originatorConversationID,
+                        'statusCode' => '1',
+                        'statusMessage' => "Request Could not be parsed",
+                    ],
+                    'responsePayload' => [
+                        'transactionInfo' => [
+                            'transactionId' => "0001",
+                        ],
+                    ],
+                ];
+                return response()->json($data);
+            }
         } catch (\Throwable $th) {
-            Log::error('Logging Query Error' . $th->getMessage());
+            Log::info('Logging Query Error' . $th->getMessage());
             $data = [
                 'header' => [
                     'messageID' => $messageID,
