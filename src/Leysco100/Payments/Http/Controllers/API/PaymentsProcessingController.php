@@ -6,6 +6,8 @@ use Carbon\Carbon;
 
 
 use Illuminate\Http\Request;
+use ParagonIE\Halite\KeyFactory;
+use ParagonIE\Halite\Asymmetric\Verifier;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -35,18 +37,6 @@ class PaymentsProcessingController extends Controller
         $isVerified = openssl_verify(json_encode($request->all(), true), $signature, $publicKey);
 
 
-        // Load the public key
-        $publicKey = openssl_pkey_get_public(file_get_contents($path));
-
-        // Verify the data using SHA256withRSA algorithm
-        $result = openssl_verify(json_encode($request->all(), true), base64_decode($signature), $publicKey, OPENSSL_ALGO_SHA256);
-        if (!$result) {
-            Log::info('RESULT:Signature Not valid' . $isVerified);
-        }
-        $result2 = openssl_verify(json_encode($request->all(), true), $signature, $publicKey, OPENSSL_ALGO_SHA256);
-        if (!$result2) {
-            Log::info('RESULT2::Signature Not valid' . $isVerified);
-        }
         if (!$isVerified) {
             Log::info('Signature Not valid' . $isVerified);
             $data = [
@@ -70,6 +60,11 @@ class PaymentsProcessingController extends Controller
 
         $data = $request->all();
         $payment = [];
+        if (array_key_exists('header', $data)) {
+            if (array_key_exists('originatorConversationID', $data['header'])) {
+                $TransID = $data['header']['originatorConversationID'];
+            }
+        }
         if (array_key_exists('requestPayload', $data)) {
             if (array_key_exists("additionalData", $data['requestPayload'])) {
                 if (array_key_exists("notificationData", $data['requestPayload']['additionalData'])) {
@@ -83,7 +78,7 @@ class PaymentsProcessingController extends Controller
                     $payment['MSISDN'] = $paymentData['debitMSISDN'] ?? "";
                     $payment['TransAmount'] = $paymentData['transactionAmt'] ?? 0;
                     $payment['TransTime'] = $transactionDate ?? now();
-                    $payment['TransID'] = $paymentData['transactionID'] ?? "";
+                    $payment['TransID'] = $TransID ?? $paymentData['transactionID'];
                     $payment['FirstName'] = $paymentData['firstName'] ?? "";
                     $payment['MiddleName'] = $paymentData['middleName'] ?? "";
                     $payment['LastName'] = $paymentData['lastName'] ?? "";
