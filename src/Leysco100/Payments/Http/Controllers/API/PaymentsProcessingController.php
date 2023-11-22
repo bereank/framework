@@ -34,6 +34,19 @@ class PaymentsProcessingController extends Controller
 
         $isVerified = openssl_verify(json_encode($request->all(), true), $signature, $publicKey);
 
+
+        // Load the public key
+        $publicKey = openssl_pkey_get_public(file_get_contents($path));
+
+        // Verify the data using SHA256withRSA algorithm
+        $result = openssl_verify(json_encode($request->all(), true), base64_decode($signature), $publicKey, OPENSSL_ALGO_SHA256);
+        if (!$result) {
+            Log::info('RESULT:Signature Not valid' . $isVerified);
+        }
+        $result2 = openssl_verify(json_encode($request->all(), true), $signature, $publicKey, OPENSSL_ALGO_SHA256);
+        if (!$result2) {
+            Log::info('RESULT2::Signature Not valid' . $isVerified);
+        }
         if (!$isVerified) {
             Log::info('Signature Not valid' . $isVerified);
             $data = [
@@ -49,7 +62,7 @@ class PaymentsProcessingController extends Controller
                     ],
                 ],
             ];
-          //  return response()->json($data);
+            //  return response()->json($data);
         }
 
         $Numbering = (new DocumentsService())
@@ -92,7 +105,7 @@ class PaymentsProcessingController extends Controller
         try {
             if ($payment) {
                 $transaction =   OCRP::create($payment);
-
+                Log::info('SUCCESS: KCB PAYMENT SAVED SUCCESSFULLY');
                 $data = [
                     'header' => [
                         'messageID' => $messageID,
