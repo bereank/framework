@@ -34,6 +34,8 @@ class DispatchController extends Controller
         $vehicle_id = \Request::has('vehicle_id') ? explode(",", \Request::get('vehicle_id')) : [];
         $searchItm = \Request::has('search') ? explode(",", \Request::get('search')) : [];
         $CallId =  request()->filled('CallId') ? request()->input('CallId') : false;
+        $withLines =  request()->filled('withLines') ? request()->input('withLines') : 1;
+
 
         if (!$user->SUPERUSER) {
             $RlpCode = $user->oudg->Driver ?? 0;
@@ -49,44 +51,70 @@ class DispatchController extends Controller
             ->first();
 
         try {
-            $dispItems = $DocumentTables->ObjectHeaderTable::with([
-                'document_lines' => function ($query) use ($DocStatus) {
-                    $query->where('LineStatus',  $DocStatus)
-                    ->with(['oitm' => function ($query) {
-                        $query->select('SWeight1', 'ItemCode');
-                    }])->select('SWeight1,ItemCode')
-        
-                        ->select(
-                            'id',
-                            'Quantity',
-                            'DelivrdQty',
-                            'ItemCode',
-                            'OpenQty',
-                            'DocEntry',
-                            'LineNum',
-                            'PickStatus',
-                            'SlpCode',
-                            'RlpCode',
-                            'Dscription',
-                            'Price',
-                            'unitMsr',
-                            'VatSum',
-                            'LineTotal',
-                            'DiscPrcnt',
-                            'Rate',
-                            'TaxCode',
-                            'PriceAfVAT',
-                            'PriceBefDi',
-                            'DocDate',
-                            'LineStatus',
-                            'UomCode',
-                            'created_at'
-                        );
-                },
-            ])
-                ->with(['oslp' => function ($query) {
-                    $query->select('SlpCode', 'SlpName', 'Telephone', 'Mobil', 'id');
-                }])
+            $dispItems = $DocumentTables->ObjectHeaderTable::select(
+                'id',
+                'DocNum',
+                'CardName',
+                'DocNum',
+                'DocDate',
+                'CardCode',
+                'NumAtCard',
+                'ClgCode',
+                'DocStatus',
+                'ObjType',
+                'DocType',
+                'ExtRef',
+                'ExtRefDocNum',
+                'SlpCode',
+                'RlpCode',
+                'vehicle_id',
+                'Comments',
+                'OwnerCode',
+                'AtcEntry',
+                'Attachment',
+            );
+
+            if ($withLines) {
+                $dispItems = $dispItems->with([
+                    'document_lines' => function ($query) use ($DocStatus) {
+                        $query->where('LineStatus',  $DocStatus)
+                            ->with(['oitm' => function ($query) {
+                                $query->select('SWeight1', 'ItemCode');
+                            }])->select('SWeight1,ItemCode')
+
+                            ->select(
+                                'id',
+                                'Quantity',
+                                'DelivrdQty',
+                                'ItemCode',
+                                'OpenQty',
+                                'DocEntry',
+                                'LineNum',
+                                'PickStatus',
+                                'SlpCode',
+                                'RlpCode',
+                                'Dscription',
+                                'Price',
+                                'unitMsr',
+                                'VatSum',
+                                'LineTotal',
+                                'DiscPrcnt',
+                                'Rate',
+                                'TaxCode',
+                                'PriceAfVAT',
+                                'PriceBefDi',
+                                'DocDate',
+                                'LineStatus',
+                                'UomCode',
+                                'created_at'
+                            );
+                    },
+                ]);
+            }
+
+            $dispItems = $dispItems->with(['oslp' => function ($query) {
+                $query->select('SlpCode', 'SlpName', 'Telephone', 'Mobil', 'id');
+            }])
                 ->with(['driver' => function ($query) {
                     $query->select('RlpCode', 'RlpName', 'Telephone', 'Mobil', 'id');
                 }])
@@ -125,31 +153,10 @@ class DispatchController extends Controller
                         'CompanyID'
                     );
                 }])
-                ->when(!$CallId, function ($query) use($startDate, $endDate) {
-                 return   $query->whereBetween('created_at', [$startDate, $endDate]);
+                ->when(!$CallId, function ($query) use ($startDate, $endDate) {
+                    return   $query->whereBetween('created_at', [$startDate, $endDate]);
                 })
-                ->select(
-                    'id',
-                    'DocNum',
-                    'CardName',
-                    'DocNum',
-                    'DocDate',
-                    'CardCode',
-                    'NumAtCard',
-                    'ClgCode',
-                    'DocStatus',
-                    'ObjType',
-                    'DocType',
-                    'ExtRef',
-                    'ExtRefDocNum',
-                    'SlpCode',
-                    'RlpCode',
-                    'vehicle_id',
-                    'Comments',
-                    'OwnerCode',
-                    'AtcEntry',
-                    'Attachment',
-                )
+
                 ->when(!empty($searchItm), function ($query) use ($searchItm) {
                     return $query->where(function ($query) use ($searchItm) {
                         return      $query->orwhereIn('CardCode', $searchItm)
@@ -167,7 +174,11 @@ class DispatchController extends Controller
                 // ->when($dataOwnership->Active, function ($query) use ($ownerData) {
                 //     $query->wherein('OwnerCode', $ownerData);
                 // })
-                ->where('DocStatus', $DocStatus)->orderBy('id', 'desc')->take(250)->get();
+                ->when(empty($searchItm), function ($query) use ($DocStatus) {
+                    $query->where('DocStatus', $DocStatus)->orderBy('id', 'desc');
+                })
+                ->take(1000)
+                ->get();
 
 
             // foreach ($dispItems as $document) {
@@ -195,42 +206,42 @@ class DispatchController extends Controller
 
         try {
             $dispItems = $DocumentTables->ObjectHeaderTable::with([
-                'document_lines' => function ($query) {          
+                'document_lines' => function ($query) {
                     $query
-                    ->with(['oitm' => function ($query) {
-                        $query->select('SWeight1', 'ItemCode');
-                    }])->select('SWeight1,ItemCode')
-        
-                    ->select(
-                        'id',
-                        'Quantity',
-                        'DelivrdQty',
-                        'ItemCode',
-                        'OpenQty',
-                        'DocEntry',
-                        'LineNum',
-                        'SlpCode',
-                        'RlpCode',
-                        'Dscription',
-                        'DocDate',
-                        'LineStatus',
-                        'UomCode',
-                        'unitMsr',
-                        'LineTotal',
-                        'ClgCode',
-                        'Price',
-                        'unitMsr',
-                        'VatSum',
-                        'LineTotal',
-                        'DiscPrcnt',
-                        'Rate',
-                        'TaxCode',
-                        'PriceAfVAT',
-                        'PriceBefDi',
-                        'OwnerCode',
-                        'BaseEntry',
-                        'created_at'
-                    );
+                        ->with(['oitm' => function ($query) {
+                            $query->select('SWeight1', 'ItemCode');
+                        }])->select('SWeight1,ItemCode')
+
+                        ->select(
+                            'id',
+                            'Quantity',
+                            'DelivrdQty',
+                            'ItemCode',
+                            'OpenQty',
+                            'DocEntry',
+                            'LineNum',
+                            'SlpCode',
+                            'RlpCode',
+                            'Dscription',
+                            'DocDate',
+                            'LineStatus',
+                            'UomCode',
+                            'unitMsr',
+                            'LineTotal',
+                            'ClgCode',
+                            'Price',
+                            'unitMsr',
+                            'VatSum',
+                            'LineTotal',
+                            'DiscPrcnt',
+                            'Rate',
+                            'TaxCode',
+                            'PriceAfVAT',
+                            'PriceBefDi',
+                            'OwnerCode',
+                            'BaseEntry',
+                            'created_at'
+                        );
                 },
             ])
                 ->where('id', $id)
@@ -286,8 +297,8 @@ class DispatchController extends Controller
                     'Attachment'
                 )
                 ->first();
-             
-               
+
+
             return (new ApiResponseService())->apiSuccessResponseService($dispItems);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
@@ -295,15 +306,16 @@ class DispatchController extends Controller
     }
     public function store(Request $request)
     {
+        $this->validate($request, [
+            'ObjType' => 'required',
+            'items' => 'required|array',
+        ]);
+
+        $itemsCollection = collect($request['items']);
+        $uniqueCardCodes = $itemsCollection->unique('CardCode');
+
         try {
             DB::connection("tenant")->beginTransaction();
-            $this->validate($request, [
-                'ObjType' => 'required',
-                'items' => 'required|array',
-            ]);
-
-            $itemsCollection = collect($request['items']);
-            $uniqueCardCodes = $itemsCollection->unique('CardCode');
 
             foreach ($uniqueCardCodes as $key => $item) {
 
@@ -318,7 +330,7 @@ class DispatchController extends Controller
                     $OCLG = OCLG::whereDate('CallDate', $callTime)
                         ->where('CardCode', $item['CardCode'])
                         ->where('RlpCode', $item['RlpCode'])
-                        ->where('CallDate',Carbon::now()->format('Y-m-d'))
+                        ->where('CallDate', Carbon::now()->format('Y-m-d'))
                         ->first();
                     if (is_null($OCLG)) {
                         //return "no call";
@@ -329,10 +341,10 @@ class DispatchController extends Controller
                             'CallDate' => $item['CallDate'] ??  Carbon::now()->toDateString(), //  Call Date
                             'CallTime' => $item['CallTime'] ?? Carbon::now()->startOfDay(), // CallTime
                             'CallEndTime' => $item['CallEndTime'] ?? Carbon::now()->addDay()->setTime(23, 0, 0), // CallTime
-                            'CloseDate'=> Carbon::now()->addDay(),
-                            'CloseTime'=>Carbon::now()->addDay()->setTime(23, 0, 0),
+                            'CloseDate' => Carbon::now()->addDay(),
+                            'CloseTime' => Carbon::now()->addDay()->setTime(23, 0, 0),
                             'OpenedDate' => Carbon::now()->format('Y-m-d'),
-                            'OpenedTime'=> Carbon::now(),
+                            'OpenedTime' => Carbon::now(),
                             'Repeat' => $item['Repeat'] ?? "N", // Recurrence Pattern //A=Annually, D=Daily, M=Monthly, N=None, W=Weekly
                             'UserSign' => $user->id ?? null,
                         ]);
@@ -372,7 +384,7 @@ class DispatchController extends Controller
                 }
                 $Numbering = (new DocumentsService())
                     ->getNumSerieByObjectId($request['ObjType']);
-                    
+
                 $user = Auth::user();
                 $default_vehicle = ORLP::where('RlpCode', $request['RlpCode'])->select('vehicle_id')->first();
                 $NewDocDetail = [
@@ -465,26 +477,26 @@ class DispatchController extends Controller
                         }
                     }
                 }
-            
+
                 (new SystemDefaults())->updateNextNumberNumberingSeries($Numbering['id']);
 
-                 //Close calls
-               
-                 if($request['ObjType'] == 214){
-                    OCLG::where('id', $baseDocHeader->ClgCode)->update([
-                    'CloseDate'=> Carbon::now(),
-                    'CloseTime'=>Carbon::now(),
-                    'CallEndTime'=>Carbon::now(), 
+                //Close calls
 
-                    ]);    
+                if ($request['ObjType'] == 214) {
+                    OCLG::where('id', $baseDocHeader->ClgCode)->update([
+                        'CloseDate' => Carbon::now(),
+                        'CloseTime' => Carbon::now(),
+                        'CallEndTime' => Carbon::now(),
+
+                    ]);
                 }
             }
-                 //Sending Sms
-                 if ($request['ObjType'] == 211) {
-                    (new DocumentsService())->sendingAssignmentNotification($newDoc->id, $uniqueCardCodes);
-                }
-               
-                
+            //Sending Sms
+            if ($request['ObjType'] == 211) {
+                (new DocumentsService())->sendingAssignmentNotification($newDoc->id, $uniqueCardCodes);
+            }
+
+
             DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService($newDoc);
         } catch (\Throwable $th) {
