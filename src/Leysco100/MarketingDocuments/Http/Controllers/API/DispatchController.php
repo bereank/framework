@@ -182,8 +182,8 @@ class DispatchController extends Controller
                 ->when(empty($searchItm), function ($query) use ($DocStatus) {
                     $query->where('DocStatus', $DocStatus)->orderBy('id', 'desc');
                 })
-              ->paginate($perPage, ['*'], 'page', $page);
-        
+                ->paginate($perPage, ['*'], 'page', $page);
+
 
             // foreach ($dispItems as $document) {
             //     $total_Qty = 0;
@@ -462,22 +462,23 @@ class DispatchController extends Controller
                             'SerialNum' => $value['SerialNum'] ?? null //    Serial No.
                         ];
 
-                        $rowItems = new $TargetTables->pdi1[0]['ChildTable']($rowdetails);
-                        $rowItems->save();
-                        $end = microtime(true);
-                        $executionTime = ($end - $start);
-                        Log::info("Lines Create time: " . $executionTime . " seconds");
-                        $start = microtime(true);
+                        // $rowItems = new $TargetTables->pdi1[0]['ChildTable']($rowdetails);
+                        // $rowItems->save();
+                        // $end = microtime(true);
+                        // $executionTime = ($end - $start);
+                        // Log::info("Lines Create time: " . $executionTime . " seconds");
+                        // $start = microtime(true);
 
-                        OpenQtyUpdateJob::dispatch(
-                            $row['ObjType'],
-                            $value['OpenQty'],
-                            $value['id']
-                        );
+                        // OpenQtyUpdateJob::dispatch(
+                        //     $row['ObjType'],
+                        //     $value['OpenQty'],
+                        //     $value['id']
+                        // );
 
-                        $end = microtime(true);
-                        $executionTime = ($end - $start);
-                        Log::info("Dispatch Effect On    Order" . $executionTime . " seconds");
+                        // $end = microtime(true);
+                        // $executionTime = ($end - $start);
+                        // Log::info("Dispatch Effect On    Order" . $executionTime . " seconds");
+                        $rowsToInsert[] = $rowdetails;
                     }
 
 
@@ -500,6 +501,12 @@ class DispatchController extends Controller
                         }
                     }
                 }
+
+                //$start = microtime(true);
+                $TargetTables->pdi1[0]['ChildTable']::insert($rowsToInsert);
+                // $end = microtime(true);
+                // $executionTime = ($end - $start);
+                // Log::info("INSERT TIME" . $executionTime . " seconds");
 
                 (new SystemDefaults())->updateNextNumberNumberingSeries($Numbering['id']);
 
