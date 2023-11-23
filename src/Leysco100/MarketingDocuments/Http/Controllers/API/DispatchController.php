@@ -20,7 +20,7 @@ use Leysco100\MarketingDocuments\Http\Controllers\Controller;
 
 class DispatchController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
 
         $RlpCode = null;
@@ -35,7 +35,8 @@ class DispatchController extends Controller
         $searchItm = \Request::has('search') ? explode(",", \Request::get('search')) : [];
         $CallId =  request()->filled('CallId') ? request()->input('CallId') : false;
         $withLines =  request()->filled('withLines') ? request()->input('withLines') : 1;
-
+        $page = $request->input('page', 1);
+        $perPage = $request->input('per_page', 50);
 
         if (!$user->SUPERUSER) {
             $RlpCode = $user->oudg->Driver ?? 0;
@@ -45,12 +46,14 @@ class DispatchController extends Controller
 
         // $ownerData =  (new AuthorizationService())->getDataOwnershipAuth($OBJType, 1);
 
+        $start = microtime(true);
 
         $DocumentTables = APDI::with('pdi1')
             ->where('ObjectID', $OBJType)
             ->first();
 
         try {
+
             $dispItems = $DocumentTables->ObjectHeaderTable::select(
                 'id',
                 'DocNum',
@@ -75,41 +78,42 @@ class DispatchController extends Controller
             );
 
             if ($withLines) {
-                $dispItems = $dispItems->with([
-                    'document_lines' => function ($query) use ($DocStatus) {
-                        $query->where('LineStatus',  $DocStatus)
-                            ->with(['oitm' => function ($query) {
-                                $query->select('SWeight1', 'ItemCode');
-                            }])->select('SWeight1,ItemCode')
+                $dispItems =
+                    $dispItems->with([
+                        'document_lines' => function ($query) use ($DocStatus) {
+                            $query->where('LineStatus',  $DocStatus)
+                                // ->with(['oitm' => function ($query) {
+                                //     $query->select('SWeight1', 'ItemCode');
+                                // }])->select('SWeight1,ItemCode')
 
-                            ->select(
-                                'id',
-                                'Quantity',
-                                'DelivrdQty',
-                                'ItemCode',
-                                'OpenQty',
-                                'DocEntry',
-                                'LineNum',
-                                'PickStatus',
-                                'SlpCode',
-                                'RlpCode',
-                                'Dscription',
-                                'Price',
-                                'unitMsr',
-                                'VatSum',
-                                'LineTotal',
-                                'DiscPrcnt',
-                                'Rate',
-                                'TaxCode',
-                                'PriceAfVAT',
-                                'PriceBefDi',
-                                'DocDate',
-                                'LineStatus',
-                                'UomCode',
-                                'created_at'
-                            );
-                    },
-                ]);
+                                ->select(
+                                    'id',
+                                    'Quantity',
+                                    'DelivrdQty',
+                                    'ItemCode',
+                                    'OpenQty',
+                                    'DocEntry',
+                                    'LineNum',
+                                    'PickStatus',
+                                    'SlpCode',
+                                    'RlpCode',
+                                    'Dscription',
+                                    'Price',
+                                    'unitMsr',
+                                    'VatSum',
+                                    'LineTotal',
+                                    'DiscPrcnt',
+                                    'Rate',
+                                    'TaxCode',
+                                    'PriceAfVAT',
+                                    'PriceBefDi',
+                                    'DocDate',
+                                    'LineStatus',
+                                    'UomCode',
+                                    'created_at'
+                                );
+                        },
+                    ]);
             }
 
             $dispItems = $dispItems->with(['oslp' => function ($query) {
@@ -177,8 +181,7 @@ class DispatchController extends Controller
                 ->when(empty($searchItm), function ($query) use ($DocStatus) {
                     $query->where('DocStatus', $DocStatus)->orderBy('id', 'desc');
                 })
-                ->take(1000)
-                ->get();
+                ->paginate($perPage, ['*'], 'page', $page);
 
 
             // foreach ($dispItems as $document) {
@@ -189,7 +192,9 @@ class DispatchController extends Controller
             //     }
             //     $document->totalQty = $total_Qty;
             // }
-
+            $end = microtime(true);
+            $executionTime = ($end - $start);
+            Log::info("Fetch Time " . $executionTime . " seconds");
             return (new ApiResponseService())->apiSuccessResponseService($dispItems);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
@@ -323,6 +328,7 @@ class DispatchController extends Controller
                     return $doc['CardCode'] == $item['CardCode'];
                 });
                 $callTime = $request['CallDate'] ??  Carbon::now()->toDateString();
+                $start = microtime(true);
 
                 if ($request['ObjType'] == 212) {
                     // create calls to BP.
@@ -410,10 +416,15 @@ class DispatchController extends Controller
 
                 $newDoc->save();
 
+                $end = microtime(true);
+                $executionTime = ($end - $start);
+                Log::info("Header  Create time: " . $executionTime . " seconds");
+
+                $start = microtime(true);
                 foreach ($itemRowsData as $key => $row) {
 
                     foreach ($row['document_lines'] as $key => $value) {
-                        Log::info($value);
+                        //Log::info($value);
                         $LineNum = ++$key;
                         $rowdetails = [
                             'DocEntry' => $newDoc->id,
@@ -449,14 +460,24 @@ class DispatchController extends Controller
                             'CodeBars' => $value['CodeBars'] ?? null, //    Bar Code
                             'SerialNum' => $value['SerialNum'] ?? null //    Serial No.
                         ];
+
                         $rowItems = new $TargetTables->pdi1[0]['ChildTable']($rowdetails);
                         $rowItems->save();
+                        $end = microtime(true);
+                        $executionTime = ($end - $start);
+                        Log::info("Lines Create time: " . $executionTime . " seconds");
+                        $start = microtime(true);
                         (new InventoryService())->dispatchEffectOnOrder(
                             $row['ObjType'],
                             $value['OpenQty'],
                             $value['id']
                         );
+
+                        $end = microtime(true);
+                        $executionTime = ($end - $start);
+                        Log::info("Dispatch Effect On    Order" . $executionTime . " seconds");
                     }
+
 
                     if ($item['ObjType'] && $item['id']) {
                         $BaseTables->pdi1[0]['ChildTable']::where('DocEntry', $row['id'])
