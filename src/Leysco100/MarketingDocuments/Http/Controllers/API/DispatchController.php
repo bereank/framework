@@ -11,6 +11,7 @@ use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Inventory\Services\InventoryService;
 use Leysco100\Shared\Services\AuthorizationService;
+use Leysco100\MarketingDocuments\Jobs\OpenQtyUpdateJob;
 use Leysco100\Shared\Models\Administration\Models\ORLP;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCLG;
@@ -46,7 +47,7 @@ class DispatchController extends Controller
 
         // $ownerData =  (new AuthorizationService())->getDataOwnershipAuth($OBJType, 1);
 
-        $start = microtime(true);
+        //$start = microtime(true);
 
         $DocumentTables = APDI::with('pdi1')
             ->where('ObjectID', $OBJType)
@@ -181,8 +182,8 @@ class DispatchController extends Controller
                 ->when(empty($searchItm), function ($query) use ($DocStatus) {
                     $query->where('DocStatus', $DocStatus)->orderBy('id', 'desc');
                 })
-                ->paginate($perPage, ['*'], 'page', $page);
-
+              ->paginate($perPage, ['*'], 'page', $page);
+        
 
             // foreach ($dispItems as $document) {
             //     $total_Qty = 0;
@@ -192,9 +193,9 @@ class DispatchController extends Controller
             //     }
             //     $document->totalQty = $total_Qty;
             // }
-            $end = microtime(true);
-            $executionTime = ($end - $start);
-            Log::info("Fetch Time " . $executionTime . " seconds");
+            // $end = microtime(true);
+            // $executionTime = ($end - $start);
+            // Log::info("Fetch Time " . $executionTime . " seconds");
             return (new ApiResponseService())->apiSuccessResponseService($dispItems);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
@@ -322,9 +323,9 @@ class DispatchController extends Controller
         try {
             DB::connection("tenant")->beginTransaction();
 
-            foreach ($uniqueCardCodes as $key => $item) {
+            foreach ($uniqueCardCodes as  $item) {
 
-                $itemRowsData = $itemsCollection->filter(function ($doc, $key) use ($item) {
+                $itemRowsData = $itemsCollection->filter(function ($doc) use ($item) {
                     return $doc['CardCode'] == $item['CardCode'];
                 });
                 $callTime = $request['CallDate'] ??  Carbon::now()->toDateString();
@@ -467,7 +468,8 @@ class DispatchController extends Controller
                         $executionTime = ($end - $start);
                         Log::info("Lines Create time: " . $executionTime . " seconds");
                         $start = microtime(true);
-                        (new InventoryService())->dispatchEffectOnOrder(
+
+                        OpenQtyUpdateJob::dispatch(
                             $row['ObjType'],
                             $value['OpenQty'],
                             $value['id']
@@ -521,6 +523,7 @@ class DispatchController extends Controller
             DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService($newDoc);
         } catch (\Throwable $th) {
+            Log::info($th->getMessage());
             DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
