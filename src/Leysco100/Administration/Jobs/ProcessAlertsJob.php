@@ -40,8 +40,8 @@ class ProcessAlertsJob implements ShouldQueue, TenantAware
      */
     public function handle()
     {
-        Log::info("_______________START____________________");
-        Log::info('Template name:  ' . $this->temp->Name);
+      //  Log::info("_______________START____________________");
+      //  Log::info('Template name:  ' . $this->temp->Name);
         $current_day = Carbon::today()->format('Y-m-d');
         $time =  Carbon::now()->format('H:i');
 
@@ -50,9 +50,9 @@ class ProcessAlertsJob implements ShouldQueue, TenantAware
 
         $queryCount = 0;
         if ($NextDate == $current_day && $this->temp->Active) {
-            Log::info('=============QUERY:' . $queryCount . '=========');
+           // Log::info('=============QUERY:' . $queryCount . '=========');
             if ($NextTime == $time) {
-                Log::info("_________________READY__________________");
+              //  Log::info("_________________READY__________________");
                 $data = (new AlertsManagerService())->processPeriod(
                     $this->temp->FrqncyType,
                     $this->temp->FrqncyIntr,
@@ -74,7 +74,7 @@ class ProcessAlertsJob implements ShouldQueue, TenantAware
                         Log::info('NO QUERY ISSET');
                     }
                     $result = DB::connection('tenant')->select($query->saved_query->QString);
-                    Log::info('-----------------' . $query->saved_query->QName . '----------');
+                    //Log::info('-----------------' . $query->saved_query->QName . '----------');
                     if (count($result) > 0) {
 
                         $headers = [];
@@ -97,18 +97,18 @@ class ProcessAlertsJob implements ShouldQueue, TenantAware
                         $alert =   $this->createAlert($results, $query);
                         dispatch(new SendAlertEmailJob($alert->id));
                     } else {
-                        Log::info('NO QUERY RESULT');
+                       // Log::info('NO QUERY RESULT');
                         return;
                     }
                 }
             } else {
-                Log::info("_______________ALERT NOT READY____________________");
+               // Log::info("_______________ALERT NOT READY____________________");
             }
             $queryCount++;
         } else {
-            Log::info("_______________ALERT NOT EXECUTING TODAY____________________");
+            //Log::info("_______________ALERT NOT EXECUTING TODAY____________________");
         }
-        Log::info("_______________END____________________");
+       // Log::info("_______________END____________________");
     }
     public function createAlert($results, $query)
     {

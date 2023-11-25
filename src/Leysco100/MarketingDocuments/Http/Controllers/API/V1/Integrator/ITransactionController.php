@@ -50,7 +50,7 @@ class ITransactionController extends Controller
 {
     public function getTransactions($ObjType)
     {
-        
+
         $updated_at = \Request::get('updated_at');
         $docEntry = \Request::get('docEntry');
 
@@ -74,11 +74,11 @@ class ITransactionController extends Controller
                 ->first();
         }
 
-       
+
         try {
             $documents = $DocumentTables->ObjectHeaderTable::whereNull('ExtRef')
                 ->where('ObjType', $ObjType)
-              //  ->where('Transfered', 'N')
+                //  ->where('Transfered', 'N')
                 ->where(function ($q) use ($docEntry) {
                     if ($docEntry != null) {
                         $q->where('id', $docEntry);
@@ -206,15 +206,15 @@ class ITransactionController extends Controller
                     $headerVal->payments = (new BankingDocumentService())->getInvoicePayment($headerVal->id);
                 }
             }
-          
 
-            // Log::info("  ********************************************* " . now() . "********************************************");
-           // Log::info($documents);
+
+            Log::info("  ********************************************* " . now() . "********************************************");
+            Log::info($documents);
             return $documents;
-          //  Log::info("  ********************************************* " . now() . "********************************************");
+            //    Log::info("  ********************************************* " . now() . "********************************************");
 
         } catch (\Throwable $th) {
-         
+
             Log::error($th);
             throw $th;
         }
@@ -583,7 +583,7 @@ class ITransactionController extends Controller
         }
 
         $ExtRef = \Request::get('ExtRef');
-        if ($ExtRef){
+        if ($ExtRef) {
             $data = $DocumentTables->ObjectHeaderTable::where('ExtRef', $ExtRef)
                 ->first();
 
@@ -634,7 +634,7 @@ class ITransactionController extends Controller
                 'Requester' => $request['Requester'],
                 'ReqType' => $request['ReqType'],
                 'Department' => $request['Department'],
-                 'DocStatus' => $request['DocStatus'],
+                'DocStatus' => $request['DocStatus'],
                 'CANCELED' => $request['CANCELED'],
                 'CardName' => $businessPartner ? $businessPartner->CardName : null,
                 'SlpCode' => $request['SlpCode'], // Sales Employee
@@ -773,7 +773,7 @@ class ITransactionController extends Controller
                     'BPLId' => $request['Branch'],
                     'WhsName' => isset($value['WhsName']) ? $value['WhsName'] : null,
                     'StockPrice' => $value['StockPrice'] ?? 0,
-                     'LineStatus' => $value['LineStatus'],
+                    'LineStatus' => $value['LineStatus'],
 
                 ];
                 $rowItems = new $DocumentTables->pdi1[0]['ChildTable']($rowdetails);
