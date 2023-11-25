@@ -72,7 +72,7 @@ class PriceUpdateJob implements ShouldQueue, TenantAware
                     ]
                 );
 
-                Log::info(" PRICE UPDATED: . " . $priceUpdated->ItemCode);
+               // Log::info(" PRICE UPDATED: . " . $priceUpdated->ItemCode);
             } catch (\Throwable $th) {
                 Log::info($th->getMessage());
                 continue;
