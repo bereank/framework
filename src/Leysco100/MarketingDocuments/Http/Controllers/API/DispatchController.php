@@ -462,8 +462,8 @@ class DispatchController extends Controller
                             'SerialNum' => $value['SerialNum'] ?? null //    Serial No.
                         ];
 
-                        // $rowItems = new $TargetTables->pdi1[0]['ChildTable']($rowdetails);
-                        // $rowItems->save();
+                        $rowItems = new $TargetTables->pdi1[0]['ChildTable']($rowdetails);
+                        $rowItems->save();
                         // $end = microtime(true);
                         // $executionTime = ($end - $start);
                         // Log::info("Lines Create time: " . $executionTime . " seconds");
@@ -478,7 +478,7 @@ class DispatchController extends Controller
                         // $end = microtime(true);
                         // $executionTime = ($end - $start);
                         // Log::info("Dispatch Effect On    Order" . $executionTime . " seconds");
-                        $rowsToInsert[] = $rowdetails;
+                        //  $rowsToInsert[] = $rowdetails;
                     }
 
 
@@ -502,8 +502,8 @@ class DispatchController extends Controller
                     }
                 }
 
-                //$start = microtime(true);
-                $TargetTables->pdi1[0]['ChildTable']::insert($rowsToInsert);
+                //    //$start = microtime(true);
+                //   $TargetTables->pdi1[0]['ChildTable']::insert($rowsToInsert);
                 // $end = microtime(true);
                 // $executionTime = ($end - $start);
                 // Log::info("INSERT TIME" . $executionTime . " seconds");
