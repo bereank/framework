@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\Administration\Models\ITG1;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
+use Leysco100\Shared\Models\Administration\Models\TaxGroup;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OPLN;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\ITM1;
@@ -29,11 +30,19 @@ class MItemController extends Controller
      */
     public function index()
     {
-       
+
         $search = \Request::get('filter');
         $all = \Request::get('all');
-        $data = OITM::select('id', 'ItemName', 'ItemCode', 'UgpEntry',
-         'SUoMEntry','VatGourpSa', 'OnHand','frozenFor')
+        $data = OITM::select(
+            'id',
+            'ItemName',
+            'ItemCode',
+            'UgpEntry',
+            'SUoMEntry',
+            'VatGourpSa',
+            'OnHand',
+            'frozenFor'
+        )
             ->where(function ($q) use ($search) {
                 if ($search) {
                     $q->where('ItemCode', 'LIKE', "%$search%")
@@ -41,9 +50,9 @@ class MItemController extends Controller
                 }
             })
             ->when(!$all, function ($query) {
-               $query->where('frozenFor', "N")
-                ->where('OnHand', '>', 0);
-            })  
+                $query->where('frozenFor', "N")
+                    ->where('OnHand', '>', 0);
+            })
             ->get();
         return $data;
     }
@@ -111,12 +120,14 @@ class MItemController extends Controller
             $ugp1 = UGP1::where('UomEntry', $ITEM->SUoMEntry)
                 ->where('UgpEntry', $ITEM->UgpEntry)
                 ->first();
-
+            $ovtg = TaxGroup::where('code', $ITEM->VatGourpSa)->first();
             //Getting Pricing Unit From OITM
 
             //Checkig if Price list for Item Exist
 
             $bpPriceList = OCRD::where('id', $request['CardCode'])->value('ListNum');
+            $opln = OPLN::where('id', $bpPriceList)->first();
+
             if (!$bpPriceList) {
                 return (new ApiResponseService())
                     ->apiMobileFailedResponseService("Customer does not have pricelist");
@@ -143,9 +154,15 @@ class MItemController extends Controller
                 ->first();
 
             if ($itm9) {
+                if ($opln->isGrossPrc == 'N') {
+                    $PRICE = $itm9->Price;
+                } else if ($opln->isGrossPrc == 'Y') {
+
+                    $PRICE =  (($ovtg->rate / 100) + 1) *  $itm9->Price;
+                }
                 $details = [
                     "SUoMEntry" => $ugp1 ? $ugp1->id : null,
-                    'FINALSALESPRICE' => $itm9->Price,
+                    'FINALSALESPRICE' =>  $PRICE,
                 ];
                 return $details;
             }
@@ -180,7 +197,7 @@ class MItemController extends Controller
                 ->first();
             $INVUNITCONVERTEDTOBASEUOM = $INVUNITCONVERTEDTOBASEUOM_QUERY ? $INVUNITCONVERTEDTOBASEUOM_QUERY->INVUNITCONVERTEDTOBASEUOM : null;
 
-            $opln = OPLN::where('id', $bpPriceList)->first();
+
 
             //Getting Current Price and Curreny
             $ITM1_DATA = ITM1::select('Price', 'Currency')
@@ -196,9 +213,16 @@ class MItemController extends Controller
             $INVUNITCONVERTEDTOBASEUOM = $INVUNITCONVERTEDTOBASEUOM == null || 0 ? 1 : $INVUNITCONVERTEDTOBASEUOM;
             $PRICINGUNITCONVERTEDTOBASEUOM = $PRICINGUNITCONVERTEDTOBASEUOM == null || 0 ? 1 : $PRICINGUNITCONVERTEDTOBASEUOM;
 
+
+            if ($opln->isGrossPrc == 'N') {
+                $PRICE =  (($PRICEPERPRICEUNIT * $SALESUNITCONVERTEDTOBASEUOM) / $PRICINGUNITCONVERTEDTOBASEUOM);
+            } else if ($opln->isGrossPrc == 'Y') {
+
+                $PRICE =  (($ovtg->rate / 100) + 1) *  (($PRICEPERPRICEUNIT * $SALESUNITCONVERTEDTOBASEUOM) / $PRICINGUNITCONVERTEDTOBASEUOM);
+            }
             $details = [
                 "SUoMEntry" => $ugp1 ? $ugp1->id : null,
-                'FINALSALESPRICE' => ($PRICEPERPRICEUNIT * $SALESUNITCONVERTEDTOBASEUOM) / $PRICINGUNITCONVERTEDTOBASEUOM,
+                'FINALSALESPRICE' => $PRICE,
             ];
 
             return $details;
