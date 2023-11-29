@@ -743,7 +743,7 @@ class DocumentsService
         }
         $listString = "";
         foreach ($items as $key => $item) {
-            $listString .= ($key + 1) . '. ' . $item['CardName'] . "\n";
+            $listString .= ($key + 1) . '. ' . $item . "\n";
         }
         $document = ODISPASS::where('id', $DocEntry)->first();
         $driverData= ORLP::where('RlpCode',    $document->RlpCode)->first();
@@ -758,7 +758,7 @@ class DocumentsService
 
      
         if ($driverData->Telephone) {
-           // Log::info($message);
+            Log::info($message);
             $response = Http::withoutVerifying()
                 ->withHeaders([
                     'h_api_key' => 'ed44559c987ef8fbec7b4e1eaa2704353d7907db0dd306bb1a21ea70b3c4dccc',
