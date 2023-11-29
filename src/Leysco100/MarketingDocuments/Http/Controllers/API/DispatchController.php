@@ -18,6 +18,7 @@ use Leysco100\Shared\Models\BusinessPartner\Models\OCLG;
 use Leysco100\MarketingDocuments\Services\SystemDefaults;
 use Leysco100\MarketingDocuments\Services\DocumentsService;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;
+use Leysco100\MarketingDocuments\Jobs\DocStatusUpdateJob;
 
 class DispatchController extends Controller
 {
@@ -317,18 +318,12 @@ class DispatchController extends Controller
             'items' => 'required|array',
         ]);
 
-        $itemsCollection = collect($request['items']);
-        $uniqueCardCodes = $itemsCollection->unique('CardCode');
-
         try {
             DB::connection("tenant")->beginTransaction();
-
-            foreach ($uniqueCardCodes as  $item) {
-
-                $itemRowsData = $itemsCollection->filter(function ($doc) use ($item) {
-                    return $doc['CardCode'] == $item['CardCode'];
-                });
-                $callTime = $request['CallDate'] ??  Carbon::now()->toDateString();
+            $cardcodes = [];
+            foreach ($request['items'] as  $item) {
+                $cardcodes[] = $item['CardCode'];
+                $callTime = $item['CallDate'] ??  Carbon::now()->toDateString();
                 $start = microtime(true);
 
                 if ($request['ObjType'] == 212) {
@@ -373,7 +368,6 @@ class DispatchController extends Controller
                     $BaseTables = APDI::with('pdi1')
                         ->where('ObjectID', $item['ObjType'])
                         ->first();
-
                     if (!$BaseTables) {
                         DB::connection("tenant")->rollback();
                         return (new ApiResponseService())->apiFailedResponseService("Not found document with base type ");
@@ -381,9 +375,11 @@ class DispatchController extends Controller
 
                     $baseDocHeader = $BaseTables->ObjectHeaderTable::where('id', $item['id'])
                         ->first();
-                    if ($baseDocHeader->DocStatus == "C" && ($item['ObjType'] != 13 ||  $request['ObjType'] != 211)) {
-                        return (new ApiResponseService())
-                            ->apiFailedResponseService("Copying to not Possible, Base Document is closed");
+                    if ($baseDocHeader) {
+                        if ($baseDocHeader->DocStatus == "C" && ($item['ObjType'] != 13 ||  $request['ObjType'] != 211)) {
+                            return (new ApiResponseService())
+                                ->apiFailedResponseService("Copying to not Possible, Base Document is closed");
+                        }
                     }
                 } else {
                     DB::connection("tenant")->rollback();
@@ -422,91 +418,62 @@ class DispatchController extends Controller
                 Log::info("Header  Create time: " . $executionTime . " seconds");
 
                 $start = microtime(true);
-                foreach ($itemRowsData as $key => $row) {
+                $rowsToInsert = [];
+                foreach ($item['document_lines'] as $key => $value) {
+                    //Log::info($value);
+                    $LineNum = ++$key;
+                    $rowdetails = [
+                        'DocEntry' => $newDoc->id,
+                        'LineNum' => $LineNum,
+                        'ItemCode' => $value['ItemCode'] ?? null,
+                        'Dscription' => $value['Dscription'] ?? null,
+                        'Quantity' => $value['OpenQty'] ?? 1,
+                        // 'BaseQty' => $value['OpenQty'] ?? 1,
+                        'PackQty' => $value['PackQty'] ?? null,
+                        'Price' => $value['Price'] ?? 0,
+                        'UomCode' => $value['UomCode'] ?? null,
+                        'unitMsr' => array_key_exists('unitMsr', $value) ? $value['unitMsr'] : null,
+                        'NumPerMsr' => array_key_exists('NumPerMsr', $value) ? $value['NumPerMsr'] : null,
+                        'OwnerCode' => $value['OwnerCode'] ?? null,
+                        'GTotal' => $value['GTotal'] ?? 0,
+                        'BaseRef' => $value['DocNum'] ?? 0,
+                        'BaseEntry' => $value['DocEntry'] ?? 0,
+                        'BaseLine' => $value['LineNum'] ?? 0,
+                        'OpenQty' => $value['OpenQty'] ?? 0,
+                        'BaseType' => $item['ObjType'],
+                        'DocDate' =>  Carbon::now()->format('Y-m-d'),
+                        'SlpCode' => $value['SlpCode'] ?? null,
+                        'RlpCode' =>  $request['RlpCode'] ?? $baseDocHeader->RlpCode ?? null,
+                        'vehicle_id' =>  $request['vehicle_id'] ?? $baseDocHeader->vehicle_id ?? null,
+                        'DiscPrcnt' => $value['DiscPrcnt'] ?? 0, //    Discount %
+                        'Rate' => $value['Rate'] ?? 0,
+                        'TaxCode' =>  $value['TaxCode'] ?? null, //    Tax Code
+                        'PriceAfVAT' =>  $value['PriceAfVAT'] ?? 0, //
+                        'PriceBefDi' =>  $value['PriceBefDi'] ?? 0, // Unit Price
+                        'LineTotal' => $value['LineTotal'] ?? 0, //    Total (LC)
+                        'WhsCode' => $value['WhsCode'] ?? null, //    Warehouse Code
+                        'ShipDate' => $value['ShipDate'] ?? null, //
+                        'CodeBars' => $value['CodeBars'] ?? null, //    Bar Code
+                        'SerialNum' => $value['SerialNum'] ?? null //    Serial No.
+                    ];
 
-                    foreach ($row['document_lines'] as $key => $value) {
-                        //Log::info($value);
-                        $LineNum = ++$key;
-                        $rowdetails = [
-                            'DocEntry' => $newDoc->id,
-                            'LineNum' => $LineNum,
-                            'ItemCode' => $value['ItemCode'] ?? null,
-                            'Dscription' => $value['Dscription'] ?? null,
-                            'Quantity' => $value['OpenQty'] ?? 1,
-                            // 'BaseQty' => $value['OpenQty'] ?? 1,
-                            'PackQty' => $value['PackQty'] ?? null,
-                            'Price' => $value['Price'] ?? 0,
-                            'UomCode' => $value['UomCode'] ?? null,
-                            'unitMsr' => array_key_exists('unitMsr', $value) ? $value['unitMsr'] : null,
-                            'NumPerMsr' => array_key_exists('NumPerMsr', $value) ? $value['NumPerMsr'] : null,
-                            'OwnerCode' => $value['OwnerCode'] ?? null,
-                            'GTotal' => $value['GTotal'] ?? 0,
-                            'BaseRef' => $value['DocNum'] ?? 0,
-                            'BaseEntry' => $value['DocEntry'] ?? 0,
-                            'BaseLine' => $value['LineNum'] ?? 0,
-                            'OpenQty' => $value['OpenQty'] ?? 0,
-                            'BaseType' => $row['ObjType'],
-                            'DocDate' =>  Carbon::now()->format('Y-m-d'),
-                            'SlpCode' => $value['SlpCode'] ?? null,
-                            'RlpCode' =>  $request['RlpCode'] ?? $baseDocHeader->RlpCode ?? null,
-                            'vehicle_id' =>  $request['vehicle_id'] ?? $baseDocHeader->vehicle_id ?? null,
-                            'DiscPrcnt' => $value['DiscPrcnt'] ?? 0, //    Discount %
-                            'Rate' => $value['Rate'] ?? 0,
-                            'TaxCode' =>  $value['TaxCode'] ?? null, //    Tax Code
-                            'PriceAfVAT' =>  $value['PriceAfVAT'] ?? 0, //
-                            'PriceBefDi' =>  $value['PriceBefDi'] ?? 0, // Unit Price
-                            'LineTotal' => $value['LineTotal'] ?? 0, //    Total (LC)
-                            'WhsCode' => $value['WhsCode'] ?? null, //    Warehouse Code
-                            'ShipDate' => $value['ShipDate'] ?? null, //
-                            'CodeBars' => $value['CodeBars'] ?? null, //    Bar Code
-                            'SerialNum' => $value['SerialNum'] ?? null //    Serial No.
-                        ];
+                    $rowItems = new $TargetTables->pdi1[0]['ChildTable']($rowdetails);
+                    $rowItems->save();
 
-                        $rowItems = new $TargetTables->pdi1[0]['ChildTable']($rowdetails);
-                        $rowItems->save();
-                        // $end = microtime(true);
-                        // $executionTime = ($end - $start);
-                        // Log::info("Lines Create time: " . $executionTime . " seconds");
-                        // $start = microtime(true);
-
-                        // OpenQtyUpdateJob::dispatch(
-                        //     $row['ObjType'],
-                        //     $value['OpenQty'],
-                        //     $value['id']
-                        // );
-
-                        // $end = microtime(true);
-                        // $executionTime = ($end - $start);
-                        // Log::info("Dispatch Effect On    Order" . $executionTime . " seconds");
-                        //  $rowsToInsert[] = $rowdetails;
-                    }
-
-
-                    if ($item['ObjType'] && $item['id']) {
-                        $BaseTables->pdi1[0]['ChildTable']::where('DocEntry', $row['id'])
-                            ->where('OpenQty', 0)->where('LineStatus', "O")->update([
-                                'LineStatus' => "C",
-                            ]);
-                        if ($BaseTables->pdi1[0]['ChildTable']::where('DocEntry', $row['id'])
-                            ->where('OpenQty', '>=', 1)
-                            ->doesntExist()
-                        ) {
-                            $baseDocHeader->update([
-                                'DocStatus' => "C",
-                            ]);
-
-                            $BaseTables->pdi1[0]['ChildTable']::where('DocEntry', $row['id'])->update([
-                                'LineStatus' => "C",
-                            ]);
-                        }
-                    }
+                    OpenQtyUpdateJob::dispatch(
+                        $item['ObjType'],
+                        $value['OpenQty'],
+                        $value['id']
+                    );
                 }
 
-                //    //$start = microtime(true);
-                //   $TargetTables->pdi1[0]['ChildTable']::insert($rowsToInsert);
-                // $end = microtime(true);
-                // $executionTime = ($end - $start);
-                // Log::info("INSERT TIME" . $executionTime . " seconds");
+
+                if ($item['ObjType'] && $item['id']) {
+                    DocStatusUpdateJob::dispatch(
+                        $BaseTables, $item['id'], $baseDocHeader
+                    );
+                }
+
 
                 (new SystemDefaults())->updateNextNumberNumberingSeries($Numbering['id']);
 
@@ -522,8 +489,10 @@ class DispatchController extends Controller
                 }
             }
             //Sending Sms
+
             if ($request['ObjType'] == 211) {
-                (new DocumentsService())->sendingAssignmentNotification($newDoc->id, $uniqueCardCodes);
+                $cardcodes = array_unique($cardcodes);
+                (new DocumentsService())->sendingAssignmentNotification($newDoc->id,  $cardcodes);
             }
 
 
