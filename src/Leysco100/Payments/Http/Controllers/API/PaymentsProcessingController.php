@@ -6,8 +6,7 @@ use Carbon\Carbon;
 
 
 use Illuminate\Http\Request;
-use ParagonIE\Halite\KeyFactory;
-use ParagonIE\Halite\Asymmetric\Verifier;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -60,6 +59,7 @@ class PaymentsProcessingController extends Controller
 
         $data = $request->all();
         $payment = [];
+        $paymentUnique = [];
         if (array_key_exists('header', $data)) {
             if (array_key_exists('originatorConversationID', $data['header'])) {
                 $TransID = $data['header']['originatorConversationID'];
@@ -78,7 +78,7 @@ class PaymentsProcessingController extends Controller
                     $payment['MSISDN'] = $paymentData['debitMSISDN'] ?? "";
                     $payment['TransAmount'] = $paymentData['transactionAmt'] ?? 0;
                     $payment['TransTime'] = $transactionDate ?? now();
-                    $payment['TransID'] = $TransID ?? $paymentData['transactionID'];
+                    $paymentUnique['TransID'] = $TransID ?? $paymentData['transactionID'];
                     $payment['FirstName'] = $paymentData['firstName'] ?? "";
                     $payment['MiddleName'] = $paymentData['middleName'] ?? "";
                     $payment['LastName'] = $paymentData['lastName'] ?? "";
@@ -97,9 +97,32 @@ class PaymentsProcessingController extends Controller
         $originatorConversationID = $data['header']['originatorConversationID'] ?? '';
         $messageID = $data['header']['messageID'] ?? '';
 
+
+        DB::connection("tenant")->beginTransaction();
         try {
-            if ($payment) {
-                $transaction =   OCRP::create($payment);
+            if (!$payment) {
+                Log::info('Error: Request Could not be parsed');
+                $data = [
+                    'header' => [
+                        'messageID' => $messageID,
+                        'originatorConversationID' => $originatorConversationID,
+                        'statusCode' => '1',
+                        'statusMessage' => "Request Could not be parsed",
+                    ],
+                    'responsePayload' => [
+                        'transactionInfo' => [
+                            'transactionId' => "0001",
+                        ],
+                    ],
+                ];
+                DB::connection("tenant")->rollback();
+                return response()->json($data);
+            } else {
+
+                $transaction =     OCRP::firstOrCreate(
+                    ['TransID' => $paymentUnique['TransID']],
+                    $payment
+                );
                 Log::info('SUCCESS: KCB PAYMENT SAVED SUCCESSFULLY');
                 $data = [
                     'header' => [
@@ -115,25 +138,11 @@ class PaymentsProcessingController extends Controller
                     ],
                 ];
                 (new SystemDefaults())->updateNextNumberNumberingSeries($Numbering['id']);
-                return response()->json($data);
-            } else {
-                Log::info('Error: Request Could not be parsed');
-                $data = [
-                    'header' => [
-                        'messageID' => $messageID,
-                        'originatorConversationID' => $originatorConversationID,
-                        'statusCode' => '1',
-                        'statusMessage' => "Request Could not be parsed",
-                    ],
-                    'responsePayload' => [
-                        'transactionInfo' => [
-                            'transactionId' => "0001",
-                        ],
-                    ],
-                ];
+                DB::connection("tenant")->commit();
                 return response()->json($data);
             }
         } catch (\Throwable $th) {
+            DB::connection("tenant")->rollback();
             Log::info('Logging Query Error' . $th->getMessage());
             $data = [
                 'header' => [
@@ -159,7 +168,7 @@ class PaymentsProcessingController extends Controller
         $user = User::where('id', 1)->first();
         Auth::login($user);
 
-        $path = __DIR__ . '/../../../resources/public_key.pem';
+        $path = __DIR__ . '/../../../resources/kcb_uat_publickey.pem';
         $publicKey = file_get_contents($path);
         $publicKey = openssl_pkey_get_public($publicKey);
 
