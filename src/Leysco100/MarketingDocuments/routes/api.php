@@ -68,6 +68,7 @@ Route::post('marketing/docs', [MarketingDocumentsController::class, 'store']);
 Route::put('marketing/docs', [MarketingDocumentsController::class, 'updateSingleDocument']);
 Route::put('marketing/attachments', [MarketingDocumentsController::class, 'upload']);
 Route::get('marketing/docs/{ObjType}', [MarketingDocumentsController::class, 'getDocumentData']);
+Route::get('marketing/docs/{ObjType}/{id}', [MarketingDocumentsController::class, 'getSingleDocData']);
 
 /*
 |--------------------------------------------------------------------------

@@ -105,4 +105,8 @@ class OITM extends Model
     {
         return $this->belongsTo(TaxGroup::class, 'code', 'VatGourpSa');
     }
+    public function ospp()
+    {
+        return $this->hasOne(OSPP::class, 'ItemCode', 'ItemCode');
+    }
 }
