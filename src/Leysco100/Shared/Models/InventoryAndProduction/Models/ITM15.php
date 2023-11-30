@@ -3,6 +3,7 @@
 namespace Leysco100\Shared\Models\InventoryAndProduction\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\Administration\Models\ITG1;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class ITM15 extends Model

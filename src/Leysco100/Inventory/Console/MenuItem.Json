@@ -73,6 +73,20 @@
                         "link": "/inventory/price-list",
                         "Visible": "Y",
                         "children": []
+                    },
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Period and Volume Discounts",
+                        "link": "/inventory/period-and-vol-discounts",
+                        "Visible": "Y",
+                        "children": []
+                    },
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Discount Groups",
+                        "link": "/inventory/discount-groups",
+                        "Visible": "Y",
+                        "children": []
                     }
                 ]
             },
