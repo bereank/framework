@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Leysco100\Administration\Http\Controllers\Approvals\ApprovalStagesControlller;
+use Leysco100\Administration\Http\Controllers\Approvals\ApprovalTemplatesControlller;
 use Leysco100\Administration\Http\Controllers\Setup\Banking\BankController;
 use Leysco100\Administration\Http\Controllers\Setup\General\UserController;
 use Leysco100\Administration\Http\Controllers\Setup\Inventory\UoMController;
@@ -139,3 +141,6 @@ Route::apiResources(['vehicles' => VehicleController::class]);
 Route::put('/settings/password_rest_change', [GeneralSettingsController::class, 'updatePswdChangOnReset']);
 Route::apiResources(['alerts' => AlertsManagementController::class]);
 Route::apiResources(['data-ownerships' => DataOwnershipController::class]);
+
+ Route::apiResources(['approval_stages' => ApprovalStagesControlller::class]);
+ Route::apiResources(['approval_templates' => ApprovalTemplatesControlller::class]);
