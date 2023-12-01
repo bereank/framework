@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 
 use Leysco100\Gpm\Services\DocumentsService;
 use Leysco100\Shared\Jobs\FormSettingUpdate;
+use Leysco100\Shared\Models\Administration\Jobs\CreateMenuForUser;
 use Leysco100\Shared\Models\CUFD;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Http\Controllers\Controller;
@@ -251,6 +252,12 @@ class FormSettingsController extends Controller
 
     public function getUserMenuSettings($user_id)
     {
+        $userfm100 = FM100::where('UserSign', $user_id)
+            ->first();
+        if(!$userfm100){
+            CreateMenuForUser::dispatch($user_id);
+        }
+
         $AllTreeview = FM100::whereNull('ParentID')
             ->where('UserSign', $user_id)
             ->with('GrandChildren')
@@ -274,10 +281,11 @@ class FormSettingsController extends Controller
         $this->validate($request, [
             'UserSign' => 'required',
         ]);
-      
+
         FormSettingUpdate::dispatchSync($request['AllIds'],
          $request['SelectedIds'],
           $request['UserSign']);
+
         return response()->json([
             'Message' => "Updated Successfully",
         ]);
@@ -288,6 +296,7 @@ class FormSettingsController extends Controller
         $details = [
             'Label' => $request['Label'],
         ];
+
         FM100::where('id', $id)->update($details);
 
         return response()->json([

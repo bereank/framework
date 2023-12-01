@@ -36,6 +36,7 @@ class GPMDocsSyncronizationJob  implements ShouldQueue, TenantAware
      */
     public function __construct()
     {
+
     }
 
     /**

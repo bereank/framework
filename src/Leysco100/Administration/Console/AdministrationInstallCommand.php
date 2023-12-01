@@ -130,9 +130,9 @@ class AdministrationInstallCommand extends Command
         // }
 
 
-        FM100::query()->update([
-            'Visible' => 'Y',
-        ]);
+//        FM100::query()->update([
+//            'Visible' => 'Y',
+//        ]);
 
     }
 

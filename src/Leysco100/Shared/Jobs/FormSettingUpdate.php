@@ -40,35 +40,21 @@ class FormSettingUpdate implements ShouldQueue
      */
     public function handle()
     {
+
         $userfm100 = FM100::where('UserSign', $this->user_id)
                 ->first();
-if(!$userfm100){
-    Log::info("No data");
-    CreateMenuForUser::dispatch($this->user_id);
-}else{
-    Log::info("data");
-}
- return;     
-//        foreach ($this->AllIds as $key => $value) {
-//            $details = [
-//                'Visible' => 'N',
-//            ];
-//            FM100::where('id', $value)
-//                ->where('UserSign', $this->user_id)
-//                ->update($details);
-//        }
-            $details = [
-                'Visible' => 'N',
-            ];
+        if(!$userfm100){
+            CreateMenuForUser::dispatch($this->user_id);
+        }
          FM100::where('UserSign', $this->user_id)
-                ->update($details);
+                ->update([
+                    'Visible' => 'N',
+                ]);
 
         foreach ($this->SelectedIds as $key => $value) {
-
             $fm100 = FM100::where('id', $value)
                 ->where('UserSign', $this->user_id)
                 ->first();
-
             $details = [
                 'Visible' => 'Y',
             ];
