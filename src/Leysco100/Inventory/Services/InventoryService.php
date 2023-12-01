@@ -5,6 +5,10 @@ namespace Leysco100\Inventory\Services;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OPLN;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\ITM1;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OBIN;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OBTL;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OIBQ;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OILM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITW;
 
@@ -170,5 +174,40 @@ class InventoryService
         ];
         $BaseTable->pdi1[0]['ChildTable']::where('id', $BaseEntry)->update($details);
         return $rowData;
+    }
+
+    public function binAllocations($ItemCode, $Quantity, $bin_allocations, $ToWhsCode, $FromBinCod = null)
+    {
+        foreach ($bin_allocations as $bin_allocation) {
+            $obin = OBIN::where('BinCode', $bin_allocation['BinCode'])->first();
+            $oibq = OIBQ::where('ItemCode', $ItemCode)
+                ->where('BinAbs', $obin->id)
+                ->first();
+            if ($FromBinCod) {
+                $fromobin = OBIN::where('BinCode', $FromBinCod)->first();
+                $fromoibq = OIBQ::where('ItemCode', $ItemCode)
+                    ->where('BinAbs', $fromobin->id)
+                    ->first();
+                if ($fromoibq) {
+                    $fromoibq->update([
+                        "OnHandQty" => $fromoibq->OnHandQty - $Quantity
+                    ]);
+                }
+            }
+            if (!$oibq) {
+                OIBQ::create([
+                    'ItemCode' => $ItemCode,
+                    'BinAbs' => $obin->id,
+                    'OnHandQty' => $Quantity,
+                    'ToWhsCode' => $ToWhsCode
+                ]);
+            } else {
+                $oibq->update([
+                    "OnHandQty" => $Quantity + $oibq->OnHandQty
+                ]);
+            }
+
+            return $obin;
+        }
     }
 }

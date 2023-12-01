@@ -9,6 +9,7 @@ use Leysco100\Administration\Http\Controllers\Controller;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OBFC;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OBIN;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OBSL;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OIBQ;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OWHS;
 
 
@@ -277,5 +278,19 @@ class BinLocationsController extends Controller
      */
     public function destroy($id)
     {
+    }
+
+    public function BinLocationItems(Request $request, $id)
+    {
+        try {
+            $oibq = OIBQ::where('BinAbs', $id)
+                ->with('bin_location')
+                ->with('item:id,ItemCode,ItemName')
+                ->get();
+            return (new ApiResponseService())
+                ->apiSuccessResponseService($oibq);
+        } catch (\Throwable $th) {
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+        }
     }
 }

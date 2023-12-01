@@ -46,8 +46,9 @@ class GPMDocsSyncronizationJob  implements ShouldQueue, TenantAware
      */
     public function handle()
     {
-        Log::info("Check gpm doc last sync  job");
+        Log::info("Check GPM DOCUMENTS LAST SYNC JOB");
 
+        Log::info("JOB FOR TENANT : " . app('currentTenant'));
         $this->autoTurnOnBcp();
         $this->deactivateBackupProcess();
 

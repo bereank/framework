@@ -58,7 +58,7 @@ class OpenQtyUpdateJob implements ShouldQueue, TenantAware
             ->where('ObjectID', $this->BaseType)
             ->first();
 
-        $rowData =  $BaseTable->pdi1[0]['ChildTable']::where('id', $this->BaseEntry)->firstOrfail();
+        $rowData =  $BaseTable->pdi1[0]['ChildTable']::where('id', $this->BaseEntry)->first();
 
         $details = [
             'OpenQty' =>  $rowData->OpenQty - $this->Quantity

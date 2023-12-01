@@ -29,19 +29,11 @@ class MItemController extends Controller
      */
     public function index()
     {
-
+       
         $search = \Request::get('filter');
         $all = \Request::get('all');
-        $data = OITM::select(
-            'id',
-            'ItemName',
-            'ItemCode',
-            'UgpEntry',
-            'SUoMEntry',
-            'VatGourpSa',
-            'OnHand',
-            'frozenFor'
-        )
+        $data = OITM::select('id', 'ItemName', 'ItemCode', 'UgpEntry',
+         'SUoMEntry','VatGourpSa', 'OnHand','frozenFor')
             ->where(function ($q) use ($search) {
                 if ($search) {
                     $q->where('ItemCode', 'LIKE', "%$search%")
@@ -49,9 +41,9 @@ class MItemController extends Controller
                 }
             })
             ->when(!$all, function ($query) {
-                $query->where('frozenFor', "N")
-                    ->where('OnHand', '>', 0);
-            })
+               $query->where('frozenFor', "N")
+                ->where('OnHand', '>', 0);
+            })  
             ->get();
         return $data;
     }

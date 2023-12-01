@@ -5,22 +5,33 @@ namespace Leysco100\Inventory\Http\Controllers\API;
 use Illuminate\Http\Request;
 
 
-use Leysco100\Shared\Models\MarketingDocuments\Models\OPLN;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Inventory\Http\Controllers\Controller;
+use Leysco100\Shared\Models\MarketingDocuments\Models\OPLN;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\ITM1;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\ITM9;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\SPP1;
 
-class PriceListController extends Controller
+class PeriodDiscountsContoller extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        $ItemCode =  request()->filled('ItemCode') ? request()->input('ItemCode') : false;
+        $ListNum =  request()->filled('ListNum') ? request()->input('ListNum') : false;
         try {
-            $data = OPLN::with('basenum', 'PrimCurr', 'addcurr1', 'addcurr2')->get();
+            $data = SPP1::when($ItemCode, function ($query) use ($ItemCode) {
+                return $query->where('ItemCode', $ItemCode);
+            })
+                ->when($ListNum, function ($query) use ($ListNum) {
+                    return $query->where('ListNum', $ListNum);
+                })
+                ->get();
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
@@ -37,15 +48,22 @@ class PriceListController extends Controller
     public function store(Request $request)
     {
         try {
-            $data = OPLN::create([
-                'ListName' => $request['ListName'], //Price List Name
-                'ValidFor' => $request['ValidFor'], //     Active
-                'PrimCurr' => $request['PrimCurr'], // Primary Currency
-                'BASE_NUM' => $request['BASE_NUM'], // Base Price List
-                'Factor' => $request['Factor'], // Default Factor
-                'AddCurr1' => $request['AddCurr1'], // Additional Currency
-                'AddCurr2' => $request['AddCurr2'], // Additional Currency 2
+
+            $validatedData = $request->validate([
+                'ItemCode' => 'nullable',
+                'CardCode' => 'nullable',
+                'LINENUM' => 'nullable|integer',
+                'Price' => 'nullable|numeric',
+                'Currency' => 'nullable',
+                'Discount' => 'nullable|numeric',
+                'ListNum' => 'nullable|integer',
+                'FromDate' => 'nullable|date',
+                'ToDate' => 'nullable|date',
+                'AutoUpdt' => 'nullable|boolean',
+                'Expand' => 'nullable|boolean',
             ]);
+
+            $data = SPP1::create($validatedData);
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
@@ -100,23 +118,12 @@ class PriceListController extends Controller
                 201
             );
     }
-    public function getPriceListItems($id)
+    public function getUomPrices($id)
     {
-        $ItemCode =  request()->filled('ItemCode') ? request()->input('ItemCode') : false;
+
         try {
-            $data = OITM::with(['itm1' => function ($query) use ($id) {
-                $query->where('PriceList', $id);
-            }])
-                ->with(['priceunit' => function ($query) use ($id) {
-                    $query->select('id', 'UomName', 'UomCode');
-                }])
-                ->with(['ospp' => function ($query) use ($id) {
-                    $query->where('ListNum', $id);
-                }])
-                ->when($ItemCode, function ($query) use ($ItemCode) {
-                    return $query->where('ItemCode', $ItemCode);
-                })
-                ->select('id', 'ItemCode', 'ItemName', 'PriceUnit')
+            $data = ITM9::where('ItemCode', $id)
+                ->with('uom')
                 ->get();
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
