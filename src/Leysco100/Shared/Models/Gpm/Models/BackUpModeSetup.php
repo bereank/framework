@@ -1,6 +1,6 @@
 <?php
 
-namespace Leysco100\Shared\Models\MarketingDocuments\Models;
+namespace Leysco100\Shared\Models\Gpm\Models;
 
 
 use Illuminate\Foundation\Auth\User;

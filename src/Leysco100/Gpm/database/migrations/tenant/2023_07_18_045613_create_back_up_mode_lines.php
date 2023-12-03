@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('ReleaseStatus', 191)->default('0'); // 0 Pending Release, 1 Released, 2 flagged
             $table->string('Comment', 191)->nullable();
             $table->timestamp('DocDate')->nullable();
+            $table->string('OwnerCode', 100)->nullable();
             $table->timestamps();
         });
     }
