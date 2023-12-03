@@ -11,14 +11,14 @@ use Leysco100\Gpm\Jobs\SendEmailJob;
 use Leysco100\Gpm\Services\BackupModeService;
 use Leysco100\Gpm\Services\FormFieldsService;
 use Leysco100\Gpm\Http\Controllers\Controller;
+use Leysco100\Shared\Models\Gpm\Models\BackUpModeLines;
+use Leysco100\Shared\Models\Gpm\Models\BackUpModeSetup;
+use Leysco100\Shared\Models\Gpm\Models\GMS1;
+use Leysco100\Shared\Models\Gpm\Models\GMS2;
+use Leysco100\Shared\Models\Gpm\Models\OGMS;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\Administration\Models\OADM;
-use Leysco100\Shared\Models\MarketingDocuments\Models\GMS1;
-use Leysco100\Shared\Models\MarketingDocuments\Models\GMS2;
-use Leysco100\Shared\Models\MarketingDocuments\Models\OGMS;
-use Leysco100\Shared\Models\MarketingDocuments\Models\BackUpModeLines;
-use Leysco100\Shared\Models\MarketingDocuments\Models\BackUpModeSetup;
 
 
 class GPMMobileAPPApiController extends Controller

@@ -13,14 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('gates', function (Blueprint $table) {
+        Schema::create('g_m_s2_s', function (Blueprint $table) {
             $table->id();
-            $table->integer('location_id');
+            $table->integer('DocEntry');
+            $table->string('Type');
             $table->string('Name');
-            $table->string('Longitude', 50)->nullable();
-            $table->string('Latitude', 50)->nullable();
-            $table->string('Address', 200)->nullable();
-            $table->string('OwnerCode', 100)->nullable();
+            $table->longText('Content');
             $table->timestamps();
         });
     }
@@ -32,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('gates');
+        Schema::dropIfExists('g_m_s2_s');
     }
 };

@@ -1,15 +1,18 @@
 <?php
 
-namespace Leysco100\Shared\Models\MarketingDocuments\Models;
+namespace Leysco100\Shared\Models\Gpm\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
-class BackUpModUsers extends Model
+class BackUpModGates extends Model
 {
     use HasFactory, UsesTenantConnection;
     protected $guarded = [];
-    //  protected $fillable = ['id'];
 
+    public function users()
+    {
+        return $this->hasMany(config('auth.providers.users.model'), 'gate_id', 'GateID');
+    }
 }

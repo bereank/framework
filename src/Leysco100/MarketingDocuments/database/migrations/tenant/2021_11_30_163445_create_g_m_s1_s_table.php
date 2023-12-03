@@ -28,7 +28,6 @@ class CreateGMS1STable extends Migration
             $table->integer('Status')->default(0)->comment("0=Successfull, 1=Does not Exist, 2=Duplicate,3=Scanned but flagged,4=Rleased");
             $table->integer('Released')->default(0)->comment("0=Not Released, 1=Not Yet");
             $table->string('Comment')->nullable();
-            $table->string('OwnerCode', 100)->nullable();
             $table->timestamps();
         });
     }

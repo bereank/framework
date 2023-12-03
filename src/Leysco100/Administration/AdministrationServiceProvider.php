@@ -4,6 +4,7 @@ namespace Leysco100\Administration;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Leysco100\Administration\Console\AdministrationMigrationsCommand;
 use Leysco100\Administration\Console\CreatePermissions;
 use Leysco100\Administration\Console\BinFieldActivationCommand;
 use Leysco100\Administration\Console\Alerts\ProcessAlertsCommand;
@@ -34,6 +35,7 @@ class AdministrationServiceProvider extends ServiceProvider
 
             $this->commands([
                 AdministrationInstallCommand::class,
+                AdministrationMigrationsCommand::class,
                 CreatePermissions::class,
                 ImportNumberingSeries::class,
                 CreateUserFormSettings::class,

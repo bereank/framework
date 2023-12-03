@@ -6,10 +6,8 @@ namespace Leysco100\Gpm\Http\Controllers\API;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Gpm\Http\Controllers\Controller;
-use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
-use Leysco100\Shared\Services\AuthorizationService;
-use Leysco100\Shared\Models\MarketingDocuments\Models\AutoBCModeSettings;
+use Leysco100\Shared\Models\Gpm\Models\AutoBCModeSettings;
 
 class BackupModeSettingsController extends Controller
 {
