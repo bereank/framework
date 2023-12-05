@@ -5,9 +5,10 @@ namespace Leysco100\Inventory\Http\Controllers\API;
 use Illuminate\Http\Request;
 
 
-use Leysco100\Shared\Models\MarketingDocuments\Models\OPLN;
+use Illuminate\Support\Facades\Validator;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Inventory\Http\Controllers\Controller;
+use Leysco100\Shared\Models\MarketingDocuments\Models\OPLN;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
 
 class PriceListController extends Controller
@@ -37,6 +38,7 @@ class PriceListController extends Controller
     public function store(Request $request)
     {
         try {
+          
             $data = OPLN::create([
                 'ListName' => $request['ListName'], //Price List Name
                 'ValidFor' => $request['ValidFor'], //     Active
@@ -123,4 +125,5 @@ class PriceListController extends Controller
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
+ 
 }

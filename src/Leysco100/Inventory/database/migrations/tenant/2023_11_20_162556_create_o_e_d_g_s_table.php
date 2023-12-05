@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('ObjCode', 50)->nullable();
             $table->string('DiscRel', 10)->nullable();
             $table->string('ValidFor', 50)->nullable();
-            $table->date('ValidForm')->nullable();
+            $table->date('ValidFrom')->nullable();
             $table->date('ValidTo')->nullable();
             $table->char('DataSource', 1)->nullable();
             $table->integer('UserSign')->nullable();

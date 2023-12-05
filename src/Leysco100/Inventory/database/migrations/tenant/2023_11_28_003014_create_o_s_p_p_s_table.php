@@ -27,6 +27,7 @@ return new class extends Migration
             $table->char('Valid', 1)->nullable();
             $table->date('ValidFrom')->nullable();
             $table->date('ValidTo')->nullable();
+            $table->string('LctCode')->nullable();
             $table->timestamps();
         });
     }

@@ -5,6 +5,7 @@ namespace Leysco100\Gpm\Http\Controllers;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Leysco100\Gpm\Http\Controllers\Controller;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
@@ -19,16 +20,27 @@ class GPMController extends Controller
     public function getGPMDocuments(Request $request)
     {
 
-        // $ObjType = 300;
+        $ObjType = 300;
         // $TargetTables = APDI::with('pdi1')
         //     ->where('ObjectID', $ObjType)
         //     ->first();
         // (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'read');
+        $user = Auth::user();
+
+        $ownerData = [];
+        // $dataOwnership = (new AuthorizationService())->CheckIfActive($ObjType, $user->EmpID);
+        // if ($dataOwnership) {
+        //     $ownerData =  (new AuthorizationService())->getDataOwnershipAuth($ObjType, 1);
+        // }
+
         try {
             $page = $request->input('page', 1);
             $perPage = $request->input('per_page', 50);
 
             $data = OGMS::with('objecttype');
+            // ->when($dataOwnership, function ($query) use ($ownerData) {
+            //     return $query->whereIn('OwnerCode', $ownerData);
+            // });
             // Apply search filters
             if ($request->has('search')) {
                 $searchTerm = $request->input('search');
@@ -70,16 +82,21 @@ class GPMController extends Controller
     public function getScanLogs(Request $request)
     {
 
-        // $ObjType = 301;
+        $ObjType = 301;
         // $TargetTables = APDI::with('pdi1')
         //     ->where('ObjectID', $ObjType)
         //     ->first();
         // (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'read');
+
         try {
-            // $data = GMS1::with('objecttype', 'creator', 'gates')
-            //     ->orderBy('id', 'desc')
-            //     ->take(5000)
-            //     ->get();
+            $user = Auth::user();
+            $ownerData = [];
+            $dataOwnership = (new AuthorizationService())->CheckIfActive($ObjType, $user->EmpID);
+
+            if ($dataOwnership) {
+                $ownerData =  (new AuthorizationService())->getDataOwnershipAuth($ObjType, 1);
+            }
+            Log::info([$ownerData, $dataOwnership]);
 
             $page = $request->input('page', 1);
             $perPage = $request->input('per_page', 50);
@@ -89,7 +106,10 @@ class GPMController extends Controller
                 'creator:id,name,account',
                 'gates:id,Name,location_id'
             ])
-                ->select('id', 'ObjType', 'DocNum', 'UserSign', 'GateID', 'Status', 'Released', 'created_at');
+                ->select('id', 'ObjType', 'DocNum', 'UserSign', 'GateID', 'Status', 'Released', 'created_at')
+                ->when($dataOwnership, function ($query) use ($ownerData) {
+                    return $query->whereIn('OwnerCode', $ownerData);
+                });
 
             // Apply search filters
             if ($request->has('search')) {

@@ -366,34 +366,34 @@
                 "link": "/inventory/item-defaults",
                 "Visible": "Y",
                 "children": []
+              }
+            ]
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Bin Locations",
+            "Visible": "Y",
+            "children": [
+              {
+                "icon": "mdi-con",
+                "Label": "Field Activation",
+                "link": "/inventory/bin-locations/field-activation",
+                "Visible": "Y",
+                "children": []
               },
               {
                 "icon": "mdi-con",
-                "Label": "Bin Locations",
+                "Label": "Attributes Codes",
+                "link": "/inventory/bin-locations/attribute-code",
                 "Visible": "Y",
-                "children": [
-                  {
-                    "icon": "mdi-con",
-                    "Label": "Field Activation",
-                    "link": "/inventory/bin-locations/field-activation",
-                    "Visible": "Y",
-                    "children": []
-                  },
-                  {
-                    "icon": "mdi-con",
-                    "Label": "Attributes Codes",
-                    "link": "/inventory/bin-locations/attribute-code",
-                    "Visible": "Y",
-                    "children": []
-                  },
-                  {
-                    "icon": "mdi-con",
-                    "Label": "Warehouse Sublevel Codes",
-                    "link": "/inventory/bin-locations/sublevel-codes",
-                    "Visible": "Y",
-                    "children": []
-                  }
-                ]
+                "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "Warehouse Sublevel Codes",
+                "link": "/inventory/bin-locations/sublevel-codes",
+                "Visible": "Y",
+                "children": []
               }
             ]
           }
