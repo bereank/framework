@@ -348,7 +348,7 @@ class InventoryTransactionsController extends Controller
                 $rowItems->save();
 
                 //bin allocations
-                if ($value['bin_allocation']) {
+                if (array_key_exists('bin_allocation', $value)) {
                     $data =    (new InventoryService())->binAllocations($ItemCode, $value['Quantity'], $value['bin_allocation'], $value['ToWhsCode'], $value['FromBinCod']);
                     $oilm =  OILM::create([
                         'DocEntry' => $newDoc->id,

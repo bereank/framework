@@ -4,11 +4,11 @@ namespace Leysco100\Administration\Http\Controllers\Setup\General;
 
 
 use Illuminate\Http\Request;
-use App\Domains\BusinessPartner\Models\OCRD;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\Administration\Models\OSLP;
 use Leysco100\Shared\Models\Administration\Models\OTER;
 use Leysco100\Shared\Models\Administration\Models\SLP1;
+use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Leysco100\Administration\Http\Controllers\Controller;
 
 class TerritoryController extends Controller
@@ -91,7 +91,7 @@ class TerritoryController extends Controller
      */
     public function destroy($id)
     {
-        $data = Territory::findOrFail($id);
+        $data = OTER::findOrFail($id);
         $data->delete();
     }
 

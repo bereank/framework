@@ -5,12 +5,15 @@ namespace Leysco100\Inventory\Http\Controllers\API;
 use Illuminate\Http\Request;
 
 
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Inventory\Http\Controllers\Controller;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OPLN;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\ITM1;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\ITM9;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OSPP;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\SPP1;
 
 class PeriodDiscountsContoller extends Controller
@@ -48,7 +51,13 @@ class PeriodDiscountsContoller extends Controller
     public function store(Request $request)
     {
         try {
-
+            $validator = Validator::make($request->all(), [
+                'ItemCode' => 'required',
+                'Discount' => 'required',
+                'FromDate' => 'required',
+                'ToDate' => 'required',
+                'ListNum' => 'required',
+            ]);
             $validatedData = $request->validate([
                 'ItemCode' => 'nullable',
                 'CardCode' => 'nullable',
@@ -125,6 +134,30 @@ class PeriodDiscountsContoller extends Controller
             $data = ITM9::where('ItemCode', $id)
                 ->with('uom')
                 ->get();
+            return (new ApiResponseService())->apiSuccessResponseService($data);
+        } catch (\Throwable $th) {
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+        }
+    }
+    public function periodDiscountItems(Request $request, $id)
+    {
+        try {
+            $page = $request->input('page', 1);
+            $perPage = $request->input('per_page', 10);
+            $searchTerm = $request->input('search') ? $request->input('search') : false;
+            $data = OSPP::with('oitm')->where('ListNum', $id);
+            if ($searchTerm) {
+                Log::info("data");
+
+                $data = $data->where(function ($query) use ($searchTerm) {
+                    $query->orWhereDate('created_at', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('ItemCode', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('CardCode', 'LIKE', "%{$searchTerm}%");
+                });
+            }
+            $data = $data->latest()
+                ->paginate($perPage, ['*'], 'page', $page);
+
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());

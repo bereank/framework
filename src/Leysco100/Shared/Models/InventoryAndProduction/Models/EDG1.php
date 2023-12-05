@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace Leysco100\Shared\Models\InventoryAndProduction\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,4 +10,9 @@ class EDG1 extends Model
 {
     use HasFactory, UsesTenantConnection;
     protected $guarded = ['id'];
+
+    public function item()
+    {
+        return $this->belongsTo(OITM::class, 'ObjKey', 'ItemCode');
+    }
 }
