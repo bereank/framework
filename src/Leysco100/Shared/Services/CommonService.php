@@ -1,4 +1,5 @@
 <?php
+
 namespace Leysco100\Shared\Services;
 
 use Illuminate\Support\Facades\Auth;
@@ -43,7 +44,7 @@ class CommonService
         $UserSign = $UserSign ?? Auth::user()->id;
         //default Numembering Seires
         $documentDefaultSeries = NNM1::where('id', ONNM::where('ObjectCode', $ObjectCode)
-                ->value('DfltSeries'))
+            ->value('DfltSeries'))
             ->where('Locked', 'N')
             ->first();
 
@@ -115,14 +116,21 @@ class CommonService
     public function createOrUpdateMenu($menuData, $parentID = null)
     {
         foreach ($menuData as $item) {
-            $menu = FM100::updateOrCreate([
-                'UserSign' => 1,
-                'ParentID' => $parentID,
-                'Label' => $item['Label'],
-                'Visible' => $item['Visible'],
-                'icon' => array_key_exists('icon', $item) ? $item['icon'] : null,
-                'link' => array_key_exists('link', $item) ? $item['link'] : null,
-            ]);
+            
+            $menu = FM100::updateOrCreate(
+                [
+                    'UserSign' => 1,
+                    'link' => array_key_exists('link', $item) ? $item['link'] : null,
+                    'Label' => $item['Label'],
+                ],
+                [
+                    'ParentID' => $parentID,
+                   
+                    'Visible' => $item['Visible'],
+                    'icon' => array_key_exists('icon', $item) ? $item['icon'] : null,
+                    'link' => array_key_exists('link', $item) ? $item['link'] : null,
+                ]
+            );
 
             if (isset($item['children']) && is_array($item['children'])) {
                 $this->createOrUpdateMenu($item['children'], $menu->id);
