@@ -132,48 +132,47 @@ class DiscountsContoller extends Controller
                         ->where('ObjKey', $ItemCode);
                 }])
                 ->get();
+            if ($oedg->count() > 0) {
+                foreach ($oedg as $discountgroup) {
+                    if ($discountgroup->edg1) {
 
-            foreach ($oedg as $discountgroup) {
-                if ($discountgroup->edg1) {
+                        if ($discountgroup->edg1->count() > 0) {
+                            foreach ($discountgroup->edg1 as $edg1) {
+                                if (($edg1->DiscType == 'P'  && $edg1->ObjType == 4)) {
+                                    $discGrp = true;
 
-                    if ($discountgroup->edg1->count() > 0) {
-                        foreach ($discountgroup->edg1 as $edg1) {
-                            if (($edg1->DiscType == 'P'  && $edg1->ObjType == 4)) {
-                                $discGrp = true;
-
-                                $data = [
-                                    "DiscPrcnt" => $edg1->Discount,
-                                    "DiscType" => 2,
-                                    "ForFree" =>   $edg1,
-                                    "Type" => "Discount Group"
-                                ];
-                                return (new ApiResponseService())->apiSuccessResponseService($data);
-                            } else {
-                                $discGrp = false;
+                                    $data = [
+                                        "DiscPrcnt" => $edg1->Discount,
+                                        "DiscType" => 2,
+                                        "ForFree" =>   $edg1,
+                                        "Type" => "Discount Group"
+                                    ];
+                                    return (new ApiResponseService())->apiSuccessResponseService($data);
+                                } else {
+                                    $discGrp = false;
+                                }
+                                if ($edg1->PayFor == 'D' && $edg1->ObjType == "4") {
+                                    $discGrp = true;
+                                    $data = [
+                                        "DiscPrcnt" => $edg1->Discount,
+                                        "DiscType" => 1,
+                                        "ForFree" =>  [],
+                                        "Type" => "Discount Group"
+                                    ];
+                                    return (new ApiResponseService())->apiSuccessResponseService($data);
+                                } else {
+                                    $discGrp = false;
+                                }
                             }
-                            if ($edg1->PayFor == 'D' && $edg1->ObjType == "4") {
-                                $discGrp = true;
-                                $data = [
-                                    "DiscPrcnt" => $edg1->Discount,
-                                    "DiscType" => 1,
-                                    "ForFree" =>  [],
-                                    "Type" => "Discount Group"
-                                ];
-                                return (new ApiResponseService())->apiSuccessResponseService($data);
-                            } else {
-                                $discGrp = false;
-                            }
+                        } else {
+                            $discGrp = false;
                         }
                     } else {
                         $discGrp = false;
                     }
-                } else {
-                    $discGrp = false;
                 }
             }
             if (!$discGrp) {
-
-
                 $spp = OSPP::where('ListNum', $ListNum)->whereDate('ValidFrom', '<=', $today)
                     ->whereDate('ValidTo', '>=', $today)
                     ->where('ItemCode', $ItemCode)
@@ -188,9 +187,6 @@ class DiscountsContoller extends Controller
                         ->where('Valid', 'Y')
                         ->get();
                 }
-
-
-
                 if ($spp) {
                     foreach ($spp as  $ospp) {
                         $spp1Data = SPP1::where('LINENUM', $ospp->id)
@@ -223,18 +219,24 @@ class DiscountsContoller extends Controller
                                         $items = $spp3;
                                     }
                                 }
+                                $data = [
+                                    "DiscPrcnt" => $DiscPrcnt,
+                                    "DiscType" => $DiscType,
+                                    "ForFree" =>   $items,
+                                    "Type" => "Period and volume"
+                                ];
+                                return (new ApiResponseService())->apiSuccessResponseService($data);
                             }
                         }
                     }
                 }
-
-                $data = [
-                    "DiscPrcnt" => $DiscPrcnt,
-                    "DiscType" => $DiscType,
-                    "ForFree" =>   $items,
-                    "Type" => "Period and volume"
-                ];
             }
+            $data = [
+                "DiscPrcnt" => $DiscPrcnt,
+                "DiscType" => $DiscType,
+                "ForFree" =>   $items,
+                "Type" => "Period and volume"
+            ];
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
