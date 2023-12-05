@@ -123,6 +123,7 @@ class DiscountsContoller extends Controller
             $DiscType = 0;
             $discGrp = true;
             $items = [];
+            $type = "period-discount";
             $oedg = OEDG::whereDate('ValidFrom', '<=', $today)
                 ->whereDate('ValidTo', '>=', $today)
                 ->where('Type', 'A')
@@ -145,7 +146,7 @@ class DiscountsContoller extends Controller
                                         "DiscPrcnt" => $edg1->Discount,
                                         "DiscType" => 2,
                                         "ForFree" =>   $edg1,
-                                        "Type" => "Discount Group"
+                                        "Type" => "Discount-Group"
                                     ];
                                     return (new ApiResponseService())->apiSuccessResponseService($data);
                                 } else {
@@ -157,7 +158,7 @@ class DiscountsContoller extends Controller
                                         "DiscPrcnt" => $edg1->Discount,
                                         "DiscType" => 1,
                                         "ForFree" =>  [],
-                                        "Type" => "Discount Group"
+                                        "Type" => "Discount-Group"
                                     ];
                                     return (new ApiResponseService())->apiSuccessResponseService($data);
                                 } else {
@@ -217,13 +218,14 @@ class DiscountsContoller extends Controller
                                             ->select('id', 'Price', 'ItemCode')
                                             ->get();
                                         $items = $spp3;
+                                        $type = "volume-discount";
                                     }
                                 }
                                 $data = [
                                     "DiscPrcnt" => $DiscPrcnt,
                                     "DiscType" => $DiscType,
                                     "ForFree" =>   $items,
-                                    "Type" => "Period and volume"
+                                    "Type" => $type
                                 ];
                                 return (new ApiResponseService())->apiSuccessResponseService($data);
                             }
@@ -235,7 +237,7 @@ class DiscountsContoller extends Controller
                 "DiscPrcnt" => $DiscPrcnt,
                 "DiscType" => $DiscType,
                 "ForFree" =>   $items,
-                "Type" => "Period and volume"
+                "Type" => $type
             ];
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
