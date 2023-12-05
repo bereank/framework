@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\Auth;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Services\AuthorizationService;
-use Leysco100\Shared\Models\MarketingDocuments\Models\BackUpModGates;
-use Leysco100\Shared\Models\MarketingDocuments\Models\BackUpModUsers;
-use Leysco100\Shared\Models\MarketingDocuments\Models\BackUpModeSetup;
+use Leysco100\Shared\Models\Gpm\Models\BackUpModGates;
+use Leysco100\Shared\Models\Gpm\Models\BackUpModUsers;
+use Leysco100\Shared\Models\Gpm\Models\BackUpModeSetup;
 
 
 class BackupModeProcessController

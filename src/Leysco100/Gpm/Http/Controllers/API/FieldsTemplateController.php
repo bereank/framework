@@ -6,12 +6,11 @@ namespace Leysco100\Gpm\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Gpm\Http\Controllers\Controller;
 use Leysco100\Shared\Services\ApiResponseService;
-use Leysco100\Shared\Models\MarketingDocuments\Models\FieldsTemplateRows;
-use Leysco100\Shared\Models\MarketingDocuments\Models\FormFieldsTemplate;
+use Leysco100\Shared\Models\Gpm\Models\FieldsTemplateRows;
+use Leysco100\Shared\Models\Gpm\Models\FormFieldsTemplate;
 
 
 

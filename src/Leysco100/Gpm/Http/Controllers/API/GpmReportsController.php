@@ -9,7 +9,7 @@ use Leysco100\Gpm\Jobs\ExportScanLogsJob;
 use Leysco100\Gpm\Services\ReportsService;
 use Leysco100\Gpm\Http\Controllers\Controller;
 use Leysco100\Shared\Services\ApiResponseService;
-use Leysco100\Shared\Models\MarketingDocuments\Models\BackUpModeLines;
+use Leysco100\Shared\Models\Gpm\Models\BackUpModeLines;
 
 
 

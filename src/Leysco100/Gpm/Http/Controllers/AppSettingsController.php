@@ -9,7 +9,7 @@ use Leysco100\Shared\Models\MobileNavBar;
 use Leysco100\Gpm\Http\Controllers\Controller;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\Administration\Models\OADM;
-use Leysco100\Shared\Models\MarketingDocuments\Models\GPMGate;
+use Leysco100\Shared\Models\Gpm\Models\GPMGate;
 
 
 

@@ -113,25 +113,17 @@ class CommonService
             ],
         ];
     }
-    public function createOrUpdateMenu($menuData, $parentID = null)
+    public function createOrUpdateMenu($menuData, $parentID = null, $UserSign = 1)
     {
         foreach ($menuData as $item) {
-            
-            $menu = FM100::updateOrCreate(
-                [
-                    'UserSign' => 1,
-                    'link' => array_key_exists('link', $item) ? $item['link'] : null,
-                    'Label' => $item['Label'],
-                ],
-                [
-                    'ParentID' => $parentID,
-                   
-                    'Visible' => $item['Visible'],
-                    'icon' => array_key_exists('icon', $item) ? $item['icon'] : null,
-                    'link' => array_key_exists('link', $item) ? $item['link'] : null,
-                ]
-            );
-
+            $menu = FM100::updateOrCreate([
+                'UserSign' => $UserSign,
+                'ParentID' => $parentID,
+                'Label' => $item['Label'],
+                'Visible' => $item['Visible'],
+                'icon' => array_key_exists('icon', $item) ? $item['icon'] : null,
+                'link' => array_key_exists('link', $item) ? $item['link'] : null,
+            ]);
             if (isset($item['children']) && is_array($item['children'])) {
                 $this->createOrUpdateMenu($item['children'], $menu->id);
             }

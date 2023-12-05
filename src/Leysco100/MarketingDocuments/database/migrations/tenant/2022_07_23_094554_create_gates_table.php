@@ -20,7 +20,6 @@ return new class extends Migration
             $table->string('Longitude', 50)->nullable();
             $table->string('Latitude', 50)->nullable();
             $table->string('Address', 200)->nullable();
-            $table->string('OwnerCode', 100)->nullable();
             $table->timestamps();
         });
     }
