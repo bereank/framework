@@ -27,6 +27,10 @@ class BackUpModeLines extends Model
     {
         return $this->belongsTo(BackUpModeSetup::class, 'DocEntry', 'id');
     }
+    public function basedoc()
+    {
+        return $this->belongsTo(GMS1::class, 'BaseEntry', 'id');
+    }
 
     public function creator()
     {
