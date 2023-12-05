@@ -17,10 +17,10 @@ return new class extends Migration
             $table->string('CardCode')->nullable();
             $table->string('SPP2Num')->nullable();
             $table->string('MaxForFree')->nullable();
-            $table->string('Quantity')->nullable();
-            $table->string('Price')->default(0);
+            $table->float('Price', 19, 6)->default(0);
+            $table->float('Quantity', 19, 6)->default(0);
             $table->string('Currency', 3)->nullable();
-            $table->string('UomEntry')->nullable();
+            $table->integer('UomEntry')->nullable();
             $table->timestamps();
         });
     }
