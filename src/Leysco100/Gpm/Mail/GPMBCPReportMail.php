@@ -9,8 +9,8 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
 use Leysco100\Gpm\Reports\BCPScanReport;
-use Leysco100\Shared\Models\MarketingDocuments\Models\BackUpModeLines;
-use Leysco100\Shared\Models\MarketingDocuments\Models\BackUpModeSetup;
+use Leysco100\Shared\Models\Gpm\Models\BackUpModeLines;
+use Leysco100\Shared\Models\Gpm\Models\BackUpModeSetup;
 
 class GPMBCPReportMail extends Mailable
 {

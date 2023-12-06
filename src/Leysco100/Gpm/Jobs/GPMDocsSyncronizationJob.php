@@ -16,11 +16,11 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Leysco100\Gpm\Services\DocumentsService;
 use Leysco100\Gpm\Services\NotificationsService;
 use Leysco100\Shared\Models\Administration\Models\OADM;
-use Leysco100\Shared\Models\MarketingDocuments\Models\GMS1;
-use Leysco100\Shared\Models\MarketingDocuments\Models\OGMS;
-use Leysco100\Shared\Models\MarketingDocuments\Models\BackUpModeLines;
-use Leysco100\Shared\Models\MarketingDocuments\Models\BackUpModeSetup;
-use Leysco100\Shared\Models\MarketingDocuments\Models\AutoBCModeSettings;
+use Leysco100\Shared\Models\Gpm\Models\GMS1;
+use Leysco100\Shared\Models\Gpm\Models\OGMS;
+use Leysco100\Shared\Models\Gpm\Models\BackUpModeLines;
+use Leysco100\Shared\Models\Gpm\Models\BackUpModeSetup;
+use Leysco100\Shared\Models\Gpm\Models\AutoBCModeSettings;
 
 
 

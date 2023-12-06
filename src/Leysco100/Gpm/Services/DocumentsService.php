@@ -2,7 +2,7 @@
 
 namespace Leysco100\Gpm\Services;
 
-use Leysco100\Shared\Models\MarketingDocuments\Models\OGMS;
+use Leysco100\Shared\Models\Gpm\Models\OGMS;
 
 
 

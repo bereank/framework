@@ -4,8 +4,8 @@ namespace Leysco100\Gpm\Services;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-use Leysco100\Shared\Models\MarketingDocuments\Models\GMS1;
-use Leysco100\Shared\Models\MarketingDocuments\Models\OGMS;
+use Leysco100\Shared\Models\Gpm\Models\GMS1;
+use Leysco100\Shared\Models\Gpm\Models\OGMS;
 
 
 class  ReportsService

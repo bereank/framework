@@ -8,8 +8,8 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Leysco100\Shared\Services\ApiResponseService;
-use Leysco100\Shared\Models\MarketingDocuments\Models\BackUpModeLines;
-use Leysco100\Shared\Models\MarketingDocuments\Models\BackUpModeSetup;
+use Leysco100\Shared\Models\Gpm\Models\BackUpModeLines;
+use Leysco100\Shared\Models\Gpm\Models\BackUpModeSetup;
 
 class BCPScanReport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize
 {
