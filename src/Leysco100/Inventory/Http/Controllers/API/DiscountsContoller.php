@@ -130,8 +130,20 @@ class DiscountsContoller extends Controller
                 ->with(['edg1' => function ($query) use ($Quantity, $ItemCode) {
                     $query->with('item:id,ItemCode,ItemName,VatGourpSa,DfltWH')
                         ->where('PayFor', '<=', $Quantity)
-                        ->where('ObjKey', $ItemCode);
+                        ->where('ObjKey', $ItemCode)
+                        ->select(
+                            'DocEntry',
+                            'ObjType',
+                            'ObjKey',
+                            'DiscType',
+                            'Discount',
+                            'PayFor',
+                            'ForFree',
+                            'UpTo',
+                            'ForFree as Quantity'
+                        );
                 }])
+
                 ->get();
             if ($oedg->count() > 0) {
                 foreach ($oedg as $discountgroup) {
@@ -215,7 +227,7 @@ class DiscountsContoller extends Controller
                                         $DiscType = 2;
                                         $spp3 = SPP3::where('SPP2Num', $spp2->id)
                                             ->with('item:id,ItemCode,ItemName,VatGourpSa,DfltWH')
-                                            ->select('id', 'Price', 'ItemCode')
+                                            ->select('id', 'Price', 'ItemCode', 'Quantity')
                                             ->get();
                                         $items = $spp3;
                                         $type = "volume-discount";
