@@ -130,19 +130,20 @@ class DiscountsContoller extends Controller
                 ->with(['edg1' => function ($query) use ($Quantity, $ItemCode) {
                     $query->with('item:id,ItemCode,ItemName,VatGourpSa,DfltWH')
                         ->where('PayFor', '<=', $Quantity)
-                        ->where('ObjKey', $ItemCode);
+                        ->where('ObjKey', $ItemCode)
+                        ->select(
+                            'DocEntry',
+                            'ObjType',
+                            'ObjKey',
+                            'DiscType',
+                            'Discount',
+                            'PayFor',
+                            'ForFree',
+                            'UpTo',
+                            'ForFree as Quantity'
+                        );
                 }])
-                ->select(
-                    'DocEntry',
-                    'ObjType',
-                    'ObjKey',
-                    'DiscType',
-                    'Discount',
-                    'PayFor',
-                    'ForFree',
-                    'UpTo',
-                    'ForFree as Quantity'
-                )
+
                 ->get();
             if ($oedg->count() > 0) {
                 foreach ($oedg as $discountgroup) {
