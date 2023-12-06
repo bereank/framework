@@ -7,8 +7,8 @@ use Leysco100\Shared\Models\Shared\Models\APDI;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
-use Leysco100\Shared\Models\MarketingDocuments\Models\GPMGate;
-use Leysco100\Shared\Models\MarketingDocuments\Models\BackUpModeSetup;
+use Leysco100\Shared\Models\Gpm\Models\GPMGate;
+use Leysco100\Shared\Models\Gpm\Models\BackUpModeSetup;
 
 
 class BackUpModeLines extends Model

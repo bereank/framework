@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
-use Leysco100\Shared\Models\MarketingDocuments\Models\GPMGate;
+use Leysco100\Shared\Models\Gpm\Models\GPMGate;
 
 class GMS1 extends Model
 {

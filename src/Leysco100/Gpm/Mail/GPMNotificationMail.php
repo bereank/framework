@@ -6,8 +6,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Leysco100\Shared\Models\Administration\Models\OADM;
-use Leysco100\Shared\Models\MarketingDocuments\Models\GMS1;
-use Leysco100\Shared\Models\MarketingDocuments\Models\GPMGate;
+use Leysco100\Shared\Models\Gpm\Models\GMS1;
+use Leysco100\Shared\Models\Gpm\Models\GPMGate;
 
 
 class GPMNotificationMail extends Mailable

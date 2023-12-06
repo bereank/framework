@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
 use Spatie\Multitenancy\Models\Tenant;
 use Illuminate\Support\Facades\Storage;
-use Leysco100\Shared\Models\MarketingDocuments\Models\GMS1;
-use Leysco100\Shared\Models\MarketingDocuments\Models\OGMS;
+use Leysco100\Shared\Models\Gpm\Models\GMS1;
+use Leysco100\Shared\Models\Gpm\Models\OGMS;
 
 use function PHPUnit\Framework\isNull;
 

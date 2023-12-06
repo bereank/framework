@@ -5,7 +5,7 @@ namespace Leysco100\Gpm\Services;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
-use Leysco100\Shared\Models\MarketingDocuments\Models\BackUpModeSetup;
+use Leysco100\Shared\Models\Gpm\Models\BackUpModeSetup;
 
 
 class BackupModeService

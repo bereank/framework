@@ -8,7 +8,7 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Leysco100\Shared\Models\MarketingDocuments\Models\OGMS;
+use Leysco100\Shared\Models\Gpm\Models\OGMS;
 
 class DocumentReport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize
 {
