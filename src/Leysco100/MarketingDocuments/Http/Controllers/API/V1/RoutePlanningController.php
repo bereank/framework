@@ -8,6 +8,7 @@ use Leysco100\MarketingDocuments\Http\Controllers\Controller;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCLG;
 use Leysco100\Shared\Models\RouteOutlet;
 use Leysco100\Shared\Models\RoutePlanning;
+use Leysco100\Shared\Services\ApiResponseService;
 
 class RoutePlanningController extends Controller
 {
@@ -18,7 +19,7 @@ class RoutePlanningController extends Controller
      */
     public function index()
     {
-        return RoutePlanning::with('calls.outlet', 'bpartners','territory')->get();
+        return RoutePlanning::with('calls.outlet', 'outlets','territory')->get();
     }
 
     /**
@@ -58,10 +59,12 @@ class RoutePlanningController extends Controller
 
         //Creating Rows:
         foreach ($request['bpartners'] as $key => $item) {
-            $HeaderItems = RouteOutlet::updateOrcreate([
-                'route_id' => $request['route_id'], //User
-                'outlet_id' => $item, //Outlet Val
-            ]);
+            $HeaderItems = RouteOutlet::updateOrcreate(
+                [
+                    'route_id' => $request['route_id'],
+                    'outlet_id' => $item, //Outlet Val
+                ]
+            );
         }
     }
 
@@ -82,6 +85,8 @@ class RoutePlanningController extends Controller
                 'UserSign' => $user->id,
             ]);
         }
+
+        return (new ApiResponseService())->apiSuccessResponseService(["Calls Created"]);
     }
     /**
      * Display the specified resource.
@@ -91,7 +96,7 @@ class RoutePlanningController extends Controller
      */
     public function show($id)
     {
-        return RoutePlanning::with('bpartners.territory', 'calls.outlet', 'calls.employees')->findOrfail($id);
+        return RoutePlanning::with( 'calls.outlet', 'calls.employees','outlets')->findOrfail($id);
     }
 
     /**
