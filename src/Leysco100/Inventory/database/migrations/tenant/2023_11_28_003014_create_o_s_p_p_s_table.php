@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('ItemCode')->nullable();
             $table->string('CardCode')->nullable();
-            $table->string('Price')->nullable();
+            $table->float('Price', 19, 6)->nullable();
             $table->string('Currency', 3)->nullable();
-            $table->string('Discount')->nullable();
+            $table->float('Discount', 19, 6)->nullable();
             $table->integer('ListNum')->nullable();
             $table->char('AutoUpdt', 1)->nullable();
             $table->char('EXPAND', 1)->nullable();
@@ -27,6 +27,7 @@ return new class extends Migration
             $table->char('Valid', 1)->nullable();
             $table->date('ValidFrom')->nullable();
             $table->date('ValidTo')->nullable();
+            $table->string('LctCode')->nullable();
             $table->timestamps();
         });
     }

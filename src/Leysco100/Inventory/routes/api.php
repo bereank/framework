@@ -11,6 +11,7 @@ use Leysco100\Inventory\Http\Controllers\API\PeriodDiscountsContoller;
 use Leysco100\Inventory\Http\Controllers\API\VolumeDiscountsContoller;
 use Leysco100\Inventory\Http\Controllers\API\InventoryTransactionsController;
 use Leysco100\Administration\Http\Controllers\Setup\Inventory\WarehouseController;
+use Leysco100\Inventory\Http\Controllers\API\DiscountGroupController;
 
 /*
     |--------------------------------------------------------------------------
@@ -23,7 +24,9 @@ Route::any('fetch-item-with-code', [ItemMasterController::class, 'getItemUsingIt
 Route::post('inventory-transactions-data/{ObjType}', [InventoryTransactionsController::class, 'getDocData']);
 Route::get('inventory-transactions-data/{ObjType}/{DocEntry}', [InventoryTransactionsController::class, 'getSingleDocData']);
 
-Route::get('price_lists/items/{id}', [PriceListController::class, 'getPriceListItems']);
+Route::get('price_lists/{id}/items', [PriceListController::class, 'getPriceListItems']);
+Route::get('period_discount/{id}', [PeriodDiscountsContoller::class, 'periodDiscountItems']);
+
 Route::get('uom-prices/{id}', [PeriodDiscountsContoller::class, 'getUomPrices']);
 
 Route::apiResources(['price_lists' => PriceListController::class]);
@@ -36,6 +39,7 @@ Route::get('item-discounts', [DiscountsContoller::class, 'getItemDiscount']);
 Route::apiResources(['period-and-vol-discounts' => DiscountsContoller::class]);
 Route::apiResources(['period-discounts' => PeriodDiscountsContoller::class]);
 Route::apiResources(['volume-discounts' => VolumeDiscountsContoller::class]);
+Route::apiResources(['discounts-group' => DiscountGroupController::class]);
 
 //Inventory Reports
 Route::get('inventory/report', [ItemMasterController::class, "inventory_report"]);

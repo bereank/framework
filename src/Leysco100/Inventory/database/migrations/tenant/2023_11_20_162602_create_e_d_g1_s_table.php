@@ -17,10 +17,10 @@ return new class extends Migration
             $table->string('ObjType', 20)->nullable();
             $table->string('ObjKey', 50)->nullable();
             $table->char('DiscType', 1)->nullable();
-            $table->decimal('Discount', 19, 6)->nullable();
-            $table->decimal('PayFor', 19, 6)->nullable();
-            $table->decimal('ForFree', 19, 6)->nullable();
-            $table->decimal('UpTo', 19, 6)->nullable();
+            $table->float('Discount', 19, 6)->default(0);
+            $table->float('PayFor', 19, 6)->default(0);
+            $table->float('ForFree', 19, 6)->default(0);
+            $table->float('UpTo', 19, 6)->default(0);
             $table->integer('LogInstanc')->nullable();
             $table->timestamps();
         });

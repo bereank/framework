@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('s_p_p1_s', function (Blueprint $table) {
             $table->id();
-            $table->string('ItemCode');
-            $table->string('CardCode');
-            $table->integer('LINENUM');
-            $table->string('Price', 10);
-            $table->string('Currency');
-            $table->string('Discount', 10);
+            $table->string('ItemCode')->nullable();
+            $table->string('CardCode')->nullable();
+            $table->integer('LINENUM')->nullable();
+            $table->float('Price', 19, 6)->nullable();
+            $table->string('Currency')->nullable();
+            $table->float('Discount', 19, 6)->nullable();
             $table->integer('ListNum');
             $table->date('FromDate');
             $table->date('ToDate');

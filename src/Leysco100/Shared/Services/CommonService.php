@@ -1,4 +1,5 @@
 <?php
+
 namespace Leysco100\Shared\Services;
 
 use Illuminate\Support\Facades\Auth;
@@ -43,7 +44,7 @@ class CommonService
         $UserSign = $UserSign ?? Auth::user()->id;
         //default Numembering Seires
         $documentDefaultSeries = NNM1::where('id', ONNM::where('ObjectCode', $ObjectCode)
-                ->value('DfltSeries'))
+            ->value('DfltSeries'))
             ->where('Locked', 'N')
             ->first();
 

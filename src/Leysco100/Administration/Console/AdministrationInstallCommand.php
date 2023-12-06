@@ -24,11 +24,11 @@ class AdministrationInstallCommand extends Command
         //Step one: create user navigation menu
         $menuJsonString = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'MenuItem.Json');
         $menuitems = json_decode($menuJsonString, true);
-//        (new CommonService())->createOrUpdateMenu($menuitems);
+       (new CommonService())->createOrUpdateMenu($menuitems);
 
         //Step two: Run all migrations associated to Admin Module
 
-        Artisan::call("leysco100:administration:run:migrations {--tenant=*}");
+      //  Artisan::call("leysco100:administration:run:migrations {--tenant=*}");
     }
 
 }

@@ -48,11 +48,12 @@ class UserDefaultsController extends Controller
                 'CogsOcrCo3' => $request['CogsOcrCo3'],
                 'CogsOcrCo4' => $request['CogsOcrCo4'],
                 'CogsOcrCo5' => $request['CogsOcrCo5'],
-                'AddToFavourites'=> $request['AddToFavourites']?? 0
+                'AddToFavourites' => $request['AddToFavourites'] ?? 0,
+                'DftBinLoc' => $request['DftBinLoc'] ?? null
             ]);
             return (new ApiResponseService())->apiSuccessResponseService("Created Successfully");
         } catch (\Throwable $th) {
-      
+
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
@@ -100,7 +101,8 @@ class UserDefaultsController extends Controller
                 'CogsOcrCo4' => $request['CogsOcrCo4'],
                 'CogsOcrCo5' => $request['CogsOcrCo5'],
                 'DftItmsGrpCod' => $request['DftItmsGrpCod'], // Defautl Item Group
-                'AddToFavourites'=> $request['AddToFavourites']?? 0
+                'AddToFavourites' => $request['AddToFavourites'] ?? 0,
+                'DftBinLoc' => $request['DftBinLoc'] ?? null
             ];
             OUDG::where('id', $id)->update($details);
             return (new ApiResponseService())->apiSuccessResponseService();

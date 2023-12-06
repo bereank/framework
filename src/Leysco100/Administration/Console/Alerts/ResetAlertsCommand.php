@@ -7,7 +7,7 @@ use Spatie\Multitenancy\Commands\Concerns\TenantAware;
 use Leysco100\Shared\Models\Administration\Models\OALT;
 use Leysco100\Administration\Services\AlertsManagerService;
 
-class RestartAlertsCommand extends Command
+class ResetAlertsCommand extends Command
 {
     use TenantAware;
     /**
@@ -15,7 +15,7 @@ class RestartAlertsCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'leysco100:administration:restart-alerts-command {--tenant=*}';
+    protected $signature = 'leysco100:administration:reset-alerts-command {--tenant=*}';
 
     /**
      * The console command description.

@@ -6,9 +6,9 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Leysco100\Administration\Console\AdministrationMigrationsCommand;
 use Leysco100\Administration\Console\CreatePermissions;
+use Leysco100\Administration\Console\Alerts\ResetAlertsCommand;
 use Leysco100\Administration\Console\BinFieldActivationCommand;
 use Leysco100\Administration\Console\Alerts\ProcessAlertsCommand;
-use Leysco100\Administration\Console\Alerts\RestartAlertsCommand;
 use Leysco100\Administration\Console\Setup\ImportNumberingSeries;
 use Leysco100\Administration\Console\AdministrationInstallCommand;
 use Leysco100\Administration\Console\Setup\CreateUserFormSettings;
@@ -41,7 +41,7 @@ class AdministrationServiceProvider extends ServiceProvider
                 CreateUserFormSettings::class,
                 BinFieldActivationCommand::class,
                 ProcessAlertsCommand::class,
-                RestartAlertsCommand::class
+                ResetAlertsCommand::class
             ]);
         }
 
