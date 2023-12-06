@@ -18,7 +18,7 @@ class RoutePlanningController extends Controller
      */
     public function index()
     {
-        return RoutePlanning::with('calls.outlet', 'bpartners')->get();
+        return RoutePlanning::with('calls.outlet', 'bpartners','territory')->get();
     }
 
     /**
@@ -44,9 +44,11 @@ class RoutePlanningController extends Controller
         $this->validate($request, [
             'name' => 'required', //description
         ]);
+
         return RoutePlanning::create([
             'name' => $request['name'],
             'user_id' => $user->id,
+            'territory_id' => $request["region"]["id"],
             'description' => $request['description'] ? $request['description'] : "Desc",
         ]);
     }

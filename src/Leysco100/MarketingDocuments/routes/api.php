@@ -1,10 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Leysco100\MarketingDocuments\Http\Controllers\API\ChannelController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DraftController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DispatchController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DocModelController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DocumentController;
+use Leysco100\MarketingDocuments\Http\Controllers\API\TierController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\MCallController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\MItemController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\MOrderController;
@@ -85,16 +87,18 @@ Route::get('marketing/docs/{ObjType}/{id}', [MarketingDocumentsController::class
 
 Route::get('items_data', [TargetController::class, 'ItemsData']);
 //Route::apiResources(['calls' => CallsController::class]);
-//Route::apiResources(['tiers' => TierController::class]);
-//Route::apiResources(['channels' => ChannelController::class]);
+Route::apiResources(['tiers' => TierController::class]);
+Route::apiResources(['channels' => ChannelController::class]);
 //Route::apiResources(['assets' => AssetsController::class]);
 //Route::apiResources(['surveys' => SurveyController::class]);
 //Route::apiResources(['schedules' => ScheduleController::class]);
 //Route::apiResources(['rules' => RulesController::class]);
+
 // Route Planning
 Route::post('route_outlets', [RoutePlanningController::class, 'createRouteOutlets']);
 Route::post('route_calls', [RoutePlanningController::class, 'createRouteCalls']);
 Route::apiResources(['routes' => RoutePlanningController::class]);
+
 // GPS LOCATIONS
 Route::get('getWorkDays', [GpsLocationController::class, 'getWorkDays']);
 Route::resource('gps-locations', GpsLocationController::class);
