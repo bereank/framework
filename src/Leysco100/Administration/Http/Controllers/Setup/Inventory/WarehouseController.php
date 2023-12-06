@@ -42,12 +42,13 @@ class WarehouseController extends Controller
             $data = OWHS::when($binActive, function ($query) use ($binActive) {
                 return $query->where('BinActivat', $binActive);
             })->with('binlocations')
-                ->where(function ($q) use ($BPLId) {
-                    if ($BPLId) {
-                        $q->where('BPLId', $BPLId)
-                            ->orWhereIn('WhsCode', ['L001', 'IMPGIT']);
-                    }
-                })->get();
+//                ->where(function ($q) use ($BPLId) {
+//                    if ($BPLId) {
+//                        $q->where('BPLId', $BPLId)
+//                            ->orWhereIn('WhsCode', ['L001', 'IMPGIT']);
+//                    }
+//                })
+                ->get();
 
 
             return (new ApiResponseService())
