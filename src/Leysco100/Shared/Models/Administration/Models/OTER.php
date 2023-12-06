@@ -4,6 +4,7 @@ namespace Leysco100\Shared\Models\Administration\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Leysco100\Shared\Models\RoutePlanning;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OTER extends Model
@@ -19,6 +20,11 @@ class OTER extends Model
     public function children()
     {
         return $this->hasMany(OTER::class, 'parent');
+    }
+
+    public function routes()
+    {
+        return $this->hasMany(RoutePlanning::class, 'territory_id');
     }
 
     public function childrenRecursive()

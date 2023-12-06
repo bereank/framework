@@ -4,7 +4,7 @@ namespace Leysco100\Administration\Http\Controllers\Setup\General;
 
 
 use Illuminate\Http\Request;
-use App\Domains\BusinessPartner\Models\OCRD;
+use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\Administration\Models\OSLP;
 use Leysco100\Shared\Models\Administration\Models\OTER;
@@ -60,13 +60,20 @@ class TerritoryController extends Controller
     {
         $territory = OTER::findOrfail($id);
 
+        $subregions = [];
+
         $subregions = OTER::where('parent', $id)->get();
-        foreach ($subregions as $key => $value) {
-            $value->salesReps = SLP1::where('Territory', $value->id)->count();
-            $value->subRegions = OTER::where('parent', $value->id)->count();
-            $value->totalOutlets = OCRD::where('Territory', $value->Territory)->count();
+
+        if ($subregions){
+            foreach ($subregions as $key => $value) {
+                $value->salesReps = SLP1::where('Territory', $value->id)->count();
+                $value->subRegions = OTER::where('parent', $value->id)->count();
+                $value->totalOutlets = OCRD::where('Territory', $value->Territory)->count();
+            }
         }
+
         $territory->outlets = OCRD::where('Territory', $id)->get();
+        
         $latitude = OCRD::where('Territory', $id)->avg('Latitude');
         $longitude = OCRD::where('Territory', $id)->avg('Longitude');
         $territory->centerMap = [
@@ -79,6 +86,7 @@ class TerritoryController extends Controller
         }
         $territory->salesReps = $salesEmployees;
         $territory->subregions = $subregions;
+
         return $territory;
     }
 
@@ -91,7 +99,7 @@ class TerritoryController extends Controller
      */
     public function destroy($id)
     {
-        $data = Territory::findOrFail($id);
+        $data = OTER::findOrFail($id);
         $data->delete();
     }
 

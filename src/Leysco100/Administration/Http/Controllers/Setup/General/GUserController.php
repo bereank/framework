@@ -139,25 +139,12 @@ class GUserController extends Controller
     {
 
         try {
-            $SUPERUSER = 0;
-            $STATUS = 0;
-
-            if ($request['SUPERUSER']) {
-                $SUPERUSER = 1;
-            }
-            if ($request['status']) {
-                $STATUS = 1;
-            }
             $settings = OADM::first();
 
             $password_changed = true;
             if ($settings->PswdChangeOnReset) {
                 $password_changed = false;
             }
-            //        return [
-            //            "status"=>$STATUS,
-            //            "SUPERUSER"=>$SUPERUSER,
-            //        ];
             $user = User::where('id', $id)->first();
             $user->update(array_filter([
                 'name' => $request['name'],
@@ -165,18 +152,19 @@ class GUserController extends Controller
                 'account' => $request['name'],
                 'DfltsGroup' => $request['DfltsGroup'] ?? 1,
                 'phone_number' => $request['phone_number'],
-                //                'SUPERUSER' => $SUPERUSER,
+//                                'SUPERUSER' => $SUPERUSER,
                 'password' => $request["password"] ? Hash::make($request['password']) : $user->password,
                 'ExtRef' => $request['ExtRef'],
                 'type' => $request['type'],
                 'gate_id' => $request['gate_id'],
-                //                'status' => $STATUS,
+//                                'status' => $STATUS,
                 'EmpID' => $request['EmpID'] ?? null,
-
+                'localUrl' => $request['localUrl']
             ]));
             $user->update([
-                'SUPERUSER' => $SUPERUSER,
-                'status' => $STATUS,
+                'useLocalSearch' => $request['useLocalSearch'] == true ? 1 : 0,
+                'SUPERUSER' => $request['SUPERUSER'] == true ? 1 : 0,
+                'status' => $request['status'] == true ? 1 : 0,
                 'password_changed' =>   $password_changed,
             ]);
             return (new ApiResponseService())->apiSuccessResponseService("Created Successfully");

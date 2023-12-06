@@ -3,6 +3,7 @@
 namespace Leysco100\Shared\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\Administration\Models\OTER;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCLG;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
@@ -33,5 +34,10 @@ class RoutePlanning extends Model
     public function calls()
     {
         return $this->hasMany(OCLG::class, 'RouteCode');
+    }
+
+    public function territory()
+    {
+        return $this->belongsTo(OTER::class, 'territory_id');
     }
 }

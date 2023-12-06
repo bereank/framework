@@ -810,6 +810,7 @@ class DocumentController extends Controller
                     return (new ApiResponseService())->apiFailedResponseService($mockedDataDraftMessage);
                 }
             }
+
             if ($newDoc->ObjType == 13 && $request['payments']) {
                 foreach ($request['payments'] as $payment) {
                     $storedProcedureResponse = null;
