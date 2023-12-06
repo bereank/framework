@@ -26,8 +26,9 @@ class RoutePlanning extends Model
         return $this->hasMany(RouteOutlet::class, 'route_id');
     }
 
-    public function bpartners()
+    public function outlets()
     {
+//        return $this->hasMany(RouteOutlet::class,  'route_id');
         return $this->belongsToMany(OCRD::class, RouteOutlet::class, 'route_id', 'outlet_id');
     }
 
