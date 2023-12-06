@@ -349,7 +349,14 @@ class InventoryTransactionsController extends Controller
 
                 //bin allocations
                 if (array_key_exists('bin_allocation', $value)) {
-                    $data =    (new InventoryService())->binAllocations($ItemCode, $value['Quantity'], $value['bin_allocation'], $value['ToWhsCode'], $value['FromBinCod']);
+                    $FromBinCod =    $value['FromBinCod'] ?? null;
+                    $data =    (new InventoryService())->binAllocations(
+                        $ItemCode,
+                        $value['Quantity'],
+                        $value['bin_allocation'],
+                        $value['ToWhsCode'],
+                        $FromBinCod
+                    );
                     $oilm =  OILM::create([
                         'DocEntry' => $newDoc->id,
                         'TransType' => $ObjType,

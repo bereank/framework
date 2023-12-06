@@ -337,7 +337,8 @@ class MarketingDocumentsController extends Controller
 
         // Step 3: Validate Document Fields
         $validatedFields  = (new MarketingDocumentService())->validateFields($defaulted_data, $request['ObjType']);
-        // Step 4: Create Document
+
+        // Step 4: Validate UDF'S
         $docData = (new MapApiFieldAction())->handle($validatedFields, $TargetTables);
 
         // Step 5: Create Document

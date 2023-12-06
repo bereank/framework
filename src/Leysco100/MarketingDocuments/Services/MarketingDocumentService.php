@@ -6,14 +6,15 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
-use Leysco100\Shared\Services\CommonService;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
-use Leysco100\MarketingDocuments\Jobs\NumberingSeries;
+use Leysco100\Inventory\Services\InventoryService;
 use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
 use Leysco100\Shared\Models\Administration\Models\OADM;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OBTL;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OILM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITW;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
@@ -444,7 +445,7 @@ class MarketingDocumentService
                     'LineTotal' => $value['LineTotal'] ?? $value['Price'], //    Total (LC)
                     'WhsCode' => $value['WhsCode'] ?? null, //    Warehouse Code
                     'ShipDate' => array_key_exists('ShipDate', $value) ? $value['ShipDate'] : null, //    Del. Date
-                    'SlpCode' => $data['SlpCode'], //    Sales Employee
+                    'SlpCode' => $data['SlpCode'] ?? null, //    Sales Employee
                     'Commission' => array_key_exists('Commission', $value) ? $value['Commission'] : null, //    Comm. %
                     'AcctCode' => array_key_exists('AcctCode', $value) ? $value['AcctCode'] : null, //    G/L Account
                     'OcrCode' => $value['OcrCode'] ?? null, //    Dimension 1
@@ -484,6 +485,38 @@ class MarketingDocumentService
 
                 $rowItems = new $TargetTables->pdi1[0]['ChildTable']($rowdetails);
                 $rowItems->save();
+
+                //bin allocations
+                if (array_key_exists('bin_allocation', $value)) {
+                    $FromBinCod =    $value['FromBinCod'] ?? null;
+
+                    $data = (new InventoryService())->binAllocations(
+                        $value['ItemCode'],
+                        $value['Quantity'],
+                        $value['bin_allocation'],
+                        $value['ToWhsCode'],
+                        $FromBinCod
+                    );
+                    $oilm =  OILM::create([
+                        'DocEntry' => $newDoc->id,
+                        'TransType' => $ObjType,
+                        'BaseType' => $data['BaseType'] ?? null,
+                        'DocLineNum' => $LineNum,
+                        'Quantity' => $value['Quantity'],
+                        'ItemCode' => $value['ItemCode'],
+                        'UserSign' => Auth::user()->id,
+                        'BPCardCode' => $data['CardCode'] ?? null,
+                        'SnBType' => $value['ManSerNum'] == "Y" ? 1 : 0,
+                        'SlpCode' => $data['SlpCode'] ?? null,
+                    ]);
+                    OBTL::create([
+                        'MessageID' => $oilm->MessageID,
+                        'BinAbs' => $data->id,
+                        'SnBMDAbs' => NULL,
+                        'Quantity' => $value['Quantity'],
+                        'ITLEntry' => NULL,
+                    ]);
+                }
 
                 $lineUDF = [];
                 if (!empty($value['udfs'])) {
