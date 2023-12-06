@@ -12,7 +12,7 @@ use Leysco100\Shared\Services\AuthorizationService;
 use Leysco100\Shared\Models\Administration\Models\OADM;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;
-use Leysco100\Shared\Models\MarketingDocuments\Models\GPMGate;
+use Leysco100\Shared\Models\Gpm\Models\GPMGate;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OBIN;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OWHS;
 
