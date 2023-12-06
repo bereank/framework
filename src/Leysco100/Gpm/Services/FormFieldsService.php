@@ -3,7 +3,7 @@
 namespace Leysco100\Gpm\Services;
 
 use Illuminate\Support\Facades\DB;
-use Leysco100\Shared\Models\MarketingDocuments\Models\FormFieldsTemplate;
+use Leysco100\Shared\Models\Gpm\Models\FormFieldsTemplate;
 
 
 
