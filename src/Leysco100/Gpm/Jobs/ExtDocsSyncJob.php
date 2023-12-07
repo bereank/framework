@@ -70,7 +70,19 @@ class ExtDocsSyncJob  implements ShouldQueue, TenantAware
                     ]
                 );
                 if ($data->wasRecentlyCreated) {
-                    Log::info('A new record was created');
+                    Log::info('A new record was created' . $data->ObjType);
+                    if ($data->ObjType == "DISPNOT" || $data->ObjType == "DS") {
+                        if ($data->BaseType && $data->BaseEntry) {
+                            Log::info([$data->BaseType , $data->BaseEntry]);
+                            $base =     OGMS::where('ObjType', $data->BaseType)->where('ExtRef', $data->BaseEntry)->first();
+                            Log::info($base);
+                        }
+                        if ($base) {
+                            $data->update([
+                                'BPLId' => $base->BPLId,
+                            ]);
+                        }
+                    }
                 } else {
                     $lineOld = explode('|', $data->LineDetails);
                     $lineNew = explode('|', $value['LineDetails']);
