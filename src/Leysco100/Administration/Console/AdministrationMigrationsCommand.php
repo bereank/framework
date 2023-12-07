@@ -5,7 +5,7 @@ namespace Leysco100\Administration\Console;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 use Leysco100\Shared\Services\CommonService;
-use Leysco100\Shared\Models\FormSetting\Models\FM100;
+use Leysco100\Shared\Models\Shared\Models\FM100;
 use Spatie\Multitenancy\Commands\Concerns\TenantAware;
 
 

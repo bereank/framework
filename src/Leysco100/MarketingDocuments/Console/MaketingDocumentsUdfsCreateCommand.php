@@ -4,7 +4,7 @@ namespace Leysco100\MarketingDocuments\Console;
 
 use Illuminate\Console\Command;
 use Leysco100\Shared\Models\Shared\Models\APDI;
-use Leysco100\Shared\Models\FormSetting\Models\FM100;
+use Leysco100\Shared\Models\Shared\Models\FM100;
 use Spatie\Multitenancy\Commands\Concerns\TenantAware;
 use Leysco100\Shared\Actions\Helpers\CreateUDFHelperAction;
 use Leysco100\Shared\Models\MarketingDocuments\Models\DRF1;

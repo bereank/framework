@@ -3,10 +3,10 @@
 namespace Leysco100\Shared\Console\Setup;
 
 use Illuminate\Console\Command;
-use Leysco100\Shared\Models\FormSetting\Models\FI100;
-use Leysco100\Shared\Models\FormSetting\Models\FM100;
-use Leysco100\Shared\Models\FormSetting\Models\FT100;
-use Leysco100\Shared\Models\FormSetting\Models\FTR100;
+use Leysco100\Shared\Models\Shared\Models\FI100;
+use Leysco100\Shared\Models\Shared\Models\FM100;
+use Leysco100\Shared\Models\Shared\Models\FT100;
+use Leysco100\Shared\Models\Shared\Models\FTR100;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Spatie\Multitenancy\Commands\Concerns\TenantAware;
 

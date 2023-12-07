@@ -16,6 +16,7 @@ class OITM extends Model
 {
 
     use UsesTenantConnection;
+
     protected $guarded = ['id'];
     protected $table = 'o_i_t_m_s';
 

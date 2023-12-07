@@ -1,17 +1,16 @@
 <?php
 
-namespace App\Domains\Marketing\Models;
+namespace Leysco100\Shared\Models\MarketingDocuments\Models;
 
-use App\Domains\Marketing\Models\OINV;
 use Illuminate\Database\Eloquent\Model;
-use App\Domains\Marketing\Models\OASSIGN;
-use App\Domains\InventoryAndProduction\Models\OITM;
-use App\Domains\InventoryAndProduction\Models\OUOM;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OUOM;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class ASSIGN1 extends Model
 {
-    use HasFactory;
+    use HasFactory, UsesTenantConnection;
 
 
 
