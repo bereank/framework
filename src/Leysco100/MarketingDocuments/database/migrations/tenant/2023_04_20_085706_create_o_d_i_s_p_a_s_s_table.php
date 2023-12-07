@@ -54,6 +54,9 @@ return new class extends Migration
             $table->string('DocTime', 1)->nullable();
             $table->integer('SlpCode')
                 ->references('id')->on('employees')->nullable();
+            $table->string('RlpCode')->nullable();
+            $table->integer('vehicle_id')->nullable();
+            $table->string('ClgCode')->nullable();
             $table->string('TrnspCode', 1)->nullable();
             $table->string('PartSupply', 1)->nullable();
             $table->string('Confirmed', 1)->nullable();

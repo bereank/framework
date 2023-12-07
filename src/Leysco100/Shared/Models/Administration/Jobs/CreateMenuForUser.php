@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Leysco100\Shared\Models\FormSetting\Models\FM100;
+use Leysco100\Shared\Models\Shared\Models\FM100;
 
 class CreateMenuForUser implements ShouldQueue
 {

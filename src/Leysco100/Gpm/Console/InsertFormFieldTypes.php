@@ -5,9 +5,7 @@ namespace Leysco100\Gpm\Console;
 
 
 use Illuminate\Console\Command;
-use Leysco100\Shared\Models\FormFieldType;
-
-
+use Leysco100\Shared\Models\Gpm\Models\FormFieldType;
 
 
 class InsertFormFieldTypes extends Command

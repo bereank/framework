@@ -46,6 +46,9 @@ return new class extends Migration
                 ->references('id')->on('warehouses')->nullable();
             $table->integer('SlpCode')
                 ->references('id')->on('employees')->nullable();
+            $table->string('RlpCode')->nullable();
+            $table->integer('vehicle_id')->nullable();
+            $table->string('ClgCode')->nullable();
             $table->float('Commission', 19, 6)->nullable();
             $table->string('TreeType', 1)->nullable();
             $table->string('AcctCode', 8)

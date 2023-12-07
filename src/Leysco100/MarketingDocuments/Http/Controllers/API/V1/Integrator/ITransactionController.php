@@ -33,7 +33,7 @@ use Leysco100\Shared\Models\Administration\Models\TaxGroup;
 use Leysco100\Shared\Models\MarketingDocuments\Models\DRF1;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OATS;
 use Leysco100\Shared\Models\MarketingDocuments\Models\ODRF;
-use Leysco100\Shared\Models\MarketingDocuments\Models\OGMS;
+use Leysco100\Shared\Models\Gpm\Models\OGMS;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OWDD;
 use Leysco100\Shared\Models\MarketingDocuments\Models\WDD1;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;

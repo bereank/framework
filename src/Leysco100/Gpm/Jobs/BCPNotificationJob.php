@@ -13,7 +13,7 @@ use Spatie\Multitenancy\Jobs\TenantAware;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Leysco100\Shared\Models\Administration\Models\OADM;
-use Leysco100\Shared\Models\MarketingDocuments\Models\BackUpModeSetup;
+use Leysco100\Shared\Models\Gpm\Models\BackUpModeSetup;
 
 class BCPNotificationJob implements ShouldQueue, TenantAware
 {

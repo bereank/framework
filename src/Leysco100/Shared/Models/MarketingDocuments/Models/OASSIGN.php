@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Domains\Marketing\Models;
+namespace Leysco100\Shared\Models\MarketingDocuments\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Domains\Marketing\Models\ASSIGN1;
-use App\Domains\BusinessPartner\Models\OCRD;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
+use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OASSIGN extends Model
 {
-    use HasFactory;
+    use HasFactory, UsesTenantConnection;
 
     protected $guarded = ['id'];
     protected $table = 'o_a_s_s_i_g_n_s';

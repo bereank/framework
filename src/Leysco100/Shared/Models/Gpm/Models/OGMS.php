@@ -8,7 +8,7 @@ use Leysco100\Shared\Models\Shared\Models\APDI;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Leysco100\Shared\Models\MarketingDocuments\Models\GMS1;
+use Leysco100\Shared\Models\Gpm\Models\GMS1;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OGMS extends Model
