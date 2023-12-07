@@ -12,8 +12,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Spatie\Multitenancy\Jobs\TenantAware;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Leysco100\Gpm\Services\NotificationsService;
-use Leysco100\Shared\Models\Administration\Models\OADM;
 use Leysco100\Shared\Models\Gpm\Models\OGMS;
 
 
@@ -44,34 +42,24 @@ class ExtDocsSyncJob  implements ShouldQueue, TenantAware
 
         DB::connection('tenant')->beginTransaction();
         try {
-            $data = $this->newRecords;
-            foreach ($data as $key => $value) {
+
+            $dataArray = $this->newRecords;
+            foreach ($dataArray as $key => $value) {
 
                 if (!$value['LineDetails']) {
 
                     continue;
                 }
 
-                $data =  OGMS::firstOrCreate(
-                    [
-                        'ObjType' => $value['ObjType'],
-                        'ExtRef' => $value['ExtRef'],
-                        'BaseEntry' => $value['BaseEntry'],
-                        'BaseType' => $value['BaseType'],
-                    ],
-                    [
-                        'ExtRefDocNum' => $value['ExtRefDocNum'],
-                        'DocDate' => $value['DocDate'],
-                        'GenerationDateTime' => Carbon::parse($value['GenerationDateTime'])->format('Y-m-d H:i:s'),
-                        'DocTotal' => $value['DocTotal'],
-                        'LineDetails' => $value['LineDetails'],
-                        'OwnerCode' => $value['OwnerCode'] ?? null,
-                        'BPLId' => $value['BPLId'] ?? null,
-                    ]
-                );
-                if ($data->wasRecentlyCreated) {
-                    Log::info('A new record was created');
-                } else {
+                $data = OGMS::where([
+                    'ObjType' => $value['ObjType'],
+                    'ExtRef' => $value['ExtRef'],
+                    'BaseEntry' => $value['BaseEntry'],
+                    'BaseType' => $value['BaseType'],
+                ])->first();
+
+                if ($data) {
+                    // Update the existing record
                     $lineOld = explode('|', $data->LineDetails);
                     $lineNew = explode('|', $value['LineDetails']);
 
@@ -82,16 +70,49 @@ class ExtDocsSyncJob  implements ShouldQueue, TenantAware
 
                         $result = $data->LineDetails . '|' . $res;
 
-                        OGMS::where('ExtRefDocNum', $data->ExtRefDocNum)->update([
-                            'LineDetails' => $result
+                        $data->update([
+                            'DocDate' => $value['DocDate'],
+                            'LineDetails' => $result,
                         ]);
+                    }
+
+                    // rest of the existing logic for updating
+                } else {
+                    // Create a new record
+                    $newRecord = OGMS::create([
+                        'ObjType' => $value['ObjType'],
+                        'ExtRef' => $value['ExtRef'],
+                        'BaseEntry' => $value['BaseEntry'],
+                        'BaseType' => $value['BaseType'],
+                        'ExtRefDocNum' => $value['ExtRefDocNum'],
+                        'DocDate' => $value['DocDate'],
+                        'GenerationDateTime' => Carbon::parse($value['GenerationDateTime'])->format('Y-m-d H:i:s'),
+                        'DocTotal' => $value['DocTotal'],
+                        'LineDetails' => $value['LineDetails'],
+                        'OwnerCode' => $value['OwnerCode'] ?? null,
+                        'BPLId' => $value['BPLId'] ?? null,
+                    ]);
+
+                    Log::info('A new record was created ' . $newRecord->ObjType);
+
+                    if ($newRecord->ObjType == "DISPNOT" || $newRecord->ObjType == "DS") {
+
+                        if ($newRecord->BaseType && $newRecord->BaseEntry) {
+
+                            $base =  OGMS::where('ObjType', $newRecord->BaseType)->where('ExtRef', $newRecord->BaseEntry)->first();
+                        }
+                        if ($base) {
+                            $newRecord->update([
+                                'BPLId' => $base->BPLId,
+                            ]);
+                        }
                     }
                 }
             }
             DB::connection('tenant')->commit();
         } catch (\Throwable $th) {
             DB::connection('tenant')->rollback();
-            Log::info($th);
+            Log::info($th->getMessage());
         }
     }
 }
