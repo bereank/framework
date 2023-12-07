@@ -3,7 +3,7 @@
 namespace Leysco100\BusinessPartner\Console;
 
 use Illuminate\Console\Command;
-use Leysco100\Shared\Models\FormSetting\Models\FM100;
+use Leysco100\Shared\Models\Shared\Models\FM100;
 use Spatie\Multitenancy\Commands\Concerns\TenantAware;
 
 

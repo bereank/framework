@@ -4,7 +4,7 @@ namespace Leysco100\Shared\Services;
 
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Shared\Models\Shared\Models\APDI;
-use Leysco100\Shared\Models\FormSetting\Models\FM100;
+use Leysco100\Shared\Models\Shared\Models\FM100;
 use Leysco100\Shared\Models\Administration\Models\NNM1;
 use Leysco100\Shared\Models\Administration\Models\NNM2;
 use Leysco100\Shared\Models\Administration\Models\ONNM;

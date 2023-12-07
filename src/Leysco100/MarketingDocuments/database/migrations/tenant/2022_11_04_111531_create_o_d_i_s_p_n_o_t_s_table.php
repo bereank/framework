@@ -56,6 +56,9 @@ return new class extends Migration
             $table->integer('GroupNum')->nullable();
             $table->string('DocTime', 1)->nullable();
             $table->integer('SlpCode')->nullable();
+            $table->string('RlpCode')->nullable();
+            $table->integer('vehicle_id')->nullable();
+            $table->string('ClgCode')->nullable();
             $table->string('TrnspCode', 1)->nullable();
             $table->string('PartSupply', 1)->nullable();
             $table->string('Confirmed', 1)->nullable();
@@ -462,7 +465,6 @@ return new class extends Migration
             $table->string('ExtRef')->nullable()->comment("Used For External Refrence");
             $table->string('ExtRefDocNum')->nullable()->comment("Used For External Refrence Doc Number");
             $table->float('ExtDocTotal', 19, 2)->default(0)->comment("Used For External Doc Total");
-            $table->integer('ClgCode')->nullable();
             $table->integer('AssEmp')->nullable();
             $table->string('NumAtCard2', 100)
                 ->references('id')->on('o_d_r_d_s')->nullable();

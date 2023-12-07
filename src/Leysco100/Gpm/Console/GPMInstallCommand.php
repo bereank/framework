@@ -4,7 +4,7 @@ namespace Leysco100\Gpm\Console;
 
 use Illuminate\Console\Command;
 use Leysco100\Shared\Services\CommonService;
-use Leysco100\Shared\Models\FormSetting\Models\FM100;
+use Leysco100\Shared\Models\Shared\Models\FM100;
 use Spatie\Multitenancy\Commands\Concerns\TenantAware;
 
 
