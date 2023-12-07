@@ -23,7 +23,7 @@ class PaymentsController extends Controller
 
         try {
             $page = $request->input('page', 1);
-            $perPage = $request->input('per_page', 50);
+            $perPage = $request->input('per_page', 10);
 
             $data = OCRP::latest();
             $data = $data->whereBetween('created_at', [
