@@ -27,10 +27,7 @@ class DocumentControllerPOC extends Controller
     {
 
         $fields = (new MapApiFieldAction())->handle($request);
-        ORDR::create($fields);
-
-      
-      
+        return $fields;
+       // ORDR::create($fields);
     }
-
 }

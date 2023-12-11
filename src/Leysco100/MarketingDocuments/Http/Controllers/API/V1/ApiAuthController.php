@@ -5,14 +5,14 @@ namespace Leysco100\MarketingDocuments\Http\Controllers\API\V1;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Leysco100\Shared\Models\GpsSetup;
 use Leysco100\Shared\Models\MobileNavBar;
+use Leysco100\Shared\Models\Gpm\Models\GPMGate;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Services\AuthorizationService;
 use Leysco100\Shared\Models\Administration\Models\OADM;
 use Leysco100\Shared\Models\Administration\Models\User;
+use Leysco100\Shared\Models\LogisticsHub\Models\GpsSetup;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;
-use Leysco100\Shared\Models\Gpm\Models\GPMGate;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OBIN;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OWHS;
 
@@ -129,11 +129,11 @@ class ApiAuthController extends Controller
             return (new ApiResponseService())->apiFailedResponseService("Your account has been deactivated.Please contact your Admin");
         }
 
-        $default_bin = User::where('id', $loginUser->id)->with('oudg')->first();
-        if ($default_bin->oudg) {
-            $defaultwarehouse = OWHS::where('id', $default_bin->oudg->Warehouse)
-                ->with(['binlocations' => function ($query) use ($default_bin) {
-                    $query->where('id', $default_bin->oudg->DftBinLoc)
+        $loggedInUser = User::where('id', $loginUser->id)->with('oudg')->first();
+        if ($loggedInUser->oudg) {
+            $defaultwarehouse = OWHS::where('id', $loggedInUser->oudg->Warehouse)
+                ->with(['binlocations' => function ($query) use ($loggedInUser) {
+                    $query->where('id', $loggedInUser->oudg->DftBinLoc)
                         ->select(
                             "id",
                             "AbsEntry",
@@ -150,6 +150,9 @@ class ApiAuthController extends Controller
                     "BinSeptor"
                 )
                 ->first();
+        }
+        if ($loggedInUser->oudg && $loggedInUser->oudg->ClockIn) {
+            $clockIn = $loggedInUser->oudg->ClockIn;
         }
         $loginUser->gateData = GPMGate::where('id', $loginUser->gate_id)->first();
         $data = [
@@ -175,6 +178,7 @@ class ApiAuthController extends Controller
             'menuNavigation' => (new AuthorizationService())->mobileNavBar(),
             'gpsSetttings' => $this->getWorkDays(),
             'defaultwarehouse' => $defaultwarehouse ?? [],
+            'ClockIn' => $clockIn ?? 0,
             'ResultState' => true,
             'ResultCode' => 1200,
             'ResultDesc' => "Operation Was Successful",

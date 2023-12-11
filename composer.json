@@ -25,7 +25,8 @@
       "Leysco100\\Inventory\\": "src/Leysco100/Inventory",
       "Leysco100\\MarketingDocuments\\": "src/Leysco100/MarketingDocuments",
       "Leysco100\\Finance\\": "src/Leysco100/Finance",
-      "Leysco100\\Payments\\": "src/Leysco100/Payments"
+      "Leysco100\\Payments\\": "src/Leysco100/Payments",
+      "Leysco100\\LogisticsHub\\": "src/Leysco100/LogisticsHub"
     }
   },
   "config": {
@@ -37,6 +38,7 @@
     "spatie/laravel-multitenancy": "3.0.3",
     "maatwebsite/excel": "^3.1",
     "spatie/laravel-permission": "^5.10",
-    "simplesoftwareio/simple-qrcode": "^4.2"
+    "simplesoftwareio/simple-qrcode": "^4.2",
+    "paragonie/halite": "^5.1"
   }
 }
