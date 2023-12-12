@@ -180,6 +180,13 @@
                 "link": "/vehicles",
                 "Visible": "Y",
                 "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "TimeSheets",
+                "link": "/time-sheets",
+                "Visible": "Y",
+                "children": []
               }
             ]
           },
