@@ -59,9 +59,11 @@ class EmployeeTimeSheetController extends Controller
             $startTime  =  $sheet->CheckInTime;
             $endTime    =  $sheet->CheckOutTime;
             $Yattendance = ETS1::where('UserSign', $user_id)->where('date', '>', $ClockInDate)
-            ->orwhere('ClockOut', '=', '00:00:00')
-            ->orwhere('ClockOut', null)->first();
-
+                ->where(function ($query) {
+                    $query->orwhere('ClockOut', '=', '00:00:00')
+                        ->orwhere('ClockOut', null);
+                })
+                ->first();
             if ($Yattendance) {
                 return (new ApiResponseService())
                     ->apiFailedResponseService([
@@ -70,8 +72,10 @@ class EmployeeTimeSheetController extends Controller
                     ]);
             }
             $attendance = ETS1::where('UserSign', $user_id)->where('date', '=', $ClockInDate)
-            ->orwhere('ClockOut', '=', '00:00:00')
-            ->orwhere('ClockOut', null)->get()->toArray();
+                ->where(function ($query) {
+                    $query->orwhere('ClockOut', '=', '00:00:00')
+                        ->orwhere('ClockOut', null);
+                })->get()->toArray();
 
             if ($attendance) {
                 return (new ApiResponseService())->apiFailedResponseService('Employee Attendance Already Created.');
@@ -79,12 +83,12 @@ class EmployeeTimeSheetController extends Controller
                 $date = date("Y-m-d");
 
                 $totalLateSeconds = strtotime($request['ClockIn']) - strtotime($date . $startTime);
-
-                $hours = floor($totalLateSeconds / 3600);
-                $mins  = floor($totalLateSeconds / 60 % 60);
-                $secs  = floor($totalLateSeconds % 60);
-                $late  = sprintf('%02d:%02d:%02d', $hours, $mins, $secs);
-
+                if ($totalLateSeconds > 0) {
+                    $hours = floor($totalLateSeconds / 3600);
+                    $mins  = floor($totalLateSeconds / 60 % 60);
+                    $secs  = floor($totalLateSeconds % 60);
+                    $late  = sprintf('%02d:%02d:%02d', $hours, $mins, $secs);
+                }
                 // //early Leaving
                 // $totalEarlyLeavingSeconds = strtotime($date . $endTime) - strtotime($request['ClockOut']);
                 // $hours                    = floor($totalEarlyLeavingSeconds / 3600);
@@ -111,7 +115,7 @@ class EmployeeTimeSheetController extends Controller
                 $timesheet->ClockIn      = $request['ClockIn'];
                 $timesheet->ClockOut     = $request['ClockOut'];
                 $timesheet->Comment     = $request['Comment'];
-                $timesheet->Late          = $late;
+                $timesheet->Late          = $late ?? null;
                 // $timesheet->EarlyLeaving = $earlyLeaving;
                 // $timesheet->OverTime      = $overtime;
                 $timesheet->TotalRest    = '00:00:00';
@@ -233,6 +237,22 @@ class EmployeeTimeSheetController extends Controller
             $ETS1->delete();
 
             return (new ApiResponseService())->apiSuccessResponseService("Deleted Successfully");
+        } catch (\Throwable $th) {
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+        }
+    }
+    public function getClocInDetails()
+    {
+        try {
+            $id = Auth::user()->id;
+            $ETS1 = ETS1::where('UserSign', $id)
+                ->where(function ($query) {
+                    $query->orwhere('ClockOut', '=', '00:00:00')
+                        ->orwhere('ClockOut', null);
+                })
+                ->first();
+
+            return (new ApiResponseService())->apiSuccessResponseService($ETS1);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }

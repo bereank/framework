@@ -71,7 +71,7 @@ Route::post('add_slp_to_target', [TargetController::class, 'addSlpToTarget']);
 Route::get('getTargetsVsPerfomance', [TargetController::class, 'getTargetsVsPerfomance']);
 Route::apiResources(['targets' => TargetController::class]);
 Route::get('get_targets_skus/{id}', [TargetController::class, 'showSkus']);
-
+Route::get('open_employee_timesheet', [EmployeeTimeSheetController::class, 'getClocInDetails']);
 
   //OpenCall
 
