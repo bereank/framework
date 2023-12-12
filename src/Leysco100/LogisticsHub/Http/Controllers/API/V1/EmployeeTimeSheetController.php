@@ -58,7 +58,20 @@ class EmployeeTimeSheetController extends Controller
             $ClockInDate = $request['Date'] ?? date("Y-m-d");
             $startTime  =  $sheet->CheckInTime;
             $endTime    =  $sheet->CheckOutTime;
-            $attendance = ETS1::where('UserSign', $user_id)->where('date', '=', $ClockInDate)->where('ClockOut', '=', '00:00:00')->get()->toArray();
+            $Yattendance = ETS1::where('UserSign', $user_id)->where('date', '>', $ClockInDate)
+            ->orwhere('ClockOut', '=', '00:00:00')
+            ->orwhere('ClockOut', null)->first();
+
+            if ($Yattendance) {
+                return (new ApiResponseService())
+                    ->apiFailedResponseService([
+                        'message' => 'Clock out first.',
+                        'data' =>  $Yattendance
+                    ]);
+            }
+            $attendance = ETS1::where('UserSign', $user_id)->where('date', '=', $ClockInDate)
+            ->orwhere('ClockOut', '=', '00:00:00')
+            ->orwhere('ClockOut', null)->get()->toArray();
 
             if ($attendance) {
                 return (new ApiResponseService())->apiFailedResponseService('Employee Attendance Already Created.');
