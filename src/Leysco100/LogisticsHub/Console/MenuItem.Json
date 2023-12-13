@@ -8,6 +8,13 @@
     "children": [
       {
         "icon": "mdi-con",
+        "Label": "Dashboard",
+        "link": "/dashboard",
+        "Visible": "Y",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
         "Label": "Customer Map",
         "link": "/outlets/map",
         "Visible": "Y",
@@ -24,6 +31,13 @@
         "icon": "mdi-con",
         "Label": "Call Management",
         "link": "/call-management",
+        "Visible": "Y",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Employee Timesheet",
+        "link": "/employee-timesheet",
         "Visible": "Y",
         "children": []
       },
@@ -59,13 +73,6 @@
         "icon": "mdi-con",
         "Label": "Vehicles",
         "link": "/vehicles",
-        "Visible": "Y",
-        "children": []
-      },
-      {
-        "icon": "mdi-con",
-        "Label": "Employee Timesheet",
-        "link": "/employee-timesheet",
         "Visible": "Y",
         "children": []
       },
