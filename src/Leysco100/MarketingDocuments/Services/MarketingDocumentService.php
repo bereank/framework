@@ -487,36 +487,36 @@ class MarketingDocumentService
                 $rowItems->save();
 
                 //bin allocations
-                if (array_key_exists('bin_allocation', $value)) {
-                    $FromBinCod =    $value['FromBinCod'] ?? null;
+                // if (array_key_exists('bin_allocation', $value)) {
+                //     $FromBinCod =    $value['FromBinCod'] ?? null;
 
-                    $data = (new InventoryService())->binAllocations(
-                        $value['ItemCode'],
-                        $value['Quantity'],
-                        $value['bin_allocation'],
-                        $value['ToWhsCode'],
-                        $FromBinCod
-                    );
-                    $oilm =  OILM::create([
-                        'DocEntry' => $newDoc->id,
-                        'TransType' => $ObjType,
-                        'BaseType' => $data['BaseType'] ?? null,
-                        'DocLineNum' => $LineNum,
-                        'Quantity' => $value['Quantity'],
-                        'ItemCode' => $value['ItemCode'],
-                        'UserSign' => Auth::user()->id,
-                        'BPCardCode' => $data['CardCode'] ?? null,
-                        'SnBType' => $value['ManSerNum'] == "Y" ? 1 : 0,
-                        'SlpCode' => $data['SlpCode'] ?? null,
-                    ]);
-                    OBTL::create([
-                        'MessageID' => $oilm->MessageID,
-                        'BinAbs' => $data->id,
-                        'SnBMDAbs' => NULL,
-                        'Quantity' => $value['Quantity'],
-                        'ITLEntry' => NULL,
-                    ]);
-                }
+                //     $data = (new InventoryService())->binAllocations(
+                //         $value['ItemCode'],
+                //         $value['Quantity'],
+                //         $value['bin_allocation'],
+                //         $value['ToWhsCode'],
+                //         $FromBinCod
+                //     );
+                //     $oilm =  OILM::create([
+                //         'DocEntry' => $newDoc->id,
+                //         'TransType' => $ObjType,
+                //         'BaseType' => $data['BaseType'] ?? null,
+                //         'DocLineNum' => $LineNum,
+                //         'Quantity' => $value['Quantity'],
+                //         'ItemCode' => $value['ItemCode'],
+                //         'UserSign' => Auth::user()->id,
+                //         'BPCardCode' => $data['CardCode'] ?? null,
+                //         'SnBType' => $value['ManSerNum'] == "Y" ? 1 : 0,
+                //         'SlpCode' => $data['SlpCode'] ?? null,
+                //     ]);
+                //     OBTL::create([
+                //         'MessageID' => $oilm->MessageID,
+                //         'BinAbs' => $data->id,
+                //         'SnBMDAbs' => NULL,
+                //         'Quantity' => $value['Quantity'],
+                //         'ITLEntry' => NULL,
+                //     ]);
+                // }
 
                 $lineUDF = [];
                 if (!empty($value['udfs'])) {
