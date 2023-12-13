@@ -155,4 +155,14 @@ class VolumeDiscountsContoller extends Controller
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
+    public function destroy($id)
+    {
+        try {
+            $data = SPP2::where('id', $id)
+                ->delete();
+            return (new ApiResponseService())->apiSuccessResponseService($data);
+        } catch (\Throwable $th) {
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+        }
+    }
 }
