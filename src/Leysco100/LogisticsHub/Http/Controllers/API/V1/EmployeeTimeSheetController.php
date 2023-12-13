@@ -59,7 +59,7 @@ class EmployeeTimeSheetController extends Controller
 
                 'Comment' => 'nullable',
                 'Date' => 'nullable|date',
-                'ClockIn' => 'required|date_format:H:i',
+                'ClockIn' => 'required|date_format:H:i:s',
                 // 'ClockOut' => 'required|date_format:H:i'
 
             ]);
@@ -182,7 +182,7 @@ class EmployeeTimeSheetController extends Controller
 
                 'Comment' => 'nullable',
                 'Date' => 'nullable|date',
-                'ClockOut' => 'required|date_format:H:i'
+                'ClockOut' => 'required|date_format:H:i:s'
 
             ]);
 
