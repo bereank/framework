@@ -18,10 +18,27 @@ class EmployeeTimeSheetController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $data = ETS1::with('user:id,name')->get();
+            $page = $request->input('page', 1);
+            $perPage = $request->input('per_page', 50);
+
+
+            $data = ETS1::with('user:id,name');
+            if ($request->has('search')) {
+                $search = $request->input('search');
+                $data = $data->where(function ($query) use ($search) {
+                    $query->orWhere('ClockOut', 'LIKE', "%{$search}%")
+                        ->orWhereDate('created_at', 'LIKE', "%{$search}%")
+                        ->orWhere('ClockIn', 'LIKE', "%{$search}%")
+                        ->orWhere('date', 'LIKE', "%{$search}%");
+                });
+            }
+            $data = $data->latest()
+                ->paginate($perPage, ['*'], 'page', $page);
+
+
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
 
@@ -83,6 +100,7 @@ class EmployeeTimeSheetController extends Controller
                 $date = date("Y-m-d");
 
                 $totalLateSeconds = strtotime($request['ClockIn']) - strtotime($date . $startTime);
+                $late = '00:00:00';
                 if ($totalLateSeconds > 0) {
                     $hours = floor($totalLateSeconds / 3600);
                     $mins  = floor($totalLateSeconds / 60 % 60);
@@ -139,7 +157,7 @@ class EmployeeTimeSheetController extends Controller
     public function show($id)
     {
         try {
-            $ETS1 = ETS1::findOrFail($id);
+            $ETS1 = ETS1::with('setup')->findOrFail($id);
 
             return (new ApiResponseService())->apiSuccessResponseService($ETS1);
         } catch (\Throwable $th) {
