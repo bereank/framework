@@ -38,7 +38,7 @@ class PriceListController extends Controller
     public function store(Request $request)
     {
         try {
-          
+
             $data = OPLN::create([
                 'ListName' => $request['ListName'], //Price List Name
                 'ValidFor' => $request['ValidFor'], //     Active
@@ -102,9 +102,11 @@ class PriceListController extends Controller
                 201
             );
     }
-    public function getPriceListItems($id)
+    public function getPriceListItems(Request $request, $id)
     {
-        $ItemCode =  request()->filled('ItemCode') ? request()->input('ItemCode') : false;
+        $page = $request->input('page', 1);
+        $perPage = $request->input('per_page', 10);
+        $search = $request->input('search') ? $request->input('search') : false;
         try {
             $data = OITM::with(['itm1' => function ($query) use ($id) {
                 $query->where('PriceList', $id);
@@ -115,15 +117,19 @@ class PriceListController extends Controller
                 ->with(['ospp' => function ($query) use ($id) {
                     $query->where('ListNum', $id);
                 }])
-                ->when($ItemCode, function ($query) use ($ItemCode) {
-                    return $query->where('ItemCode', $ItemCode);
+                ->when($search, function ($query) use ($search) {
+                    return $query->where(function ($query) use ($search) {
+                        $query->orWhere('ItemCode', 'LIKE', "%{$search}%")
+                            ->orWhere('ItemName', 'LIKE', "%{$search}%");
+                    });
                 })
                 ->select('id', 'ItemCode', 'ItemName', 'PriceUnit')
-                ->get();
+                ->paginate($perPage, ['*'], 'page', $page);
+
+
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
- 
 }
