@@ -36,6 +36,7 @@ use Leysco100\Administration\Http\Controllers\SystemInit\Authorization\DataOwner
 use Leysco100\Administration\Http\Controllers\SystemInit\CompanyDetails\CompanyDetailsController;
 use Leysco100\Administration\Http\Controllers\SystemInit\GeneralSettings\GeneralSettingsController;
 use Leysco100\Administration\Http\Controllers\Setup\Financials\GLDetermination\GLAccountDeterminationController;
+use Leysco100\Administration\Http\Controllers\Setup\General\TimeSheetsMasterController;
 use Leysco100\Administration\Http\Controllers\Setup\Inventory\BinLocationsController;
 
 Route::get('activeGLaccounts', [ChartOfAccountController::class, 'fetchActiveAccounts']);
@@ -142,5 +143,6 @@ Route::put('/settings/password_rest_change', [GeneralSettingsController::class, 
 Route::apiResources(['alerts' => AlertsManagementController::class]);
 Route::apiResources(['data-ownerships' => DataOwnershipController::class]);
 
- Route::apiResources(['approval_stages' => ApprovalStagesControlller::class]);
- Route::apiResources(['approval_templates' => ApprovalTemplatesControlller::class]);
+Route::apiResources(['approval_stages' => ApprovalStagesControlller::class]);
+Route::apiResources(['approval_templates' => ApprovalTemplatesControlller::class]);
+Route::apiResources(['timesheets-master-data' => TimeSheetsMasterController::class]);

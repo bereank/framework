@@ -21,6 +21,7 @@ class PaymentsController extends Controller
 
         $paginate = request()->filled('paginate') ? request()->input('paginate') : false;
 
+        $searchTerm = $request->input('search') ? $request->input('search') : false;
         try {
             $page = $request->input('page', 1);
             $perPage = $request->input('per_page', 50);
@@ -30,6 +31,17 @@ class PaymentsController extends Controller
                 $startdate,
                 $endate,
             ]);
+
+            if ($searchTerm) {
+                $data = $data->where(function ($query) use ($searchTerm) {
+                    $query->orWhereDate('created_at', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('Balance', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('TransID', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('FirstName', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('TransAmount', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('MSISDN', 'LIKE', "%{$searchTerm}%");
+                });
+            }
             if ($paginate) {
                 $data = $data->paginate($perPage, ['*'], 'page', $page);
             } else {

@@ -1,0 +1,81 @@
+[
+  {
+    "icon": "mdi-highway",
+    "icon-alt": "mdi-chevron-down",
+    "Label": "Logistics Hub",
+    "model": true,
+    "Visible": "N",
+    "children": [
+      {
+        "icon": "mdi-con",
+        "Label": "Customer Map",
+        "link": "/outlets/map",
+        "Visible": "Y",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Route Planning",
+        "link": "/routes",
+        "Visible": "Y",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Call Management",
+        "link": "/call-management",
+        "Visible": "Y",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Targets",
+        "link": "/targets",
+        "Visible": "Y",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Channels and Tiers",
+        "link": "/channels",
+        "Visible": "Y",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Survey",
+        "link": "/survey",
+        "Visible": "Y",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Distributors",
+        "link": "/distributors",
+        "Visible": "Y",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Vehicles",
+        "link": "/vehicles",
+        "Visible": "Y",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Employee Timesheet",
+        "link": "/employee-timesheet",
+        "Visible": "Y",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
+        "Label": "Dispatch",
+        "link": "/dispatch",
+        "Visible": "N",
+        "children": []
+      }
+    ]
+  }
+]

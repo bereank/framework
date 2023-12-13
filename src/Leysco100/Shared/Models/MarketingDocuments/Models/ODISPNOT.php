@@ -4,6 +4,7 @@ namespace Leysco100\Shared\Models\MarketingDocuments\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Leysco100\Shared\Models\Shared\Models\APDI;
+use Leysco100\Shared\Models\LogisticsHub\Models\OCLG;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
 use Leysco100\Shared\Models\Administration\Models\ORLP;
@@ -11,7 +12,6 @@ use Leysco100\Shared\Models\Administration\Models\OSLP;
 use Leysco100\Shared\Models\Administration\Models\OUDP;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\BusinessPartner\Models\OBPL;
-use Leysco100\Shared\Models\BusinessPartner\Models\OCLG;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Leysco100\Shared\Models\Administration\Models\Vehicle;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
