@@ -17,7 +17,7 @@ class OCLG extends Model
 
     public function outlet()
     {
-        return $this->belongsTo(OCRD::class, 'CardCode', 'id');
+        return $this->belongsTo(OCRD::class, 'CardCode', 'CardCode');
     }
 
     public function employees()
