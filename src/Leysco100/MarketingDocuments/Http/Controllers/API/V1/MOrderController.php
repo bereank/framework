@@ -8,6 +8,7 @@ use App\Models\ExOrderItems;
 use Illuminate\Http\Request;
 use Leysco100\Shared\Models\CUFD;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Models\Administration\Models\EOTS;
@@ -372,7 +373,7 @@ class MOrderController extends Controller
                     "id" => 6,
                     "Type" => "ARCreditMemo",
                     "Name" => "A/R Credit Memo",
-                    "doctype" => 211
+                    "doctype" => 14
                 ],
 
 
@@ -391,25 +392,68 @@ class MOrderController extends Controller
 
                 $userFields = CUFD::where('ObjType', $item['doctype'])
                     ->where("TableName", $headerTable)
+                    ->with('items:id,FieldID,FldValue as Value,Descr')
                     ->select(
                         "id",
                         "FieldName",
                         "FieldDescription",
-                        "NotNull"
+                        "NotNull",
+                        "ValidRule",
+                        "RTable",
+                        "DispField",
+                        "RField"
                     )
                     ->get();
+                foreach ($userFields as &$userFld) {
+                    if ($userFld->ValidRule == 3) {
+                        if ($userFld->relationLoaded('items')) {
+                            $userFld->unsetRelation('items');
+                        }
+                        $object = APDI::find($userFld->RTable);
+                        $res = $object->ObjectHeaderTable::select(
+                            'id',
+                            DB::raw("{$userFld->RField} as  Value"),
+                            DB::raw("{$userFld->DispField} as Descr")
+                        )
+                            ->get();
+
+                        $userFld->items = $res;
+                    }
+                }
 
                 $line_table = (new $form->pdi1[0]['ChildTable'])->getTable();
 
                 $LineuserFields = CUFD::where('ObjType', $item['doctype'])
                     ->where("TableName", $line_table)
+                    ->with('items:id,FieldID,FldValue as Value,Descr')
                     ->select(
                         "id",
                         "FieldName",
                         "FieldDescription",
-                        "NotNull"
+                        "NotNull",
+                        "ValidRule",
+                        "RTable",
+                        "DispField",
+                        "RField"
                     )
                     ->get();
+
+                foreach ($LineuserFields as &$lineFld) {
+                    if ($lineFld->ValidRule == 3) {
+                        if ($lineFld->relationLoaded('items')) {
+                            $lineFld->unsetRelation('items');
+                        }
+                        $object = APDI::find($lineFld->RTable);
+                        $res = $object->ObjectHeaderTable::select(
+                            'id',
+                            DB::raw("{$lineFld->RField} as  Value"),
+                            DB::raw("{$lineFld->DispField} as Descr")
+                        )
+                            ->get();
+
+                        $lineFld->items = $res;
+                    }
+                }
 
                 $item['HeaderUserFields'] = $userFields;
 

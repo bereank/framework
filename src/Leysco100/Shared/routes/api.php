@@ -8,6 +8,7 @@ use Leysco100\Shared\Http\Controllers\API\FormSettingsController;
 use Leysco100\Shared\Http\Controllers\API\QueryManagerController;
 use Leysco100\Shared\Http\Controllers\API\UserDefinedFieldsController;
 use Leysco100\Administration\Http\Controllers\Setup\General\GUserController;
+use Leysco100\Shared\Http\Controllers\API\RecurringTransactionsTempController;
 use Leysco100\Administration\Http\Controllers\SystemInit\GeneralSettings\GeneralSettingsController;
 
 
@@ -35,3 +36,5 @@ use Leysco100\Administration\Http\Controllers\SystemInit\GeneralSettings\General
  Route::apiResources(['users' => GUserController::class]);
  Route::apiResources(['general_settings' => GeneralSettingsController::class]);
  Route::apiResources(['query_manager' => QueryManagerController::class]);
+ Route::apiResources(['recurringtransactiontemplates' => RecurringTransactionsTempController::class]);
+            

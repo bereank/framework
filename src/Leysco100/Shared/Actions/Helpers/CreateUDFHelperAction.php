@@ -6,9 +6,11 @@ use Leysco100\Shared\Models\CUFD;
 use Leysco100\Shared\Models\UserDict;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
+use Leysco100\Shared\Models\Shared\Models\UFD1;
 
 class CreateUDFHelperAction
 {
+
     /**
      * Create User Define Fields
      *
@@ -18,7 +20,12 @@ class CreateUDFHelperAction
      * @var string $fieldType
      * @var int $fieldSize
      * @var string $ObjType
-     *
+     * @var  $RField
+     * @var $RTable
+     * @var $ValidRule
+     * @var $FldValue
+     * @var $DispField
+     * @var $Descr
      */
     public function __construct(
         protected string $tableName,
@@ -26,6 +33,13 @@ class CreateUDFHelperAction
         protected string $fieldDescription,
         protected string $fieldType,
         protected int $fieldSize,
+        protected  $RField,
+        protected $RTable,
+        protected $ValidRule,
+        protected $FldValue,
+        protected $DispField,
+        protected $Descr,
+
         protected string $ObjType
     ) {
         $this->tableName = $tableName;
@@ -33,6 +47,12 @@ class CreateUDFHelperAction
         $this->fieldDescription = $fieldDescription;
         $this->fieldType = $fieldType;
         $this->fieldSize = $fieldSize;
+        $this->RField = $RField;
+        $this->RTable = $RTable;
+        $this->ValidRule = $ValidRule;
+        $this->FldValue = $FldValue;
+        $this->DispField = $DispField;
+        $this->Descr = $Descr;
         $this->ObjType = $ObjType;
     }
 
@@ -41,17 +61,38 @@ class CreateUDFHelperAction
 
 
         Schema::connection('tenant')->table($this->tableName, function (Blueprint $table) {
-            $fieldName = "U_" . $this->fieldName;
-            CUFD::firstOrCreate([
+            $fieldName = $this->fieldName;
+            if (strpos($fieldName, 'U_') !== 0) {
+                $fieldName = "U_" . $fieldName;
+            }
+            $newRecord =     CUFD::firstOrCreate([
                 'FieldName' =>  $fieldName,
                 'TableName' => $this->tableName
             ], [
                 'FieldDescription' => $this->fieldDescription,
                 'FieldType' => $this->fieldType,
                 'ObjType' => $this->ObjType,
-                'FieldSize' => $this->fieldSize
-            ]);
+                'FieldSize' => $this->fieldSize,
+                'DispField' => $this->DispField ?? null,
+                'ValidRule' => $this->ValidRule ?? null,
+                'RTable' => $this->RTable ?? null,
+                'RField' => $this->RField ?? null,
 
+            ]);
+            if ($this->ValidRule == 2) {
+
+                foreach ($this->FldValue as $key => $value) {
+                    if (array_key_exists($key,  $this->Descr)) {
+                        $UFD1 =  UFD1::create([
+                            'TableID' => 1,
+                            'FieldID' =>   $newRecord->id,
+                            'IndexID' => $key,
+                            'FldValue' => $value,
+                            'Descr' => $this->Descr[$key]
+                        ]);
+                    }
+                }
+            }
 
             if ($this->checkIfColumnExist($this->tableName,   $fieldName)) {
                 return true;

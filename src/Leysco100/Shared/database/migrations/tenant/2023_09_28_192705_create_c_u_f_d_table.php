@@ -21,10 +21,17 @@ return new class extends Migration
             $table->string('TableName')->nullable();
             $table->integer('FieldSize');
             $table->boolean('NotNull')->default(0);
-            $table->string('RTable',20)->nullable();
-            $table->string('RField',20)->nullable();
-            $table->string('RelUDO',20)->nullable();
-            $table->timestamps();    
+            $table->string('RTable', 20)->nullable();
+            $table->string('RField', 20)->nullable();
+            $table->string('DispField', 50)->nullable();
+            $table->string('RelUDO', 20)->nullable();
+            $table->string('Action', 20)->nullable();
+            $table->char('Sys')->nullable();
+            $table->string('ValidRule', 20)->nullable();
+            $table->string('RelSO', 20)->nullable();
+            $table->string('RThrdPTab', 20)->nullable();
+            $table->string('RThrdPFld', 20)->nullable();
+            $table->timestamps();
         });
     }
 
