@@ -17,7 +17,7 @@ class CreateOCLGSTable extends Migration
             $table->bigIncrements('id');
             $table->string('ClgCode', 1)->nullable();
             $table->integer('CardCode')
-                ->references('id')->on('o_c_d_s');
+                ->references('id')->on('o_c_r_d_s');
             $table->integer('SlpCode')->nullable();
             $table->integer('RouteCode')->nullable();
             $table->date('CallDate')->nullable();
