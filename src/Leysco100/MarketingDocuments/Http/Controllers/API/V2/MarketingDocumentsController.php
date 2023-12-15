@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Leysco100\Shared\Models\Banking\Services\BankingDocumentService;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Models\Banking\Models\PDF2;
 use Leysco100\Shared\Models\Banking\Models\RCT2;
@@ -342,6 +343,26 @@ class MarketingDocumentsController extends Controller
         $docData = (new MapApiFieldAction())->handle($validatedFields, $TargetTables);
 
         // Step 5: Create Document
-        return (new MarketingDocumentService())->createDoc($docData, $TargetTables, $request['ObjType']);
+        $newDoc =  (new MarketingDocumentService())->createDoc($docData, $TargetTables, $request['ObjType']);
+
+        //step 6: Record Payment data
+        if ($request['payments']) {
+            foreach ($request['payments'] as $payment) {
+                $storedProcedureResponse = null;
+                if ($newDoc->ObjType == 13) {
+                    $newPayment = (new BankingDocumentService())->processIncomingPayment($newDoc, $payment);
+//                        $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions(140, "A", $newPayment->id);
+                } else {
+                    $newPayment = (new BankingDocumentService())->processDraftIncomingPayment($newDoc, $payment);
+//                        $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions(24, "A", $newPayment->id);
+                }
+                if ($storedProcedureResponse) {
+                    if ($storedProcedureResponse->error != 0) {
+                        return (new ApiResponseService())->apiFailedResponseService($storedProcedureResponse->error_message);
+                    }
+                }
+            }
+        }
+        return (new ApiResponseService())->apiSuccessResponseService($newDoc);
     }
 }
