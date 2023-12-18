@@ -158,16 +158,23 @@ class DiscountsContoller extends Controller
             if ($oedg->count() > 0) {
                 foreach ($oedg as $discountgroup) {
                     if ($discountgroup->edg1) {
-
                         if ($discountgroup->edg1->count() > 0) {
                             foreach ($discountgroup->edg1 as $edg1) {
                                 if (($edg1->DiscType == 'P'  && $edg1->ObjType == 4)) {
                                     $discGrp = true;
-
+                                    if ($edg1->PayFor > 0 && $Quantity > 0) {
+                                        $FreeItmQty =  ($Quantity / $edg1->PayFor);
+                                        if ($FreeItmQty < $edg1->UpTo) {
+                                            $edg1->Quantity = floor($FreeItmQty) * $edg1->ForFree;
+                                        } else {
+                                            $edg1->Quantity = $edg1->UpTo;
+                                        }
+                                    }
+                                    $ForFreeArr[] = $edg1;
                                     $data = [
                                         "DiscPrcnt" => $edg1->Discount,
                                         "DiscType" => 2,
-                                        "ForFree" =>   $edg1,
+                                        "ForFree" =>  $ForFreeArr,
                                         "Type" => "Discount-Group"
                                     ];
                                     return (new ApiResponseService())->apiSuccessResponseService($data);
@@ -235,11 +242,22 @@ class DiscountsContoller extends Controller
                                     if ($spp2->DiscType == 2) {
 
                                         $DiscType = 2;
-                                        $spp3 = SPP3::where('SPP2Num', $spp2->id)
+                                        $ForFree = SPP3::where('SPP2Num', $spp2->id)
                                             ->with('item:id,ItemCode,ItemName,VatGourpSa,DfltWH')
-                                            ->select('id', 'Price', 'ItemCode', 'Quantity')
+                                            ->select('id', 'Price', 'ItemCode', 'Quantity', 'MaxForFree')
                                             ->get();
-                                        $items = $spp3;
+                                        foreach ($ForFree as &$spp3) {
+                                            if ($spp2->Amount > 0 && $Quantity > 0) {
+                                                $FreeItmQty =  ($Quantity / $spp2->Amount);
+
+                                                if ($FreeItmQty < $spp3->MaxForFree) {
+                                                    $spp3->Quantity = floor($FreeItmQty) * $spp3->Quantity;
+                                                } else {
+                                                    $spp3->Quantity = (int)$spp3->MaxForFree;
+                                                }
+                                            }
+                                        }
+                                        $items = $ForFree;
                                         $type = "volume-discount";
                                     }
                                 }
