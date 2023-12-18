@@ -24,7 +24,8 @@ class DiscountGroupController extends Controller
     public function index()
     {
         try {
-            $data = OEDG::get();
+            $data = OEDG::with('creator')->get();
+
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
@@ -79,8 +80,10 @@ class DiscountGroupController extends Controller
      */
     public function show($id)
     {
+
         try {
             $data = OEDG::where('id', $id)
+                ->with('edg1:id,DocEntry,ObjKey as ItemCode,ObjType,DiscType,Discount,PayFor,ForFree,UpTo')
                 ->first();
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
@@ -99,6 +102,52 @@ class DiscountGroupController extends Controller
      */
     public function update(Request $request, $id)
     {
+        Log::info($request);
+        try {
+            OEDG::where('id', $id)->update([
+                'Type' => $request['Type'],
+                'ObjType' => $request['ObjType'] ?? null,
+                'ObjCode' => $request['ObjCode'] ?? null,
+                'DiscRel' => $request['DiscRel'] ?? null,
+                'ValidFor' => $request['ValidFor'] ?? null,
+                'ValidFrom' => $request['ValidFrom'] ?? null,
+                'ValidTo' => $request['ValidTo'] ?? null,
+                'UserSign2' => Auth::user()->id,
+            ]);
+
+            if ($request['edg1']) {
+                EDG1::where('DocEntry', $id)->delete();
+            }
+            foreach ($request['edg1'] as $item) {
+
+                EDG1::updateorCreate([
+                    'DocEntry' => $id,
+                    'ObjKey' => $item['ItemCode']
+                ], [
+                    'ObjType' => $request['ObjType'] ?? null,
+                    'DiscType' => $item['ForFree'] ? 'P' : 'D',
+                    'Discount' => $item['Discount'] ?? 0,
+                    'PayFor' => $item['PayFor'] ?? 1,
+                    'ForFree' => $item['ForFree'] ?? 1,
+                    'UpTo' => $item['UpTo'] ?? 1,
+                ]);
+            }
+            return (new ApiResponseService())->apiSuccessResponseService("Updated Successfuly");
+        } catch (\Throwable $th) {
+            Log::info($th->getMessage());
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+        }
     }
- 
+    public function destroy($id)
+    {
+        try {
+            $data = OEDG::where('id', $id)
+                ->delete();
+            $linesdata = EDG1::where('DocEntry', $id)
+                ->delete();
+            return (new ApiResponseService())->apiSuccessResponseService($data);
+        } catch (\Throwable $th) {
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+        }
+    }
 }

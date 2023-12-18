@@ -3,15 +3,16 @@
 namespace Leysco100\Gpm\Console;
 
 
-
 use Illuminate\Console\Command;
 use Leysco100\Shared\Models\Gpm\Models\FormFieldType;
+use Spatie\Multitenancy\Commands\Concerns\TenantAware;
 
 
 class InsertFormFieldTypes extends Command
 {
+    use TenantAware;
     // command definition: php artisan insert:form-field-types
-    protected $signature = 'insert:form-field-types';
+    protected $signature = 'insert:form-field-types {--tenant=*}';
 
     protected $description = 'Insert the FormFieldTypes data into the database';
 

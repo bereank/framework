@@ -80,8 +80,7 @@ class DiscountsContoller extends Controller
     public function show($id)
     {
         try {
-            $data = OPLN::with('itm1.item')
-                ->where('id', $id)
+            $data = OSPP::where('id', $id)
                 ->first();
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
@@ -90,7 +89,18 @@ class DiscountsContoller extends Controller
     }
 
 
-
+    public function destroy($id)
+    {
+        try {
+            $data = OSPP::where('id', $id)
+                ->delete();
+            $linesdata = SPP1::where('LINENUM', $id)
+                ->delete();
+            return (new ApiResponseService())->apiSuccessResponseService($data);
+        } catch (\Throwable $th) {
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+        }
+    }
     public function getItemDiscount(Request $request)
 
     {
