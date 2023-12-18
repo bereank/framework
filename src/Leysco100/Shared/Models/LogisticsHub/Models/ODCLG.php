@@ -8,12 +8,12 @@ use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
-class OCLG extends Model
+class ODCLG extends Model
 {
     use UsesTenantConnection;
 
     protected $guarded = ['id'];
-    protected $table = 'o_c_l_g_s';
+    protected $table = 'o_d_c_l_g_s';
 
     public function outlet()
     {
@@ -33,7 +33,6 @@ class OCLG extends Model
     {
         return $this->hasMany(CallObjective::class, 'CallCode');
     }
-
     public function user()
     {
         return $this->belongsTo(User::class, 'UserSign');

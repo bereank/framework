@@ -37,7 +37,7 @@ class ApiResponseService
      * Abort Process Response
      */
 
-    public function apiSuccessAbortProcessResponse(string $message)
+    public function apiSuccessAbortProcessResponse($message)
     {
         abort(response()
                 ->json([
@@ -45,7 +45,7 @@ class ApiResponseService
                     'ResultCode' => 1500,
                     'ValidationError' => "This is validation error",
                     'ResultDesc' => $message,
-                ], 200));
+                ], 422));
     }
 
     /**

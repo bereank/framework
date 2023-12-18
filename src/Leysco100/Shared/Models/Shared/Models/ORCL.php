@@ -11,4 +11,9 @@ class ORCL extends Model
     use HasFactory, UsesTenantConnection;
     protected $guarded = ['id'];
     protected $table = 'o_r_c_l_s';
+
+    public function orcp()
+    {
+        return $this->hasOne(ORCP::class, 'id', 'RcpEntry');
+    }
 }

@@ -2,8 +2,9 @@
 
 namespace Leysco100\Shared\Models\Shared\Models;
 
-use App\Domains\Marketing\Models\ORCL;
+
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\Shared\Models\ORCL;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Leysco100\Shared\Models\MarketingDocuments\Models\ODRF;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
@@ -20,9 +21,11 @@ class ORCP extends Model
     {
         return $this->belongsTo(ODRF::class, 'DraftEntry');
     }
-
+   // document_lines
     public function orcl()
     {
         return $this->hasOne(ORCL::class, 'RcpEntry');
     }
+
+    
 }

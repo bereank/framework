@@ -88,6 +88,13 @@
                 "link": "/gpm/form_field_template",
                 "Visible": "Y",
                 "children": []
+              },
+              {
+                "icon": "mdi-con",
+                "Label": "Mobile Menu",
+                "link": "gpm/mobile-menu",
+                "Visible": "Y",
+                "children": []
               }
             ]
           }
