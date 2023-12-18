@@ -23,18 +23,19 @@ use Leysco100\Administration\Http\Controllers\SystemInit\GeneralSettings\General
 |
  */
 
- Route::get('form_settings/{ObjType}', [FormSettingsController::class, 'getFormSettings']);
- Route::post('form_settings', [FormSettingsController::class, 'updateFormSettings']);
- Route::get('form_settings_menu', [FormSettingsController::class, 'formSettingsMenu']);
- Route::post('form_settings_menu', [FormSettingsController::class, 'updateFormSettingsMenu']);
- Route::post('form_settings_menu/{ID}', [FormSettingsController::class, 'updateSingleMenu']);
- Route::get('form_settings_menu/user/{ID}', [FormSettingsController::class, 'getUserMenuSettings']);
+Route::get('form_settings/{ObjType}', [FormSettingsController::class, 'getFormSettings']);
+Route::post('form_settings', [FormSettingsController::class, 'updateFormSettings']);
+Route::get('form_settings_menu', [FormSettingsController::class, 'formSettingsMenu']);
+Route::post('form_settings_menu', [FormSettingsController::class, 'updateFormSettingsMenu']);
+Route::post('form_settings_menu/{ID}', [FormSettingsController::class, 'updateSingleMenu']);
+Route::get('form_settings_menu/user/{ID}', [FormSettingsController::class, 'getUserMenuSettings']);
 
- Route::post('create-udf', UserDefinedFieldsController::class);
+Route::post('create-udf', UserDefinedFieldsController::class);
+
+Route::post('/recurringtransaction/next-execution', [RecurringTransactionsTempController::class, 'getNextExec']);
 
 
- Route::apiResources(['users' => GUserController::class]);
- Route::apiResources(['general_settings' => GeneralSettingsController::class]);
- Route::apiResources(['query_manager' => QueryManagerController::class]);
- Route::apiResources(['recurringtransactiontemplates' => RecurringTransactionsTempController::class]);
-            
+Route::apiResources(['users' => GUserController::class]);
+Route::apiResources(['general_settings' => GeneralSettingsController::class]);
+Route::apiResources(['query_manager' => QueryManagerController::class]);
+Route::apiResources(['recurringtransactiontemplates' => RecurringTransactionsTempController::class]);

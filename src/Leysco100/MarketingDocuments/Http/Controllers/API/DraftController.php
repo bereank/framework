@@ -4,9 +4,11 @@ namespace Leysco100\MarketingDocuments\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Leysco100\MarketingDocuments\Http\Controllers\Controller;
+use Leysco100\Shared\Models\LogisticsHub\Models\ODCLG;
+use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\MarketingDocuments\Models\DRF1;
 use Leysco100\Shared\Models\MarketingDocuments\Models\ODRF;
+use Leysco100\MarketingDocuments\Http\Controllers\Controller;
 
 class DraftController extends Controller
 {
@@ -15,16 +17,38 @@ class DraftController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return ODRF::with(
-            'outlet',
-            'drf1.oitm.itm1',
-            'drf1.oitm.inventoryuom',
-            'drf1.oitm.ougp.ouom',
-            'drf1.oitm.oitb'
-        )
-            ->get();
+        try {
+
+            $page = $request->input('page', 1);
+            $perPage = $request->input('per_page', 10);
+            $searchTerm = $request->input('search') ? $request->input('search') : false;
+            $ObjType = $request->input('ObjType') ? $request->input('ObjType') : 17;
+            $data = ODRF::with(
+                'outlet',
+                'document_lines'
+                // 'document_lines.oitm.itm1',
+                // 'document_lines.oitm.inventoryuom',
+                // 'document_lines.oitm.ougp.ouom',
+                // 'document_lines.oitm.oitb'
+            )->where('ObjType', $ObjType);
+          //  $data = ODCLG::where('id', '!=', null);
+            if ($searchTerm) {
+
+                $data = $data->where(function ($query) use ($searchTerm) {
+                    $query->orWhereDate('created_at', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('id', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('DocNum', 'LIKE', "%{$searchTerm}%")
+                        ->orWhere('CardCode', 'LIKE', "%{$searchTerm}%");
+                });
+            }
+            $data = $data->latest()
+                ->paginate($perPage, ['*'], 'page', $page);
+            return (new ApiResponseService())->apiSuccessResponseService($data);
+        } catch (\Throwable $th) {
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+        }
     }
     /**
      * Display a listing of the resource.
