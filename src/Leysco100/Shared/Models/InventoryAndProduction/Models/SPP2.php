@@ -20,4 +20,11 @@ class SPP2 extends Model
     {
         return $this->hasMany(SPP3::class, 'SPP2Num');
     }
+
+    public function fields()
+    {
+        return $this->hasMany(SPP3::class, 'SPP2Num');
+    }
+
+    
 }

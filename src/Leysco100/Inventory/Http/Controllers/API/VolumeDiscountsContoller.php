@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Inventory\Http\Controllers\Controller;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\ITM9;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\SPP1;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\SPP2;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\SPP3;
 
@@ -32,13 +33,14 @@ class VolumeDiscountsContoller extends Controller
                 })
                 ->with('uom')
                 ->with('spp3.item')
+                ->with('fields:UomEntry as UomCode,id,CardCode,Currency,ItemCode,MaxForFree,Price,Quantity,SPP2Num')
                 ->get();
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
-
+   
 
     /**
      * Store a newly created resource in storage.
@@ -48,11 +50,10 @@ class VolumeDiscountsContoller extends Controller
      */
     public function store(Request $request)
     {
-        Log::info($request);
+
         try {
 
             $validatedData = $request->validate([
-                'ItemCode' => 'required',
                 'CardCode' => 'nullable',
                 'SPP1LNum' => 'required',
                 'Amount' => 'required',
@@ -62,9 +63,19 @@ class VolumeDiscountsContoller extends Controller
                 'DiscType' => 'required',
                 'UomEntry' => 'nullable',
             ]);
-
+            $spp1 =     SPP1::where('id', $request['SPP1LNum'])->first();
             // Create a new record in the database
-            $data = SPP2::create($validatedData);
+            $data = SPP2::create([
+                'ItemCode' => $spp1->ItemCode,
+                'CardCode' => $request['CardCode'] ?? null,
+                'SPP1LNum' => $request['SPP1LNum'],
+                'Amount' => $request['Amount'],
+                'Price' => $request['Price'] ?? 0.0,
+                'Currency' => $request['Currency'] ?? 'KES',
+                'Discount' => $request['Discount'],
+                'DiscType' => $request['DiscType'],
+                'UomEntry' => $request['UomEntry'],
+            ]);
 
             foreach ($request['fields'] as $field) {
                 if ($field['ItemCode']) {
@@ -82,6 +93,7 @@ class VolumeDiscountsContoller extends Controller
             }
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
+            Log::info($th);
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
@@ -104,6 +116,7 @@ class VolumeDiscountsContoller extends Controller
                 ->when($SPP1LNum, function ($query) use ($SPP1LNum) {
                     return $query->where('SPP1LNum', $SPP1LNum);
                 })
+               
                 ->get();
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
@@ -133,8 +146,36 @@ class VolumeDiscountsContoller extends Controller
             'UomEntry' => 'nullable',
         ]);
 
-        SPP2::where('id', $id)->update($validatedData);
+        $data =    SPP2::where('id', $id)->update([
+            'ItemCode' => $request['ItemCode'],
+            'CardCode' => $request['CardCode'] ?? null,
+            'SPP1LNum' => $request['SPP1LNum'],
+            'Amount' => $request['Amount'],
+            'Price' => $request['Price'] ?? 0.0,
+            'Currency' => $request['Currency'] ?? 'KES',
+            'Discount' => $request['Discount'],
+            'DiscType' => $request['DiscType'],
+            'UomEntry' => $request['UomEntry']
+        ]);
 
+
+        if ($request['fields']) {
+            SPP3::where('SPP2Num', $id)->delete();
+            foreach ($request['fields'] as $field) {
+                if ($field['ItemCode']) {
+                    SPP3::create([
+                        'ItemCode' => $field['ItemCode'] ?? null,
+                        'CardCode' => $field['CardCode'] ?? null,
+                        'SPP2Num' =>  $id,
+                        'MaxForFre' => $field['MaxForFre'] ?? null,
+                        'Quantity' => $field['Quantity'] ?? 1,
+                        'Price' => 0,
+                        'Currency' => $field['Currency'] ?? 'KES',
+                        'UomEntry' => $field['UomEntry'] ?? null,
+                    ]);
+                }
+            }
+        }
         return response()
             ->json(
                 [

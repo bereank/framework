@@ -5,6 +5,7 @@ namespace Leysco100\Inventory\Http\Controllers\API;
 use Illuminate\Http\Request;
 
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Leysco100\Shared\Services\ApiResponseService;
@@ -50,6 +51,7 @@ class PeriodDiscountsContoller extends Controller
      */
     public function store(Request $request)
     {
+        DB::connection("tenant")->beginTransaction();
         try {
             $validator = Validator::make($request->all(), [
                 'ItemCode' => 'required',
@@ -73,8 +75,10 @@ class PeriodDiscountsContoller extends Controller
             ]);
 
             $data = SPP1::create($validatedData);
+            DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
@@ -108,24 +112,44 @@ class PeriodDiscountsContoller extends Controller
      */
     public function update(Request $request, $id)
     {
-        $details = [
-            'ListName' => $request['ListName'],
-            'ValidFor' => $request['ValidFor'],
-            'PrimCurr' => $request['PrimCurr'],
-            'BASE_NUM' => $request['BASE_NUM'], // Base Price List
-            'Factor' => $request['Factor'], // Default Factor
-            'AddCurr1' => $request['AddCurr1'],
-            'AddCurr2' => $request['AddCurr2'],
-        ];
-        OPLN::where('id', $id)->update($details);
+        Log::info($request);
+        DB::connection("tenant")->beginTransaction();
+        try {
 
-        return response()
-            ->json(
-                [
-                    'message' => "Updated Successfully",
-                ],
-                201
-            );
+            $validatedData = $request->validate([
+                'ItemCode' => 'nullable',
+                'CardCode' => 'nullable',
+                'LINENUM' => 'nullable|integer',
+                'Price' => 'nullable|numeric',
+                'Currency' => 'nullable',
+                'Discount' => 'nullable|numeric',
+                'ListNum' => 'nullable|integer',
+                'FromDate' => 'nullable|date',
+                'ToDate' => 'nullable|date',
+                'AutoUpdt' => 'nullable|boolean',
+                'Expand' => 'nullable|boolean',
+            ]);
+
+            $data = SPP1::where('id', $id)->update([
+                'ItemCode' => $request['ItemCode'],
+                'CardCode' => $request['CardCode'] ?? null,
+
+                'Price' => $request['Price'] ?? 0,
+                'Currency' => $request['Currency'] ?? 'Kes',
+                'Discount' => $request['Discount'] ?? 0,
+
+                'FromDate' => $request['FromDate'] ?? null,
+                'ToDate' => $request['ToDate'] ?? null,
+                'AutoUpdt' => $request['AutoUpdt'] ?? 1,
+
+            ]);
+            DB::connection("tenant")->commit();
+            return (new ApiResponseService())->apiSuccessResponseService($data);
+        } catch (\Throwable $th) {
+            Log::info($th);
+            DB::connection("tenant")->rollback();
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+        }
     }
     public function getUomPrices($id)
     {
@@ -157,6 +181,17 @@ class PeriodDiscountsContoller extends Controller
             }
             $data = $data->latest()
                 ->paginate($perPage, ['*'], 'page', $page);
+
+            return (new ApiResponseService())->apiSuccessResponseService($data);
+        } catch (\Throwable $th) {
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+        }
+    }
+    public function destroy($id)
+    {
+        try {
+            $data = SPP1::where('id', $id)
+                ->delete();
 
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
