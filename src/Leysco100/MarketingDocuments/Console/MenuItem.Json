@@ -76,6 +76,13 @@
       },
       {
         "icon": "mdi-con",
+        "Label": "Recurring Transactions",
+        "link": "/sales/recurrent-transactions",
+        "Visible": "N",
+        "children": []
+      },
+      {
+        "icon": "mdi-con",
         "Label": "Recurring Transaction Template",
         "link": "/sales/recurrent-templates",
         "Visible": "N",

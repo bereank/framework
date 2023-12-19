@@ -2,6 +2,7 @@
 
 namespace Leysco100\Inventory\Services;
 
+use Illuminate\Support\Facades\Log;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OPLN;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\ITM1;
@@ -176,38 +177,51 @@ class InventoryService
         return $rowData;
     }
 
-    public function binAllocations($ItemCode, $Quantity, $bin_allocations, $ToWhsCode, $FromBinCod = null)
+    public function binAllocations($ObjType, $ItemCode, $bin_allocation, $ToWhsCode, $FromBinCod)
     {
-        foreach ($bin_allocations as $bin_allocation) {
-            $obin = OBIN::where('BinCode', $bin_allocation['BinCode'])->first();
-            $oibq = OIBQ::where('ItemCode', $ItemCode)
-                ->where('BinAbs', $obin->id)
-                ->first();
-            if ($FromBinCod) {
-                $fromobin = OBIN::where('BinCode', $FromBinCod)->first();
+
+        $obin = OBIN::where('BinCode', $bin_allocation['BinCode'])->first();
+
+        $oibq = OIBQ::where('ItemCode', $ItemCode)
+            ->where('BinAbs', $obin->id)
+            ->first();
+
+        if ($FromBinCod) {
+            $fromobin = OBIN::where('BinCode', $FromBinCod)->first();
+         
+            if ($fromobin) {
                 $fromoibq = OIBQ::where('ItemCode', $ItemCode)
                     ->where('BinAbs', $fromobin->id)
                     ->first();
                 if ($fromoibq) {
                     $fromoibq->update([
-                        "OnHandQty" => $fromoibq->OnHandQty - $Quantity
+                        "OnHandQty" => $fromoibq->OnHandQty - $bin_allocation['QtyVar']
                     ]);
                 }
             }
-            if (!$oibq) {
+        }
+        if (!$oibq) {
+            if ($ObjType == 67) {
                 OIBQ::create([
                     'ItemCode' => $ItemCode,
                     'BinAbs' => $obin->id,
-                    'OnHandQty' => $Quantity,
-                    'ToWhsCode' => $ToWhsCode
-                ]);
-            } else {
-                $oibq->update([
-                    "OnHandQty" => $Quantity + $oibq->OnHandQty
+                    'OnHandQty' => $bin_allocation['QtyVar'],
+                    'ToWhsCode' => $ToWhsCode ?? null,
                 ]);
             }
-
-            return $obin;
+        } else {
+            if ($ObjType == 67) {
+                $oibq->update([
+                    "OnHandQty" => $bin_allocation['QtyVar'] + $oibq->OnHandQty
+                ]);
+            }
+            if ($ObjType == 13) {
+                $oibq->update([
+                    "OnHandQty" => $oibq->OnHandQty-$bin_allocation['QtyVar']
+                ]);
+            }
         }
+
+        return $obin;
     }
 }
