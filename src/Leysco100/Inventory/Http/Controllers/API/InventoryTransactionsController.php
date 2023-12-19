@@ -29,6 +29,7 @@ use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITW;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OSRN;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\WTR19;
 use Leysco100\MarketingDocuments\Services\DatabaseValidationServices;
 use Leysco100\Shared\Models\MarketingDocuments\Services\GeneralDocumentValidationService;
 
@@ -272,6 +273,19 @@ class InventoryTransactionsController extends Controller
                     }
                 }
 
+                //Validate Bin-locations
+                if (array_key_exists('bin_allocation', $value) && !empty($value['bin_allocation'])) {
+                    foreach ($value['bin_allocation'] as $key => $BinVal) {
+                        if (!empty($BinVal)) {
+                            $obin = OBIN::where('BinCode', $BinVal['BinCode'])->first();
+                            if (!$obin) {
+                                return (new ApiResponseService())
+                                    ->apiNotFoundResponse("Bin Code Does Not Exist");
+                            }
+                        }
+                    }
+                }
+
                 $doctTotal = $doctTotal + $AvgPrice;
                 $rowdetails = [
                     'DocEntry' => $newDoc->id,
@@ -306,6 +320,7 @@ class InventoryTransactionsController extends Controller
                     'GrossBuyPr' => array_key_exists('GrossBuyPr', $value) ? $value['GrossBuyPr'] : null, //   Gross Profit Base Price
                     'GPTtlBasPr' => array_key_exists('GPTtlBasPr', $value) ? $value['GPTtlBasPr'] : null, //    Gross Profit Total Base Price
 
+                    'ObjType' => $request['ObjType'] ?? null,
                     'BaseType' => $request['BaseType'] ?? $request['BaseType'], //    Base Type
                     'BaseRef' => $request['BaseRef'] ? $request['BaseRef'] : null, //    Base Ref.
                     'BaseEntry' => $request['BaseEntry'] ? $request['BaseEntry'] : null, //    Base Key
@@ -344,34 +359,72 @@ class InventoryTransactionsController extends Controller
 
                 ];
 
-                $rowItems = new $TargetTables->pdi1[0]['ChildTable']($rowdetails);
+                $result = array_filter($TargetTables->pdi1->toArray(), function ($item) {
+                    return $item['ChildType'] === 'document_lines';
+                });
+
+                $lineModel = collect($result)->first();
+
+                $rowItems = new $lineModel['ChildTable']($rowdetails);
                 $rowItems->save();
 
                 //bin allocations
                 if (array_key_exists('bin_allocation', $value)) {
+
+                    $result = array_filter($TargetTables->pdi1->toArray(), function ($item) {
+                        return $item['ChildType'] === 'bin_allocations';
+                    });
+                    $lineModel = collect($result)->first();
+
                     $FromBinCod =    $value['FromBinCod'] ?? null;
-                    $data =    (new InventoryService())->binAllocations(
-                        $ItemCode,
-                        $value['Quantity'],
-                        $value['bin_allocation'],
-                        $value['ToWhsCode'],
-                        $FromBinCod
-                    );
-                    $oilm =  OILM::create([
-                        'DocEntry' => $newDoc->id,
-                        'TransType' => $ObjType,
-                        'DocLineNum' => $LineNum,
-                        'Quantity' => $value['Quantity'],
-                        'ItemCode' => $ItemCode,
-                        'UserSign' => Auth::user()->id
-                    ]);
-                    OBTL::create([
-                        'MessageID' => $oilm->MessageID,
-                        'BinAbs' => $data->id,
-                        'SnBMDAbs' => NULL,
-                        'Quantity' => $value['Quantity'],
-                        'ITLEntry' => NULL,
-                    ]);
+
+                    foreach ($value['bin_allocation'] as $key => $BinVal) {
+                        if (!empty($BinVal)) {
+                            $SubLineNum = ++$key;
+                            $obin = OBIN::where('BinCode', $BinVal['BinCode'])->first();
+                            $bindata = $lineModel['ChildTable']::create([
+                                'DocEntry' => $newDoc->id,
+                                'BinAllocSe' => $LineNum,
+                                'LineNum' => $LineNum,
+                                'SubLineNum' => $SubLineNum,
+                                'SnBType' => null,
+                                'SnBMDAbs' => null,
+                                'BinAbs' =>  $obin->id,
+                                'Quantity' =>  $BinVal['QtyVar'],
+                                'ItemCode' => $ItemCode,
+                                'WhsCode' =>  $request['ToWhsCode'],
+                                'ObjType' =>  $request['ObjType'],
+                                'AllowNeg' => 'N',
+                                'BinActTyp' => 1
+                            ]);
+
+                            $resdata =    (new InventoryService())->binAllocations(
+                                $request['ObjType'],
+                                $ItemCode,
+                                $BinVal,
+                                $value['ToWhsCode'],
+                                $FromBinCod
+                            );
+
+
+
+                            // $oilm =  OILM::create([
+                            //     'DocEntry' => $newDoc->id,
+                            //     'TransType' => $ObjType,
+                            //     'DocLineNum' => $LineNum,
+                            //     'Quantity' => $BinVal['QtyVar'],
+                            //     'ItemCode' => $ItemCode,
+                            //     'UserSign' => Auth::user()->id
+                            // ]);
+                            // OBTL::create([
+                            //     'MessageID' => $oilm->id,
+                            //     'BinAbs' => $Bindata->id,
+                            //     'SnBMDAbs' => NULL,
+                            //     'Quantity' => $BinVal['QtyVar'],
+                            //     'ITLEntry' => NULL,
+                            // ]);
+                        }
+                    }
                 }
 
                 /**
@@ -455,9 +508,9 @@ class InventoryTransactionsController extends Controller
      */
     public function show($id)
     {
-        $isDoc = \Request::get('isDoc');
+        $isDoc = request()->filled('isDoc') ? request()->input('isDoc') : 1;
         $DocEntry = $id;
-        $ObjType = 66;
+        $ObjType = request()->filled('ObjType') ? request()->input('ObjType') : 66;
 
         $originalObjType = $ObjType;
         if ($isDoc == 0) {
@@ -551,9 +604,9 @@ class InventoryTransactionsController extends Controller
 
     public function getSingleDocData($ObjType, $DocEntry)
     {
-        $isDoc = \Request::get('isDoc');
-        $DocEntry = $DocEntry;
-        $ObjType = $ObjType;
+
+        $isDoc = request()->filled('isDoc') ? request()->input('isDoc') : 1;
+
 
         $originalObjType = $ObjType;
         if ($isDoc == 0) {
@@ -562,83 +615,153 @@ class InventoryTransactionsController extends Controller
         $DocumentTables = APDI::with('pdi1')
             ->where('ObjectID', $ObjType)
             ->first();
-        (new AuthorizationService())->checkIfAuthorize($DocumentTables->id, 'view');
 
-        $data = $DocumentTables->ObjectHeaderTable::with('objecttype', 'department', 'document_lines.oitm', 'branch', 'CreatedBy', 'location')
-            ->where('id', $DocEntry)
-            ->first();
+        if (!$DocumentTables) {
+            return (new ApiResponseService())
+                ->apiNotFoundResponse("Not found document with objtype " . $ObjType);
+        }
 
-        $document_lines = $data->document_lines;
 
-        foreach ($document_lines as $key => $row) {
-            $serialNumbers = SRI1::where('BaseType', $ObjType)
-                ->where('BaseEntry', $data->id)
-                ->where('LineNum', $row->id)
-                ->get();
+        //    (new AuthorizationService())->checkIfAuthorize($DocumentTables->id, 'view');
 
-            // return $serialNumbers;
-            foreach ($serialNumbers as $key => $serial) {
-                $serial->osrn = OSRN::where('SysNumber', $serial->SysSerial)
-                    ->where('ItemCode', $row->ItemCode)
-                    ->first();
+        try {
+            $data = $DocumentTables->ObjectHeaderTable::with(
+                'objecttype',
+                'department',
+                'document_lines.oitm',
+                'branch',
+                'CreatedBy:id,name',
+                'location',
+                'bin_allocations'
+            )
+                ->where('id', $DocEntry)
+                ->first();
+            if (!$data) {
+                return (new ApiResponseService())->apiNotFoundResponse('No data');
             }
-            $row->SerialNumbers = $serialNumbers;
-            $row->formattedLineTotal = number_format($row->LineTotal, 2);
-            $row->formattedPrice = number_format($row->Price, 2);
-            $row->formattedPriceBefDisc = number_format($row->PriceBefDi, 2);
-        }
+            // bin_allocations
+            // $result = array_filter($DocumentTables->pdi1->toArray(), function ($item) {
+            //     return $item['ChildType'] === 'bin_allocations';
+            // });
+            // $firstValue = collect($result)->first();
 
-        $oats = OATS::where('DocEntry', $DocEntry)
-            ->where('ObjType', $ObjType)->get();
-        foreach ($oats as $key => $file) {
-            $file->realPath = asset($file->Path);
-        }
-        $data->oats = $oats;
-        $data->isDoc = $isDoc;
+            // foreach ($data->document_lines as $d) {
+            //     $line = $firstValue['ChildTable']::where('LineNum', $d->LineNum)->where('DocEntry', $data->id)->get();
+            //     $d->bin_alloc = $line;
+            // }
 
-        if ($isDoc == 0) {
-            $data->DocStatus = "Draft";
-        }
-        $generalSettings = OADM::where('id', 1)->value('printUnsyncDocs');
-        if ($generalSettings == 1 && $data->ExtRef == null) {
-            $data->printUnsyncDocs = 1;
-        }
 
-        // return $data->draftKey;
+            $document_lines = $data->document_lines;
 
-        /**
-         * Addin Approvers
-         */
+            foreach ($document_lines as $key => $row) {
+                $serialNumbers = SRI1::where('BaseType', $ObjType)
+                    ->where('BaseEntry', $data->id)
+                    ->where('LineNum', $row->id)
+                    ->get();
 
-        $data->originIsApproval = 0;
-        $owdd = OWDD::where('DocEntry', $data->ExtRef)->first();
-
-        if ($owdd) {
-            $data->originIsApproval = 1;
-            $approvers = WDD1::where('WddCode', $owdd->WddCode)->where('Status', "Y")->get();
-
-            foreach ($approvers as $key => $approver) {
-                $userDetails = User::where('ExtRef', $approver->UserID)->first();
-                $approver->userDetails = $userDetails;
-
-                if ($userDetails) {
-                    $approver->Date = now()->format('Y-m-d');
-                    $approver->imagePath = $userDetails ? "data:image/jpeg;base64," . $userDetails->signaturePath : null;
+                // return $serialNumbers;
+                foreach ($serialNumbers as $key => $serial) {
+                    $serial->osrn = OSRN::where('SysNumber', $serial->SysSerial)
+                        ->where('ItemCode', $row->ItemCode)
+                        ->first();
                 }
+                $row->SerialNumbers = $serialNumbers;
+                $row->formattedLineTotal = number_format($row->LineTotal, 2);
+                $row->formattedPrice = number_format($row->Price, 2);
+                $row->formattedPriceBefDisc = number_format($row->PriceBefDi, 2);
             }
-            $data->approvers = $approvers;
+
+            $oats = OATS::where('DocEntry', $DocEntry)
+                ->where('ObjType', $ObjType)->get();
+            foreach ($oats as $key => $file) {
+                $file->realPath = asset($file->Path);
+            }
+            $data->oats = $oats;
+            $data->isDoc = $isDoc;
+
+            if ($isDoc == 0) {
+                $data->DocStatus = "Draft";
+            }
+            $generalSettings = OADM::where('id', 1)->value('printUnsyncDocs');
+            if ($generalSettings == 1 && $data->ExtRef == null) {
+                $data->printUnsyncDocs = 1;
+            }
+
+            // return $data->draftKey;
+
+            /**
+             * Addin Approvers
+             */
+
+            $data->originIsApproval = 0;
+            $owdd = OWDD::where('DocEntry', $data->ExtRef)->first();
+
+            if ($owdd) {
+                $data->originIsApproval = 1;
+                $approvers = WDD1::where('WddCode', $owdd->WddCode)->where('Status', "Y")->get();
+
+                foreach ($approvers as $key => $approver) {
+                    $userDetails = User::where('ExtRef', $approver->UserID)->first();
+                    $approver->userDetails = $userDetails;
+
+                    if ($userDetails) {
+                        $approver->Date = now()->format('Y-m-d');
+                        $approver->imagePath = $userDetails ? "data:image/jpeg;base64," . $userDetails->signaturePath : null;
+                    }
+                }
+                $data->approvers = $approvers;
+            }
+
+            // $BINALLOC = DB::connection('tenant')->table('o_w_t_r_s AS T0')
+            //     ->join('w_t_r1_s AS T1', 'T0.id', '=', 'T1.DocEntry')
+            //     ->join('o_w_h_s_s AS T3', 'T1.WhsCode', '=', 'T3.WhsCode')
+            //     ->join('o_w_h_s_s AS T4', 'T1.FromWhsCod', '=', 'T4.WhsCode')
+            //     ->leftjoin('o_s_l_p_s AS T5', 'T0.SlpCode', '=', 'T5.SlpCode')
+            //     ->join('o_i_l_m_s AS T6', 'T1.ItemCode', '=', 'T6.ItemCode')
+            //     ->leftJoin('o_c_r_d_s AS T2', 'T0.CardCode', '=', 'T2.CardCode')
+            //     ->join('o_i_l_m_s AS T7', function ($join) {
+            //         $join->on('T7.DocEntry', '=', 'T1.DocEntry')
+            //             ->on('T7.TransType', '=', 'T1.ObjType')
+            //             ->on('T7.DocLineNum', '=', 'T1.LineNum');
+            //     })
+            //     ->Join('o_b_t_l_s AS T8', 'T8.MessageID', '=', 'T7.id')
+            //     ->Join('o_b_i_n AS T10', 'T8.BinAbs', '=', 'T10.id')
+            //     ->where('T0.id', $DocEntry)
+            //     ->where('T6.DocEntry', $DocEntry)
+            //     ->select(
+            //         'T0.id',
+            //         'T0.ObjType',
+            //         'T0.BPLId',
+            //         'T0.ToWhsCode',
+            //         'T0.SlpCode',
+            //         'T1.WhsCode',
+            //         'T1.LineNum',
+            //         'T3.WhsName',
+            //         'T6.ItemCode',
+            //         'T6.Quantity',
+            //         'T7.DocLineNum',
+            //         'T7.TransType',
+            //         'T7.DocEntry',
+            //         'T1.DocEntry As T1DocEntry',
+            //         'T8.id as ObtlID',
+            //         'T8.MessageID',
+            //         'T10.BinCode',
+            //         'T8.BinAbs',
+            //     )
+            //     ->get();
+            // return $BINALLOC;
+            /**
+             * Format Values for Reports;
+             */
+            $data->formattedSubDocTotal = number_format($data->DocTotal - $data->VatSum, 2);
+            $data->formattedDocTotalBeforeTax = number_format($data->DocTotal - $data->VatSum, 2);
+            $data->formattedVatSum = number_format($data->VatSum, 2);
+            $data->formattedDocTotal = number_format($data->DocTotal, 2);
+            $data->formattedBalance = number_format($data->DocTotal - $data->PaidToDate, 2);
+            $data->formattedPaidToDate = number_format($data->PaidToDate, 2);
+            return (new ApiResponseService())->apiSuccessResponseService($data);
+        } catch (\Throwable $th) {
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
-
-        /**
-         * Format Values for Reports;
-         */
-        $data->formattedSubDocTotal = number_format($data->DocTotal - $data->VatSum, 2);
-        $data->formattedDocTotalBeforeTax = number_format($data->DocTotal - $data->VatSum, 2);
-        $data->formattedVatSum = number_format($data->VatSum, 2);
-        $data->formattedDocTotal = number_format($data->DocTotal, 2);
-        $data->formattedBalance = number_format($data->DocTotal - $data->PaidToDate, 2);
-        $data->formattedPaidToDate = number_format($data->PaidToDate, 2);
-
-        return $data;
     }
 }

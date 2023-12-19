@@ -49,9 +49,9 @@ class OWTR extends Model
         return $this->hasMany(RDR1::class, 'DocEntry');
     }
 
-    public function rows()
+    public function bin_allocations()
     {
-        return $this->hasMany(WTR1::class, 'DocEntry');
+        return $this->hasMany(WTR19::class, 'DocEntry');
     }
 
     public function objecttype()

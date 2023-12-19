@@ -16,4 +16,10 @@ class ORCL extends Model
     {
         return $this->hasOne(ORCP::class, 'id', 'RcpEntry');
     }
+
+    public function objecttype()
+    {
+        return $this->belongsTo(APDI::class, 'DocObjType', 'ObjectID');
+    }
+
 }
