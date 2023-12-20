@@ -51,7 +51,7 @@ class RecurringTransactionCommand extends Command
             Log::info("RECURRING POSTINGS CREATE");
             $TargetTable = APDI::with('pdi1')->where('ObjectID', $recurr_posting->DocObjType)->first();
 
-            $DraftTable = APDI::with('pdi1')->where('ObjectID', $TargetTable->DrftModel)->first();
+            $DraftTable = APDI::with('pdi1')->where('ObjectID', $TargetTable->DrftObj)->first();
 
             if ($TargetTable && $DraftTable) {
                 $draft = $DraftTable->ObjectHeaderTable::where('id', $recurr_posting->DraftEntry)
@@ -79,6 +79,7 @@ class RecurringTransactionCommand extends Command
 
                         $rowItems->save();
                     }
+                    Log::info("Data replicated successfully!");
                 } else {
                     Log::info("draft is not found");
                 }
@@ -86,9 +87,9 @@ class RecurringTransactionCommand extends Command
                 Log::info("target table is not found");
             }
 
+            Log::info("Recurring Postings Excecuted");
 
-
-            Log::info("Data replicated successfully!");
+            
 
             $ExecutionTime = Carbon::now()->subMinutes(1)->format('H:i:s');
             $recurrPeriodsService = new RecurrPeriodsService();

@@ -33,7 +33,7 @@ Route::get('form_settings_menu/user/{ID}', [FormSettingsController::class, 'getU
 Route::post('create-udf', UserDefinedFieldsController::class);
 
 Route::post('/recurringtransaction/next-execution', [RecurringTransactionsTempController::class, 'getNextExec']);
-
+Route::get('/recurringtransactions', [RecurringTransactionsTempController::class, 'getRecurTrans']);
 
 Route::apiResources(['users' => GUserController::class]);
 Route::apiResources(['general_settings' => GeneralSettingsController::class]);

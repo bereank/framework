@@ -40,19 +40,34 @@ class ApiResponseService
     public function apiSuccessAbortProcessResponse($message)
     {
         abort(response()
-                ->json([
-                    'ResultState' => false,
-                    'ResultCode' => 1500,
-                    'ValidationError' => "This is validation error",
-                    'ResultDesc' => $message,
-                ], 422));
+            ->json([
+                'ResultState' => false,
+                'ResultCode' => 1500,
+                'ValidationError' => "This is validation error",
+                'ResultDesc' => $message,
+            ], 422));
+    }
+
+    /**
+     * Not Found Response
+     */
+
+    public function apiNotFoundResponse($message)
+    {
+        abort(response()
+            ->json([
+                'ResultState' => false,
+                'ResultCode' => 1500,
+                'ValidationError' => "Not Found",
+                'ResultDesc' => $message,
+            ], 404));
     }
 
     /**
      *  Failure API Response
      * @return \Illuminate\Http\JsonResponse
      */
-    public function apiFailedResponseService($message,$data = null)
+    public function apiFailedResponseService($message, $data = null)
     {
         $response = [
             'ResultState' => false,
@@ -60,11 +75,11 @@ class ApiResponseService
             'ValidationError' => "Details error",
             'ResultDesc' => $message,
         ];
-        if ($data != null){
+        if ($data != null) {
             $response["ResultData"] = $data;
         }
 
-        return response()->json($response, 200);
+        return response()->json($response, 500);
     }
 
     /**

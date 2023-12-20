@@ -44,9 +44,13 @@ class OWTQ extends Model
         return $this->hasMany(RDR1::class, 'DocEntry');
     }
 
-    public function rows()
+    public function document_lines()
     {
         return $this->hasMany(WTQ1::class, 'DocEntry');
+    }
+    public function bin_allocations()
+    {
+        return $this->hasMany(WTR19::class, 'DocEntry');
     }
 
     public function objecttype()

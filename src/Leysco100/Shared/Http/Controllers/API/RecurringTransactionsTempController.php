@@ -206,7 +206,7 @@ class RecurringTransactionsTempController extends Controller
 
     public function getNextExec(Request $request)
     {
-    
+
         try {
             $recurrPeriodsService = new RecurrPeriodsService();
             $NextExecution = $recurrPeriodsService
@@ -217,8 +217,20 @@ class RecurringTransactionsTempController extends Controller
                     StartDate: $request['StartDate'],
                     EndDate: $request['EndDate'],
                 );
-        
+
             return (new ApiResponseService())->apiSuccessResponseService($NextExecution);
+        } catch (\Throwable $th) {
+
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+        }
+    }
+
+    public function getRecurTrans(Request $request)
+    {
+        try {
+            $data = ORCL::with('orcp','objecttype')->get();
+
+            return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
 
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());

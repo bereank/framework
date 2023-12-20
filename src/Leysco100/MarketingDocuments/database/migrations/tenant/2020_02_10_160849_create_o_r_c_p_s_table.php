@@ -20,22 +20,29 @@ class CreateORCPSTable extends Migration
             $table->string('Dscription', 50)->nullable();
             $table->string('IsRemoved', 1)->default('N');
             $table->string('DocObjType', 20)->default(-1);
-            $table->string('DraftEntry')
-                ->references('id')->on('o_d_r_f_s')->nullable();
+            $table->string('DraftEntry')->references('id')->on('o_d_r_f_s')->nullable();
             $table->string('Frequency', 1)->default('M');
             $table->string('Remind')->default(1001);
             $table->date('StartDate')->nullable();
             $table->date('EndDate')->nullable();
             $table->string('LogInstanc', 1)->nullable();
-            $table->string('CreateUser')
-                ->references('id')->on('users')->nullable();
-            $table->string('UpdateUser')
-                ->references('id')->on('users')->nullable();
-            $table->string('DataSource', 1)->default('N');
-            $table->string('PriceUpdat', 1)->default('N');
-            $table->integer('CompanyID')
-                ->references('id')->on('companies')->nullable();
+            $table->time('ExecTime')->nullable();
+            $table->date('ExecDay')->nullable();
+            $table->string('TimeZone')->nullable();
+            $table->integer('UserSign')->nullable();
+            $table->integer('UserSign2')->nullable();
+            $table->boolean('Retry')->default(0);
+            $table->integer('RetryAfter')->nullable();
+            $table->time('MaxRetryTime')->nullable();
+            $table->time('RetryTime')->nullable();
+            $table->string('CreateUser')->references('id')->on('users')->nullable();
+            $table->string('UpdateUser')->references('id')->on('users')->nullable();
+            $table->string('DataSource', 1)->nullable()->default('N');
+            $table->string('PriceUpdat', 1)->nullable()->default('N');
+            $table->integer('CompanyID')->references('id')->on('companies')->nullable();
             $table->timestamps();
+
+      
         });
     }
 

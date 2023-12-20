@@ -91,8 +91,17 @@
     "isDoc": "Y",
     "JrnStatus": "Y",
     "DocumentName": "A/R Invoice",
-    "ChildTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\INV1",
-    "ChildType": "Items",
+    "DrftObj": 112,
+    "children": [
+      {
+        "ChildTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\INV1",
+        "ChildType": "document_lines"
+      },
+      {
+        "ChildTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\INV19",
+        "ChildType": "bin_allocations"
+      }
+    ],
     "ObjAcronym": ""
   },
   {
@@ -103,8 +112,17 @@
     "RowStatus": "A",
     "isDoc": "Y",
     "JrnStatus": "Y",
-    "ChildTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\RIN1",
-    "ChildType": "Items",
+    "DrftObj": 112,
+    "children": [
+      {
+        "ChildTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\RIN1",
+        "ChildType": "document_lines"
+      },
+      {
+        "ChildTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\RIN19",
+        "ChildType": "bin_allocations"
+      }
+    ],
     "ObjAcronym": ""
   },
   {
@@ -115,8 +133,17 @@
     "RowStatus": "A",
     "isDoc": "Y",
     "JrnStatus": "Y",
-    "ChildTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\DLN1",
-    "ChildType": "Items",
+    "DrftObj": 112,
+    "children": [
+      {
+        "ChildTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\DLN1",
+        "ChildType": "document_lines"
+      },
+      {
+        "ChildTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\DLN19",
+        "ChildType": "bin_allocations"
+      }
+    ],
     "ObjAcronym": ""
   },
   {
@@ -139,8 +166,17 @@
     "RowStatus": "A",
     "isDoc": "Y",
     "JrnStatus": "N",
-    "ChildTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\RDR1",
-    "ChildType": "Items",
+    "DrftObj": 112,
+    "children": [
+      {
+        "ChildTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\RDR1",
+        "ChildType": "document_lines"
+      },
+      {
+        "ChildTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\RDR19",
+        "ChildType": "bin_allocations"
+      }
+    ],
     "ObjAcronym": ""
   },
   {
@@ -223,8 +259,17 @@
     "RowStatus": "A",
     "isDoc": "Y",
     "JrnStatus": "N",
-    "ChildTable": "Leysco100\\Shared\\Models\\InventoryAndProduction\\Models\\WTQ1",
-    "ChildType": "Items",
+    "DrftObj": 112,
+    "children": [
+      {
+        "ChildTable": "Leysco100\\Shared\\Models\\InventoryAndProduction\\Models\\WTQ1",
+        "ChildType": "document_lines"
+      },
+      {
+        "ChildTable": "Leysco100\\Shared\\Models\\InventoryAndProduction\\Models\\WTQ19",
+        "ChildType": "bin_allocations"
+      }
+    ],
     "ObjAcronym": ""
   },
   {
@@ -235,11 +280,19 @@
     "RowStatus": "A",
     "isDoc": "Y",
     "JrnStatus": "N",
-    "ChildTable": "Leysco100\\Shared\\Models\\InventoryAndProduction\\Models\\WTR1",
-    "ChildType": "Items",
+    "DrftObj": 112,
+    "children": [
+      {
+        "ChildTable": "Leysco100\\Shared\\Models\\InventoryAndProduction\\Models\\WTR1",
+        "ChildType": "document_lines"
+      },
+      {
+        "ChildTable": "Leysco100\\Shared\\Models\\InventoryAndProduction\\Models\\WTR19",
+        "ChildType": "bin_allocations"
+      }
+    ],
     "ObjAcronym": ""
   },
-
   {
     "ObjectID": 112,
     "ObjectHeaderTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\ODRF",
@@ -248,8 +301,17 @@
     "RowStatus": "A",
     "isDoc": "N",
     "JrnStatus": "N",
-    "ChildTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\DRF1",
-    "ChildType": "Items",
+    "DrftObj": 112,
+    "children": [
+      {
+        "ChildTable": "Leysco100\\Shared\\Models\\InventoryAndProduction\\Models\\DRF1",
+        "ChildType": "document_lines"
+      },
+      {
+        "ChildTable": "Leysco100\\Shared\\Models\\InventoryAndProduction\\Models\\DRF19",
+        "ChildType": "bin_allocations"
+      }
+    ],
     "ObjAcronym": ""
   },
   {
@@ -300,7 +362,6 @@
     "ChildType": "Items",
     "ObjAcronym": ""
   },
-
   {
     "ObjectID": 203,
     "ObjectHeaderTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\ODPI",
@@ -313,7 +374,6 @@
     "ChildType": "Items",
     "ObjAcronym": ""
   },
-
   {
     "ObjectID": 200,
     "ObjectHeaderTable": "Leysco100\\Shared\\Models\\BusinessPartner\\Models\\OOAT",
@@ -447,40 +507,37 @@
     "ObjAcronym": ""
   },
   {
-
-    "ObjectID" : 211,
-    "ObjectHeaderTable" : "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\ODISPASS",
-    "PermissionName" : "dispatch_assignment",
-    "DocumentName" : "Dispatch Assignment",
-    "RowStatus" : "A",
-    "JrnStatus" : "N",
-    "isDoc" : "Y",
+    "ObjectID": 211,
+    "ObjectHeaderTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\ODISPASS",
+    "PermissionName": "dispatch_assignment",
+    "DocumentName": "Dispatch Assignment",
+    "RowStatus": "A",
+    "JrnStatus": "N",
+    "isDoc": "Y",
     "ChildTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\DISPASS1",
     "ChildType": "Items",
     "ObjAcronym": ""
   },
   {
-
-    "ObjectID":212,
-    "ObjectHeaderTable":"Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\ODISPNOT",
-    "PermissionName":"dispatch_note",
-    "DocumentName":"Dispatch Note",
-    "RowStatus":"A",
-    "JrnStatus":"N",
-    "isDoc":"Y",
+    "ObjectID": 212,
+    "ObjectHeaderTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\ODISPNOT",
+    "PermissionName": "dispatch_note",
+    "DocumentName": "Dispatch Note",
+    "RowStatus": "A",
+    "JrnStatus": "N",
+    "isDoc": "Y",
     "ChildTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\DISPNOT1",
     "ChildType": "Items",
     "ObjAcronym": "DISPNOT"
   },
   {
-
-    "ObjectID" : 213,
-    "ObjectHeaderTable" : "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\ODISPRET",
-    "PermissionName" : "dispatch_return",
-    "DocumentName" : "Dispatch Returns",
-    "RowStatus" : "A",
-    "JrnStatus" : "N",
-    "isDoc" : "Y",
+    "ObjectID": 213,
+    "ObjectHeaderTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\ODISPRET",
+    "PermissionName": "dispatch_return",
+    "DocumentName": "Dispatch Returns",
+    "RowStatus": "A",
+    "JrnStatus": "N",
+    "isDoc": "Y",
     "ChildTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\DISPRET1",
     "ChildType": "Items",
     "ObjAcronym": ""
