@@ -21,7 +21,7 @@ class AdministrationMigrationsCommand extends Command
 
     public function handle()
     {
-        dd("running migrations");
+//        dd("running migrations");
 
          $tableName = 'users';
          $jsonsFields = file_get_contents(base_path('resources/setupdata/field_header_footer_details.json'));

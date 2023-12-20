@@ -19,8 +19,6 @@ class LogisticsHubInstallCommand extends Command
     public function handle()
     {
 
-   
-
         $menuJsonString = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'MenuItem.Json');
         $menuitems = json_decode($menuJsonString, true);
 

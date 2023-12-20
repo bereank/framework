@@ -4,6 +4,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Leysco100\LogisticsHub\Http\Controllers\API\V1\MCallController;
+use Leysco100\LogisticsHub\Http\Controllers\API\V1\RouteAssignmentController;
 use Leysco100\LogisticsHub\Http\Controllers\API\V1\TargetController;
 use Leysco100\LogisticsHub\Http\Controllers\API\V1\ExpenseController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\TierController;
@@ -42,6 +43,7 @@ Route::apiResources(['channels' => ChannelController::class]);
 Route::post('route_outlets', [RoutePlanningController::class, 'createRouteOutlets']);
 Route::post('route_calls', [RoutePlanningController::class, 'createRouteCalls']);
 Route::apiResources(['routes' => RoutePlanningController::class]);
+Route::apiResources(['route_assignments' => RouteAssignmentController::class]);
 
 // GPS LOCATIONS
 Route::get('getWorkDays', [GpsLocationController::class, 'getWorkDays']);

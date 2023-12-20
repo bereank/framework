@@ -56,6 +56,9 @@ class RoutePlanningController extends Controller
 
     public function createRouteOutlets(Request $request)
     {
+        //Add routeid to ocrds table
+
+
 
         //Creating Rows:
         foreach ($request['bpartners'] as $key => $item) {
@@ -76,7 +79,7 @@ class RoutePlanningController extends Controller
             $OCLG = OCLG::firstOrCreate([
                 'RouteCode' => $request['RouteCode'], // Sales Employee
                 'SlpCode' => $request['SlpCode'], // Sales Employee
-                'CardCode' => $value['id'], // Oulet/Customer
+                'CardCode' => $value['CardCode'], // Oulet/Customer
                 'CallDate' => $request['CallDate'], //  Call Date
             ], [
                 'CallTime' => $value['StartTime'], // CallTime

@@ -22,17 +22,31 @@
       },
       {
         "icon": "mdi-con",
-        "Label": "Route Planning",
-        "link": "/routes",
+        "Label": "Route Management",
         "Visible": "Y",
-        "children": []
-      },
-      {
-        "icon": "mdi-con",
-        "Label": "Call Management",
-        "link": "/call-management",
-        "Visible": "Y",
-        "children": []
+        "children": [
+          {
+            "icon": "mdi-con",
+            "Label": "Routes",
+            "link": "/routes",
+            "Visible": "Y",
+            "children": []
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Routes Assignments",
+            "link": "/routes-assignment",
+            "Visible": "Y",
+            "children": []
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Call Management",
+            "link": "/call-management",
+            "Visible": "Y",
+            "children": []
+          }
+        ]
       },
       {
         "icon": "mdi-con",
