@@ -6,8 +6,9 @@ namespace Leysco100\Inventory\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
+use Illuminate\Support\Facades\Auth;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Inventory\Services\InventoryService;
@@ -121,7 +122,7 @@ class InventoryTransactionsController extends Controller
         $this->validate($request, [
             'ObjType' => 'required',
         ]);
-
+        Log::info($request);
         $user = Auth::user();
         $ObjType = (int) $request['ObjType'];
 
@@ -377,7 +378,7 @@ class InventoryTransactionsController extends Controller
                     $lineModel = collect($result)->first();
 
                     $FromBinCod =    $value['FromBinCod'] ?? null;
-
+                    Log::info('FROM BIN: ' . $FromBinCod);
                     foreach ($value['bin_allocation'] as $key => $BinVal) {
                         if (!empty($BinVal)) {
                             $SubLineNum = ++$key;
@@ -403,7 +404,7 @@ class InventoryTransactionsController extends Controller
                                 $ItemCode,
                                 $BinVal,
                                 $value['ToWhsCode'],
-                                $FromBinCod
+                                $FromBinCod,
                             );
 
 
