@@ -16,6 +16,8 @@ class CreateCRD15STable extends Migration
         Schema::create('c_r_d15_s', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('CardCode');
+            $table->integer('RouteID')
+                ->references('id')->on('route_plannings')->nullable();
             $table->integer('GroupCode');
             $table->integer('QryGroup')->nullable();
             $table->integer('CompanyID')

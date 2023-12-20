@@ -337,6 +337,8 @@ class CreateOCRDSTable extends Migration
             $table->integer('isBlocked')->default(0)->comment("Blocked from being sold to, 0=No, 1=Yes");
             $table->integer('CompanyID')
                 ->references('id')->on('companies')->nullable();
+            $table->integer('RouteID')
+                ->references('id')->on('route_plannings')->nullable();
             $table->timestamps();
         });
     }
