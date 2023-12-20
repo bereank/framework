@@ -6,7 +6,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
-use Leysco100\Shared\Models\Banking\Services\BankingDocumentService;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Inventory\Services\InventoryService;
@@ -14,11 +13,13 @@ use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
 use Leysco100\Shared\Models\Administration\Models\OADM;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OBIN;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OBTL;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OILM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITW;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
+use Leysco100\Shared\Models\Banking\Services\BankingDocumentService;
 
 class MarketingDocumentService
 {
@@ -301,6 +302,18 @@ class MarketingDocumentService
                 return (new ApiResponseService())
                     ->apiSuccessAbortProcessResponse("Select Tax Code for item " . $value['ItemCode'] ?? "");
             }
+            //Validate Bin-locations
+            if (array_key_exists('bin_allocation', $value) && !empty($value['bin_allocation'])) {
+                foreach ($value['bin_allocation'] as $key => $BinVal) {
+                    if (!empty($BinVal)) {
+                        $obin = OBIN::where('BinCode', $BinVal['BinCode'])->first();
+                        if (!$obin) {
+                            return (new ApiResponseService())
+                                ->apiNotFoundResponse("Bin Code Does Not Exist");
+                        }
+                    }
+                }
+            }
             // If Not Sales Order the Inventory Quantities should be Greater
 
             if ($checkStockAvailabilty) {
@@ -484,40 +497,58 @@ class MarketingDocumentService
 
                 ];
 
-                $rowItems = new $TargetTables->pdi1[0]['ChildTable']($rowdetails);
+                // $rowItems = new $TargetTables->pdi1[0]['ChildTable']($rowdetails);
+                // $rowItems->save();
+
+                $result = array_filter($TargetTables->pdi1->toArray(), function ($item) {
+                    return $item['ChildType'] === 'document_lines';
+                });
+
+                $lineModel = collect($result)->first();
+
+                $rowItems = new $lineModel['ChildTable']($rowdetails);
                 $rowItems->save();
 
                 //bin allocations
-                // if (array_key_exists('bin_allocation', $value)) {
-                //     $FromBinCod =    $value['FromBinCod'] ?? null;
+                if (array_key_exists('bin_allocation', $value)) {
+                    $result = array_filter($TargetTables->pdi1->toArray(), function ($item) {
+                        return $item['ChildType'] === 'bin_allocations';
+                    });
+                    $lineModel = collect($result)->first();
 
-                //     $data = (new InventoryService())->binAllocations(
-                //         $value['ItemCode'],
-                //         $value['Quantity'],
-                //         $value['bin_allocation'],
-                //         $value['ToWhsCode'],
-                //         $FromBinCod
-                //     );
-                //     $oilm =  OILM::create([
-                //         'DocEntry' => $newDoc->id,
-                //         'TransType' => $ObjType,
-                //         'BaseType' => $data['BaseType'] ?? null,
-                //         'DocLineNum' => $LineNum,
-                //         'Quantity' => $value['Quantity'],
-                //         'ItemCode' => $value['ItemCode'],
-                //         'UserSign' => Auth::user()->id,
-                //         'BPCardCode' => $data['CardCode'] ?? null,
-                //         'SnBType' => $value['ManSerNum'] == "Y" ? 1 : 0,
-                //         'SlpCode' => $data['SlpCode'] ?? null,
-                //     ]);
-                //     OBTL::create([
-                //         'MessageID' => $oilm->MessageID,
-                //         'BinAbs' => $data->id,
-                //         'SnBMDAbs' => NULL,
-                //         'Quantity' => $value['Quantity'],
-                //         'ITLEntry' => NULL,
-                //     ]);
-                // }
+                    $FromBinCod =    $value['WhsCode'] ?? null;
+
+                    foreach ($value['bin_allocation'] as $key => $BinVal) {
+                        $SubLineNum = ++$key;
+                        $obin = OBIN::where('BinCode', $BinVal['BinCode'])->first();
+
+                        $bindata = $lineModel['ChildTable']::create([
+                            'DocEntry' => $newDoc->id,
+                            'BinAllocSe' => $LineNum,
+                            'LineNum' => $LineNum,
+                            'SubLineNum' => $SubLineNum,
+                            'SnBType' => null,
+                            'SnBMDAbs' => null,
+                            'BinAbs' =>  $obin->id,
+                            'Quantity' =>  $BinVal['QtyVar'],
+                            'ItemCode' => $value['ItemCode'],
+                            'WhsCode' =>  $value['WhsCode'] ?? $obin->WhsCode,
+                            'ObjType' => $ObjType,
+                            'AllowNeg' => 'N',
+                            'BinActTyp' => 1
+                        ]);
+
+                        $resdata =    (new InventoryService())->binAllocations(
+                            $ObjType,
+                            $value['ItemCode'],
+                            $BinVal,
+                            $WhsCode = null,
+                            $FromBinCod
+                        );
+                    }
+                }
+
+
 
                 $lineUDF = [];
                 if (!empty($value['udfs'])) {

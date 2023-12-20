@@ -51,7 +51,7 @@ class RecurringTransactionCommand extends Command
             Log::info("RECURRING POSTINGS CREATE");
             $TargetTable = APDI::with('pdi1')->where('ObjectID', $recurr_posting->DocObjType)->first();
 
-            $DraftTable = APDI::with('pdi1')->where('ObjectID', $TargetTable->DrftModel)->first();
+            $DraftTable = APDI::with('pdi1')->where('ObjectID', $TargetTable->DrftObj)->first();
 
             if ($TargetTable && $DraftTable) {
                 $draft = $DraftTable->ObjectHeaderTable::where('id', $recurr_posting->DraftEntry)
