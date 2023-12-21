@@ -28,7 +28,7 @@ return new class extends Migration
                 $table->integer('RouteActive')->nullable()->after('RouteID');
             }
             if (!Schema::hasColumn('o_u_d_g_s', 'SellFromBin')) {
-                $table->string('SellFromBin')->nullable()->after('RouteActive');
+                $table->boolean('SellFromBin')->default(0)->nullable()->after('RouteActive');
             }
         });
     }

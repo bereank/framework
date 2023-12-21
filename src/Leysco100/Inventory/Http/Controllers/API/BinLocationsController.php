@@ -3,6 +3,7 @@
 namespace Leysco100\Inventory\Http\Controllers\API;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Administration\Http\Controllers\Controller;
@@ -23,7 +24,7 @@ class BinLocationsController extends Controller
     public function index()
     {
         try {
-            $WhsCode =  request()->filled('WhsCode') ? request()->input('WhsCode') : false;
+            $WhsCode = request()->filled('WhsCode') ? request()->input('WhsCode') : false;
 
             $data = OBIN::with('warehouse')
                 ->when($WhsCode, function ($query) use ($WhsCode) {
@@ -76,11 +77,17 @@ class BinLocationsController extends Controller
                 $SL4Abs = OBSL::where('SLCode', $request['SL4Code'])->first();
             }
         }
+        $obin = OBIN::where('BinCode', $BinCode)->first();
+        if ($obin) {
+            return (new ApiResponseService())->apiFailedResponseService("Bin Code already Exists");
+        }
 
+        DB::connection("tenant")->beginTransaction();
         try {
+
             $obin = new OBIN([
                 'SysBin' => 0,
-                'BinCode' =>  $BinCode,
+                'BinCode' => $BinCode,
                 'WhsCode' => $data->WhsCode,
                 'SL1Abs' => $SL1Abs->id ?? null,
                 'SL1Code' => $request['SL1Code'] ?? null,
@@ -124,20 +131,21 @@ class BinLocationsController extends Controller
                 'MinLevel' => $request['MinLevel'] ?? null,
                 'MaxLevel' => $request['MaxLevel'] ?? null,
                 'ReceiveBin' => $request['ReceiveBin'] ?? 0,
-                'NoAutoAllc' =>  $request['NoAutoAllc'] ?? null,
-                'MaxWeight1' =>  $request['MaxWeight1'] ?? null,
-                'Wght1Unit' =>  $request['Wght1Unit'] ?? null,
-                'MaxWeight2' =>  $request['MaxWeight2'] ?? null,
-                'Wght2Unit' =>  $request['Wght2Unit'] ?? null,
-                'UoMRtrict' =>  $request['UoMRtrict'] ?? null,
-                'SpcUoMCode' =>  $request['SpcUoMCode'] ?? null,
-                'SpcUGPCode' =>  $request['SpcUGPCode'] ?? null,
-                'SngUoMCode' =>  $request['SngUoMCode'] ?? null,
+                'NoAutoAllc' => $request['NoAutoAllc'] ?? null,
+                'MaxWeight1' => $request['MaxWeight1'] ?? null,
+                'Wght1Unit' => $request['Wght1Unit'] ?? null,
+                'MaxWeight2' => $request['MaxWeight2'] ?? null,
+                'Wght2Unit' => $request['Wght2Unit'] ?? null,
+                'UoMRtrict' => $request['UoMRtrict'] ?? null,
+                'SpcUoMCode' => $request['SpcUoMCode'] ?? null,
+                'SpcUGPCode' => $request['SpcUGPCode'] ?? null,
+                'SngUoMCode' => $request['SngUoMCode'] ?? null,
             ]);
             $obin->save();
-            return (new ApiResponseService())
-                ->apiSuccessResponseService($obin);
+            DB::connection("tenant")->commit();
+            return (new ApiResponseService())->apiSuccessResponseService($obin);
         } catch (\Throwable $th) {
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
@@ -184,6 +192,7 @@ class BinLocationsController extends Controller
             'AbsEntry' => 'nullable',
             'WhsCode' => 'required',
         ]);
+
         $data = OWHS::where('WhsCode', $request['WhsCode'])->first();
         $BinCode = '';
         if ($data) {
@@ -205,11 +214,17 @@ class BinLocationsController extends Controller
                 $BinCode .= $data->BinSeptor . $request['SL4Code'];
             }
         }
+        $obin = OBIN::where('id', '!=', $id)->where('BinCode', $BinCode)->first();
+        if ($obin) {
+            return (new ApiResponseService())->apiFailedResponseService("Bin Code already Exists");
+        }
 
+        DB::connection("tenant")->beginTransaction();
         try {
+
             $obin = OBIN::where('id', $id)->update([
                 'SysBin' => 0,
-                'BinCode' =>  $BinCode,
+                'BinCode' => $BinCode,
                 'WhsCode' => $data->WhsCode,
                 'SL1Abs' => $request['SL1Abs'] ?? null,
                 'SL1Code' => $request['SL1Code'] ?? null,
@@ -253,19 +268,20 @@ class BinLocationsController extends Controller
                 'MinLevel' => $request['MinLevel'] ?? null,
                 'MaxLevel' => $request['MaxLevel'] ?? null,
                 'ReceiveBin' => $request['ReceiveBin'] ?? 0,
-                'NoAutoAllc' =>  $request['NoAutoAllc'] ?? null,
-                'MaxWeight1' =>  $request['MaxWeight1'] ?? null,
-                'Wght1Unit' =>  $request['Wght1Unit'] ?? null,
-                'MaxWeight2' =>  $request['MaxWeight2'] ?? null,
-                'Wght2Unit' =>  $request['Wght2Unit'] ?? null,
-                'UoMRtrict' =>  $request['UoMRtrict'] ?? null,
-                'SpcUoMCode' =>  $request['SpcUoMCode'] ?? null,
-                'SpcUGPCode' =>  $request['SpcUGPCode'] ?? null,
-                'SngUoMCode' =>  $request['SngUoMCode'] ?? null,
+                'NoAutoAllc' => $request['NoAutoAllc'] ?? null,
+                'MaxWeight1' => $request['MaxWeight1'] ?? null,
+                'Wght1Unit' => $request['Wght1Unit'] ?? null,
+                'MaxWeight2' => $request['MaxWeight2'] ?? null,
+                'Wght2Unit' => $request['Wght2Unit'] ?? null,
+                'UoMRtrict' => $request['UoMRtrict'] ?? null,
+                'SpcUoMCode' => $request['SpcUoMCode'] ?? null,
+                'SpcUGPCode' => $request['SpcUGPCode'] ?? null,
+                'SngUoMCode' => $request['SngUoMCode'] ?? null,
             ]);
-            return (new ApiResponseService())
-                ->apiSuccessResponseService($obin);
+            DB::connection("tenant")->commit();
+            return (new ApiResponseService())->apiSuccessResponseService($obin);
         } catch (\Throwable $th) {
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
