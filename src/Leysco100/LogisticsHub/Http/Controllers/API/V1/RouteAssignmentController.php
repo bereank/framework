@@ -16,21 +16,23 @@ class RouteAssignmentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request$request)
+    public function index(Request $request)
     {
-        $this->validate($request, [
-            'date' => 'required',
-        ]);
+//        $this->validate($request, [
+//            'date' => 'required',
+//        ]);
 
         $date = $request["date"];
 
         $SlpCode = $request["SlpCode"];
 
         $assignments = RouteAssignment::with('route', 'oslp')
-            ->where("Date",$date)
-            ->where( function ($q) use ($SlpCode){
+            ->where( function ($q) use ($SlpCode, $date){
                 if ($SlpCode){
                     $q->where("SLPCode",$SlpCode);
+                }
+                if ($date){
+                    $q->where("Date",$date);
                 }
             })
             ->get();
