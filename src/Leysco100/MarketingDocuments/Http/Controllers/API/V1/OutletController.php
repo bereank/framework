@@ -5,6 +5,11 @@ namespace Leysco100\MarketingDocuments\Http\Controllers\API\V1;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Leysco100\Shared\Models\Administration\Models\User;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OBIN;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OIBQ;
+use Leysco100\Shared\Models\LogisticsHub\Models\RouteAssignment;
+use Leysco100\Shared\Models\LogisticsHub\Models\RoutePlanning;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\MarketingDocuments\Jobs\NumberingSeries;
@@ -31,13 +36,35 @@ class OutletController extends Controller
      */
     public function index()
     {
+
+        $date = date("Y-m-d");
+
+        $user = User::where('id', Auth::user()->id)->with('oudg')->first();
+
+        $RouteActive =   $user->oudg?->RouteActive ?? false;
+
+        $outletIds = [];
+
+        if ($RouteActive) {
+            $assignments = RouteAssignment::where("Date",$date)->with("route.outlets")->where("SlpCode",$user->oudg->SalePerson)->get();
+            foreach ($assignments as $assignment){
+                $outletIds =  $assignment->route->outlets->pluck("id");
+            }
+        }
+
         $data = OCRD::select('id', 'CardCode', 'CardName', 'Address', 'PriceListNum', 'Longitude', 'Latitude')
             ->with('contacts')
+            ->where(function ($q) use ($outletIds){
+                if (count($outletIds)>0){
+                    $q->whereIn("id",$outletIds);
+                }
+            })
             ->orderBy('CardName', 'asc')
             ->where('CardName', '!=', null)
             ->where('CardType', 'C')
             ->where('frozenFor', "N")
             ->get();
+
         return $data;
     }
 
