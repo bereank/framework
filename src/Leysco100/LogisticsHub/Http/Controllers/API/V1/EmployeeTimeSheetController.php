@@ -3,6 +3,7 @@
 namespace Leysco100\LogisticsHub\Http\Controllers\API\V1;
 
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Shared\Services\ApiResponseService;
@@ -75,27 +76,31 @@ class EmployeeTimeSheetController extends Controller
             $ClockInDate = $request['Date'] ?? date("Y-m-d");
             $startTime  =  $sheet->CheckInTime;
             $endTime    =  $sheet->CheckOutTime;
-            $Yattendance = ETS1::where('UserSign', $user_id)->where('date', '>', $ClockInDate)
-                ->where(function ($query) {
-                    $query->orwhere('ClockOut', '=', '00:00:00')
-                        ->orwhere('ClockOut', null);
-                })
+            $Yattendance = ETS1::where('UserSign', $user_id)->whereDate('date', '<', $ClockInDate)
+                ->where('ClockOut', null)
+                ->where('ClockIn', '!=', null)
                 ->first();
+
             if ($Yattendance) {
                 return (new ApiResponseService())
-                    ->apiFailedResponseService([
-                        'message' => 'Clock out first.',
+                    ->apiSuccessResponseService([
+                        'type' => 1,
+                        'message' => 'Please clock out for the previous day first.',
                         'data' =>  $Yattendance
                     ]);
             }
-            $attendance = ETS1::where('UserSign', $user_id)->where('date', '=', $ClockInDate)
-                ->where(function ($query) {
-                    $query->orwhere('ClockOut', '=', '00:00:00')
-                        ->orwhere('ClockOut', null);
-                })->get()->toArray();
+
+            $attendance = ETS1::where('UserSign', $user_id)->whereDate('date', '=', $ClockInDate)
+                ->where('ClockIn', '!=', null)
+                ->where('ClockOut', null)
+                ->first();
 
             if ($attendance) {
-                return (new ApiResponseService())->apiFailedResponseService('Employee Attendance Already Created.');
+                return (new ApiResponseService())->apiSuccessResponseService([
+                    'type' => 2,
+                    'message' => 'Employee Attendance Already Created.',
+                    'data' =>  $attendance
+                ]);
             } else {
                 $date = date("Y-m-d");
 
@@ -142,7 +147,10 @@ class EmployeeTimeSheetController extends Controller
                 $timesheet->save();
             }
 
-            return (new ApiResponseService())->apiSuccessResponseService("Created Successfullty");
+            return (new ApiResponseService())->apiSuccessResponseService([
+                'message' => "Created Successfully",
+                'data' => $timesheet
+            ]);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
@@ -179,12 +187,10 @@ class EmployeeTimeSheetController extends Controller
 
 
             $validatedData = $request->validate([
-
-                'Comment' => 'nullable',
-                'Date' => 'nullable|date',
-                'ClockOut' => 'required|date_format:H:i:s'
-
+                'Comment' => 'nullable'
             ]);
+            $ClockOutTime = Carbon::now()->format('Y-m-d H:i');
+
 
             $user_id = Auth::user()->id;
             $user = User::with('oudg')->where('id', $user_id)->first();
@@ -194,23 +200,22 @@ class EmployeeTimeSheetController extends Controller
             $code = $user->oudg->EtstCode;
 
             $sheet = ETST::where('id', $code)->first();
-            $ClockInDate = $request['Date'] ?? date("Y-m-d");
 
             $endTime    =  $sheet->CheckOutTime;
 
             $date = date("Y-m-d");
 
             //early Leaving
-            $totalEarlyLeavingSeconds = strtotime($date . $endTime) - strtotime($request['ClockOut']);
+            $totalEarlyLeavingSeconds = strtotime($date . $endTime) - strtotime($ClockOutTime);
             $hours                    = floor($totalEarlyLeavingSeconds / 3600);
             $mins                     = floor($totalEarlyLeavingSeconds / 60 % 60);
             $secs                     = floor($totalEarlyLeavingSeconds % 60);
             $earlyLeaving             = sprintf('%02d:%02d:%02d', $hours, $mins, $secs);
 
 
-            if (strtotime($request['ClockOut']) > strtotime($date . $endTime)) {
+            if (strtotime($ClockOutTime) > strtotime($date . $endTime)) {
                 //Overtime
-                $totalOvertimeSeconds = strtotime($request['ClockOut']) - strtotime($date . $endTime);
+                $totalOvertimeSeconds =  strtotime($ClockOutTime) - strtotime($date . $endTime);
                 $hours                = floor($totalOvertimeSeconds / 3600);
                 $mins                 = floor($totalOvertimeSeconds / 60 % 60);
                 $secs                 = floor($totalOvertimeSeconds % 60);
@@ -221,10 +226,10 @@ class EmployeeTimeSheetController extends Controller
 
             $timesheet->update([
                 'DocEntry' => $sheet->id,
-                'Date'          => $request['Date'] ?? now(),
-                'Status'        => 'Present',
+                // 'Date'          => $request['Date'] ?? now(),
+                // 'Status'        => 'Present',
 
-                'ClockOut'     => $request['ClockOut'],
+                'ClockOut'     => Carbon::now()->format('H:i:s'),
                 'Comment'     => $request['Comment'],
 
                 'EarlyLeaving' => $earlyLeaving,
@@ -235,7 +240,7 @@ class EmployeeTimeSheetController extends Controller
             ]);
 
 
-            return (new ApiResponseService())->apiSuccessResponseService("Updated Successfullty");
+            return (new ApiResponseService())->apiSuccessResponseService("Updated Successfully");
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
@@ -271,6 +276,50 @@ class EmployeeTimeSheetController extends Controller
                 ->first();
 
             return (new ApiResponseService())->apiSuccessResponseService($ETS1);
+        } catch (\Throwable $th) {
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+        }
+    }
+
+    public function confirmClockIn(Request $request)
+    {
+        try {
+            $ClockInDate = $request['date'] ?? date("Y-m-d");
+            $ClockInDate = Carbon::parse($ClockInDate);
+            $user_id = Auth::user()->id;
+            $Yattendance = ETS1::where('UserSign', $user_id)->whereDate('date', '<', $ClockInDate)
+                ->where('ClockOut', null)
+                ->where('ClockIn', '!=', null)
+                ->first();
+
+            if ($Yattendance) {
+                return (new ApiResponseService())
+                    ->apiSuccessResponseService([
+                        'type' => 1,
+                        'message' => 'Please clock out for the previous day first.',
+                        'data' =>  $Yattendance
+                    ]);
+            }
+
+            $attendance = ETS1::where('UserSign', $user_id)->whereDate('date', '=', $ClockInDate)
+                ->where('ClockIn', '!=', null)
+                ->where('ClockOut', null)
+                ->first();
+
+            if ($attendance) {
+                return (new ApiResponseService())->apiSuccessResponseService([
+                    'type' => 2,
+                    'message' => 'Employee Attendance Already Created.',
+                    'data' =>  $attendance
+                ]);
+            }
+
+            if (!$Yattendance && !$attendance) {
+                return (new ApiResponseService())->apiSuccessResponseService([
+                    'type' => 3,
+                    'message' => 'Create attendance'
+                ]);
+            }
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }

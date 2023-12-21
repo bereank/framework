@@ -23,8 +23,14 @@ class DiscountGroupController extends Controller
      */
     public function index()
     {
+        $ObjType =  request()->filled('ObjType') ? request()->input('ObjType') : 4;
+     
         try {
-            $data = OEDG::with('creator')->get();
+            $data = OEDG::with('creator')
+            ->when($ObjType, function ($query) use ($ObjType) {
+                return $query->where('ObjType', $ObjType);
+            })
+            ->get();
 
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
@@ -41,13 +47,29 @@ class DiscountGroupController extends Controller
      */
     public function store(Request $request)
     {
-        Log::info($request['edg1']);
+        Log::info($request);
+        $this->validate($request, [
+            'Type' => 'required',
+            'ValidFrom' => 'required',
+            'ValidTo' => 'required',
+            'ObjType' => 'required',
+            'edg1' => 'required|array',
+            'edg1.*.ObjKey' => 'required',
+        ]);
         try {
+            $obj = -1;
+            if ($request['Type'] == 'C' || $request['Type'] == 'V') {
+                $obj = 10;
+            }
+            if ($request['Type'] == 'S') {
+                $obj = 2;
+            }
             $data = OEDG::create([
                 'Type' => $request['Type'],
-                'ObjType' => $request['ObjType'] ?? null,
+                'ObjType' =>  $request['ObjType'],
+                'DiscGrpTyp' => $obj  ?? null,
                 'ObjCode' => $request['ObjCode'] ?? null,
-                'DiscRel' => $request['DiscRel'] ?? null,
+                'DiscRel' => $request['DiscRel'] ?? 'L',
                 'ValidFor' => $request['ValidFor'] ?? null,
                 'ValidFrom' => $request['ValidFrom'] ?? null,
                 'ValidTo' => $request['ValidTo'] ?? null,
@@ -56,7 +78,7 @@ class DiscountGroupController extends Controller
             foreach ($request['edg1'] as $item) {
                 EDG1::create([
                     'DocEntry' => $data->id,
-                    'ObjKey' => $item['ItemCode'] ?? null,
+                    'ObjKey' => $item['ObjKey'] ?? null,
                     'ObjType' => $request['ObjType'] ?? null,
                     'DiscType' => $item['ForFree'] ? 'P' : 'D',
                     'Discount' => $item['Discount'] ?? 0,
@@ -102,7 +124,12 @@ class DiscountGroupController extends Controller
      */
     public function update(Request $request, $id)
     {
-        Log::info($request);
+        $this->validate($request, [
+            'ValidFrom' => 'required',
+            'ValidTo' => 'required',
+            'edg1' => 'required',
+            'ObjType' => 'required'
+        ]);
         try {
             OEDG::where('id', $id)->update([
                 'Type' => $request['Type'],
