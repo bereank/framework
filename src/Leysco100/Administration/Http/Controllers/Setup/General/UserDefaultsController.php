@@ -3,6 +3,7 @@
 namespace Leysco100\Administration\Http\Controllers\Setup\General;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\Administration\Models\OUDG;
 use Leysco100\Administration\Http\Controllers\Controller;
@@ -34,6 +35,7 @@ class UserDefaultsController extends Controller
      */
     public function store(Request $request)
     {
+        DB::connection("tenant")->beginTransaction();
         try {
             $data = OUDG::create([
                 'Code' => $request['Code'], // Default Code
@@ -51,11 +53,14 @@ class UserDefaultsController extends Controller
                 'AddToFavourites' => $request['AddToFavourites'] ?? 0,
                 'DftBinLoc' => $request['DftBinLoc'] ?? null,
                 'EtstCode' => $request['EtstCode'] ?? null,
-                'ClockIn' => $request['ClockIn'] ?? null
+                'RouteID' => $request['RouteID'] ?? null, //Default Route
+                'RouteActive' => $request['RouteActive'] == true ? 1 : 0,
+                'SellFromBin' => $request['SellFromBin'] == true ? 1 : 0,
             ]);
+            DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService("Created Successfully");
         } catch (\Throwable $th) {
-
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
@@ -89,6 +94,7 @@ class UserDefaultsController extends Controller
      */
     public function update(Request $request, $id)
     {
+        DB::connection("tenant")->beginTransaction();
         try {
             $details = [
                 'Code' => $request['Code'], // Default Code
@@ -106,11 +112,17 @@ class UserDefaultsController extends Controller
                 'AddToFavourites' => $request['AddToFavourites'] ?? 0,
                 'DftBinLoc' => $request['DftBinLoc'] ?? null,
                 'EtstCode' => $request['EtstCode'] ?? null,
-                'ClockIn' => $request['ClockIn'] ?? null
+                'ClockIn' => $request['ClockIn'] ?? null,
+                'RouteID' => $request['RouteID'] ?? null,
+                'RouteActive' => $request['RouteActive'] == true ? 1 : 0,
+                'SellFromBin' => $request['SellFromBin'] == true ? 1 : 0,
             ];
-            OUDG::where('id', $id)->update($details);
-            return (new ApiResponseService())->apiSuccessResponseService();
+            $data = OUDG::where('id', $id)->update($details);
+
+            DB::connection("tenant")->commit();
+            return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
+            DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
     }
