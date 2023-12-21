@@ -3,6 +3,7 @@
 namespace Leysco100\LogisticsHub\Http\Controllers\API\V1;
 
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Shared\Services\ApiResponseService;
@@ -75,27 +76,31 @@ class EmployeeTimeSheetController extends Controller
             $ClockInDate = $request['Date'] ?? date("Y-m-d");
             $startTime  =  $sheet->CheckInTime;
             $endTime    =  $sheet->CheckOutTime;
-            $Yattendance = ETS1::where('UserSign', $user_id)->where('date', '>', $ClockInDate)
-                ->where(function ($query) {
-                    $query->orwhere('ClockOut', '=', '00:00:00')
-                        ->orwhere('ClockOut', null);
-                })
+            $Yattendance = ETS1::where('UserSign', $user_id)->whereDate('date', '<', $ClockInDate)
+                ->where('ClockOut', null)
+                ->where('ClockIn', '!=', null)
                 ->first();
+
             if ($Yattendance) {
                 return (new ApiResponseService())
-                    ->apiFailedResponseService([
-                        'message' => 'Clock out first.',
+                    ->apiSuccessResponseService([
+                        'type' => 1,
+                        'message' => 'Please clock out for the previous day first.',
                         'data' =>  $Yattendance
                     ]);
             }
-            $attendance = ETS1::where('UserSign', $user_id)->where('date', '=', $ClockInDate)
-                ->where(function ($query) {
-                    $query->orwhere('ClockOut', '=', '00:00:00')
-                        ->orwhere('ClockOut', null);
-                })->get()->toArray();
+
+            $attendance = ETS1::where('UserSign', $user_id)->whereDate('date', '=', $ClockInDate)
+                ->where('ClockIn', '!=', null)
+                ->where('ClockOut', null)
+                ->first();
 
             if ($attendance) {
-                return (new ApiResponseService())->apiFailedResponseService('Employee Attendance Already Created.');
+                return (new ApiResponseService())->apiSuccessResponseService([
+                    'type' => 2,
+                    'message' => 'Employee Attendance Already Created.',
+                    'data' =>  $attendance
+                ]);
             } else {
                 $date = date("Y-m-d");
 
@@ -271,6 +276,50 @@ class EmployeeTimeSheetController extends Controller
                 ->first();
 
             return (new ApiResponseService())->apiSuccessResponseService($ETS1);
+        } catch (\Throwable $th) {
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+        }
+    }
+
+    public function confirmClockIn(Request $request)
+    {
+        try {
+            $ClockInDate = $request['date'] ?? date("Y-m-d");
+            $ClockInDate = Carbon::parse($ClockInDate);
+            $user_id = Auth::user()->id;
+            $Yattendance = ETS1::where('UserSign', $user_id)->whereDate('date', '<', $ClockInDate)
+                ->where('ClockOut', null)
+                ->where('ClockIn', '!=', null)
+                ->first();
+
+            if ($Yattendance) {
+                return (new ApiResponseService())
+                    ->apiSuccessResponseService([
+                        'type' => 1,
+                        'message' => 'Please clock out for the previous day first.',
+                        'data' =>  $Yattendance
+                    ]);
+            }
+
+            $attendance = ETS1::where('UserSign', $user_id)->whereDate('date', '=', $ClockInDate)
+                ->where('ClockIn', '!=', null)
+                ->where('ClockOut', null)
+                ->first();
+
+            if ($attendance) {
+                return (new ApiResponseService())->apiSuccessResponseService([
+                    'type' => 2,
+                    'message' => 'Employee Attendance Already Created.',
+                    'data' =>  $attendance
+                ]);
+            }
+
+            if (!$Yattendance && !$attendance) {
+                return (new ApiResponseService())->apiSuccessResponseService([
+                    'type' => 3,
+                    'message' => 'Create attendance'
+                ]);
+            }
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
