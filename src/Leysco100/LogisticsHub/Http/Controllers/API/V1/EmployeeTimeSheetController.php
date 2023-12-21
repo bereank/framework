@@ -189,6 +189,8 @@ class EmployeeTimeSheetController extends Controller
             $validatedData = $request->validate([
                 'Comment' => 'nullable'
             ]);
+            $ClockOutTime = Carbon::now()->format('Y-m-d H:i');
+
 
             $user_id = Auth::user()->id;
             $user = User::with('oudg')->where('id', $user_id)->first();
@@ -204,16 +206,16 @@ class EmployeeTimeSheetController extends Controller
             $date = date("Y-m-d");
 
             //early Leaving
-            $totalEarlyLeavingSeconds = strtotime($date . $endTime) - strtotime($request['ClockOut']);
+            $totalEarlyLeavingSeconds = strtotime($date . $endTime) - strtotime($ClockOutTime);
             $hours                    = floor($totalEarlyLeavingSeconds / 3600);
             $mins                     = floor($totalEarlyLeavingSeconds / 60 % 60);
             $secs                     = floor($totalEarlyLeavingSeconds % 60);
             $earlyLeaving             = sprintf('%02d:%02d:%02d', $hours, $mins, $secs);
 
 
-            if (strtotime($request['ClockOut']) > strtotime($date . $endTime)) {
+            if (strtotime($ClockOutTime) > strtotime($date . $endTime)) {
                 //Overtime
-                $totalOvertimeSeconds = strtotime($request['ClockOut']) - strtotime($date . $endTime);
+                $totalOvertimeSeconds =  strtotime($ClockOutTime) - strtotime($date . $endTime);
                 $hours                = floor($totalOvertimeSeconds / 3600);
                 $mins                 = floor($totalOvertimeSeconds / 60 % 60);
                 $secs                 = floor($totalOvertimeSeconds % 60);
@@ -227,7 +229,7 @@ class EmployeeTimeSheetController extends Controller
                 // 'Date'          => $request['Date'] ?? now(),
                 // 'Status'        => 'Present',
 
-                'ClockOut'     => $request['ClockOut'],
+                'ClockOut'     => Carbon::now()->format('H:i:s'),
                 'Comment'     => $request['Comment'],
 
                 'EarlyLeaving' => $earlyLeaving,
