@@ -74,6 +74,7 @@ Route::get('getTargetsVsPerfomance', [TargetController::class, 'getTargetsVsPerf
 Route::apiResources(['targets' => TargetController::class]);
 Route::get('get_targets_skus/{id}', [TargetController::class, 'showSkus']);
 Route::get('open_employee_timesheet', [EmployeeTimeSheetController::class, 'getClocInDetails']);
+Route::get('/confirm/employee-timesheet', [EmployeeTimeSheetController::class, 'confirmClockIn']);
 
   //OpenCall
 
