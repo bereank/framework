@@ -600,7 +600,7 @@ class MarketingDocumentService
             (new SystemDefaults())->updateNextNumberNumberingSeries($data['Series']);
 
             //Record Payment data
-            if ($data['payments'] && $ObjType == 13 &&  $ObjType == 112) {
+            if (array_key_exists('payments', $data) && !empty($data['payments']) && $ObjType == 13 &&  $ObjType == 112) {
                 foreach ($data['payments'] as $payment) {
                     //                $storedProcedureResponse = null;
                     if ($ObjType == 13) {
