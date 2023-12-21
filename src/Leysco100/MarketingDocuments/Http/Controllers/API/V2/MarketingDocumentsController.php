@@ -345,24 +345,7 @@ class MarketingDocumentsController extends Controller
         // Step 5: Create Document
         $newDoc =  (new MarketingDocumentService())->createDoc($docData, $TargetTables, $request['ObjType']);
 
-        //step 6: Record Payment data
-        if ($request['payments']) {
-            foreach ($request['payments'] as $payment) {
-//                $storedProcedureResponse = null;
-                if ($newDoc["ObjType"] == 13) {
-                    $newPayment = (new BankingDocumentService())->processIncomingPayment($newDoc, $payment);
-//                        $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions(140, "A", $newPayment->id);
-                } else {
-                    $newPayment = (new BankingDocumentService())->processDraftIncomingPayment($newDoc, $payment);
-//                        $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions(24, "A", $newPayment->id);
-                }
-//                if ($storedProcedureResponse) {
-//                    if ($storedProcedureResponse->error != 0) {
-//                        return (new ApiResponseService())->apiFailedResponseService($storedProcedureResponse->error_message);
-//                    }
-//                }
-            }
-        }
+      
         return (new ApiResponseService())->apiSuccessResponseService($newDoc);
     }
 }
