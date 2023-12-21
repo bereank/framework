@@ -26,7 +26,7 @@ class RouteAssignmentController extends Controller
 
         $SlpCode = $request["SlpCode"];
 
-        $assignments = RouteAssignment::with('route', 'oslp')
+        $assignments = RouteAssignment::with('route.outlets', 'oslp')
             ->where( function ($q) use ($SlpCode, $date){
                 if ($SlpCode){
                     $q->where("SLPCode",$SlpCode);
@@ -61,12 +61,16 @@ class RouteAssignmentController extends Controller
         DB::connection("tenant")->beginTransaction();
         try {
 
-            $assignment =  RouteAssignment::create([
-                'SlpCode' => $request['SlpCode'],
-                'RouteID' => $request['RouteID'],
-                'Date' => $request['date'],
-                'Repeat' => $request['Repeat'],
-            ]);
+            $assignment =  RouteAssignment::updateOrcreate(
+                [
+                    'SlpCode' => $request['SlpCode'],
+                    'RouteID' => $request['RouteID'],
+                    'Date' => $request['date'],
+                ],
+                [
+                    'Repeat' => $request['Repeat'],
+                ]
+            );
 
             DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService($assignment);
