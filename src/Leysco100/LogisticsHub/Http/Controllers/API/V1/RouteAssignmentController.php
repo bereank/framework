@@ -16,9 +16,24 @@ class RouteAssignmentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request$request)
     {
-        $assignments = RouteAssignment::with('route', 'oslp')->get();
+        $this->validate($request, [
+            'date' => 'required',
+        ]);
+
+        $date = $request["date"];
+
+        $SlpCode = $request["SlpCode"];
+
+        $assignments = RouteAssignment::with('route', 'oslp')
+            ->where("Date",$date)
+            ->where( function ($q) use ($SlpCode){
+                if ($SlpCode){
+                    $q->where("SLPCode",$SlpCode);
+                }
+            })
+            ->get();
 
         return (new ApiResponseService())->apiSuccessResponseService($assignments);
     }
@@ -63,9 +78,9 @@ class RouteAssignmentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request)
     {
-        //
+
     }
 
     /**
