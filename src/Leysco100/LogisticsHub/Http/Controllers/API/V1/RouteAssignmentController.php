@@ -16,21 +16,23 @@ class RouteAssignmentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request$request)
+    public function index(Request $request)
     {
-        $this->validate($request, [
-            'date' => 'required',
-        ]);
+//        $this->validate($request, [
+//            'date' => 'required',
+//        ]);
 
         $date = $request["date"];
 
         $SlpCode = $request["SlpCode"];
 
-        $assignments = RouteAssignment::with('route', 'oslp')
-            ->where("Date",$date)
-            ->where( function ($q) use ($SlpCode){
+        $assignments = RouteAssignment::with('route.outlets', 'oslp')
+            ->where( function ($q) use ($SlpCode, $date){
                 if ($SlpCode){
                     $q->where("SLPCode",$SlpCode);
+                }
+                if ($date){
+                    $q->where("Date",$date);
                 }
             })
             ->get();
@@ -59,12 +61,16 @@ class RouteAssignmentController extends Controller
         DB::connection("tenant")->beginTransaction();
         try {
 
-            $assignment =  RouteAssignment::create([
-                'SlpCode' => $request['SlpCode'],
-                'RouteID' => $request['RouteID'],
-                'Date' => $request['date'],
-                'Repeat' => $request['Repeat'],
-            ]);
+            $assignment =  RouteAssignment::updateOrcreate(
+                [
+                    'SlpCode' => $request['SlpCode'],
+                    'RouteID' => $request['RouteID'],
+                    'Date' => $request['date'],
+                ],
+                [
+                    'Repeat' => $request['Repeat'],
+                ]
+            );
 
             DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService($assignment);
