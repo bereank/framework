@@ -6,13 +6,17 @@ namespace Leysco100\MarketingDocuments\Http\Controllers\API\V1;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\Administration\Models\ITG1;
+use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OPLN;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\ITM1;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\ITM9;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OBIN;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OIBQ;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITG;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\UGP1;
@@ -29,11 +33,27 @@ class MItemController extends Controller
      */
     public function index()
     {
-       
+
         $search = \Request::get('filter');
         $all = \Request::get('all');
-        $data = OITM::select('id', 'ItemName', 'ItemCode', 'UgpEntry',
-         'SUoMEntry','VatGourpSa', 'OnHand','frozenFor')
+
+        $user = User::where('id', Auth::user()->id)->with('oudg')->first();
+        $SellFromBin =   $user->oudg?->SellFromBin ?? false;
+        $BinItems=[];
+        if ($SellFromBin) {
+            $BIN = OBIN::where('id', $user->oudg->DftBinLoc)->first();
+            $BinItems = OIBQ::where('BinAbs', $BIN->id)->pluck('ItemCode');
+        }
+        $data = OITM::select(
+            'id',
+            'ItemName',
+            'ItemCode',
+            'UgpEntry',
+            'SUoMEntry',
+            'VatGourpSa',
+            'OnHand',
+            'frozenFor'
+        )
             ->where(function ($q) use ($search) {
                 if ($search) {
                     $q->where('ItemCode', 'LIKE', "%$search%")
@@ -41,10 +61,22 @@ class MItemController extends Controller
                 }
             })
             ->when(!$all, function ($query) {
-               $query->where('frozenFor', "N")
-                ->where('OnHand', '>', 0);
-            })  
+                $query->where('frozenFor', "N")
+                    ->where('OnHand', '>', 0);
+            })
+            ->when($SellFromBin, function ($query2) use ($BinItems) {
+                $query2->whereIn('ItemCode', $BinItems);
+            })
             ->get();
+        if ($SellFromBin) {
+            foreach ($data as $d) {
+                $items = OIBQ::where('BinAbs', $BIN->id)->where('ItemCode', $d->ItemCode)->first();
+
+                $d->BinAbs = $items->BinAbs;
+                $d->OnHandQty = $items->OnHandQty;
+                $d->Freezed = $items->Freezed;
+            }
+        }
         return $data;
     }
     /**
