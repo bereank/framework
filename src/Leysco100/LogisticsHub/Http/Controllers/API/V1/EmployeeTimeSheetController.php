@@ -147,7 +147,10 @@ class EmployeeTimeSheetController extends Controller
                 $timesheet->save();
             }
 
-            return (new ApiResponseService())->apiSuccessResponseService("Created Successfullty");
+            return (new ApiResponseService())->apiSuccessResponseService([
+                'message' => "Created Successfully",
+                'data' => $timesheet
+            ]);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
@@ -184,11 +187,7 @@ class EmployeeTimeSheetController extends Controller
 
 
             $validatedData = $request->validate([
-
-                'Comment' => 'nullable',
-                'Date' => 'nullable|date',
-                'ClockOut' => 'required|date_format:H:i:s'
-
+                'Comment' => 'nullable'
             ]);
 
             $user_id = Auth::user()->id;
@@ -199,7 +198,6 @@ class EmployeeTimeSheetController extends Controller
             $code = $user->oudg->EtstCode;
 
             $sheet = ETST::where('id', $code)->first();
-            $ClockInDate = $request['Date'] ?? date("Y-m-d");
 
             $endTime    =  $sheet->CheckOutTime;
 
@@ -226,8 +224,8 @@ class EmployeeTimeSheetController extends Controller
 
             $timesheet->update([
                 'DocEntry' => $sheet->id,
-                'Date'          => $request['Date'] ?? now(),
-                'Status'        => 'Present',
+                // 'Date'          => $request['Date'] ?? now(),
+                // 'Status'        => 'Present',
 
                 'ClockOut'     => $request['ClockOut'],
                 'Comment'     => $request['Comment'],
@@ -240,7 +238,7 @@ class EmployeeTimeSheetController extends Controller
             ]);
 
 
-            return (new ApiResponseService())->apiSuccessResponseService("Updated Successfullty");
+            return (new ApiResponseService())->apiSuccessResponseService("Updated Successfully");
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
