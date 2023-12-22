@@ -599,6 +599,24 @@ class MarketingDocumentService
 
             (new SystemDefaults())->updateNextNumberNumberingSeries($data['Series']);
 
+            //Record Payment data
+            if (array_key_exists('payments', $data) && !empty($data['payments']) && $ObjType == 13 &&  $ObjType == 112) {
+                foreach ($data['payments'] as $payment) {
+                    //                $storedProcedureResponse = null;
+                    if ($ObjType == 13) {
+                        $newPayment = (new BankingDocumentService())->processIncomingPayment($newDoc, $payment);
+                        //                        $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions(140, "A", $newPayment->id);
+                    } else {
+                        $newPayment = (new BankingDocumentService())->processDraftIncomingPayment($newDoc, $payment);
+                        //                        $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions(24, "A", $newPayment->id);
+                    }
+                    //                if ($storedProcedureResponse) {
+                    //                    if ($storedProcedureResponse->error != 0) {
+                    //                        return (new ApiResponseService())->apiFailedResponseService($storedProcedureResponse->error_message);
+                    //                    }
+                    //                }
+                }
+            }
             DB::connection("tenant")->commit();
             $newDoc['document_lines'] = $documentRows;
             return (new ApiResponseService())->apiSuccessResponseService($newDoc);

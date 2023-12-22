@@ -38,7 +38,7 @@ class VehicleController extends Controller
     public function store(Request $request)
     {
 
-  
+
         try {
             $validatedData = $request->validate([
                 'RegistrationNO' => 'required',
@@ -87,12 +87,12 @@ class VehicleController extends Controller
     {
         try {
             $vehicle = Vehicle::findOrFail($id);
-
+            $vhcle = Vehicle::where('id', '!=', $id)->where('RegistrationNO', $vehicle->RegistrationNO)->first();
+            if ($vhcle) {
+                return (new ApiResponseService())->apiFailedResponseService("Registration No Already Exists");
+            }
             $validatedData = $request->validate([
-                'RegistrationNO' => [
-                    'required',
-                    Rule::unique('vehicles')->ignore($vehicle->id),
-                ],
+                'RegistrationNO' => 'required',
                 'Make' => 'nullable|string',
                 'Model' => 'nullable|string',
                 'Brand' => 'nullable|string',
