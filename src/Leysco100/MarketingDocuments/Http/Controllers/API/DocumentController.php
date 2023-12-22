@@ -804,12 +804,12 @@ class DocumentController extends Controller
 //            }
 
             //Validating Draft using Oringal base type
-            if ($objectTypePassedToTns == 112) {
-                $mockedDataDraftMessage = (new GeneralDocumentValidationService())->draftValidation($newDoc, $documentRows);
-                if ($mockedDataDraftMessage) {
-                    return (new ApiResponseService())->apiFailedResponseService($mockedDataDraftMessage);
-                }
-            }
+//            if ($objectTypePassedToTns == 112) {
+//                $mockedDataDraftMessage = (new GeneralDocumentValidationService())->draftValidation($newDoc, $documentRows);
+//                if ($mockedDataDraftMessage) {
+//                    return (new ApiResponseService())->apiFailedResponseService($mockedDataDraftMessage);
+//                }
+//            }
 
             if ($newDoc->ObjType == 13 && $request['payments']) {
                 foreach ($request['payments'] as $payment) {
