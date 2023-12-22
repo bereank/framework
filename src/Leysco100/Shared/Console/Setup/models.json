@@ -304,7 +304,7 @@
     "DrftObj": 112,
     "children": [
       {
-        "ChildTable": "Leysco100\\Shared\\Models\\InventoryAndProduction\\Models\\DRF1",
+        "ChildTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\DRF1",
         "ChildType": "document_lines"
       },
       {
