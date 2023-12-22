@@ -328,9 +328,18 @@ class MarketingDocumentsController extends Controller
             ->where('ObjectID', $request['ObjType'])
             ->first();
 
+        $ObjType = $request['ObjType'];
+
         if (!$TargetTables) {
             return (new ApiResponseService())
                 ->apiFailedResponseService("Not found document with objtype " . $request['ObjType']);
+        }
+
+        if ($TargetTables->hasExtApproval == 1) {
+            $TargetTables = APDI::with('pdi1')
+                ->where('ObjectID', 112)
+                ->first();
+            $ObjType = 112;
         }
 
         // Step 2: Default Fields
@@ -343,7 +352,7 @@ class MarketingDocumentsController extends Controller
         $docData = (new MapApiFieldAction())->handle($validatedFields, $TargetTables);
 
         // Step 5: Create Document
-        $newDoc =  (new MarketingDocumentService())->createDoc($docData, $TargetTables, $request['ObjType']);
+        $newDoc =  (new MarketingDocumentService())->createDoc($docData, $TargetTables, $ObjType);
 
       
         return (new ApiResponseService())->apiSuccessResponseService($newDoc);
