@@ -335,12 +335,12 @@ class MarketingDocumentsController extends Controller
                 ->apiFailedResponseService("Not found document with objtype " . $request['ObjType']);
         }
 
-        if ($TargetTables->hasExtApproval == 1) {
-            $TargetTables = APDI::with('pdi1')
-                ->where('ObjectID', 112)
-                ->first();
-            $ObjType = 112;
-        }
+//        if ($TargetTables->hasExtApproval == 1) {
+//            $TargetTables = APDI::with('pdi1')
+//                ->where('ObjectID', 112)
+//                ->first();
+//            $ObjType = 112;
+//        }
 
         // Step 2: Default Fields
         $defaulted_data = (new MarketingDocumentService())->fieldsDefaulting($request->all());
