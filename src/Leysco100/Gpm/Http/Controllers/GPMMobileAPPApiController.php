@@ -557,6 +557,7 @@ class GPMMobileAPPApiController extends Controller
                 GMS1::where('id', $data->DocEntry)
                     ->update([
                         'Released' => 1,
+                        'Comment'=>$request['comment'] ?? null
                     ]);
                 BackUpModeLines::where("id", $id)
                     ->update([
@@ -610,6 +611,7 @@ class GPMMobileAPPApiController extends Controller
                 GMS1::where('id', $data->ScanLogID)
                     ->update([
                         'Released' => 1,
+                        'Comment'=>$request['comment'] ?? null
                     ]);
 
                 return response()
