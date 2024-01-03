@@ -645,7 +645,7 @@ class TargetController extends Controller
             $data = OITM::select('id', 'ItemName', 'ItemCode')
                 ->where('SellItem', 'Y')
                 ->orderBy('ItemCode', 'asc')
-                ->take(2000)
+                ->take(10000)
                 ->get();
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {

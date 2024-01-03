@@ -102,12 +102,9 @@ class DiscountsContoller extends Controller
         }
     }
     public function getItemDiscount(Request $request)
-
     {
-
-
         try {
-            $validatedData = $request->validate([
+            $request->validate([
                 "ItemCode" => 'required|exists:tenant.o_i_t_m_s',
                 "CardCode" => 'required|exists:tenant.o_c_r_d_s',
                 "Quantity" => "required"
@@ -123,7 +120,7 @@ class DiscountsContoller extends Controller
         $Quantity =  request()->filled('Quantity') ? request()->input('Quantity') : 1;
         $UomEntry = request()->filled('UomEntry') ? request()->input('UomEntry') : false;
         try {
-            $ocrd = OCRD::where('CardCode', $CardCode)->select('CardCode', 'ListNum')->first();
+            $ocrd = $this->getOCRD($CardCode);
             $ListNum = $ListNum ? $ListNum : $ocrd->ListNum;
 
             $today = Carbon::now()->toDateString();
@@ -131,36 +128,33 @@ class DiscountsContoller extends Controller
             $spp3 = [];
             $DiscPrcnt = 0;
             $DiscType = 0;
-            $discGrp = true;
+            $discGrp = false;
             $items = [];
             $type = "period-discount";
-            $oedg = OEDG::whereDate('ValidFrom', '<=', $today)
-                ->whereDate('ValidTo', '>=', $today)
-                ->where('Type', 'A')
-                ->with(['edg1' => function ($query) use ($Quantity, $ItemCode) {
-                    $query->with('item:id,ItemCode,ItemName,VatGourpSa,DfltWH')
-                        ->where('PayFor', '<=', $Quantity)
-                        ->where('ObjKey', $ItemCode)
-                        ->select(
-                            'DocEntry',
-                            'ObjType',
-                            'ObjKey',
-                            'DiscType',
-                            'Discount',
-                            'PayFor',
-                            'ForFree',
-                            'UpTo',
-                            'ForFree as Quantity'
-                        );
-                }])
 
-                ->get();
+            $oedg = $this->getOEDG($today, $Quantity, $ItemCode);
+         
             if ($oedg->count() > 0) {
                 foreach ($oedg as $discountgroup) {
                     if ($discountgroup->edg1) {
+
                         if ($discountgroup->edg1->count() > 0) {
+
                             foreach ($discountgroup->edg1 as $edg1) {
-                                if (($edg1->DiscType == 'P'  && $edg1->ObjType == 4)) {
+                               
+                                $CODE = 0;
+                                $GRPCODE = 0;
+
+                                if ($discountgroup->Type == 'Specific BP') {
+                                    $CODE = $discountgroup->ObjCode;
+                                }
+                                if ($discountgroup->Type == 'Customer Group') {
+                                    $GRPCODE = $discountgroup->ObjCode;
+                                  
+                                }
+                                if (($edg1->DiscType == 'P'  && $edg1->ObjType == 4 &&
+                                    ($discountgroup->Type == 'All BPs' || $CardCode ==  $CODE  || $GRPCODE == $ocrd->GroupCode))) {
+
                                     $discGrp = true;
                                     if ($edg1->PayFor > 0 && $Quantity > 0) {
                                         $FreeItmQty =  ($Quantity / $edg1->PayFor);
@@ -200,16 +194,14 @@ class DiscountsContoller extends Controller
                     } else {
                         $discGrp = false;
                     }
+              
                 }
             }
+           
             if (!$discGrp) {
-                $spp = OSPP::where('ListNum', $ListNum)->whereDate('ValidFrom', '<=', $today)
-                    ->whereDate('ValidTo', '>=', $today)
-                    ->where('ItemCode', $ItemCode)
-                    ->where('CardCode', $CardCode)
-                    ->where('Valid', 'Y')
-                    ->get();
+                    $spp=$this->getVolAndPeriodDisc($ListNum, $today, $ItemCode, $CardCode);
                 if (!$spp) {
+                    
                     $spp = OSPP::where('ListNum', $ListNum)->whereDate('ValidFrom', '<=', $today)
                         ->whereDate('ValidTo', '>=', $today)
                         ->where('ItemCode', $ItemCode)
@@ -283,5 +275,74 @@ class DiscountsContoller extends Controller
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
+    }
+
+
+
+    private function getOCRD($cardCode)
+    {
+        return OCRD::where('CardCode', $cardCode)->select('CardCode', 'ListNum', 'GroupCode')->first();
+    }
+
+    private function getOEDG($today, $quantity, $itemCode)
+    {
+        return OEDG::whereDate('ValidFrom', '<=', $today)
+            ->whereDate('ValidTo', '>=', $today)
+            //  ->where('Type', 'A')
+            ->with(['edg1' => function ($query) use ($quantity, $itemCode) {
+                $query->with('item:id,ItemCode,ItemName,VatGourpSa,DfltWH')
+                    ->where('PayFor', '<=', $quantity)
+                    ->where('ObjKey', $itemCode)
+                    ->select(
+                        'id',
+                        'DocEntry',
+                        'ObjType',
+                        'ObjKey',
+                        'DiscType',
+                        'Discount',
+                        'PayFor',
+                        'ForFree',
+                        'UpTo',
+                        'ForFree as Quantity'
+                    );
+            }])
+            ->get();
+    }
+
+    private function getVolAndPeriodDisc($listNum, $today, $itemCode, $cardCode)
+    {
+        return OSPP::where('ListNum', $listNum)->whereDate('ValidFrom', '<=', $today)
+            ->whereDate('ValidTo', '>=', $today)
+            ->where('ItemCode', $itemCode)
+            ->where('CardCode', $cardCode)
+            ->where('Valid', 'Y')
+            ->get();
+    }
+
+    private function getSPPWithoutCardCode($listNum, $today, $itemCode)
+    {
+        return OSPP::where('ListNum', $listNum)->whereDate('ValidFrom', '<=', $today)
+            ->whereDate('ValidTo', '>=', $today)
+            ->where('ItemCode', $itemCode)
+            ->whereNull('CardCode')
+            ->where('Valid', 'Y')
+            ->get();
+    }
+
+    private function processSPP($spp, $today, $itemCode, $uomEntry)
+    {
+        // Your logic here...
+    }
+
+    private function defaultResponse()
+    {
+        $data = [
+            "DiscPrcnt" => 0,
+            "DiscType" => 0,
+            "ForFree" => [],
+            "Type" => "period-discount"
+        ];
+
+        return (new ApiResponseService())->apiSuccessResponseService($data);
     }
 }
