@@ -23,7 +23,7 @@ class BusinessPartnerController extends Controller
         // (new AuthorizationService())->checkIfAuthorize(1, 'read');
         try {
             $data = OCRD::with('territory', 'tiers', 'channels', 'octg')
-                ->take(100)
+                ->take(300)
                 ->orderBy('id', 'desc')
                 ->get();
             return (new ApiResponseService())
