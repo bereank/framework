@@ -3,6 +3,9 @@
 namespace Leysco100\Shared\Models\Finance\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Leysco100\Shared\Models\Shared\Models\ODIM;
+use Leysco100\Shared\Models\Finance\Models\OCCT;
+use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OPRC extends Model
