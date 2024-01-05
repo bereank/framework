@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('f_s_c1_s', function (Blueprint $table) {
             $table->bigIncrements("id");
             $table->integer("InvoiceId");
-            $table->integer("status")->comment("0 for success, 1 for failed");
-            $table->integer("message");
+            $table->integer("statusCode")->comment("0 for success, 1 for failed");
+            $table->text("message");
             $table->timestamps();
         });
     }

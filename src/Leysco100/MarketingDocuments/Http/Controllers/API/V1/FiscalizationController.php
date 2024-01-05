@@ -95,12 +95,15 @@ class FiscalizationController extends Controller
     {
         try {
             DB::connection("tenant")->beginTransaction();
-            $ofsc = OFSC::where("id",$id)->first();
+            $ofsc = OFSC::where("InvoiceId",$id)->first();
+            if (!$ofsc){
+                return (new ApiResponseService())->apiNotFoundResponse("data not found");
+            }
             //step one: create new record on fsc1 table
             $fsc1 = new FSC1();
             $fsc1->InvoiceId = $id;
             $fsc1->message = $request["message"];
-            $fsc1->status = $request["status"] == "success" ? 0 : 1;
+            $fsc1->statusCode = $request["statusCode"];
             $fsc1->save();
             //step two: delete existing ofsc record
             $ofsc->delete();
