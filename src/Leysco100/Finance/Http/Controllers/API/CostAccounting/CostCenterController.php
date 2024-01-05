@@ -5,6 +5,7 @@ namespace Leysco100\Finance\Http\Controllers\API\CostAccounting;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Leysco100\Shared\Models\Shared\Models\ODIM;
 use Leysco100\Shared\Models\Finance\Models\OPRC;
@@ -61,9 +62,15 @@ class CostCenterController extends Controller
         try {
 
             $data = OPRC::create([
-                'PrcCode' => $request['PrcCode'],
-                'PrcName' => $request['PrcName'],
-                'DimCode' => $request['DimCode'],
+                'PrcCode' => $request['PrcCode'] ?? null,
+                'PrcName' => $request['PrcName'] ?? null,
+                'DimCode' => $request['DimCode'] ?? null,
+                'ValidFrom' => $request['ValidFrom'] ?? null,
+                'ValidTo' => $request['ValidTo'] ?? null,
+                'Active' => $request['Active'] ?? null,
+                'CCOwner' => $request['CCOwner'] ?? null,
+                'UserSign' => Auth::user()->id,
+                'ExtRef'=> $request['ExtRef'] ?? null,
             ]);
 
             $distributionRules = OOCR::where('DimCode', $request['DimCode'])->first();
@@ -73,14 +80,22 @@ class CostCenterController extends Controller
                     'OcrCode' => $request['PrcCode'],
                     'OcrName' => $request['PrcName'],
                     'OcrTotal' => 100,
+                    'UserSign' => Auth::user()->id,
                     'DimCode' => $request['DimCode'],
+                    'Active' => $request['Active'] ?? null,
+                    'ExtRef'=> $request['ExtRef'] ?? null,
                 ]);
 
                 $newDist1 = OCR1::create([
                     'OcrCode' => $newDist->id,
-                    'PrcCode' => $data->id,
+                    'PrcCode' => $request['PrcCode'],
+                    'UserSign' => Auth::user()->id,
+                    'ValidFrom' => $request['ValidFrom'] ?? null,
+                    'ValidTo' => $request['ValidTo'] ?? null,
                     'PrcAmount' => 100,
                     'OcrTotal' => 100,
+                    'Active' => $request['Active'] ?? null,
+                    'ExtRef'=> $request['ExtRef'] ?? null,
                 ]);
             }
             DB::connection("tenant")->commit();
