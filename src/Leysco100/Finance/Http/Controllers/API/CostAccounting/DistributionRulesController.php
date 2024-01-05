@@ -63,7 +63,9 @@ class DistributionRulesController extends Controller
     public function show($id)
     {
         try {
-            $data = OOCR::select('OcrCode', 'OcrName')->where('DimCode', $id)->get();
+            $data = OOCR::with('odim', 'oprc','ocr1.oprc')->where('id', $id)->first();
+            $data->ValidFrom = $data->oprc->ValidFrom;
+            $data->ValidTo = $data->oprc->ValidTo;
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());

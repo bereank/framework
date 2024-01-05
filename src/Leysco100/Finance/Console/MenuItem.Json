@@ -1,80 +1,81 @@
-{
-  "icon": "mdi-briefcase-check-outline",
-  "icon-alt": "mdi-chevron-down",
-  "Label": "Financials",
-  "model": true,
-  "Visible": "N",
-  "children": [
-      {
-          "icon": "mdi-con",
-          "Label": "Chart of Accounts",
-          "link": "/chart-of-accounts",
-          "Visible": "Y",
-          "children": []
-      },
-      {
-          "icon": "mdi-con",
-          "Label": "Edit Chart of Accounts",
-          "link": "/edit-chart-of-accounts",
-          "Visible": "Y",
-          "children": []
-      },
-      {
-          "icon": "mdi-con",
-          "Label": "Journal Entry",
-          "link": "/journal-entry",
-          "Visible": "N",
-          "children": []
-      },
-      {
-          "icon": "mdi-con",
-          "Label": "Internal Reconciliations",
-          "Visible": "N",
-          "children": [
-              {
-                  "icon": "mdi-con",
-                  "Label": "Reconciliation",
-                  "Visible": "Y",
-                  "link": "/internal-reconciliation",
-                  "children": []
-              },
-              {
-                  "icon": "mdi-con",
-                  "Label": "Manage Reconciliations",
-                  "Visible": "Y",
-                  "link": "/internal/manage-previous-reconciliation",
-                  "children": []
-              }
-          ]
-      },
-
-      {
-          "icon": "mdi-con",
-          "Label": "Cost Accounting",
-          "Visible": "Y",
-          "children": [
-              {
-                  "icon": "mdi-con",
-                  "Label": "Dimensions",
-                  "Visible": "Y",
-                  "link": "/cost-accounting/dimensions",
-                  "children": []
-              },
-              {
-                  "icon": "mdi-con",
-                  "Label": "Cost Centres",
-                  "Visible": "Y",
-                  "link": "/cost-accounting/cost-centres",
-                  "children": []
-              },
-              {
-                  "icon": "mdi-con",
-                  "Label": "Distrubution Rules",
-                  "Visible": "Y",
-                  "link": "/cost-accounting/distribution-rules",
-                  "children": []
-              }
-          ]
-      }
-  ]
-}
+[
+    {
+        "icon": "mdi-briefcase-check-outline",
+        "icon-alt": "mdi-chevron-down",
+        "Label": "Financials",
+        "model": true,
+        "Visible": "N",
+        "children": [
+            {
+                "icon": "mdi-con",
+                "Label": "Chart of Accounts",
+                "link": "/chart-of-accounts",
+                "Visible": "Y",
+                "children": []
+            },
+            {
+                "icon": "mdi-con",
+                "Label": "Edit Chart of Accounts",
+                "link": "/edit-chart-of-accounts",
+                "Visible": "Y",
+                "children": []
+            },
+            {
+                "icon": "mdi-con",
+                "Label": "Journal Entry",
+                "link": "/journal-entry",
+                "Visible": "N",
+                "children": []
+            },
+            {
+                "icon": "mdi-con",
+                "Label": "Internal Reconciliations",
+                "Visible": "N",
+                "children": [
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Reconciliation",
+                        "Visible": "Y",
+                        "link": "/internal-reconciliation",
+                        "children": []
+                    },
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Manage Reconciliations",
+                        "Visible": "Y",
+                        "link": "/internal/manage-previous-reconciliation",
+                        "children": []
+                    }
+                ]
+            },
+            {
+                "icon": "mdi-con",
+                "Label": "Cost Accounting",
+                "Visible": "Y",
+                "children": [
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Dimensions",
+                        "Visible": "Y",
+                        "link": "/cost-accounting/dimensions",
+                        "children": []
+                    },
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Cost Centres",
+                        "Visible": "Y",
+                        "link": "/cost-accounting/cost-centres",
+                        "children": []
+                    },
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Distrubution Rules",
+                        "Visible": "Y",
+                        "link": "/cost-accounting/distribution-rules",
+                        "children": []
+                    }
+                ]
+            }
+        ]
+    }
+]

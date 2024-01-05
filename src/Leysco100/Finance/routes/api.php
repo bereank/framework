@@ -4,8 +4,8 @@
 use Illuminate\Support\Facades\Route;
 use Leysco100\Finance\Http\Controllers\API\BranchesController;
 use Leysco100\Finance\Http\Controllers\API\LocationController;
+use Leysco100\Finance\Http\Controllers\API\CostAccounting\DimensionController;
 use Leysco100\Finance\Http\Controllers\API\CostAccounting\CostCenterController;
-use Leysco100\BusinessPartner\Http\Controllers\API\CostAccounting\DimensionController;
 use Leysco100\Finance\Http\Controllers\API\CostAccounting\DistributionRulesController;
 
 /*

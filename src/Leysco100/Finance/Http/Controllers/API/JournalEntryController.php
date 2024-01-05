@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Http\Controllers\API\Financials;
+namespace Leysco100\Finance\Http\Controllers\API;
 
-use App\APDI;
-use App\ChartOfAccount;
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\DB;
-use App\Domains\Finance\Models\JDT1;
-use App\Domains\Finance\Models\OJDT;
-use App\Http\Controllers\Controller;
-use App\Domains\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\Shared\Models\APDI;
+use Leysco100\Shared\Models\Finance\Models\JDT1;
+use Leysco100\Shared\Models\Finance\Models\OJDT;
+use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Finance\Http\Controllers\Controller;
+use Leysco100\Shared\Models\Finance\Models\ChartOfAccount;
+
 
 class JournalEntryController extends Controller
 {

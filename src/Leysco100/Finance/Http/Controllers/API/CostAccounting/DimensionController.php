@@ -1,13 +1,16 @@
 <?php
 
-namespace Leysco100\BusinessPartner\Http\Controllers\API\CostAccounting;
+namespace Leysco100\Finance\Http\Controllers\API\CostAccounting;
+
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Leysco100\BusinessPartner\Http\Controllers\Controller;
-use Leysco100\Shared\Models\Shared\Models\FTR100;
 use Leysco100\Shared\Models\Shared\Models\ODIM;
+use Leysco100\Shared\Models\Shared\Models\FTR100;
 use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Finance\Http\Controllers\Controller;
+
+
 
 class DimensionController extends Controller
 {
@@ -20,9 +23,9 @@ class DimensionController extends Controller
     {
         try {
             $data = ODIM::get();
-            foreach ($data as $val){
+            foreach ($data as &$val){
                 $val->DimStatus = "Inactive";
-                if ($val->DimActive){
+                if ($val->DimActive == "Y"){
                     $val->DimStatus = "Active";
                 }
             }
@@ -66,6 +69,9 @@ class DimensionController extends Controller
             $data->DimStatus = false;
             if ($data->DimActive == "Y") {
                 $data->DimStatus = true;
+            }
+            if ($data->DimActive == "N") {
+                $data->DimStatus = false;
             }
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
