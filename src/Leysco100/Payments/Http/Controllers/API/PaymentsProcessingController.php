@@ -352,7 +352,6 @@ class PaymentsProcessingController extends Controller
             $payment['DocNum'] =  $Numbering['NextNumber'];
             $payment['BusinessShortCode'] = null;
             $payment['Balance'] =  $paymentData['billAmount'] ?? 0;
-            $payment['TransID'] =   $paymentData['bankreference'] ?? "";
             $payment['Source'] = 2;
             $payment['ObjType'] = 218;
 
