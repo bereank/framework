@@ -5,6 +5,7 @@ use Leysco100\MarketingDocuments\Http\Controllers\API\DraftController;
 use Leysco100\LogisticsHub\Http\Controllers\API\V1\ITerritoryController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DocModelController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DocumentController;
+use Leysco100\MarketingDocuments\Http\Controllers\API\V1\FiscalizationController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\MItemController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\MOrderController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\OutletController;
@@ -227,3 +228,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 //);
 
 Route::post('v2-create-document', [DocumentControllerPOC::class, 'store']);
+
+
+//fiscalization Apis
+Route::apiResources(['documents/fiscalization' => FiscalizationController::class]);

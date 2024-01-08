@@ -176,11 +176,11 @@ class BankingDocumentService
 
         // $invoice = OINV::where('id', $document->id)->first();
 //        $invoiceBalance = $document->DocTotal - ($document->PaidToDate + $request['TotalPaid']);
-//        $InvoiceDetails = [
-//            'PaidToDate' => $document->PaidToDate ? $document->PaidToDate : 0 + $request['TotalPaid'],
-//        ];
-//
-//        $document->update($InvoiceDetails);
+        $InvoiceDetails = [
+            'PaidToDate' => $document->PaidToDate ? $document->PaidToDate : 0 + $request['TotalPaid'],
+        ];
+
+        $document->update($InvoiceDetails);
         if (count($request['cheques']) > 0) {
             //Saving RCT1  Chekc Details
             foreach ($request['cheques'] as $key => $value) {
