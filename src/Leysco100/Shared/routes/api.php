@@ -30,11 +30,12 @@ Route::post('form_settings_menu', [FormSettingsController::class, 'updateFormSet
 Route::post('form_settings_menu/{ID}', [FormSettingsController::class, 'updateSingleMenu']);
 Route::get('form_settings_menu/user/{ID}', [FormSettingsController::class, 'getUserMenuSettings']);
 
-Route::post('create-udf', UserDefinedFieldsController::class);
+
 
 Route::post('/recurringtransaction/next-execution', [RecurringTransactionsTempController::class, 'getNextExec']);
 Route::get('/recurringtransactions', [RecurringTransactionsTempController::class, 'getRecurTrans']);
 
+Route::apiResources(['user_fields' => UserDefinedFieldsController::class]);
 Route::apiResources(['users' => GUserController::class]);
 Route::apiResources(['general_settings' => GeneralSettingsController::class]);
 Route::apiResources(['query_manager' => QueryManagerController::class]);

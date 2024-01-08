@@ -70,7 +70,7 @@ class CreateUDFHelperAction
                 'TableName' => $this->tableName
             ], [
                 'FieldDescription' => $this->fieldDescription,
-                'FieldType' => $this->fieldType,
+                'FieldType' => 'String', //$this->fieldType,
                 'ObjType' => $this->ObjType,
                 'FieldSize' => $this->fieldSize,
                 'DispField' => $this->DispField ?? null,
@@ -89,6 +89,10 @@ class CreateUDFHelperAction
                             'IndexID' => $key,
                             'FldValue' => $value,
                             'Descr' => $this->Descr[$key]
+                        ]);
+
+                        CUFD::where('id', $newRecord->id)->update([
+                            'FieldType' => 'select'
                         ]);
                     }
                 }

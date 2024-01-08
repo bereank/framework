@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DraftController;
+use Leysco100\LogisticsHub\Http\Controllers\API\V1\ITerritoryController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DocModelController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DocumentController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\FiscalizationController;
@@ -20,7 +21,6 @@ use Leysco100\MarketingDocuments\Http\Controllers\API\V1\Integrator\ProductContr
 use Leysco100\MarketingDocuments\Http\Controllers\API\V2\MarketingDocumentsController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\Integrator\CustomerController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\Integrator\IInventoryController;
-use Leysco100\MarketingDocuments\Http\Controllers\API\V1\Integrator\ITerritoryController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\Integrator\ITransactionController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\Integrator\IIncomingPaymentController;
 

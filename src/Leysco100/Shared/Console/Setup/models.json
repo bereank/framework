@@ -555,6 +555,28 @@
     "ObjAcronym": ""
   },
   {
+    "ObjectID": 215,
+    "ObjectHeaderTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\BackUpModeSetup",
+    "DocumentName": "Back Up Mode Documents",
+    "PermissionName": "back_up_mode_document",
+    "RowStatus": "A",
+    "isDoc": "N",
+    "JrnStatus": "Y",
+    "ChildTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\BackUpModeLines",
+    "ChildType": "Items",
+    "ObjAcronym": ""
+  },
+  {
+    "ObjectID": 216,
+    "ObjectHeaderTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\AutoBCModeSettings",
+    "DocumentName": "Back Up Mode setting",
+    "PermissionName": "back_up_mode_setting",
+    "RowStatus": "A",
+    "isDoc": "N",
+    "JrnStatus": "Y",
+    "ObjAcronym": ""
+  },
+  {
     "ObjectID": 300,
     "ObjectHeaderTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\OGMS",
     "DocumentName": "Gpm Documents",
@@ -587,22 +609,26 @@
     "ObjAcronym": ""
   },
   {
-    "ObjectID": 215,
-    "ObjectHeaderTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\BackUpModeSetup",
-    "DocumentName": "Back Up Mode Documents",
-    "PermissionName": "back_up_mode_document",
+    "ObjectID": 303,
+    "ObjectHeaderTable": "Leysco100\\Shared\\Models\\SalesOportunities\\Models\\OOCR",
+    "DocumentName": "Distribution Rules",
+    "PermissionName": "distribution_rules",
     "RowStatus": "A",
     "isDoc": "N",
     "JrnStatus": "Y",
-    "ChildTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\BackUpModeLines",
-    "ChildType": "Items",
+    "children": [
+      {
+        "ChildTable": "Leysco100\\Shared\\Models\\SalesOportunities\\Models\\OCR1",
+        "ChildType": "document_lines"
+      }
+    ],
     "ObjAcronym": ""
   },
   {
-    "ObjectID": 216,
-    "ObjectHeaderTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\AutoBCModeSettings",
-    "DocumentName": "Back Up Mode setting",
-    "PermissionName": "back_up_mode_setting",
+    "ObjectID": 304,
+    "ObjectHeaderTable": "Leysco100\\Shared\\Models\\Finance\\Models\\OPRC",
+    "DocumentName": "Cost Accounting",
+    "PermissionName": "cost_accounting",
     "RowStatus": "A",
     "isDoc": "N",
     "JrnStatus": "Y",
