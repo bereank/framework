@@ -20,6 +20,7 @@ use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITW;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
 use Leysco100\Shared\Models\Banking\Services\BankingDocumentService;
+use Leysco100\MarketingDocuments\Http\Controllers\API\PriceCalculationController;
 
 class MarketingDocumentService
 {
@@ -91,6 +92,11 @@ class MarketingDocumentService
                     if ($itemDetails) {
                         $StockPrice = $itemDetails->AvgPrice;
                         $documentLines[$key]['StockPrice'] = $StockPrice;
+
+                        //defaulting item dimensions
+                    $dimensions =     (new PriceCalculationController())->getItemDefaultDimensions( $itemDetails->id);
+
+                    return $dimensions;
                     }
                     if (data_get($line, 'Quantity')) {
                         if ($itemDetails) {
@@ -98,7 +104,9 @@ class MarketingDocumentService
                             $documentLines[$key]['Weight1'] = $Weight1;
                         }
                     }
+                    
                 }
+
                 if (!(data_get($line, 'WhsCode'))) {
                     if ($user_data->oudg->Warehouse) {
                         $documentLines[$key]['WhsCode'] =  $user_data->oudg->Warehouse;
