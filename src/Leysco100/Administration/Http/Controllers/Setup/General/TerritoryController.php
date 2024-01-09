@@ -4,6 +4,7 @@ namespace Leysco100\Administration\Http\Controllers\Setup\General;
 
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\Administration\Models\OSLP;
 use Leysco100\Shared\Models\Administration\Models\OTER;
@@ -21,10 +22,34 @@ class TerritoryController extends Controller
     public function index()
     {
         try {
+
             $data = OTER::whereNull('parent')
                 ->with('childrenRecursive')
-                ->get();
+                ->get()
+                ->toArray(); // Convert the collection to an array
 
+            $data['outlets'] = OCRD::whereNotNull('Latitude')
+                ->whereNotNull('Longitude')
+                ->get()
+                ->map(function ($outlet) {
+                    return [
+                        'lat' => (float) $outlet->Latitude,
+                        'lng' => (float) $outlet->Longitude,
+                        'CardCode' => $outlet->CardCode,
+                        'CardName' => $outlet->CardName,
+                    ];
+                });
+
+            $latitude = OCRD::whereNotNull('Latitude')->avg('Latitude');
+            $longitude = OCRD::whereNotNull('Longitude')->avg('Longitude');
+
+            $data['centerMap'] = [
+                'lat' => (float) $latitude ?? 1.9099,
+                'lng' => (float) $longitude ?? 34.9099,
+            ];
+
+
+            Log::info($data);
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
@@ -66,12 +91,25 @@ class TerritoryController extends Controller
             $value->subRegions = OTER::where('parent', $value->id)->count();
             $value->totalOutlets = OCRD::where('Territory', $value->Territory)->count();
         }
-        $territory->outlets = OCRD::where('Territory', $id)->get();
-        $latitude = OCRD::where('Territory', $id)->avg('Latitude');
-        $longitude = OCRD::where('Territory', $id)->avg('Longitude');
+        $territory->outlets = OCRD::where('Territory', $id)
+            ->whereNotNull('Latitude')
+            ->whereNotNull('Longitude')
+
+            ->get()
+            ->map(function ($outlet) {
+                return [
+                    'lat' => (int) $outlet->Latitude,
+                    'lng' => (int) $outlet->Longitude,
+                    'CardCode' => $outlet->CardCode,
+                    'CardName' => $outlet->CardName,
+                ];
+            });
+
+        $latitude = OCRD::where('Territory', $id)->whereNotNull('Latitude')->avg('Latitude');
+        $longitude = OCRD::where('Territory', $id)->whereNotNull('Longitude')->avg('Longitude');
         $territory->centerMap = [
-            'lat' => $latitude,
-            'lng' => $longitude,
+            'lat' => (int)  $latitude ?? 1.9099,
+            'lng' => (int)  $longitude ?? 34.9099,
         ];
         $salesEmployees = OSLP::select('id', 'SlpName')->get();
         foreach ($salesEmployees as $key => $value) {
