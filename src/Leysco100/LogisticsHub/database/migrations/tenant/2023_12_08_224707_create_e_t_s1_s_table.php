@@ -24,6 +24,10 @@ return new class extends Migration
             $table->time('OverTime')->nullable();
             $table->time('TotalRest')->nullable();
             $table->string('Comment')->nullable();
+            $table->decimal('latitude', 10, 7)->nullable();
+            $table->decimal('longitude', 10, 7)->nullable();
+            $table->string('address')->nullable();
+            $table->string('LogDevice')->nullable();
             $table->timestamps();
         });
     }

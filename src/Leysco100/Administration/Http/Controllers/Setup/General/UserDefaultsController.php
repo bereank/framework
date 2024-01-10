@@ -56,6 +56,9 @@ class UserDefaultsController extends Controller
                 'RouteID' => $request['RouteID'] ?? null, //Default Route
                 'RouteActive' => $request['RouteActive'] == true ? 1 : 0,
                 'SellFromBin' => $request['SellFromBin'] == true ? 1 : 0,
+                'GpsSetUpID' => $request['GpsSetUpID'] ?? null, //Gps Setup
+                'GpsActive' => $request['GpsActive'] == true ? 1 : 0,
+                'EdtItmPrc' => $request['EdtItmPrc'] == true ? 1 : 0,
             ]);
             DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService("Created Successfully");
@@ -116,6 +119,9 @@ class UserDefaultsController extends Controller
                 'RouteID' => $request['RouteID'] ?? null,
                 'RouteActive' => $request['RouteActive'] == true ? 1 : 0,
                 'SellFromBin' => $request['SellFromBin'] == true ? 1 : 0,
+                'GpsSetUpID' => $request['GpsSetUpID'] ?? null, //Gps Setup
+                'GpsActive' => $request['GpsActive'] == true ? 1 : 0,
+                'EdtItmPrc' => $request['EdtItmPrc'] == true ? 1 : 0,
             ];
             $data = OUDG::where('id', $id)->update($details);
 

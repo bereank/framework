@@ -15,10 +15,31 @@
       },
       {
         "icon": "mdi-con",
-        "Label": "Customer Map",
-        "link": "/outlets/map",
+        "Label": "Gps Locations and Maps",
         "Visible": "Y",
-        "children": []
+        "children": [
+          {
+            "icon": "mdi-con",
+            "Label": "Gps Setup",
+            "link": "/gps-setup",
+            "Visible": "Y",
+            "children": []
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Gps Locations",
+            "link": "/gps-locations",
+            "Visible": "Y",
+            "children": []
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Customer Map",
+            "link": "/outlets/map",
+            "Visible": "Y",
+            "children": []
+          }
+        ]
       },
       {
         "icon": "mdi-con",

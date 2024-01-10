@@ -30,9 +30,18 @@ return new class extends Migration
             if (!Schema::hasColumn('o_u_d_g_s', 'SellFromBin')) {
                 $table->boolean('SellFromBin')->default(0)->nullable()->after('RouteActive');
             }
+            if (!Schema::hasColumn('o_u_d_g_s', 'GpsActive')) {
+                $table->boolean('GpsActive')->default(0)->nullable()->after('SellFromBin');
+            }
+            if (!Schema::hasColumn('o_u_d_g_s', 'GpsSetUpID')) {
+                $table->integer('GpsSetUpID')->nullable()->after('GpsActive');
+            }
+            if (!Schema::hasColumn('o_u_d_g_s', 'EdtItmPrc')) {
+                $table->boolean('EdtItmPrc')->default(0)->nullable()->after('GpsSetUpID');
+            }
         });
     }
-
+    
     /**
      * Reverse the migrations.
      */

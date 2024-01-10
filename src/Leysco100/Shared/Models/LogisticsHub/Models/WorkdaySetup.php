@@ -12,6 +12,6 @@ class WorkdaySetup extends Model
 
     public function gps()
     {
-        return $this->belongsTo(GpsSetup::class, 'gps_setup_id');
+        return $this->belongsTo(OGPS::class, 'gps_setup_id');
     }
 }
