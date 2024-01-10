@@ -15,7 +15,7 @@ use Leysco100\LogisticsHub\Http\Controllers\API\V1\GpsLocationController;
 use Leysco100\LogisticsHub\Http\Controllers\API\V1\RouteActionsController;
 use Leysco100\LogisticsHub\Http\Controllers\API\V1\RoutePlanningController;
 use Leysco100\LogisticsHub\Http\Controllers\API\V1\EmployeeTimeSheetController;
-
+use Leysco100\LogisticsHub\Http\Controllers\API\V1\GpsSetUpController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +48,7 @@ Route::apiResources(['route_assignments' => RouteAssignmentController::class]);
 // GPS LOCATIONS
 Route::get('getWorkDays', [GpsLocationController::class, 'getWorkDays']);
 Route::resource('gps-locations', GpsLocationController::class);
+Route::apiResources(['gps-setup' => GpsSetUpController::class]);
 
 /*
 

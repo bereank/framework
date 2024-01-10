@@ -9,11 +9,10 @@ use Leysco100\Shared\Models\MobileNavBar;
 use Leysco100\Shared\Models\Gpm\Models\GPMGate;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Services\AuthorizationService;
+use Leysco100\Shared\Models\LogisticsHub\Models\OGPS;
 use Leysco100\Shared\Models\Administration\Models\OADM;
 use Leysco100\Shared\Models\Administration\Models\User;
-use Leysco100\Shared\Models\LogisticsHub\Models\GpsSetup;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;
-use Leysco100\Shared\Models\InventoryAndProduction\Models\OBIN;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OWHS;
 
 
@@ -192,8 +191,11 @@ class ApiAuthController extends Controller
     public function getWorkDays()
     {
         try {
-            $worKdays = GpsSetup::with(['workDays:id,gps_setup_id,dayName,start_time,end_time'])
-                ->select('id', 'max_latitude', 'min_latitude', 'max_longitude', 'min_longitude', 'start_time', 'end_time')
+            $loginUser = Auth::user();
+            $loggedInUser = User::where('id', $loginUser->id)->with('oudg')->first();
+
+            $worKdays = OGPS::with(['workDays:id,gps_setup_id,dayName,start_time,end_time'])
+                //->where('id', $loggedInUser->oudg->GpsSetUpID)
                 ->first();
 
             $weekdays = "1,2,3,4,5,6";

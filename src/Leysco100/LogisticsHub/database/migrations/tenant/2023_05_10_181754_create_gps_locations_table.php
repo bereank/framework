@@ -15,14 +15,15 @@ return new class extends Migration
     {
         Schema::create('gps_locations', function (Blueprint $table) {
             $table->id();
+            $table->integer('OwnerCode')->nullable();
+            $table->integer('ObjType')->nullable();
             $table->unsignedBigInteger('user_id');
-            $table->string('email');
-            $table->string('name');
+            $table->string('email')->nullable();
+            $table->string('name')->nullable();
             $table->decimal('latitude', 10, 7);
             $table->decimal('longitude', 10, 7);
-            $table->string('address');
+            $table->string('address')->nullable();
             $table->timestamps();
-
             $table->foreign('user_id')->references('id')->on('users');
         });
     }

@@ -139,6 +139,10 @@ class EmployeeTimeSheetController extends Controller
                 $timesheet->ClockOut     = $request['ClockOut'];
                 $timesheet->Comment     = $request['Comment'];
                 $timesheet->Late          = $late ?? null;
+                $timesheet->longitude       = $request['longitude'] ?? null;
+                $timesheet->LogDevice        = $request['LogDevice'] ?? null;
+                $timesheet->address         = $request['address'] ?? null;
+                $timesheet->latitude         = $request['latitude'] ?? null;
                 // $timesheet->EarlyLeaving = $earlyLeaving;
                 // $timesheet->OverTime      = $overtime;
                 $timesheet->TotalRest    = '00:00:00';
