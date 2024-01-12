@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DraftController;
-use Leysco100\LogisticsHub\Http\Controllers\API\V1\ITerritoryController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DocModelController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\DocumentController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\V1\FiscalizationController;
@@ -151,7 +150,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/object-update-status', [ProductController::class, 'getObjectUpdateStatus']);
 
     Route::get('/retailers/search', [CustomerController::class, 'searchRetailer']);
-    Route::get('/regions/search', [ITerritoryController::class, 'searchRegion']);
+    
     Route::get('/customergroups/search', [CustomerController::class, 'searchCustomerGroup']);
     Route::post('/customergroups/create', [CustomerController::class, 'createCustomerGroup']);
 
