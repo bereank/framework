@@ -781,20 +781,75 @@ class DocumentsService
     {
 
         $user_id = Auth::user()->id;
-        // $user = User::with('oudg')->find($user_id);
-
-        //        return null;
+        $user = User::with('oudg')->find($user_id);
+         
         $item = OITM::with('oidg')->where('id', $itemID)->first();
-        // return $item;
-        $oudg = Auth::user()->oudg;
-        $getOcrCode2 = DB::connection("tenant")->select('call DEPARTMENT_AUTOCOGS(?)', array($item->ItemCode));
-        $getOcrCode3 = DB::connection("tenant")->select('call PRODUCTLINE_AUTOCOGS(?)', array($item->ItemCode));
-        // $OcrCode4 = $user->ougd;
-        return [
-            'OcrCode' => $oudg->CogsOcrCod,
-            'OcrCode2' => $getOcrCode2[0]->OcrCode2,
-            'OcrCode3' => $getOcrCode3[0]->OcrCode3,
 
+        $OcrCode = '';
+        $OcrCode2 = "";
+        $OcrCode3 = '';
+        $OcrCode4 = '';
+        $OcrCode5 = '';
+        if ($item->CogsOcrCodMthd == 'U') {
+            $OcrCode = $user->oudg->CogsOcrCod ?? null;
+        } else {
+            $OcrCode = null;
+        }
+        if ($item->CogsOcrCo2Mthd == 'L') {
+            try {
+                $getOcrCode2 = DB::connection("tenant")->select('call DEPARTMENT_AUTOCOGS(?)', array($item->ItemCode));
+                $OcrCode2 =  $getOcrCode2[0]->OcrCode2 ?? null;
+            } catch (\Illuminate\Database\QueryException $e) {
+                // Check if the error code indicates that the stored procedure is not found
+                if ($e->getCode() == 'PROCEDURE_NOT_FOUND_ERROR_CODE') {
+
+                    Log::error('Stored procedure not found: PRODUCTLINE_AUTOCOGS');
+                } else {
+
+                    Log::error('Database query exception: ' . $e->getMessage());
+                }
+            }
+        } else {
+            $OcrCode2 =  $user->oudg->CogsOcrCo2 ?? null;
+        }
+        if ($item->CogsOcrCo3Mthd == 'L') {
+            try {
+                $getOcrCode3 = DB::connection("tenant")->select('call PRODUCTLINE_AUTOCOGS(?)', array($item->ItemCode));
+                $OcrCode3 =    $getOcrCode3[0]->OcrCode3 ?? null;
+            } catch (\Illuminate\Database\QueryException $e) {
+                // Check if the error code indicates that the stored procedure is not found
+                if ($e->getCode() == 'PROCEDURE_NOT_FOUND_ERROR_CODE') {
+
+                    Log::error('Stored procedure not found: PRODUCTLINE_AUTOCOGS');
+                } else {
+
+                    Log::error('Database query exception: ' . $e->getMessage());
+                }
+            }
+        } else {
+            $OcrCode3 =  $user->oudg->CogsOcrCo3 ?? null;
+        }
+        // if ($item->CogsOcrCo4Mthd) {
+
+        $OcrCode4 = $user->oudg->CogsOcrCo4 ?? null;
+        // } else {
+        //     $OcrCode4 = null;
+        // }
+        if ($item->CogsOcrCo5Mthd) {
+            $OcrCode5 = $user->oudg->CogsOcrCo5 ?? null;
+        } else {
+            $OcrCode5 = null;
+        }
+
+
+
+
+        return [
+            'OcrCode' => $OcrCode,
+            'OcrCode2' => $OcrCode2,
+            'OcrCode3' => $OcrCode3,
+            'OcrCode4' => $OcrCode4,
+            'OcrCode5' => $OcrCode5,
             'U_AllowDisc' => $item->QryGroup61 == "Y" ? "N" : "Y",
         ];
     }
