@@ -94,9 +94,13 @@ class MarketingDocumentService
                         $documentLines[$key]['StockPrice'] = $StockPrice;
 
                         //defaulting item dimensions
-                    $dimensions =     (new PriceCalculationController())->getItemDefaultDimensions( $itemDetails->id);
-
-                    return $dimensions;
+                        $dimensions =     (new PriceCalculationController())->getItemDefaultDimensions($itemDetails->id);
+                        $documentLines[$key]['OcrCode'] = $dimensions['OcrCode'] ?? null;
+                        $documentLines[$key]['OcrCode2'] = $dimensions['OcrCode2'] ?? null;
+                        $documentLines[$key]['OcrCode3'] = $dimensions['OcrCode3'] ?? null;
+                        $documentLines[$key]['U_AllowDisc'] = $dimensions['U_AllowDisc'] ?? null;
+                        $documentLines[$key]['OcrCode4'] = $dimensions['OcrCode4'] ?? null;
+                        $documentLines[$key]['OcrCode5'] = $dimensions['OcrCode5'] ?? null;
                     }
                     if (data_get($line, 'Quantity')) {
                         if ($itemDetails) {
@@ -104,7 +108,6 @@ class MarketingDocumentService
                             $documentLines[$key]['Weight1'] = $Weight1;
                         }
                     }
-                    
                 }
 
                 if (!(data_get($line, 'WhsCode'))) {
@@ -480,6 +483,7 @@ class MarketingDocumentService
                     'CogsOcrCo3' => $value['OcrCode3'] ?? null,
                     'CogsOcrCo4' => $value['OcrCode4'] ?? null,
                     'CogsOcrCo5' => $value['OcrCode5'] ?? null,
+                    
 
                     'BaseType' => $value['BaseType'] ?? null, //    Base Type
                     'BaseRef' => $value['BaseRef'] ?? null, //    Base Ref.
@@ -627,7 +631,7 @@ class MarketingDocumentService
             }
             DB::connection("tenant")->commit();
             $newDoc['document_lines'] = $documentRows;
-            return (new ApiResponseService())->apiSuccessResponseService($newDoc);
+            return $newDoc;
         } catch (\Throwable $th) {
             Log::error($th->getMessage());
             DB::connection("tenant")->rollback();
