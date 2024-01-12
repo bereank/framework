@@ -31,6 +31,7 @@ use Leysco100\Shared\Models\MarketingDocuments\Models\ODRF;
 use Leysco100\Shared\Models\MarketingDocuments\Models\ORDR;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OWDD;
 use Leysco100\Shared\Models\MarketingDocuments\Models\WDD1;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OSRN;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OUOM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
@@ -734,7 +735,7 @@ class DocumentsService
     }
     public function sendingAssignmentNotification($DocEntry,  $items)
     {
-       
+
         $data = OADM::where('id', 1)->first();
 
         if (!$data->NotifAlert) {
@@ -746,17 +747,17 @@ class DocumentsService
             $listString .= ($key + 1) . '. ' . $item . "\n";
         }
         $document = ODISPASS::where('id', $DocEntry)->first();
-        $driverData= ORLP::where('RlpCode',    $document->RlpCode)->first();
-        $assignmentSummary = $listString . 
-         "Please check on your app and accept the assignments as soon as possible.\n".
-         "Thanks \nDate : " . $document->DocDate . ",\n";
-         $messageSignature = "SAMWEST DISTRIBUTORS";
+        $driverData = ORLP::where('RlpCode',    $document->RlpCode)->first();
+        $assignmentSummary = $listString .
+            "Please check on your app and accept the assignments as soon as possible.\n" .
+            "Thanks \nDate : " . $document->DocDate . ",\n";
+        $messageSignature = "SAMWEST DISTRIBUTORS";
 
-          $message = "Hi " . $driverData->RlpName . ",\n" .
-          "You have been assigned the deliveries for the following customers:" . "\n" .
-          $assignmentSummary . "\n\n" . $messageSignature;
+        $message = "Hi " . $driverData->RlpName . ",\n" .
+            "You have been assigned the deliveries for the following customers:" . "\n" .
+            $assignmentSummary . "\n\n" . $messageSignature;
 
-     
+
         if ($driverData->Telephone) {
             Log::info($message);
             $response = Http::withoutVerifying()
@@ -774,5 +775,27 @@ class DocumentsService
         }
 
         return;
+    }
+
+    public function getItemDefaultDimensions($itemID)
+    {
+
+        $user_id = Auth::user()->id;
+        // $user = User::with('oudg')->find($user_id);
+
+        //        return null;
+        $item = OITM::with('oidg')->where('id', $itemID)->first();
+        // return $item;
+        $oudg = Auth::user()->oudg;
+        $getOcrCode2 = DB::connection("tenant")->select('call DEPARTMENT_AUTOCOGS(?)', array($item->ItemCode));
+        $getOcrCode3 = DB::connection("tenant")->select('call PRODUCTLINE_AUTOCOGS(?)', array($item->ItemCode));
+        // $OcrCode4 = $user->ougd;
+        return [
+            'OcrCode' => $oudg->CogsOcrCod,
+            'OcrCode2' => $getOcrCode2[0]->OcrCode2,
+            'OcrCode3' => $getOcrCode3[0]->OcrCode3,
+
+            'U_AllowDisc' => $item->QryGroup61 == "Y" ? "N" : "Y",
+        ];
     }
 }
