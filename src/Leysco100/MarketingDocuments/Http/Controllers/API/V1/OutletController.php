@@ -5,17 +5,13 @@ namespace Leysco100\MarketingDocuments\Http\Controllers\API\V1;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
-use Leysco100\Shared\Models\Administration\Models\User;
-use Leysco100\Shared\Models\InventoryAndProduction\Models\OBIN;
-use Leysco100\Shared\Models\InventoryAndProduction\Models\OIBQ;
-use Leysco100\Shared\Models\LogisticsHub\Models\RouteAssignment;
-use Leysco100\Shared\Models\LogisticsHub\Models\RoutePlanning;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\LogisticsHub\Models\OCLG;
 use Leysco100\MarketingDocuments\Jobs\NumberingSeries;
 use Leysco100\Shared\Models\Administration\Models\NNM1;
 use Leysco100\Shared\Models\Administration\Models\ONNM;
-use Leysco100\Shared\Models\BusinessPartner\Models\OCLG;
+use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCPR;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRG;
@@ -25,6 +21,10 @@ use Leysco100\Shared\Models\MarketingDocuments\Models\OINV;
 use Leysco100\Shared\Models\MarketingDocuments\Models\ORDR;
 use Leysco100\Shared\Models\MarketingDocuments\Models\RDR1;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;
+use Leysco100\Shared\Models\LogisticsHub\Models\RoutePlanning;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OBIN;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OIBQ;
+use Leysco100\Shared\Models\LogisticsHub\Models\RouteAssignment;
 
 
 class OutletController extends Controller

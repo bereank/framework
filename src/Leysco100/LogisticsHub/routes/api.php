@@ -39,6 +39,7 @@ Route::apiResources(['channels' => ChannelController::class]);
 //Route::apiResources(['schedules' => ScheduleController::class]);
 //Route::apiResources(['rules' => RulesController::class]);
 
+Route::get('/regions/search', [ITerritoryController::class, 'searchRegion']);
 // Route Planning
 Route::post('route_outlets', [RoutePlanningController::class, 'createRouteOutlets']);
 Route::post('route_calls', [RoutePlanningController::class, 'createRouteCalls']);
