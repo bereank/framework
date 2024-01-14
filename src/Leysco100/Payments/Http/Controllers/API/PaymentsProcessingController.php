@@ -328,7 +328,7 @@ class PaymentsProcessingController extends Controller
 
             $paymentData =  $request->all();
 
-            $exists = OCRP::where('BankRefNo', $paymentData['bankreference'])->exists();
+            $exists = OCRP::where('TransID', $paymentData['bankreference'])->exists();
 
             if ($exists) {
                 return response()->json([
@@ -391,7 +391,7 @@ class PaymentsProcessingController extends Controller
                     "description" => "UserName Does Not Exist",
                     "type" => "1"
                 ];
-                return response()->json($data);
+                return  response()->json($data);
             }
             $check = !Hash::check($request->password, $user->password);
             if ($check) {
