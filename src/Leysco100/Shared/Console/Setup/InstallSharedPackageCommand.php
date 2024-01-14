@@ -4,6 +4,7 @@ namespace Leysco100\Shared\Console\Setup;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
+use Leysco100\Shared\Models\Shared\Models\FI100;
 use Spatie\Multitenancy\Models\Tenant;
 use Illuminate\Support\Facades\Artisan;
 use Leysco100\Shared\Models\Shared\Models\APDI;
@@ -31,11 +32,16 @@ class InstallSharedPackageCommand extends Command
 
     public function handle()
     {
+        $oadm = OADM::where("CompnyName",Tenant::current()->name)->first();
 
+        if (!$oadm){
+            OADM::create([
+                'CompnyName' => Tenant::current()->name
+            ]);
+        }
 
-        //        OADM::create([
-        //                'CompnyName' => Tenant::current()->name
-        //        ]);
+        APDI::query()->truncate();
+        PDI1::query()->truncate();
 
         $modelsJsonString = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'models.json');
 
@@ -69,15 +75,15 @@ class InstallSharedPackageCommand extends Command
 
                     ], [
                         'ChildType' => $childModel['ChildType'],
-
                     ]);
                 }
             }
         }
 
+        $this->info("Creating Default User");
+        Artisan::call('leysco100:shared:create-default-user --tenant='.Tenant::current()->id);
 
-        //        $this->info("Creating Default User");
-        //        Artisan::call('leysco100:shared:create-default-user');
-
+        $this->info("Creating Default Document Form-settings");
+        Artisan::call('leysco100:shared:create-default-document-form-settings --tenant='.Tenant::current()->id);
     }
 }

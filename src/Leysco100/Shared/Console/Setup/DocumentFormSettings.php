@@ -63,7 +63,6 @@ class DocumentFormSettings extends Command
                     'ClickEvent' => array_key_exists('ClickEvent', $value) ? $value['ClickEvent'] : null,
                 ]);
             }
-
             //Creating Tab for Each Form
             $formTabsJsonString = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'tabs.json');
             $form_tabs = json_decode($formTabsJsonString, true);
@@ -73,24 +72,6 @@ class DocumentFormSettings extends Command
                     'Label' => $value['Label'],
                     'WithTable' => $value['WithTable'],
                 ]);
-
-//                $tabsJsonString = file_get_contents( __DIR__ . DIRECTORY_SEPARATOR .  'tab_fields.json');
-//                $tabs = json_decode($tabsJsonString, true);
-//                foreach ($tabs as $key => $value) {
-//                    $tab = FI100::firstOrCreate([
-//                        'FormID' => $form->id,
-//                        'FieldName' => $value['FieldName'],
-//                        'Label' => $value['Label'],
-//                        'FieldType' => $value['FieldType'],
-//                        'ColumnWidth' => $value['ColumnWidth'],
-//                        'Visible' => $value['Visible'],
-//                        'Readonly' => $value['Readonly'],
-//                        'Required' => $value['Required'],
-//                        "data" => $value['data'],
-//                        'TabID' => $newtab->id,
-//                        'ClickEvent' => array_key_exists('ClickEvent', $value) ? $value['ClickEvent'] : null,
-//                    ]);
-//                }
 
                 if ($newtab->WithTable == 1) {
                     $uomsJsonString = file_get_contents(__DIR__. DIRECTORY_SEPARATOR.'rows_fields.json');
