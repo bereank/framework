@@ -6,17 +6,18 @@ use Illuminate\Console\Command;
 
 use Illuminate\Support\Facades\Hash;
 use Leysco100\Shared\Models\Administration\Models\User;
-
+use Spatie\Multitenancy\Commands\Concerns\TenantAware;
 
 
 class CreateDefaultUserCommand extends Command
 {
+    use TenantAware;
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'leysco100:shared:create-default-user';
+    protected $signature = 'leysco100:shared:create-default-user {--tenant=*}';
 
     /**
      * The console command description.
@@ -32,6 +33,7 @@ class CreateDefaultUserCommand extends Command
             'email' => 'manager@leysco100.com',
         ],[
             'account' => 'manager',
+            'account_type' => 'POS',
             'name' => 'Administrator',
             'DfltsGroup' => 1,
             'SUPERUSER' => 1,
