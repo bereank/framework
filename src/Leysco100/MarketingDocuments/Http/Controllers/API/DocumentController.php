@@ -513,6 +513,7 @@ class DocumentController extends Controller
         DB::connection("tenant")->beginTransaction();
         try {
 
+
             /**
              * Handling  Document Numbering
              */
@@ -574,9 +575,11 @@ class DocumentController extends Controller
 
             $newDoc->save();
 
-            $newDoc->update($request->UserFields);
-
+            if (is_array($request->UserFields)){
+                $newDoc->update($request->UserFields);
+            }
             $documentRows = [];
+
 
             foreach ($request['document_lines'] as $key => $value) {
                 $LineNum = $key;

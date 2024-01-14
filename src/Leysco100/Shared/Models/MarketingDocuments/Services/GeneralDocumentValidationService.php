@@ -65,54 +65,54 @@ class GeneralDocumentValidationService
             }
 
 
-            if (!isset($request->UserFields['U_CashName'])) {
-                (new ApiResponseService())->apiSuccessAbortProcessResponse("Cash Customer is Required");
-            }
+//            if (!isset($request->UserFields['U_CashName'])) {
+//                (new ApiResponseService())->apiSuccessAbortProcessResponse("Cash Customer is Required");
+//            }
 
-            if ($request->UserFields['U_CashName']) {
-                if (strlen($request->UserFields['U_CashName']) > 50) {
-                    (new ApiResponseService())->apiSuccessAbortProcessResponse("Cash Customer is incorrect");
-                }
-                $validate_U_CashName = StoredProcedureExternalMethodsAction::ValidateName($request->UserFields['U_CashName']);
-                if (!$validate_U_CashName) {
-                    (new ApiResponseService())->apiSuccessAbortProcessResponse("CG - Ensure you have Captured A Valid Cash Customer Name with atleast 2 Names e.g \"Ali Tom\"");
-                }
-            }
+//            if ($request->UserFields['U_CashName']) {
+//                if (strlen($request->UserFields['U_CashName']) > 50) {
+//                    (new ApiResponseService())->apiSuccessAbortProcessResponse("Cash Customer is incorrect");
+//                }
+//                $validate_U_CashName = StoredProcedureExternalMethodsAction::ValidateName($request->UserFields['U_CashName']);
+//                if (!$validate_U_CashName) {
+//                    (new ApiResponseService())->apiSuccessAbortProcessResponse("CG - Ensure you have Captured A Valid Cash Customer Name with atleast 2 Names e.g \"Ali Tom\"");
+//                }
+//            }
 
-            if (!isset($request->UserFields['U_CashNo'])) {
-                (new ApiResponseService())->apiSuccessAbortProcessResponse("Customer Phone is Required");
-            }
+//            if (!isset($request->UserFields['U_CashNo'])) {
+//                (new ApiResponseService())->apiSuccessAbortProcessResponse("Customer Phone is Required");
+//            }
 
-            if ($request->UserFields['U_CashNo']) {
-                if (strlen($request->UserFields['U_CashNo']) < 10) {
-                    (new ApiResponseService())->apiSuccessAbortProcessResponse("Customer Phone is incorrect");
-                }
-                $validate_U_CashNo = StoredProcedureExternalMethodsAction::ValidateMobileNumber($request->UserFields['U_CashNo']);
-                if (!$validate_U_CashNo) {
-                    (new ApiResponseService())->apiSuccessAbortProcessResponse("CG - Ensure you have Captured A Valid Mobile Phone Number e.g. +2547**123***");
-                }
-            }
+//            if ($request->UserFields['U_CashNo']) {
+//                if (strlen($request->UserFields['U_CashNo']) < 10) {
+//                    (new ApiResponseService())->apiSuccessAbortProcessResponse("Customer Phone is incorrect");
+//                }
+//                $validate_U_CashNo = StoredProcedureExternalMethodsAction::ValidateMobileNumber($request->UserFields['U_CashNo']);
+//                if (!$validate_U_CashNo) {
+//                    (new ApiResponseService())->apiSuccessAbortProcessResponse("CG - Ensure you have Captured A Valid Mobile Phone Number e.g. +2547**123***");
+//                }
+//            }
 
             //            if (!isset($request['U_IDNo'])) {
             //                (new ApiResponseService())->apiSuccessAbortProcessResponse("Customer ID No is Required");
             //            }
 
-            if (isset($request->UserFields['U_IDNo'])) {
-                if (!is_numeric($request->UserFields['U_IDNo'])) {
-                    (new ApiResponseService())->apiSuccessAbortProcessResponse("Customer ID is incorrect");
-                }
-            }
+//            if (isset($request->UserFields['U_IDNo'])) {
+//                if (!is_numeric($request->UserFields['U_IDNo'])) {
+//                    (new ApiResponseService())->apiSuccessAbortProcessResponse("Customer ID is incorrect");
+//                }
+//            }
 
 //            if (!$request->UserFields['U_CashMail']) {
 //                (new ApiResponseService())->apiSuccessAbortProcessResponse("Customer Email is Required");
 //            }
 
-            if (isset($request->UserFields['U_CashMail'])) {
-                $validate_U_CashMail = StoredProcedureExternalMethodsAction::ValidateEmail($request->UserFields['U_CashMail']);
-                if (!$validate_U_CashMail) {
-                    (new ApiResponseService())->apiSuccessAbortProcessResponse("CG - Ensure you have Captured A Valid email Adress e.g.\"geff@gmail.com\", or indicate N/A where email does not exist");
-                }
-            }
+//            if (isset($request->UserFields['U_CashMail'])) {
+//                $validate_U_CashMail = StoredProcedureExternalMethodsAction::ValidateEmail($request->UserFields['U_CashMail']);
+//                if (!$validate_U_CashMail) {
+//                    (new ApiResponseService())->apiSuccessAbortProcessResponse("CG - Ensure you have Captured A Valid email Adress e.g.\"geff@gmail.com\", or indicate N/A where email does not exist");
+//                }
+//            }
 
             $paymentTerms = $businessPartner->octg;
 
