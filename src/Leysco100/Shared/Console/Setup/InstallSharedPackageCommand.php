@@ -80,10 +80,37 @@ class InstallSharedPackageCommand extends Command
             }
         }
 
-        $this->info("Creating Default User");
-        Artisan::call('leysco100:shared:create-default-user --tenant='.Tenant::current()->id);
+//        $this->info("Creating Default User");
+//        Artisan::call('leysco100:shared:create-default-user --tenant='.Tenant::current()->id);
 
-        $this->info("Creating Default Document Form-settings");
-        Artisan::call('leysco100:shared:create-default-document-form-settings --tenant='.Tenant::current()->id);
+//        $this->info("Creating Default Document Form-settings");
+//        Artisan::call('leysco100:shared:create-default-document-form-settings --tenant='.Tenant::current()->id);
+
+        $packages = $this->ask("Do You Want To Install All Packages? (Y) yes, (N) No");
+
+        if (strtolower($packages) == "yes" || strtolower($packages) == "y"){
+            //install all existing packages
+            $this->info("Installing Administration Package");
+            Artisan::call('leysco100:administration:install --tenant='.Tenant::current()->id);
+
+            $this->info("Installing Finance Package");
+            Artisan::call('leysco100:finance:install --tenant='.Tenant::current()->id);
+
+            $this->info("Installing Inventory Package");
+            Artisan::call('leysco100:inventory:install --tenant='.Tenant::current()->id);
+
+            $this->info("Installing Sales Package");
+            Artisan::call('leysco100:marketing-documents:install --tenant='.Tenant::current()->id);
+
+            $this->info("Installing Logistics-hub Package");
+            Artisan::call('leysco100:logistics-hub:install --tenant='.Tenant::current()->id);
+
+            $this->info("Installing Banking Package");
+            Artisan::call('leysco100:banking:install --tenant='.Tenant::current()->id);
+
+            $this->info("Installing Gpm Package");
+            Artisan::call('leysco100:gpm:install --tenant='.Tenant::current()->id);
+            //7. install Gpm package
+        }
     }
 }

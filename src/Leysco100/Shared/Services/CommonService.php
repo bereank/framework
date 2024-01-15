@@ -120,7 +120,7 @@ class CommonService
                 [
                     'UserSign' => $UserSign,
                     'ParentID' => $parentID,
-                    'Visible' => $item['Visible'],
+                    'Visible' => $UserSign == 1 ? "Y" : $item['Visible'],
                     'link' => array_key_exists('link', $item) ? $item['link'] : null,
                     'Label' => $item['Label'],
                 ],
@@ -131,6 +131,17 @@ class CommonService
             );
             if (isset($item['children']) && is_array($item['children'])) {
                 $this->createOrUpdateMenu($item['children'], $menu->id);
+            }
+        }
+    }
+
+    public function deleteExistingMenu($menuData)
+    {
+        foreach ($menuData as $item) {
+            $menu = FM100::where("ParentID",$item->id)->get();
+            $item->delete();
+            if (count($menu)>0) {
+                $this->deleteExistingMenu($menu);
             }
         }
     }

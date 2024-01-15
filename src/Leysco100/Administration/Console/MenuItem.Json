@@ -4,7 +4,7 @@
     "icon-alt": "mdi-chevron-down",
     "Label": "Administration",
     "model": true,
-    "Visible": "Y",
+    "Visible": "N",
     "children": [
       {
         "icon": "mdi-con",

@@ -523,6 +523,8 @@ class DocumentController extends Controller
                     $request['Series']
                 );
 
+            return $DocNum;
+
             $NewDocDetails = [
                 'ObjType' => $request['ObjType'],
                 'DocType' => $request['DocType'],
