@@ -254,10 +254,6 @@ class FormSettingsController extends Controller
     {
         $userfm100 = FM100::where('UserSign', $user_id)
             ->first();
-        if(!$userfm100){
-            CreateMenuForUser::dispatch($user_id);
-        }
-
         $AllTreeview = FM100::whereNull('ParentID')
             ->where('UserSign', $user_id)
             ->with('GrandChildren')
