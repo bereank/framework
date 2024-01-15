@@ -178,6 +178,7 @@ class ApiAuthController extends Controller
             'gpsSetttings' => $this->getWorkDays(),
             'defaultwarehouse' => $defaultwarehouse ?? [],
             'ClockIn' => $clockIn ?? 0,
+            'UserData'=>   $loggedInUser,
             'ResultState' => true,
             'ResultCode' => 1200,
             'ResultDesc' => "Operation Was Successful",
