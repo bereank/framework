@@ -3,11 +3,12 @@
 namespace Leysco100\Shared\Models\BusinessPartner\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Leysco100\Shared\Models\Administration\Models\Channel;
+use Leysco100\Shared\Models\AssetTracking;
+use Leysco100\Shared\Models\LogisticsHub\Models\OCLG;
 use Leysco100\Shared\Models\Administration\Models\OSLP;
 use Leysco100\Shared\Models\Administration\Models\OTER;
 use Leysco100\Shared\Models\Administration\Models\Tier;
-use Leysco100\Shared\Models\AssetTracking;
+use Leysco100\Shared\Models\Administration\Models\Channel;
 use Leysco100\Shared\Models\MarketingDocuments\Models\ODLN;
 use Leysco100\Shared\Models\MarketingDocuments\Models\ODPI;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OINV;
