@@ -412,6 +412,9 @@ class DocumentController extends Controller
             'ObjType' => 'required',
         ]);
 
+        //initiate the api response service
+        $apiResponseService = new ApiResponseService();
+
         (new GeneralDocumentValidationService())->documentHeaderValidation($request);
 
         //Necessary Validations
@@ -428,11 +431,11 @@ class DocumentController extends Controller
                 ->first();
             $CardCode = $baseDocHeader->CardCode;
             if ($generalSettings == 1 && $baseDocHeader->ExtRef == null) {
-                return (new ApiResponseService())
+                return $apiResponseService
                     ->apiFailedResponseService("Copy to is Disable for Documents Pending syncing ");
             }
             if ($baseDocHeader->DocStatus == "C") {
-                return (new ApiResponseService())
+                return $apiResponseService
                     ->apiFailedResponseService("Copying to not Possible, Base Document is closed");
             }
         }
@@ -446,7 +449,7 @@ class DocumentController extends Controller
             ->first();
 
         if (!$TargetTables) {
-            return (new ApiResponseService())
+            return $apiResponseService
                 ->apiFailedResponseService("Not found document with objtype " . $ObjType);
         }
 
@@ -478,12 +481,12 @@ class DocumentController extends Controller
 
         $customerDetails = OCRD::where('CardCode', $CardCode)->first();
         if (!$customerDetails && $ObjType != 205) {
-            return (new ApiResponseService())
+            return $apiResponseService
                 ->apiFailedResponseService("Customer Required");
         }
 
         if ($request['DiscPrcnt'] > 100) {
-            return (new ApiResponseService())
+            return $apiResponseService
                 ->apiFailedResponseService("Invalid Discount Percentage");
         }
 
@@ -803,7 +806,7 @@ class DocumentController extends Controller
 //            $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions($objectTypePassedToTns, "A", $newDoc->id);
 //            if ($storedProcedureResponse) {
 //                if ($storedProcedureResponse->error != 0) {
-//                    return (new ApiResponseService())->apiFailedResponseService($storedProcedureResponse->error_message);
+//                    return $apiResponseService->apiFailedResponseService($storedProcedureResponse->error_message);
 //                }
 //            }
 
@@ -811,23 +814,24 @@ class DocumentController extends Controller
 //            if ($objectTypePassedToTns == 112) {
 //                $mockedDataDraftMessage = (new GeneralDocumentValidationService())->draftValidation($newDoc, $documentRows);
 //                if ($mockedDataDraftMessage) {
-//                    return (new ApiResponseService())->apiFailedResponseService($mockedDataDraftMessage);
+//                    return $apiResponseService->apiFailedResponseService($mockedDataDraftMessage);
 //                }
 //            }
 
             if ($newDoc->ObjType == 13 && $request['payments']) {
+                $bankingDocumentService = new BankingDocumentService();
                 foreach ($request['payments'] as $payment) {
                     $storedProcedureResponse = null;
                     if ($saveToDraft) {
-                        $newPayment = (new BankingDocumentService())->processDraftIncomingPayment($newDoc, $payment);
+                        $newPayment = $bankingDocumentService->processDraftIncomingPayment($newDoc, $payment);
 //                        $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions(140, "A", $newPayment->id);
                     } else {
-                        $newPayment = (new BankingDocumentService())->processIncomingPayment($newDoc, $payment);
+                        $newPayment = $bankingDocumentService->processIncomingPayment($newDoc, $payment);
 //                        $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions(24, "A", $newPayment->id);
                     }
                     if ($storedProcedureResponse) {
                         if ($storedProcedureResponse->error != 0) {
-                            return (new ApiResponseService())->apiFailedResponseService($storedProcedureResponse->error_message);
+                            return $apiResponseService->apiFailedResponseService($storedProcedureResponse->error_message);
                         }
                     }
                 }
@@ -848,7 +852,7 @@ class DocumentController extends Controller
                 $oscl = OSCL::where('id', $request['serviceCallId'])->first();
 
                 if ($oscl->customer != $newDoc->CardCode) {
-                    return (new ApiResponseService())
+                    return $apiResponseService
                         ->apiFailedResponseService(" C&G Error - Customer Code/Customer Name on JobCard and Expense Documents should be similar!");
                 }
                 (new ServiceCallService())->mapServiceCallWithExpenseDocument($objectTypePassedToTns, $newDoc->id, $request['serviceCallId']);
@@ -861,11 +865,11 @@ class DocumentController extends Controller
             DB::connection("tenant")->commit();
             //            $documentForDirecPostingToSAP = (new DocumentsService())->getDocumentForDirectPostingToSAP($newDoc->ObjType, $newDoc->id);
             //            $newDoc->documentForDirecPostingToSAP = $documentForDirecPostingToSAP;
-            return (new ApiResponseService())->apiSuccessResponseService($newDoc);
+            return $apiResponseService->apiSuccessResponseService($newDoc);
         } catch (\Throwable $th) {
             Log::info($th);
             DB::connection("tenant")->rollback();
-            return (new ApiResponseService())->apiFailedResponseService("Process failed, Server Error", $th);
+            return $apiResponseService->apiFailedResponseService("Process failed, Server Error", $th);
         }
     }
     // saving Attachments
