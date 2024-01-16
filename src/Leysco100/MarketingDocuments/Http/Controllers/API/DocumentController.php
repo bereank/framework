@@ -867,7 +867,7 @@ class DocumentController extends Controller
             //            $newDoc->documentForDirecPostingToSAP = $documentForDirecPostingToSAP;
             return $apiResponseService->apiSuccessResponseService($newDoc);
         } catch (\Throwable $th) {
-//            dd($th);
+            dd($th);
             Log::info($th);
             DB::connection("tenant")->rollback();
             return $apiResponseService->apiFailedResponseService("Process failed, Server Error", $th);
