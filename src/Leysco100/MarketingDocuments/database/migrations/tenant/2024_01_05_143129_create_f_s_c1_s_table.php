@@ -14,6 +14,13 @@ return new class extends Migration
         Schema::create('f_s_c1_s', function (Blueprint $table) {
             $table->bigIncrements("id");
             $table->integer("InvoiceId");
+            $table->string("U_ControlCode")->nullable();
+            $table->string("U_RelatedInv")->nullable();
+            $table->string("U_CUInvoiceNum")->nullable();
+            $table->string("U_QRCode")->nullable();
+            $table->string("U_QrLocation")->nullable();
+            $table->string("U_ReceiptNo")->nullable();
+            $table->string("U_CommitedTime")->nullable();
             $table->integer("statusCode")->comment("0 for success, 1 for failed");
             $table->text("message");
             $table->timestamps();

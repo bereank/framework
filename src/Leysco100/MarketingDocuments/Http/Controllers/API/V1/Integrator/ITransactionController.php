@@ -203,7 +203,7 @@ class ITransactionController extends Controller
                 $headerVal->deals = $rowData;
 
                 if ($headerVal->ObjType == 13) {
-                    $headerVal->payments = (new BankingDocumentService())->getInvoicePayment($headerVal->id);
+                    $headerVal->payments = [(new BankingDocumentService())->getInvoicePayment($headerVal->id)];
                 }
             }
 

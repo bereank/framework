@@ -24,6 +24,7 @@ use Leysco100\Shared\Models\Administration\Models\ONNM;
 use Leysco100\Shared\Models\Administration\Models\OUDP;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Actions\Helpers\HideTableRowsFieldsPerDocumentAction;
+use Leysco100\Shared\Services\UserFieldsService;
 
 
 class FormSettingsController extends Controller
@@ -66,9 +67,11 @@ class FormSettingsController extends Controller
 //        $line_table = (new $form->pdi1[0]['ChildTable'])->getTable();
         $header_table = (new $form->ObjectHeaderTable)->getTable();
 
-        $UDFs = CUFD::where('ObjType', $ObjType)
-            ->where("TableName",$header_table)
-            ->get();
+//        $UDFs = CUFD::where('ObjType', $ObjType)
+//            ->where("TableName",$header_table)
+//            ->get();
+        $data['doctype'] = $ObjType;
+        $UDFs = (new UserFieldsService())->processUDF($data);
 
         $tabs = FT100::where('FormID', $form->id)->get();
 
