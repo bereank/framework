@@ -22,7 +22,7 @@ class DimensionController extends Controller
     public function index()
     {
         try {
-            $data = ODIM::get();
+            $data = ODIM::with('oocr')->get();
             foreach ($data as &$val){
                 $val->DimStatus = "Inactive";
                 if ($val->DimActive == "Y"){
@@ -65,7 +65,7 @@ class DimensionController extends Controller
     public function show($id)
     {
         try {
-            $data = ODIM::where('id', $id)->first();
+            $data = ODIM::with('oocr')->where('id', $id)->first();
             $data->DimStatus = false;
             if ($data->DimActive == "Y") {
                 $data->DimStatus = true;
