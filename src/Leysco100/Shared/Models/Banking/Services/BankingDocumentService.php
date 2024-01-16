@@ -130,7 +130,7 @@ class BankingDocumentService
 
         $numberingDetails = (new CommonService())->gettingObjectNumberingSeries(140);
 
-        dd($numberingDetails);
+//        dd($numberingDetails);
 
         $IncomingPaymentDetails = [
             'CardCode' => $document->CardCode, //Customer/Vendor Code
