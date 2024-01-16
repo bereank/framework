@@ -43,7 +43,7 @@ class CreateODRFSTable extends Migration
             $table->float('DocRate', 19, 6)->nullable();
             $table->float('DocTotal', 19, 6)->nullable();
             $table->string('DocTotalFC', 1)->nullable();
-            $table->string('PaidToDate', 1)->nullable();
+            $table->string('PaidToDate', 191)->nullable();
             $table->string('PaidFC', 1)->nullable();
             $table->string('GrosProfit', 1)->nullable();
             $table->string('GrosProfFC', 1)->nullable();
