@@ -81,8 +81,6 @@ class BankingDocumentService
             'PaidToDate' => $document->PaidToDate ? $document->PaidToDate : $request['TotalPaid'],
         ];
 
-        dd($InvoiceDetails);
-
         $document->update($InvoiceDetails);
         if (count($request['cheques']) > 0) {
             //Saving RCT1  Chekc Details
