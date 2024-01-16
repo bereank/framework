@@ -80,11 +80,11 @@ class InstallSharedPackageCommand extends Command
             }
         }
 
-//        $this->info("Creating Default User");
-//        Artisan::call('leysco100:shared:create-default-user --tenant='.Tenant::current()->id);
+        $this->info("Creating Default User");
+        Artisan::call('leysco100:shared:create-default-user --tenant='.Tenant::current()->id);
 
-//        $this->info("Creating Default Document Form-settings");
-//        Artisan::call('leysco100:shared:create-default-document-form-settings --tenant='.Tenant::current()->id);
+        $this->info("Creating Default Document Form-settings");
+        Artisan::call('leysco100:shared:create-default-document-form-settings --tenant='.Tenant::current()->id);
 
         $packages = $this->ask("Do You Want To Install All Packages? (Y) yes, (N) No");
 
@@ -110,7 +110,7 @@ class InstallSharedPackageCommand extends Command
 
             $this->info("Installing Gpm Package");
             Artisan::call('leysco100:gpm:install --tenant='.Tenant::current()->id);
-            //7. install Gpm package
+
         }
     }
 }

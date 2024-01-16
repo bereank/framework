@@ -101,6 +101,14 @@ class FiscalizationController extends Controller
             }
             //step one: create new record on fsc1 table
             $fsc1 = new FSC1();
+            $fsc1->cache = json_encode($request->all());
+            $fsc1->U_ControlCode = $request["U_ControlCode"];
+            $fsc1->U_RelatedInv = $request["U_RelatedInv"];
+            $fsc1->U_CUInvoiceNum = $request["U_CUInvoiceNum"];
+            $fsc1->U_QRCode = $request["U_QRCode"];
+            $fsc1->U_QrLocation = $request["U_QrLocation"];
+            $fsc1->U_ReceiptNo = $request["U_ReceiptNo"];
+            $fsc1->U_CommitedTime = $request["U_CommitedTime"];
             $fsc1->InvoiceId = $id;
             $fsc1->message = $request["message"];
             $fsc1->statusCode = $request["statusCode"];
