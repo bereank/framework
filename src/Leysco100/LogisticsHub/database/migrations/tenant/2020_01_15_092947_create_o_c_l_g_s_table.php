@@ -31,7 +31,9 @@ class CreateOCLGSTable extends Migration
             $table->string('Summary')->nullable();
             $table->string('Status', 1)->default('D');//O Opened //D Due,C Closed, A  Abondened
             $table->string('AprovalStatus', 1)->default('P'); // A,Approved,P Pending
-            $table->integer('UserSign');
+            $table->integer('UserSign')->nullable()->references('id')->on('users');
+            $table->integer('OwnerCode')->nullable();
+            $table->integer('ObjType')->nullable();
             $table->integer('CountryID')->references('id')->on('countries')->nullable();
             $table->timestamps();
         });

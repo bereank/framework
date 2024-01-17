@@ -54,6 +54,15 @@ return new class extends Migration
                 $table->string('LogDevice')->nullable()->after('address');
             }
         });
+
+        Schema::table('o_c_l_g_s', function (Blueprint $table) {
+            if (!Schema::hasColumn('o_c_l_g_s', 'OwnerCode')) {
+                $table->integer('OwnerCode')->nullable();
+            }
+            if (!Schema::hasColumn('o_c_l_g_s', 'ObjType')) {
+                $table->integer('ObjType')->nullable();
+            }
+        });
     }
 
     /**
@@ -78,6 +87,11 @@ return new class extends Migration
             $table->dropColumn('latitude');
             $table->dropColumn('LogDevice');
             $table->dropColumn('address');
+        });
+
+        Schema::table('o_c_l_g_s', function (Blueprint $table) {
+            $table->integer('OwnerCode')->nullable();
+            $table->integer('ObjType')->nullable();
         });
     }
 };
