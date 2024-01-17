@@ -3,12 +3,14 @@
 namespace Leysco100\LogisticsHub\Http\Controllers\API\V1;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\LogisticsHub\Models\OCLG;
+use Leysco100\Shared\Models\LogisticsHub\Models\ORPS;
 use Leysco100\LogisticsHub\Http\Controllers\Controller;
-use Leysco100\Shared\Models\LogisticsHub\Models\RouteOutlet;
-use Leysco100\Shared\Models\LogisticsHub\Models\RoutePlanning;
+use Leysco100\Shared\Models\LogisticsHub\Models\CRD16;
 
 class RoutePlanningController extends Controller
 {
@@ -19,7 +21,27 @@ class RoutePlanningController extends Controller
      */
     public function index()
     {
-        return RoutePlanning::with('calls.outlet', 'outlets','territory')->get();
+        $name = request()->filled('name') ? request()->input('name')  : false;
+
+        $UserSign = request()->filled('UserSign') ? request()->input('UserSign')  : false;
+
+        $OwnerCode = request()->filled('OwnerCode') ? request()->input('OwnerCode')  : false;
+        try {
+            $record =  ORPS::with('calls.outlet', 'outlets', 'territory')
+                ->when($name, function ($query) use ($name) {
+                    return $query->where('name',  $name);
+                })
+                ->when($UserSign, function ($query) use ($UserSign) {
+                    return $query->where('UserSign', $UserSign);
+                })
+                ->when($OwnerCode, function ($query) use ($OwnerCode) {
+                    return $query->where('OwnerCode', $OwnerCode);
+                })
+                ->get();
+            return (new ApiResponseService())->apiSuccessResponseService($record);
+        } catch (\Throwable $th) {
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+        }
     }
 
     /**
@@ -42,16 +64,46 @@ class RoutePlanningController extends Controller
     {
         $user = Auth::user();
 
-        $this->validate($request, [
-            'name' => 'required', //description
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'TerritoryID' => 'required',
         ]);
 
-        return RoutePlanning::create([
-            'name' => $request['name'],
-            'user_id' => $user->id,
-            'territory_id' => $request["region"]["id"],
-            'description' => $request['description'] ? $request['description'] : "Desc",
-        ]);
+        if ($validator->fails()) {
+            return (new ApiResponseService())->apiFailedResponseService($validator->errors()->first());
+        }
+
+        try {
+            $record =   ORPS::updateOrcreate(
+                [
+                    "Code" => $request['Code'] ?? null,
+                    "StartLng" => $request['StartLng'] ?? null,
+                    "StartLat" => $request['StartLat'] ?? null,
+                    "EndLat" => $request['EndLat'] ?? null,
+                    "EndLng" => $request['EndLng'] ?? null,
+                    "StartLocName" => $request['EndLng'] ?? null,
+                    "EndLocName" => $request['EndLng'] ?? null,
+                    "DocNum" => $request['DocNum'] ?? null,
+                    "OwnerCode" => $request['OwnerCode'] ?? $user->EmpID,
+                    "ObjType" => null,
+                    "ExtCode" => $request['ExtCode'] ?? null,
+                    "Active" => $request['Active'] ?? null
+                ],
+                [
+                    'name' => $request['name'],
+                    'UserSign' => $user->id,
+                    'TerritoryID' => $request["TerritoryID"],
+                    'Description' => $request['Description'] ? $request['description'] : null,
+                    "ObjType" => null,
+                    "ExtCode" => $request['ExtCode'] ?? null,
+                    "Active" => $request['Active'] ?? null
+                ]
+
+            );
+            return (new ApiResponseService())->apiSuccessResponseService($record);
+        } catch (\Throwable $th) {
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+        }
     }
 
     public function createRouteOutlets(Request $request)
@@ -62,10 +114,10 @@ class RoutePlanningController extends Controller
 
         //Creating Rows:
         foreach ($request['bpartners'] as $key => $item) {
-            $HeaderItems = RouteOutlet::updateOrcreate(
+            $HeaderItems = CRD16::updateOrcreate(
                 [
-                    'route_id' => $request['route_id'],
-                    'outlet_id' => $item, //Outlet Val
+                    'RouteID' => $request['route_id'],
+                    'CardCode' => $item, //Outlet Val
                 ]
             );
         }
@@ -99,7 +151,12 @@ class RoutePlanningController extends Controller
      */
     public function show($id)
     {
-        return RoutePlanning::with( 'calls.outlet', 'calls.employees','outlets')->findOrfail($id);
+        try {
+            $record =   ORPS::with('calls.outlet', 'calls.employees', 'outlets')->find($id);
+            return (new ApiResponseService())->apiSuccessResponseService($record);
+        } catch (\Throwable $th) {
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+        }
     }
 
     /**
@@ -125,15 +182,33 @@ class RoutePlanningController extends Controller
         $user = Auth::user();
 
         $this->validate($request, [
-            'name' => 'required',
+            'name' => 'required', //description
+            'TerritoryID' => 'required',
         ]);
 
-        $route = [
-            'name' => $request['name'],
-            'user_id' => $user->id,
-            'description' => $request['description'],
-        ];
-        RoutePlanning::where('id', $id)->update($route);
+        try {
+            $record =   ORPS::where('id', $id)->update([
+                'name' => $request['name'],
+                'UserSign' => $user->id,
+                'TerritoryID' => $request["TerritoryID"],
+                'Description' => $request['Description'] ? $request['description'] : null,
+                "Code" => $request['Code'] ?? null,
+                "StartLng" => $request['StartLng'] ?? null,
+                "StartLat" => $request['StartLat'] ?? null,
+                "EndLat" => $request['EndLat'] ?? null,
+                "EndLng" => $request['EndLng'] ?? null,
+                "StartLocName" => $request['EndLng'] ?? null,
+                "EndLocName" => $request['EndLng'] ?? null,
+                "DocNum" => $request['DocNum'] ?? null,
+                "OwnerCode" => $request['OwnerCode'] ?? $user->EmpID,
+                "ObjType" => null,
+                "ExtCode" => $request['ExtCode'] ?? null,
+                "Active" => $request['Active'] ?? null
+            ]);
+            return (new ApiResponseService())->apiSuccessResponseService($record);
+        } catch (\Throwable $th) {
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+        }
     }
 
     /**
@@ -145,5 +220,13 @@ class RoutePlanningController extends Controller
     public function destroy($id)
     {
         //
+        try {
+            $record =   ORPS::where('id', $id)->update([
+                "Active" => false
+            ]);
+            return (new ApiResponseService())->apiSuccessResponseService();
+        } catch (\Throwable $th) {
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+        }
     }
 }

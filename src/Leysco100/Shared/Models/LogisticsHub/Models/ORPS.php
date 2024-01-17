@@ -4,33 +4,31 @@ namespace Leysco100\Shared\Models\LogisticsHub\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Leysco100\Shared\Models\LogisticsHub\Models\OCLG;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Leysco100\Shared\Models\Administration\Models\OTER;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
-use Leysco100\Shared\Models\LogisticsHub\Models\RouteOutlet;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
-class RoutePlanning extends Model
+class ORPS extends Model
 {
-    Use UsesTenantConnection;
+    use HasFactory, UsesTenantConnection;
 
     protected $guarded = ['id'];
-    protected $table = 'route_plannings';
-
     public function owner()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'UserSign');
     }
 
     public function rows()
     {
-        return $this->hasMany(RouteOutlet::class, 'route_id');
+        return $this->hasMany(CRD16::class, 'RouteID');
     }
 
     public function outlets()
     {
-//        return $this->hasMany(RouteOutlet::class,  'route_id');
-        return $this->belongsToMany(OCRD::class, RouteOutlet::class, 'route_id', 'outlet_id');
+//        return $this->hasMany(CRD16::class,  'route_id');
+        return $this->belongsToMany(OCRD::class, CRD16::class, 'RouteID', 'CardCode');
     }
 
     public function calls()
@@ -40,6 +38,7 @@ class RoutePlanning extends Model
 
     public function territory()
     {
-        return $this->belongsTo(OTER::class, 'territory_id');
+        return $this->belongsTo(OTER::class, 'TerritoryID');
     }
+  
 }

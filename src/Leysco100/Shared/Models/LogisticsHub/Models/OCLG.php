@@ -22,7 +22,7 @@ class OCLG extends Model
 
     public function employees()
     {
-        return $this->belongsTo(OSLP::class, 'SlpCode');
+        return $this->belongsTo(OSLP::class, 'SlpCode','SlpCode');
     }
 
     public function objectives()
