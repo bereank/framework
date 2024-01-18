@@ -22,6 +22,8 @@ class PaymentsController extends Controller
         $paginate = request()->filled('paginate') ? request()->input('paginate') : false;
 
         $searchTerm = $request->input('search') ? $request->input('search') : false;
+
+        $source = \Request::has('Source') ? explode(",", \Request::get('Source')) : [];
         try {
             $page = $request->input('page', 1);
             $perPage = $request->input('per_page', 50);
@@ -30,7 +32,9 @@ class PaymentsController extends Controller
             $data = $data->whereBetween('created_at', [
                 $startdate,
                 $endate,
-            ]);
+            ])->when(!empty($source), function ($query) use ($source) {
+                $query->whereIn('Source', $source);
+            });
 
             if ($searchTerm) {
                 $data = $data->where(function ($query) use ($searchTerm) {
