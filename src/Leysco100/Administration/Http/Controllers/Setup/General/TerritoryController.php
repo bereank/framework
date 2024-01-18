@@ -23,12 +23,11 @@ class TerritoryController extends Controller
     {
         try {
 
-            $data = OTER::whereNull('parent')
+            $territories = OTER::whereNull('parent')
                 ->with('childrenRecursive')
-                ->get()
-                ->toArray(); // Convert the collection to an array
+                ->get();
 
-            $data['outlets'] = OCRD::whereNotNull('Latitude')
+            $outlets = OCRD::whereNotNull('Latitude')
                 ->whereNotNull('Longitude')
                 ->get()
                 ->map(function ($outlet) {
@@ -43,14 +42,17 @@ class TerritoryController extends Controller
             $latitude = OCRD::whereNotNull('Latitude')->avg('Latitude');
             $longitude = OCRD::whereNotNull('Longitude')->avg('Longitude');
 
-            $data['centerMap'] = [
+            $centerMap = [
                 'lat' => (float) $latitude ?? 1.9099,
                 'lng' => (float) $longitude ?? 34.9099,
             ];
+            $res = collect(['territories' => null, 'outlets' => null, 'centerMap' => null]);
 
+            $res->put('territories', $territories);
+            $res->put('outlets', $outlets);
+            $res->put('centerMap', $centerMap);
 
-            Log::info($data);
-            return (new ApiResponseService())->apiSuccessResponseService($data);
+            return (new ApiResponseService())->apiSuccessResponseService($res);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }

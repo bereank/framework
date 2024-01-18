@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\LogisticsHub\Models\OCLG;
 use Leysco100\LogisticsHub\Http\Controllers\Controller;
+use Leysco100\LogisticsHub\Services\RouteMgtService;
 use Leysco100\Shared\Models\Administration\Models\OUDG;
 use Leysco100\Shared\Models\Administration\Models\User;
 
@@ -104,23 +105,8 @@ class CallController extends Controller
         }
 
         try {
-            $user = Auth::user();
-            $OCLG = OCLG::create([
-                'ClgCode' => $request['ClgCode'],
-                'SlpCode' => $request['SlpCode'] ?? OUDG::where('id', $user->DfltsGroup)->value('SalePerson'), // Sales Employee
-                'CardCode' => $request['CardCode'], // Oulet/Customer
-                'CallDate' => $request['CallDate'], //  Call Date
-                'CallTime' => $request['CallTime'], // CallTime
-                'UserSign' => $user->id,
-                'RouteCode' => $request['RouteCode'] ?? null,
-                'CallEndTime' => $request['CallEndTime'] ?? null, // CallTime
-                'CloseDate' => $request['CloseDate'] ?? null,
-                'CloseTime' => $request['CloseTime'] ?? null,
-                'Repeat' => $request['Repeat'] ? $request['Repeat'] : "N", // Recurrence Pattern //A=Annually, D=Daily, M=Monthly, N=None, W=Weekly
-                'Summary' => $request['Summary'] ?? null,
-                'Status' => $request['Status'] ?? 'D',
-            ]);
-
+            
+            $OCLG = (new RouteMgtService())->CreateCallsService($request->toArray());
             return (new ApiResponseService())->apiSuccessResponseService(['data' => $OCLG, "message" => "Call Created Successfully"]);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());

@@ -17,6 +17,7 @@ use Leysco100\Inventory\Http\Controllers\Controller;
 use Leysco100\MarketingDocuments\Jobs\NumberingSeries;
 use Leysco100\Shared\Models\Administration\Models\EOTS;
 use Leysco100\Shared\Models\Administration\Models\OADM;
+use Leysco100\Shared\Models\Administration\Models\OUDG;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\MarketingDocuments\Services\DocumentsService;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OATS;
@@ -32,6 +33,7 @@ use Leysco100\Shared\Models\InventoryAndProduction\Models\OSRN;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\WTR19;
 use Leysco100\MarketingDocuments\Services\DatabaseValidationServices;
+use Leysco100\MarketingDocuments\Http\Controllers\API\PriceCalculationController;
 use Leysco100\Shared\Models\MarketingDocuments\Services\GeneralDocumentValidationService;
 
 
@@ -122,7 +124,7 @@ class InventoryTransactionsController extends Controller
         $this->validate($request, [
             'ObjType' => 'required',
         ]);
-        Log::info($request);
+
         $user = Auth::user();
         $ObjType = (int) $request['ObjType'];
 
@@ -253,6 +255,11 @@ class InventoryTransactionsController extends Controller
                         ->apiFailedResponseService("Items Required");
                 }
                 $ItemCode = $product->ItemCode;
+                if ($user->oudg->SellFromBin) {
+                    //defaulting item dimensions
+                    $dimensions =     (new PriceCalculationController())->getItemDefaultDimensions($product->id);
+                }
+
                 if (!$ItemCode) {
                     return (new ApiResponseService())
                         ->apiFailedResponseService("Items Required");
@@ -286,7 +293,21 @@ class InventoryTransactionsController extends Controller
                         }
                     }
                 }
+                if ($user->oudg->SellFromBin && $request['ObjType'] == 67 && empty($value['bin_allocation'])) {
+                    if ($value['CogsOcrCo4']) {
+                        $defaults = OUDG::where('CogsOcrCo4', $value['CogsOcrCo4'])->first();
+                        $obin = OBIN::where('id', $defaults->DftBinLoc)->first();
 
+                        $value['bin_allocation'] =  [
+                            [
+                                'BinCode' => $obin->BinCode,
+                                'QtyVar' => $value['Quantity']
+                            ]
+                        ];
+                    }
+                }
+                
+           
                 $doctTotal = $doctTotal + $AvgPrice;
                 $rowdetails = [
                     'DocEntry' => $newDoc->id,
@@ -312,11 +333,11 @@ class InventoryTransactionsController extends Controller
                     'SlpCode' => $request['SlpCode'], //    Sales Employee
                     'Commission' => array_key_exists('Commission', $value) ? $value['Commission'] : null, //    Comm. %
                     'AcctCode' => array_key_exists('AcctCode', $value) ? $value['AcctCode'] : null, //    G/L Account
-                    'OcrCode' => $value['OcrCode'] ?? null, //    Dimension 1
-                    'OcrCode2' => $value['OcrCode2'] ?? null, //    Dimension 2
-                    'OcrCode3' => $value['OcrCode3'] ?? null, //    Dimension 3
-                    'OcrCode4' => $value['OcrCode4'] ?? null, //    Dimension 4
-                    'OcrCode5' => $value['OcrCode5'] ?? null, //    Dimension 5
+                    'OcrCode' => isset($value['OcrCode']) ? $value['OcrCode'] : null, //    Dimension 1
+                    'OcrCode2' => isset($value['OcrCode2']) ? $value['OcrCode2'] : null, //    Dimension 2
+                    'OcrCode3' => isset($value['OcrCode3']) ? $value['OcrCode3'] : null, //    Dimension 3
+                    'OcrCode4' => isset($value['OcrCode4']) ? $value['OcrCode4'] : null, //    Dimension 4
+                    'OcrCode5' => isset($value['OcrCode5']) ? $value['OcrCode5'] : null, //    Dimension 5
                     'OpenQty' => array_key_exists('Quantity', $value) ? $value['Quantity'] : null, //    Open Inv. Qty
                     'GrossBuyPr' => array_key_exists('GrossBuyPr', $value) ? $value['GrossBuyPr'] : null, //   Gross Profit Base Price
                     'GPTtlBasPr' => array_key_exists('GPTtlBasPr', $value) ? $value['GPTtlBasPr'] : null, //    Gross Profit Total Base Price
@@ -344,11 +365,11 @@ class InventoryTransactionsController extends Controller
                     'LinePoPrss' => array_key_exists('LinePoPrss', $value) ? $value['LinePoPrss'] : null, //    Allow Procmnt. Doc.
 
                     //Cogs Values
-                    'CogsOcrCod' => $value['OcrCode'] ?? null,
-                    'CogsOcrCo2' => $value['OcrCode2'] ?? null,
-                    'CogsOcrCo3' => $value['OcrCode3'] ?? null,
-                    'CogsOcrCo4' => $value['OcrCode4'] ?? null,
-                    'CogsOcrCo5' => $value['OcrCode5'] ?? null,
+                    'CogsOcrCod' => isset($value['OcrCode']) ? $value['OcrCode'] : (isset($dimensions['OcrCode']) ? $dimensions['OcrCode'] : null),
+                    'CogsOcrCo2' => isset($value['OcrCode2']) ? $value['OcrCode2'] : (isset($dimensions['OcrCode2']) ? $dimensions['OcrCode2'] : null),
+                    'CogsOcrCo3' => isset($value['OcrCode3']) ? $value['OcrCode3'] : (isset($dimensions['OcrCode3']) ? $dimensions['OcrCode3'] : null),
+                    'CogsOcrCo4' => isset($value['OcrCode4']) ? $value['OcrCode4'] : (isset($dimensions['OcrCode4']) ? $dimensions['OcrCode4'] : null),
+                    'CogsOcrCo5' => isset($value['OcrCode5']) ? $value['OcrCode5'] : (isset($dimensions['OcrCode5']) ? $dimensions['OcrCode5'] : null),
                     //Inventory Transaction  Value
                     'PQTReqDate' => $request['ReqDate'] ?? null,
 
@@ -378,7 +399,7 @@ class InventoryTransactionsController extends Controller
                     $lineModel = collect($result)->first();
 
                     $FromBinCod =    $value['FromBinCod'] ?? null;
-                    Log::info('FROM BIN: ' . $FromBinCod);
+
                     foreach ($value['bin_allocation'] as $key => $BinVal) {
                         if (!empty($BinVal)) {
                             $SubLineNum = ++$key;
@@ -496,6 +517,7 @@ class InventoryTransactionsController extends Controller
             //            return (new ApiResponseService())->apiSuccessResponseService($newDoc);
             return (new ApiResponseService())->apiSuccessResponseService($newDoc);
         } catch (\Throwable $th) {
+            Log::info($th);
             DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }

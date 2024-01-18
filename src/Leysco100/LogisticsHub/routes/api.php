@@ -3,19 +3,19 @@
 
 
 use Illuminate\Support\Facades\Route;
-use Leysco100\LogisticsHub\Http\Controllers\API\V1\MCallController;
-use Leysco100\LogisticsHub\Http\Controllers\API\V1\RouteAssignmentController;
+use Leysco100\LogisticsHub\Http\Controllers\API\V1\CallController;
 use Leysco100\LogisticsHub\Http\Controllers\API\V1\TargetController;
 use Leysco100\LogisticsHub\Http\Controllers\API\V1\ExpenseController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\TierController;
 use Leysco100\LogisticsHub\Http\Controllers\API\V1\DispatchController;
+use Leysco100\LogisticsHub\Http\Controllers\API\V1\GpsSetUpController;
 use Leysco100\LogisticsHub\Http\Controllers\API\V1\ITerritoryController;
 use Leysco100\MarketingDocuments\Http\Controllers\API\ChannelController;
 use Leysco100\LogisticsHub\Http\Controllers\API\V1\GpsLocationController;
 use Leysco100\LogisticsHub\Http\Controllers\API\V1\RouteActionsController;
 use Leysco100\LogisticsHub\Http\Controllers\API\V1\RoutePlanningController;
+use Leysco100\LogisticsHub\Http\Controllers\API\V1\RouteAssignmentController;
 use Leysco100\LogisticsHub\Http\Controllers\API\V1\EmployeeTimeSheetController;
-use Leysco100\LogisticsHub\Http\Controllers\API\V1\GpsSetUpController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,7 +43,7 @@ Route::get('/regions/search', [ITerritoryController::class, 'searchRegion']);
 // Route Planning
 Route::post('route_outlets', [RoutePlanningController::class, 'createRouteOutlets']);
 Route::post('route_calls', [RoutePlanningController::class, 'createRouteCalls']);
-Route::apiResources(['routes' => RoutePlanningController::class]);
+Route::apiResources(['routes_planning' => RoutePlanningController::class]);
 Route::apiResources(['route_assignments' => RouteAssignmentController::class]);
 
 // GPS LOCATIONS
@@ -78,21 +78,22 @@ Route::get('get_targets_skus/{id}', [TargetController::class, 'showSkus']);
 Route::get('open_employee_timesheet', [EmployeeTimeSheetController::class, 'getClocInDetails']);
 Route::get('/confirm/employee-timesheet', [EmployeeTimeSheetController::class, 'confirmClockIn']);
 
-  //OpenCall
+//OpenCall
 
-  Route::post('openCall/{callID}', [MCallController::class, 'openCall']);
-  Route::post('closeCall/{callID}', [MCallController::class, 'closeCall']);
+// Route::post('openCall/{callID}', [CallController::class, 'openCall']);
+// Route::post('closeCall/{callID}', [CallController::class, 'closeCall']);
+Route::put('call_action/{callID}', [CallController::class, 'callActions']);
 
-  Route::post('osa', [RouteActionsController::class, 'OnShelfAvailabilty']);
-  // Route::post('pricetracking', 'API\V1\RouteActionsController@PriceTracking');
-  // Route::post('shareofshelf', 'API\V1\RouteActionsController@ShareOfShelf');
-  // Route::post('productplacement', 'API\V1\RouteActionsController@ProductPlacement');
-  // Route::post('callobjective', 'API\V1\RouteActionsController@CallObjective');
-  // Route::post('contactperson', 'API\V1\OutletController@CreateContactPerson');
-  Route::apiResources(['expense' => ExpenseController::class]);
-  Route::apiResources(['call' => MCallController::class]);
+Route::post('osa', [RouteActionsController::class, 'OnShelfAvailabilty']);
+// Route::post('pricetracking', 'API\V1\RouteActionsController@PriceTracking');
+// Route::post('shareofshelf', 'API\V1\RouteActionsController@ShareOfShelf');
+// Route::post('productplacement', 'API\V1\RouteActionsController@ProductPlacement');
+// Route::post('callobjective', 'API\V1\RouteActionsController@CallObjective');
+// Route::post('contactperson', 'API\V1\OutletController@CreateContactPerson');
+Route::apiResources(['expense' => ExpenseController::class]);
+Route::apiResources(['call' => CallController::class]);
 
-  Route::put('/routes', [ITerritoryController::class, 'createOrUpdateRoutes']);
-  Route::apiResources(['regions' => ITerritoryController::class]);
-  
+Route::put('/routes', [ITerritoryController::class, 'createOrUpdateRoutes']);
+Route::apiResources(['regions' => ITerritoryController::class]);
+
 Route::apiResources(['employee-timesheet' => EmployeeTimeSheetController::class]);

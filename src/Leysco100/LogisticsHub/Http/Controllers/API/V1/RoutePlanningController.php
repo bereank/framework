@@ -4,13 +4,14 @@ namespace Leysco100\LogisticsHub\Http\Controllers\API\V1;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\LogisticsHub\Models\OCLG;
 use Leysco100\Shared\Models\LogisticsHub\Models\ORPS;
-use Leysco100\LogisticsHub\Http\Controllers\Controller;
 use Leysco100\Shared\Models\LogisticsHub\Models\CRD16;
+use Leysco100\LogisticsHub\Http\Controllers\Controller;
 
 class RoutePlanningController extends Controller
 {
@@ -62,11 +63,12 @@ class RoutePlanningController extends Controller
      */
     public function store(Request $request)
     {
+        Log::info($request);
         $user = Auth::user();
 
         $validator = Validator::make($request->all(), [
             'name' => 'required',
-            'TerritoryID' => 'required',
+            // 'TerritoryID' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -81,13 +83,13 @@ class RoutePlanningController extends Controller
                     "StartLat" => $request['StartLat'] ?? null,
                     "EndLat" => $request['EndLat'] ?? null,
                     "EndLng" => $request['EndLng'] ?? null,
-                    "StartLocName" => $request['EndLng'] ?? null,
-                    "EndLocName" => $request['EndLng'] ?? null,
+                    "StartLocName" => $request['StartLocName'] ?? null,
+                    "EndLocName" => $request['EndLocName'] ?? null,
                     "DocNum" => $request['DocNum'] ?? null,
                     "OwnerCode" => $request['OwnerCode'] ?? $user->EmpID,
                     "ObjType" => null,
                     "ExtCode" => $request['ExtCode'] ?? null,
-                    "Active" => $request['Active'] ?? null
+                    "Active" => $request['Active'] ?? true
                 ],
                 [
                     'name' => $request['name'],
@@ -113,7 +115,8 @@ class RoutePlanningController extends Controller
 
 
         //Creating Rows:
-        foreach ($request['bpartners'] as $key => $item) {
+        foreach ($request['bpartners'] as $item) {
+            Log::info($item);
             $HeaderItems = CRD16::updateOrcreate(
                 [
                     'RouteID' => $request['route_id'],

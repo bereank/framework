@@ -11,6 +11,7 @@ use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Inventory\Services\InventoryService;
 use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
 use Leysco100\Shared\Models\Administration\Models\OADM;
+use Leysco100\Shared\Models\Administration\Models\OUDG;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OBIN;
@@ -95,12 +96,28 @@ class MarketingDocumentService
 
                         //defaulting item dimensions
                         $dimensions =     (new PriceCalculationController())->getItemDefaultDimensions($itemDetails->id);
-                        $documentLines[$key]['OcrCode'] = $dimensions['OcrCode'] ?? null;
-                        $documentLines[$key]['OcrCode2'] = $dimensions['OcrCode2'] ?? null;
-                        $documentLines[$key]['OcrCode3'] = $dimensions['OcrCode3'] ?? null;
+                        $documentLines[$key]['OcrCode'] = isset($line['OcrCode']) && !empty($line['OcrCode']) ? $line['OcrCode'] : $dimensions['OcrCode'];
+                        $documentLines[$key]['OcrCode2'] = isset($line['OcrCode2']) && !empty($line['OcrCode2']) ? $line['OcrCode2'] : $dimensions['OcrCode2'];
+                        $documentLines[$key]['OcrCode3'] = isset($line['OcrCode3']) && !empty($line['OcrCode3']) ? $line['OcrCode3'] : $dimensions['OcrCode3'];
                         $documentLines[$key]['U_AllowDisc'] = $dimensions['U_AllowDisc'] ?? null;
-                        $documentLines[$key]['OcrCode4'] = $dimensions['OcrCode4'] ?? null;
-                        $documentLines[$key]['OcrCode5'] = $dimensions['OcrCode5'] ?? null;
+                        $documentLines[$key]['OcrCode4'] = isset($line['OcrCode4']) && !empty($line['OcrCode4']) ? $line['OcrCode4'] : $dimensions['OcrCode4'];
+                        $documentLines[$key]['OcrCode5'] = isset($line['OcrCode5'])  && !empty($line['OcrCode5'])? $line['OcrCode5'] : $dimensions['OcrCode5'];
+
+                        if ($user_data->oudg->SellFromBin && $data['ObjType'] == 13 && empty($value['bin_allocation'])) {
+                            if ($line['OcrCode4']) {
+                                $defaults = OUDG::where('CogsOcrCo4',  $line['OcrCode4'])->first();
+                                $obin = OBIN::where('id', $defaults->DftBinLoc)->first();
+                                if ($defaults->DftBinLoc && $obin) {
+                                    $documentLines[$key]['bin_allocation'] =  [
+                                        [
+                                            'BinCode' => $obin->BinCode,
+                                            'QtyVar' =>  $line['Quantity']
+                                        ]
+                                    ];
+                                }
+                            }
+                        }
+
                     }
                     if (data_get($line, 'Quantity')) {
                         if ($itemDetails) {
@@ -483,7 +500,7 @@ class MarketingDocumentService
                     'CogsOcrCo3' => $value['OcrCode3'] ?? null,
                     'CogsOcrCo4' => $value['OcrCode4'] ?? null,
                     'CogsOcrCo5' => $value['OcrCode5'] ?? null,
-                    
+
 
                     'BaseType' => $value['BaseType'] ?? null, //    Base Type
                     'BaseRef' => $value['BaseRef'] ?? null, //    Base Ref.

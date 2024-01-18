@@ -3,11 +3,15 @@
 namespace Leysco100\LogisticsHub\Http\Controllers\API\V1;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Leysco100\LogisticsHub\Http\Controllers\Controller;
-use Leysco100\Shared\Models\LogisticsHub\Models\ORAS;
+use Illuminate\Support\Facades\Auth;
 use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\LogisticsHub\Services\RouteMgtService;
+use Leysco100\Shared\Models\LogisticsHub\Models\OCLG;
+use Leysco100\Shared\Models\LogisticsHub\Models\ORAS;
+use Leysco100\Shared\Models\LogisticsHub\Models\CRD16;
+use Leysco100\LogisticsHub\Http\Controllers\Controller;
+use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 
 class RouteAssignmentController extends Controller
 {
@@ -81,7 +85,32 @@ class RouteAssignmentController extends Controller
                     "Active" => $request['Active'] ?? null
                 ]
             );
+            $Codes = CRD16::where('RouteID', $request['RouteID'])->pluck('CardCode');
+            $CardCodes =   OCRD::whereIn('id', $Codes)->pluck('CardCode');
+            foreach ($CardCodes as $CardCode) {
+                $otherCalls = OCLG::whereDate('CallDate', $request['date'])
+                    ->where('CardCode', $CardCode)
+                    ->first();
 
+                if ($request['CreateCall'] && empty($otherCalls)) {
+                    $call = [
+                        'ClgCode' => null,
+                        'SlpCode' => $request['SlpCode'],
+                        'CardCode' => $CardCode, //Customer
+                        'CallDate' => $request['date'], //  Call Date
+                        'CallTime' => null, // CallTime
+                        'UserSign' => $user->id,
+                        'RouteCode' => $request['RouteID'] ?? null,
+                        'CallEndTime' =>  null,
+                        'CloseDate' =>  null,
+                        'CloseTime' =>   null,
+                        'Repeat' =>  "N",
+                        'Summary' =>  null,
+                        'Status' => 'D',
+                    ];
+                    $OCLG = (new RouteMgtService())->CreateCallsService($call);
+                }
+            }
             DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService($assignment);
         } catch (\Throwable $th) {
