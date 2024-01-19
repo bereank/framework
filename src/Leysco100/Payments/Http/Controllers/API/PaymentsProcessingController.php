@@ -252,8 +252,8 @@ class PaymentsProcessingController extends Controller
 
     public function  eqbValidation(Request $request)
     {
-        return response()->json(['error' => 'API disabled'], 403);
-        Log::info("____________EQB VALIDATION  _______________________");
+    
+        Log::info("____________EQB VALIDATION API _______________________");
         Log::info($request->all());
 
         $this->eqbAuth($request);
@@ -308,8 +308,8 @@ class PaymentsProcessingController extends Controller
 
     public function eqbPaymentNotification(Request $request)
     {
-        return response()->json(['error' => 'API disabled'], 403);
-        Log::info("____________EQB PAYMENT NOTIFICATION  _______________________");
+        
+        Log::info("____________EQB PAYMENT NOTIFICATION  API_______________________");
         Log::info($request->all());
 
         $this->eqbAuth($request);
