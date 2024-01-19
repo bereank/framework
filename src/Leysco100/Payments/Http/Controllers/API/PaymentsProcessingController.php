@@ -252,7 +252,7 @@ class PaymentsProcessingController extends Controller
 
     public function  eqbValidation(Request $request)
     {
-    
+
         Log::info("____________EQB VALIDATION API _______________________");
         Log::info($request->all());
 
@@ -308,7 +308,7 @@ class PaymentsProcessingController extends Controller
 
     public function eqbPaymentNotification(Request $request)
     {
-        
+
         Log::info("____________EQB PAYMENT NOTIFICATION  API_______________________");
         Log::info($request->all());
 
@@ -328,8 +328,24 @@ class PaymentsProcessingController extends Controller
                 ->getNumSerieByObjectId(218);
 
             $paymentData =  $request->all();
+            if (!array_key_exists('bankreference', $paymentData)) {
+                return response()->json([
+                    "responseCode" => "OK",
+                    "responseMessage" => "MISSING BANKREFERENCE"
+                ]);
+            }
+            $code = $paymentData['bankreference'];
 
-            $exists = OCRP::where('TransID', $paymentData['bankreference'])->exists();
+            $dateString = substr($paymentData['bankreference'], 0, 8);
+
+            $date = Carbon::createFromFormat('Ymd', $dateString);
+
+            // Check if the parsed date is valid
+            if ($date && $date->isValid()) {
+                $code = substr($paymentData['bankreference'], 8);
+            }
+
+            $exists = OCRP::where('TransID', $code)->exists();
 
             if ($exists) {
                 return response()->json([
@@ -337,7 +353,20 @@ class PaymentsProcessingController extends Controller
                     "responseMessage" => "DUPLICATE TRANSACTION"
                 ]);
             }
+
             $transactionDate = Carbon::parse($paymentData['transactionDate']);
+            if (!$transactionDate->isToday()) {
+                return response()->json([
+                    "responseCode" => "OK",
+                    "responseMessage" => "GIVEN DATE IS NOT EQUAL TO TODAY"
+                ]);
+            }
+            if ($paymentData['billNumber'] != 811895) {
+                return response()->json([
+                    "responseCode" => "OK",
+                    "responseMessage" => "INVALID BILLNUMBER"
+                ]);
+            }
             $payment = [];
 
             $payment['BusinessKey'] = $paymentData['billNumber'] ?? "";
@@ -349,7 +378,7 @@ class PaymentsProcessingController extends Controller
             $payment['TransactType'] = $paymentData['paymentMode'] ?? "";
             $payment['ContactName'] = $paymentData['debitcustname'] ?? "";
             $payment['debitAccNo'] = $paymentData['debitaccount'] ?? "";
-            $payment['TransID'] = $paymentData['bankreference'] ?? "";
+            $payment['TransID'] = $code;
             $payment['DocNum'] =  $Numbering['NextNumber'];
             $payment['BusinessShortCode'] = null;
             $payment['Balance'] =  $paymentData['billAmount'] ?? 0;
