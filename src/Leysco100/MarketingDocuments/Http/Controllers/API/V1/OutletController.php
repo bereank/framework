@@ -21,10 +21,7 @@ use Leysco100\Shared\Models\MarketingDocuments\Models\OINV;
 use Leysco100\Shared\Models\MarketingDocuments\Models\ORDR;
 use Leysco100\Shared\Models\MarketingDocuments\Models\RDR1;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;
-use Leysco100\Shared\Models\LogisticsHub\Models\RoutePlanning;
-use Leysco100\Shared\Models\InventoryAndProduction\Models\OBIN;
-use Leysco100\Shared\Models\InventoryAndProduction\Models\OIBQ;
-use Leysco100\Shared\Models\LogisticsHub\Models\RouteAssignment;
+use Leysco100\Shared\Models\LogisticsHub\Models\ORAS;
 
 
 class OutletController extends Controller
@@ -46,7 +43,7 @@ class OutletController extends Controller
         $outletIds = [];
 
         if ($RouteActive) {
-            $assignments = RouteAssignment::where("Date",$date)->with("route.outlets")->where("SlpCode",$user->oudg->SalePerson)->get();
+            $assignments = ORAS::where("Date",$date)->with("route.outlets")->where("SlpCode",$user->oudg->SalePerson)->get();
             foreach ($assignments as $assignment){
                 $outletIds =  $assignment->route->outlets->pluck("id");
             }
