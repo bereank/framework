@@ -38,11 +38,15 @@ class ImportNumberingSeries extends Command
 
         $documents = [17, 15, 16, 13, 14, 23, 24, 1470000113, 1250000001, 191, 66, 67];
 
-//        $userSeriesName = $this->ask('Enter Series Name:');
-        $seriesJsonString = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'numberingseries.json');;
+        //        $userSeriesName = $this->ask('Enter Series Name:');
+        $seriesJsonString = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . './BorderPlusJson/numberingseries.json');;
+
+
         $series = json_decode($seriesJsonString, true);
+
         foreach ($series as $key => $value) {
-//             DB::connection("tenant")->beginTransaction();
+
+            //             DB::connection("tenant")->beginTransaction();
             try {
                 if (!isset($value['SeriesName'])) {
                     continue;
@@ -57,12 +61,12 @@ class ImportNumberingSeries extends Command
                 if (!in_array($document, $documents)) {
                     continue;
                 }
-//                if ($userSeriesName != $SeriesName) {
-//                    continue;
-//                }
+                //                if ($userSeriesName != $SeriesName) {
+                //                    continue;
+                //                }
 
                 $details = $this->getObjectDetails($document);
-//                dd($details);
+                //                dd($details);
                 if (!$details) {
                     continue;
                 }
@@ -81,12 +85,14 @@ class ImportNumberingSeries extends Command
                     'Locked' => $value['Locked'] ?? "N", //Locked
                     'IsForCncl' => $value['Is Series for Cancelation'] ?? "N",
                     'GroupCode' => $value['Group'] ?? 1,
+                    'NumSize' => $value['Numeric Size'] ?? null,
+
                 ]);
                 $this->comment("CREATED SERIES ID: " . $nnm1->id);
-//                 DB::connection("tenant")->commit();
+                //                 DB::connection("tenant")->commit();
             } catch (\Throwable $th) {
                 Log::info($th);
-//                 DB::connection("tenant")->rollback();
+                //                 DB::connection("tenant")->rollback();
             }
         }
     }
