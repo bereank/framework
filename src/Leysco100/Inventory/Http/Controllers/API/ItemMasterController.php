@@ -4,6 +4,7 @@ namespace Leysco100\Inventory\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Leysco100\Shared\Services\ApiResponseService;
@@ -12,6 +13,7 @@ use Leysco100\Shared\Services\AuthorizationService;
 use Leysco100\Inventory\Http\Controllers\Controller;
 use Leysco100\MarketingDocuments\Jobs\NumberingSeries;
 use Leysco100\Shared\Models\Administration\Models\ITG1;
+use Leysco100\Shared\Models\Administration\Models\NNM1;
 use Leysco100\Shared\Models\Administration\Models\OADM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITG;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
@@ -31,22 +33,22 @@ class ItemMasterController extends Controller
      */
     public function index()
     {
-//        (new AuthorizationService())->checkIfAuthorize(3, 'read');
+        //        (new AuthorizationService())->checkIfAuthorize(3, 'read');
         try {
             $search = \Request::get('f');
 
-//            $data = OITM::select('id', 'ItemName', 'ItemCode', 'INUoMEntry', 'SUoMEntry', 'PUoMEntry', 'UgpEntry', 'VatGourpSa', 'VatGroupPu', 'ManSerNum', 'QryGroup61')
-//                ->with('inventoryuom', 'salesuom', 'purchaseuom', 'ougp')
-//                ->where(function ($q) use ($search) {
-//                    if ($search != null) {
-//                        $q->where('ItemCode', 'LIKE', "%{$search}%");
-//                    }
-//                })
-//                ->take(50)
-//                ->orderBy('ItemCode', 'asc')
-//                ->get();
+            //            $data = OITM::select('id', 'ItemName', 'ItemCode', 'INUoMEntry', 'SUoMEntry', 'PUoMEntry', 'UgpEntry', 'VatGourpSa', 'VatGroupPu', 'ManSerNum', 'QryGroup61')
+            //                ->with('inventoryuom', 'salesuom', 'purchaseuom', 'ougp')
+            //                ->where(function ($q) use ($search) {
+            //                    if ($search != null) {
+            //                        $q->where('ItemCode', 'LIKE', "%{$search}%");
+            //                    }
+            //                })
+            //                ->take(50)
+            //                ->orderBy('ItemCode', 'asc')
+            //                ->get();
             $data = OITM::select('id', 'ItemName', 'ItemCode')
-//                ->with('inventoryuom', 'salesuom', 'purchaseuom', 'ougp')
+                //                ->with('inventoryuom', 'salesuom', 'purchaseuom', 'ougp')
                 ->where(function ($q) use ($search) {
                     if ($search != null) {
                         $q->where('ItemCode', 'LIKE', "%{$search}%");
@@ -77,7 +79,7 @@ class ItemMasterController extends Controller
             $page = $request->input('page', 1);
             $perPage = $request->input('per_page', 50);
             $skip = 0;
-            if($page >  1) {
+            if ($page >  1) {
                 $skip = $page * $perPage;
             }
 
@@ -89,40 +91,40 @@ class ItemMasterController extends Controller
 
 
 
-//            $data = OITM::select('id', 'ItemName', 'ItemCode', 'INUoMEntry', 'SUoMEntry', 'PUoMEntry', 'UgpEntry', 'VatGourpSa', 'VatGroupPu', 'ManSerNum', 'QryGroup61')
-//                ->with('inventoryuom', 'salesuom', 'purchaseuom', 'ougp')
-//                ->where(function ($q) use ($search) {
-//                    if ($search != null) {
-//                        $q->where('ItemCode', 'LIKE', "%{$search}%");
-//                    }
-//                })
-//                ->take(50)
-//                ->orderBy('ItemCode', 'asc')
-//                ->get();
+            //            $data = OITM::select('id', 'ItemName', 'ItemCode', 'INUoMEntry', 'SUoMEntry', 'PUoMEntry', 'UgpEntry', 'VatGourpSa', 'VatGroupPu', 'ManSerNum', 'QryGroup61')
+            //                ->with('inventoryuom', 'salesuom', 'purchaseuom', 'ougp')
+            //                ->where(function ($q) use ($search) {
+            //                    if ($search != null) {
+            //                        $q->where('ItemCode', 'LIKE', "%{$search}%");
+            //                    }
+            //                })
+            //                ->take(50)
+            //                ->orderBy('ItemCode', 'asc')
+            //                ->get();
 
 
-//            $data = OITW::select('o_i_t_w_s.id', 'o_i_t_w_s.ItemCode','a.ItemName', 'o_i_t_w_s.WhsCode', 'o_i_t_w_s.IsCommited', 'o_i_t_w_s.OnHand', 'o_i_t_w_s.OnOrder')
+            //            $data = OITW::select('o_i_t_w_s.id', 'o_i_t_w_s.ItemCode','a.ItemName', 'o_i_t_w_s.WhsCode', 'o_i_t_w_s.IsCommited', 'o_i_t_w_s.OnHand', 'o_i_t_w_s.OnOrder')
             $oitwdata = DB::connection("tenant")->table('o_i_t_w_s')
-            ->selectRaw("id, ItemCode,WhsCode, IsCommited, OnHand, OnOrder")
-            ->where(function ($q) use ($search, $itemcodesearch, $whsecodesearch) {
+                ->selectRaw("id, ItemCode,WhsCode, IsCommited, OnHand, OnOrder")
+                ->where(function ($q) use ($search, $itemcodesearch, $whsecodesearch) {
                     if ($search != null) {
                         $q->orWhere('ItemCode', 'LIKE', "%{$search}%")
                             ->orWhere("%{$search}%", 'LIKE', 'ItemCode')
                             ->orWhere('WhsCode', 'LIKE', "%{$search}%")
                             ->orWhere("%{$search}%", 'LIKE', 'WhsCode');
-//                            ->orWhere('a.ItemName', 'LIKE', "%{$search}%")
-//                            ->orWhere("%{$search}%", 'LIKE','a.ItemName');
+                        //                            ->orWhere('a.ItemName', 'LIKE', "%{$search}%")
+                        //                            ->orWhere("%{$search}%", 'LIKE','a.ItemName');
                     }
                     if ($itemcodesearch != null) {
                         $q->orWhere('ItemCode', 'LIKE', "%{$itemcodesearch}%")
-                        ->orWhere("%{$itemcodesearch}%", 'LIKE','ItemCode' );
+                            ->orWhere("%{$itemcodesearch}%", 'LIKE', 'ItemCode');
                     }
-                    if ( $whsecodesearch != null) {
+                    if ($whsecodesearch != null) {
                         $q->orWhere('WhsCode', 'LIKE', "%{ $whsecodesearch}%")
-                        ->orWhere("%{ $whsecodesearch}%", 'LIKE','WhsCode');
+                            ->orWhere("%{ $whsecodesearch}%", 'LIKE', 'WhsCode');
                     }
                 })
-                ->take($count??1000)
+                ->take($count ?? 1000)
                 ->orderBy('ItemCode', 'asc')
                 ->toSql();
 
@@ -130,10 +132,10 @@ class ItemMasterController extends Controller
             $data = DB::connection("tenant")->table('o_i_t_m_s')
 
                 ///->join(DB::raw("({$services} as services)"), 'services.customer_id', '=', 'customers.customer_id')
-                ->join(DB::raw("({$oitwdata}) as oitwdata"), 'oitwdata.ItemCode', '=', 'o_i_t_m_s.ItemCode','right outer')
-                ->select('oitwdata.id', 'oitwdata.ItemCode','o_i_t_m_s.ItemName', 'oitwdata.WhsCode', 'oitwdata.IsCommited', 'oitwdata.OnHand', 'oitwdata.OnOrder')
-//                ->get();
-                ->paginate($perPage, ['*'] , 'page',  $page);
+                ->join(DB::raw("({$oitwdata}) as oitwdata"), 'oitwdata.ItemCode', '=', 'o_i_t_m_s.ItemCode', 'right outer')
+                ->select('oitwdata.id', 'oitwdata.ItemCode', 'o_i_t_m_s.ItemName', 'oitwdata.WhsCode', 'oitwdata.IsCommited', 'oitwdata.OnHand', 'oitwdata.OnOrder')
+                //                ->get();
+                ->paginate($perPage, ['*'], 'page',  $page);
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
@@ -147,65 +149,74 @@ class ItemMasterController extends Controller
             $page = $request->input('page', 1);
             $perPage = $request->input('per_page', 50);
             $skip = 0;
-            if($page >  1) {
+            if ($page >  1) {
                 $skip = $page * $perPage;
             }
 
             $search = \Request::get('search');
-//            $itemcodesearch = \Request::get('itemcode');
-//            $ItemNamesearch = \Request::get('ItemName');
-//            $serrialnumbersearch = \Request::get('serialnumber');
-//            $count = \Request::get('count');
+            //            $itemcodesearch = \Request::get('itemcode');
+            //            $ItemNamesearch = \Request::get('ItemName');
+            //            $serrialnumbersearch = \Request::get('serialnumber');
+            //            $count = \Request::get('count');
 
-            $osrnData =DB::connection("tenant")->table("o_s_r_n_s")
-            ->select('id', 'ItemCode','DistNumber', 'SysNumber','InDate','ItemName')
-//                ->where(function ($q) use ($search, $itemcodesearch, $ItemNamesearch,$serrialnumbersearch ) {
+            $osrnData = DB::connection("tenant")->table("o_s_r_n_s")
+                ->select('id', 'ItemCode', 'DistNumber', 'SysNumber', 'InDate', 'ItemName')
+                //                ->where(function ($q) use ($search, $itemcodesearch, $ItemNamesearch,$serrialnumbersearch ) {
                 ->where(function ($q) use ($search) {
                     if ($search != null) {
                         $q->orWhere('ItemCode', 'LIKE', "%{$search}%");
-//                            ->orWhere("%{$search}%", 'LIKE', 'ItemCode')
-//                            ->orWhere('ItemName', 'LIKE', "%{$search}%")
-//                            ->orWhere("%{$search}%", 'LIKE', 'ItemName')
-//                            ->orWhere('DistNumber', 'LIKE', "%{$search}%")
-//                            ->orWhere("%{$search}%", 'LIKE', 'DistNumber')
-//                            ->orWhere('SysNumber', 'LIKE', "%{$search}%");
-//                            ->orWhere("%{$search}%", 'LIKE', 'SysNumber');
+                        //                            ->orWhere("%{$search}%", 'LIKE', 'ItemCode')
+                        //                            ->orWhere('ItemName', 'LIKE', "%{$search}%")
+                        //                            ->orWhere("%{$search}%", 'LIKE', 'ItemName')
+                        //                            ->orWhere('DistNumber', 'LIKE', "%{$search}%")
+                        //                            ->orWhere("%{$search}%", 'LIKE', 'DistNumber')
+                        //                            ->orWhere('SysNumber', 'LIKE', "%{$search}%");
+                        //                            ->orWhere("%{$search}%", 'LIKE', 'SysNumber');
 
                     }
-//                    if ($itemcodesearch != null) {
-//                        $q->orWhere('ItemCode', 'LIKE', "%{$itemcodesearch}%")
-//                            ->orWhere("%{$itemcodesearch}%", 'LIKE','ItemCode' );
-//                    }
-//                    if ( $ItemNamesearch != null) {
-//                        $q->orWhere('ItemName', 'LIKE', "%{ $ItemNamesearch}%")
-//                            ->orWhere("%{ $ItemNamesearch}%", 'LIKE','ItemName');
-//                    }
-//                    if ( $serrialnumbersearch != null) {
-//                        $q->orWhere('DistNumber', 'LIKE', "%{ $serrialnumbersearch}%")
-//                            ->orWhere("%{ $serrialnumbersearch}%", 'LIKE','DistNumber');
-//                    }
+                    //                    if ($itemcodesearch != null) {
+                    //                        $q->orWhere('ItemCode', 'LIKE', "%{$itemcodesearch}%")
+                    //                            ->orWhere("%{$itemcodesearch}%", 'LIKE','ItemCode' );
+                    //                    }
+                    //                    if ( $ItemNamesearch != null) {
+                    //                        $q->orWhere('ItemName', 'LIKE', "%{ $ItemNamesearch}%")
+                    //                            ->orWhere("%{ $ItemNamesearch}%", 'LIKE','ItemName');
+                    //                    }
+                    //                    if ( $serrialnumbersearch != null) {
+                    //                        $q->orWhere('DistNumber', 'LIKE', "%{ $serrialnumbersearch}%")
+                    //                            ->orWhere("%{ $serrialnumbersearch}%", 'LIKE','DistNumber');
+                    //                    }
                 })
-                ->take($count??1000)
+                ->take($count ?? 1000)
                 ->orderBy('ItemCode', 'asc')
                 ->orderBy('DistNumber', 'asc')
                 ->toSql();
 
             $data = DB::connection("tenant")->table('o_s_r_q_s')
-                ->join(DB::raw("({$osrnData}) as osrnData") ,function($join){
+                ->join(DB::raw("({$osrnData}) as osrnData"), function ($join) {
                     $join->on('osrnData.ItemCode', '=', 'o_s_r_q_s.ItemCode')
-                    ->on('osrnData.SysNumber', '=', 'o_s_r_q_s.SysNumber');
-                    })
-                ->select('o_s_r_q_s.id', 'o_s_r_q_s.ItemCode','osrnData.ItemName', 'o_s_r_q_s.WhsCode', 'o_s_r_q_s.Quantity','o_s_r_q_s.CommitQty','osrnData.DistNumber','osrnData.SysNumber',
+                        ->on('osrnData.SysNumber', '=', 'o_s_r_q_s.SysNumber');
+                })
+                ->select(
+                    'o_s_r_q_s.id',
+                    'o_s_r_q_s.ItemCode',
+                    'osrnData.ItemName',
+                    'o_s_r_q_s.WhsCode',
+                    'o_s_r_q_s.Quantity',
+                    'o_s_r_q_s.CommitQty',
+                    'osrnData.DistNumber',
+                    'osrnData.SysNumber',
                     DB::raw('(CASE
         WHEN o_s_r_q_s.Quantity = 0 THEN "Unavailable"
         WHEN o_s_r_q_s.CommitQty = 1 AND o_s_r_q_s.Quantity = 1 THEN "Allocated"
         WHEN o_s_r_q_s.Quantity = 1  THEN "Available"
         ELSE "Unknown"
-        END) AS Status'))
+        END) AS Status')
+                )
                 ->orderBy('o_s_r_q_s.ItemCode', 'asc')
                 ->orderBy('osrnData.DistNumber', 'asc')
                 ->orderBy('o_s_r_q_s.WhsCode', 'asc')
-                ->paginate($perPage, ['*'] , 'page',  $page);
+                ->paginate($perPage, ['*'], 'page',  $page);
 
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
@@ -342,6 +353,7 @@ class ItemMasterController extends Controller
             DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService();
         } catch (\Throwable $th) {
+            Log::info($th->getMessage());
             DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
@@ -480,17 +492,17 @@ class ItemMasterController extends Controller
     public function getItemUsingItemCode(Request $request)
     {
         try {
- //           $ItemCode = \Request::get('ItemCode');
-//            $data = OITM::select('id', 'ItemName', 'ItemCode', 'INUoMEntry', 'SUoMEntry', 'PUoMEntry', 'UgpEntry', 'VatGourpSa', 'VatGroupPu', 'ManSerNum', 'QryGroup61')
-//                ->with('salesuom', 'ougp')
-//                ->where('ItemCode', $ItemCode)
-//                ->first();
-//            $data = OITM::select('id', 'ItemName', 'ItemCode', 'INUoMEntry', 'SUoMEntry', 'PUoMEntry', 'UgpEntry', 'VatGourpSa', 'VatGroupPu', 'ManSerNum', 'QryGroup61')
-////                ->with('salesuom', 'ougp')
-//                ->where('ItemCode', $ItemCode)
-//                ->first()->toArray();
+            //           $ItemCode = \Request::get('ItemCode');
+            //            $data = OITM::select('id', 'ItemName', 'ItemCode', 'INUoMEntry', 'SUoMEntry', 'PUoMEntry', 'UgpEntry', 'VatGourpSa', 'VatGroupPu', 'ManSerNum', 'QryGroup61')
+            //                ->with('salesuom', 'ougp')
+            //                ->where('ItemCode', $ItemCode)
+            //                ->first();
+            //            $data = OITM::select('id', 'ItemName', 'ItemCode', 'INUoMEntry', 'SUoMEntry', 'PUoMEntry', 'UgpEntry', 'VatGourpSa', 'VatGroupPu', 'ManSerNum', 'QryGroup61')
+            ////                ->with('salesuom', 'ougp')
+            //                ->where('ItemCode', $ItemCode)
+            //                ->first()->toArray();
             //get default price
-        $data = PriceCalculationController::fetchItemDefaultPrice($request->all());
+            $data = PriceCalculationController::fetchItemDefaultPrice($request->all());
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
