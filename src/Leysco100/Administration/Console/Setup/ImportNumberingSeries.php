@@ -38,6 +38,7 @@ class ImportNumberingSeries extends Command
 
         $documents = [17, 15, 16, 13, 14, 23, 24, 1470000113, 1250000001, 191, 66, 67];
 
+        $this->info("Creating Numbering Series");
         //        $userSeriesName = $this->ask('Enter Series Name:');
         $seriesJsonString = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . './BorderPlusJson/numberingseries.json');;
 
@@ -51,6 +52,7 @@ class ImportNumberingSeries extends Command
                 if (!isset($value['SeriesName'])) {
                     continue;
                 }
+                $this->info($value['SeriesName']);
 
                 if (!isset($value['Document'])) {
                     continue;
@@ -59,6 +61,7 @@ class ImportNumberingSeries extends Command
                 $document = $value['Document'];
                 $SeriesName = $value['SeriesName'];
                 if (!in_array($document, $documents)) {
+                    $this->info($value['Not in documents. ' . $document]);
                     continue;
                 }
                 //                if ($userSeriesName != $SeriesName) {
@@ -68,6 +71,8 @@ class ImportNumberingSeries extends Command
                 $details = $this->getObjectDetails($document);
                 //                dd($details);
                 if (!$details) {
+
+                    $this->info($value['No Details']);
                     continue;
                 }
 
