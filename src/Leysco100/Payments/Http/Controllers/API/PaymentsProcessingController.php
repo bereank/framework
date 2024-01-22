@@ -361,12 +361,7 @@ class PaymentsProcessingController extends Controller
                     "responseMessage" => "GIVEN DATE IS NOT EQUAL TO TODAY"
                 ]);
             }
-            if ($paymentData['billNumber'] != 811895) {
-                return response()->json([
-                    "responseCode" => "OK",
-                    "responseMessage" => "INVALID BILLNUMBER"
-                ]);
-            }
+          
             $payment = [];
 
             $payment['BusinessKey'] = $paymentData['billNumber'] ?? "";
