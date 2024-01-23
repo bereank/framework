@@ -577,9 +577,11 @@ class ITransactionController extends Controller
         $DocumentTables = APDI::with('pdi1')
             ->where('ObjectID', $request['ObjType'])
             ->first();
-
+        Log::info("CREATING OBJECT: " . $request['ObjType']);
         if (!$DocumentTables) {
-            abort("Document object does not exist", 500);
+            Log::info("Document object does not exist: " . $request['ObjType']);
+
+            abort(500, 'Document object does not exist.');
         }
 
         $ExtRef = \Request::get('ExtRef');
@@ -735,13 +737,13 @@ class ITransactionController extends Controller
                     'Price' => $value['Price'], //
                     'DiscPrcnt' => $value['DiscPrcnt'] ?? 0,
                     'Rate' => $value['Rate'] ?? 0,
-                    'TaxCode' => $value['VatGroup']?? null,
+                    'TaxCode' => $value['VatGroup'] ?? null,
                     'PriceAfVAT' => $value['PriceAfVAT'],
                     'PriceBefDi' => $value['UnitPrice'],
                     'LineTotal' => $value['LineTotal'],
                     'VatSum' => $vatSum,
-                    'WhsCode' => $value['WhsCode']?? null,
-                    'SlpCode' => $request['SlpCode']?? null,//    Sales Employee
+                    'WhsCode' => $value['WhsCode'] ?? null,
+                    'SlpCode' => $request['SlpCode'] ?? null, //    Sales Employee
                     'Commission' => $value['Commission'] ?? null, //    Comm. %
                     'AcctCode' => $value['AcctCode'] ?? null, //    G/L Account
                     'OcrCode' => $value['OcrCode'], //    Dimension 1
