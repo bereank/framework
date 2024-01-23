@@ -15,17 +15,17 @@ return new class extends Migration
             $table->id();
             $table->integer('UserSign')
                 ->references('id')->on('users')->nullable();
-            $table->integer('FormID', 20)->nullable();
-            $table->string('ItemID', 50)->nullable();
-            $table->integer('ColID', 20)->nullable();
-            $table->integer('ActionT', 6)->nullable();
-            $table->integer('QueryId', 6)
+            $table->integer('FormID')->nullable();
+            $table->string('ItemID')->nullable();
+            $table->integer('ColID')->nullable();
+            $table->integer('ActionT')->nullable();
+            $table->integer('QueryId')
                 ->references('id')->on('o_u_q_r')->nullable();
-            $table->integer('IndexID', 6)->nullable();
-            $table->integer('Refresh', 1)->nullable();
-            $table->string('FieldID', 60)->nullable();
-            $table->integer('FrceRfrsh', 1)->nullable();
-            $table->integer('ByField', 1)->nullable();
+            $table->integer('IndexID')->nullable();
+            $table->integer('Refresh')->nullable();
+            $table->string('FieldID')->nullable();
+            $table->integer('FrceRfrsh')->nullable();
+            $table->integer('ByField')->nullable();
             $table->string('ObjType')->nullable();
             $table->timestamps();
         });
