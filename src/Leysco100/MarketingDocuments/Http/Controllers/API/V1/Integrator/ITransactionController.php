@@ -209,7 +209,7 @@ class ITransactionController extends Controller
 
 
             Log::info("  ********************************************* " . now() . "********************************************");
-           // Log::info($documents);
+            Log::info($documents);
             return $documents;
             //    Log::info("  ********************************************* " . now() . "********************************************");
 

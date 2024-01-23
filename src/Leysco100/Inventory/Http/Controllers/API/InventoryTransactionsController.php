@@ -32,6 +32,7 @@ use Leysco100\Shared\Models\InventoryAndProduction\Models\OITW;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OSRN;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\WTR19;
+use Leysco100\MarketingDocuments\Services\MarketingDocumentService;
 use Leysco100\MarketingDocuments\Services\DatabaseValidationServices;
 use Leysco100\MarketingDocuments\Http\Controllers\API\PriceCalculationController;
 use Leysco100\Shared\Models\MarketingDocuments\Services\GeneralDocumentValidationService;
@@ -81,9 +82,8 @@ class InventoryTransactionsController extends Controller
                 })
                 ->orderBy('id', 'desc')
                 ->take(100)
-
                 ->get();
-
+            Log::info($data);
             foreach ($data as $key => $val) {
                 $val->isDoc = (int) $isDoc;
                 $checkErrors = EOTS::where('ObjType', $tableObjType)
@@ -127,6 +127,7 @@ class InventoryTransactionsController extends Controller
 
         $user = Auth::user();
         $ObjType = (int) $request['ObjType'];
+        // $defaulted_data = (new MarketingDocumentService())->fieldsDefaulting($request->all());
 
         $saveToDraft = false;
         $TargetTables = APDI::with('pdi1')
