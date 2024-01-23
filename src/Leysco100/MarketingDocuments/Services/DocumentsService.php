@@ -790,8 +790,9 @@ class DocumentsService
         $OcrCode3 = "";
         $OcrCode4 = "";
         $OcrCode5 = "";
+
         if ($item->CogsOcrCodMthd == 'U') {
-            $OcrCode = $user->oudg->CogsOcrCod ?? null;
+            $OcrCode = $user->oudg?->CogsOcrCod ?? null;
         } else {
             $OcrCode = null;
         }
@@ -810,7 +811,7 @@ class DocumentsService
             //     }
             // }
         } else {
-            $OcrCode2 =  $user->oudg->CogsOcrCo2 ?? null;
+            $OcrCode2 =  $user->oudg?->CogsOcrCo2 ?? null;
         }
         if ($item->CogsOcrCo3Mthd == 'L') {
             // try {
@@ -827,22 +828,20 @@ class DocumentsService
             //     }
             // }
         } else {
-            $OcrCode3 =  $user->oudg->CogsOcrCo3 ?? null;
+            $OcrCode3 =  $user->oudg?->CogsOcrCo3 ?? null;
         }
         //   if ($item->CogsOcrCo4Mthd == 'U') {
 
-        $OcrCode4 = $user->oudg->CogsOcrCo4 ?? null;
+        $OcrCode4 = $user->oudg?->CogsOcrCo4 ?? null;
         // } else {
         //     $OcrCode4 = null;
         // }
         //  if ($item->CogsOcrCo5Mthd == 'U') {
-        $OcrCode5 = $user->oudg->CogsOcrCo5 ?? null;
+        $OcrCode5 = $user->oudg?->CogsOcrCo5 ?? null;
         // } else {
         //     $OcrCode5 = null;
         // }
 
-
-        Log::info($user->oudg);
 
         return [
             'OcrCode' => $OcrCode,
