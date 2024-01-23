@@ -597,7 +597,8 @@ class ITransactionController extends Controller
         }
 
         $businessPartner = [];
-        if ($ObjType != 205 || $ObjType != 67 || $ObjType != 66 || $ObjType != 1250000001) {
+        if ($ObjType != 205 && $ObjType != 67 && $ObjType != 66 && $ObjType != 1250000001) {
+
             $businessPartner = OCRD::where('CardCode', $request['CardCode'])->first();
 
             if (!$businessPartner) {
