@@ -257,6 +257,7 @@ class InventoryTransactionsController extends Controller
                 $ItemCode = $product->ItemCode;
                 if ($user->oudg->SellFromBin) {
                     //defaulting item dimensions
+
                     $dimensions =     (new PriceCalculationController())->getItemDefaultDimensions($product->id);
                 }
 
@@ -294,20 +295,22 @@ class InventoryTransactionsController extends Controller
                     }
                 }
                 if ($user->oudg->SellFromBin && $request['ObjType'] == 67 && empty($value['bin_allocation'])) {
-                    if ($value['CogsOcrCo4']) {
+                    if (array_key_exists('CogsOcrCo4', $value)) {
                         $defaults = OUDG::where('CogsOcrCo4', $value['CogsOcrCo4'])->first();
-                        $obin = OBIN::where('id', $defaults->DftBinLoc)->first();
+                        if ($defaults) {
+                            $obin = OBIN::where('id', $defaults->DftBinLoc)->first();
 
-                        $value['bin_allocation'] =  [
-                            [
-                                'BinCode' => $obin->BinCode,
-                                'QtyVar' => $value['Quantity']
-                            ]
-                        ];
+                            $value['bin_allocation'] =  [
+                                [
+                                    'BinCode' => $obin->BinCode,
+                                    'QtyVar' => $value['Quantity']
+                                ]
+                            ];
+                        }
                     }
                 }
-                
-           
+
+
                 $doctTotal = $doctTotal + $AvgPrice;
                 $rowdetails = [
                     'DocEntry' => $newDoc->id,

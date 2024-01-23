@@ -49,19 +49,19 @@ class ImportNumberingSeries extends Command
 
             //             DB::connection("tenant")->beginTransaction();
             try {
-                if (!isset($value['SeriesName'])) {
+                if (!isset($value['Series Name'])) {
                     continue;
                 }
-                $this->info($value['SeriesName']);
+                $this->info($value['Series Name']);
 
                 if (!isset($value['Document'])) {
                     continue;
                 }
 
                 $document = $value['Document'];
-                $SeriesName = $value['SeriesName'];
+                $SeriesName = $value['Series Name'];
                 if (!in_array($document, $documents)) {
-                    $this->info($value['Not in documents. ' . $document]);
+                    $this->info('Not in documents. ' . $document);
                     continue;
                 }
                 //                if ($userSeriesName != $SeriesName) {
@@ -72,11 +72,11 @@ class ImportNumberingSeries extends Command
                 //                dd($details);
                 if (!$details) {
 
-                    $this->info($value['No Details']);
+                    $this->info('No Details');
                     continue;
                 }
 
-                $this->info("Creating Series" . $value['SeriesName']);
+                $this->info("Creating Series" . $value['Series Name']);
 
                 $nnm1 = NNM1::create([
                     'ExtRef' => $value['Series'],
@@ -84,7 +84,7 @@ class ImportNumberingSeries extends Command
                     'ObjectCode' => $details->id, // ID FROM ONNM
                     'InitialNum' => $value['InitialNum'], //Initial Number
                     'NextNumber' => $value['InitialNum'], // NextNumber
-                    'LastNum' => $value['LastNum'], //LastNum
+                    'LastNum' => $value['LastNum'] ?? null, //LastNum
                     'BeginStr' => $value['BeginStr'],
                     'Remark' => $value['Remarks'] ?? null,
                     'Locked' => $value['Locked'] ?? "N", //Locked
@@ -112,7 +112,12 @@ class ImportNumberingSeries extends Command
             $ObjType = 66;
         }
         $apdi = APDI::where('ObjectID', $ObjType)->first();
-        $onnm = ONNM::where('ObjectCode', $apdi->id)->first();
+
+        if ($apdi) {
+            $onnm = ONNM::where('ObjectCode', $apdi->id)->first();
+        } else {
+            $onnm = [];
+        }
         return $onnm;
     }
 }
