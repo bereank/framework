@@ -108,8 +108,9 @@ class MarketingDocumentService
                         $documentLines[$key]['OcrCode5'] = isset($line['OcrCode5']) && !empty($line['OcrCode5']) ? $line['OcrCode5'] : (isset($dimensions['OcrCode5']) ? $dimensions['OcrCode5'] : null);
 
                         if ($user_data->oudg->SellFromBin && $data['ObjType'] == 13 && empty($value['bin_allocation'])) {
-                            if ($line['OcrCode4'] || $dimensions['OcrCode4']) {
-                                $defaults = OUDG::where('CogsOcrCo4',  $line['OcrCode4'])->first();
+                            if (isset($line['OcrCode4']) || isset($dimensions['OcrCode4'])) {
+                                $lineOcrCode4 =  $line['OcrCode4'] ?? $dimensions['OcrCode4'];
+                                $defaults = OUDG::where('CogsOcrCo4',  $lineOcrCode4)->first();
                                 $obin = OBIN::where('id', $defaults->DftBinLoc)->first();
                                 if ($defaults->DftBinLoc && $obin) {
                                     $documentLines[$key]['bin_allocation'] =  [
