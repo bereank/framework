@@ -151,6 +151,7 @@ class ITransactionController extends Controller
                     "U_CommitedTime" => $headerVal->U_CommitedTime,
                     "U_IncoTerms" => $headerVal->U_IncoTerms,
                     "U_PCash" => $headerVal->U_PCash,
+                    "U_Approval" => "Pending"
                 ];
 
                 $headerVal->UserFields = $userFields;
