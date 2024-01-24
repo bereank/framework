@@ -4,7 +4,6 @@ namespace Leysco100\MarketingDocuments\Http\Controllers\API\V1\Integrator;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Leysco100\Shared\Models\MarketingDocuments\Services\GeneralDocumentService;
 use Leysco100\Shared\Models\OINS;
 use Leysco100\Shared\Models\OSCL;
 use Leysco100\Shared\Models\OSCO;
@@ -14,12 +13,14 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Leysco100\Shared\Models\Gpm\Models\OGMS;
 use Leysco100\Shared\Services\CommonService;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Models\Shared\Models\EODC;
 use Leysco100\Shared\Models\Banking\Models\ORCT;
 use Leysco100\Shared\Models\Banking\Models\PDF2;
 use Leysco100\Shared\Models\Banking\Models\RCT2;
+use Leysco100\Shared\Services\UserFieldsService;
 use Leysco100\MarketingDocuments\Jobs\NumberingSeries;
 use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
 use Leysco100\Shared\Models\Administration\Models\EOTS;
@@ -33,7 +34,6 @@ use Leysco100\Shared\Models\Administration\Models\TaxGroup;
 use Leysco100\Shared\Models\MarketingDocuments\Models\DRF1;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OATS;
 use Leysco100\Shared\Models\MarketingDocuments\Models\ODRF;
-use Leysco100\Shared\Models\Gpm\Models\OGMS;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OWDD;
 use Leysco100\Shared\Models\MarketingDocuments\Models\WDD1;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;
@@ -44,6 +44,7 @@ use Leysco100\Shared\Models\InventoryAndProduction\Models\OUOM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
 use Leysco100\Shared\Models\Shared\Services\ServiceCallService;
 use Leysco100\Shared\Models\Banking\Services\BankingDocumentService;
+use Leysco100\Shared\Models\MarketingDocuments\Services\GeneralDocumentService;
 
 
 class ITransactionController extends Controller
@@ -140,22 +141,35 @@ class ITransactionController extends Controller
 
                 //Custom Udfs
 
-                $userFields = (object)[
-                    "U_CashMail" => $headerVal->U_CashMail,
-                    "U_ControlCode" => $headerVal->U_ControlCode,
-                    "U_RelatedInv" => $headerVal->U_RelatedInv,
-                    "U_CUInvoiceNum" => $headerVal->U_CUInvoiceNum,
-                    "U_QRCode" => $headerVal->U_QRCode,
-                    "U_QrLocation" => $headerVal->U_QrLocation,
-                    "U_ReceiptNo" => $headerVal->U_ReceiptNo,
-                    "U_CommitedTime" => $headerVal->U_CommitedTime,
-                    "U_IncoTerms" => $headerVal->U_IncoTerms,
-                    "U_PCash" => $headerVal->U_PCash,
-                    "U_Approval" => "Pending"
-                ];
+                // $userFields = (object)[
+                //     "U_CashMail" => $headerVal->U_CashMail,
+                //     "U_ControlCode" => $headerVal->U_ControlCode,
+                //     "U_RelatedInv" => $headerVal->U_RelatedInv,
+                //     "U_CUInvoiceNum" => $headerVal->U_CUInvoiceNum,
+                //     "U_QRCode" => $headerVal->U_QRCode,
+                //     "U_QrLocation" => $headerVal->U_QrLocation,
+                //     "U_ReceiptNo" => $headerVal->U_ReceiptNo,
+                //     "U_CommitedTime" => $headerVal->U_CommitedTime,
+                //     "U_IncoTerms" => $headerVal->U_IncoTerms,
+                //     "U_PCash" => $headerVal->U_PCash,
+                //     "U_Approval"=>"Pending"
+                // ];
 
-                $headerVal->UserFields = $userFields;
+                //Return UDF's Dynamically
 
+                $data =  APDI::with('pdi1')->where('ObjectID', $ObjType)->first();
+                $data['doctype'] = $ObjType;
+                if ($data) {
+                    $record = (new UserFieldsService())->processUDF($data);
+                }
+                $userFields = (object)[];
+                if (array_key_exists('HeaderUserFields', $record)) {
+                    foreach ($record['HeaderUserFields'] as $headerField) {
+                        $userFields->{$headerField['FieldName']} = $headerVal->{$headerField['FieldName']};
+                    }
+
+                    $headerVal->UserFields = $userFields;
+                }
                 $rowData = $DocumentTables->pdi1[0]['ChildTable']::where('DocEntry', $headerVal->id)->get();
                 Log::info("TOTAL LINES FOUND : " . $rowData->count());
                 foreach ($rowData as $key => $val) {
@@ -197,9 +211,19 @@ class ITransactionController extends Controller
                     $val->VatGroup = $val->TaxCode;
                     $val->UoMEntry = OUOM::Where('id', $val->UomCode)->value('ExtRef') ?? null;
 
-                    $val->UserFields = (object)[
-                        "U_HSCode" => null
-                    ];
+                    // Return Udf's
+                    // $val->UserFields = (object)[
+                    //     "U_HSCode" => null
+                    // ];
+                    // Return Udf's
+                    $UserFields = (object)[];
+                    if (array_key_exists('LineUserFields', $record)) {
+                        foreach ($record['LineUserFields'] as $lineField) {
+                            $UserFields->{$lineField['FieldName']} = $val->{$lineField['FieldName']};
+                        }
+
+                        $val->UserFields = $UserFields;
+                    }
                 }
                 $headerVal->document_lines = $rowData;
 
@@ -212,7 +236,7 @@ class ITransactionController extends Controller
 
 
             Log::info("  ********************************************* " . now() . "********************************************");
-            Log::info($documents);
+            // Log::info($documents);
             return $documents;
             //    Log::info("  ********************************************* " . now() . "********************************************");
 
