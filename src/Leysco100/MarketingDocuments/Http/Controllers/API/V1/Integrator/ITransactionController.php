@@ -149,6 +149,8 @@ class ITransactionController extends Controller
                     "U_QrLocation" => $headerVal->U_QrLocation,
                     "U_ReceiptNo" => $headerVal->U_ReceiptNo,
                     "U_CommitedTime" => $headerVal->U_CommitedTime,
+                    "U_IncoTerms" => 'EXW',
+                    "U_PCash" => 'Purchase Request',
                 ];
 
                 $headerVal->UserFields = $userFields;
