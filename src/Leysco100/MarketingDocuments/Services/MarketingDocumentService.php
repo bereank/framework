@@ -2,11 +2,14 @@
 
 namespace Leysco100\MarketingDocuments\Services;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
+use Leysco100\Shared\Models\OUQR;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Shared\Models\Shared\Models\APDI;
+use Leysco100\Shared\Models\Shared\Models\CSHS;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Inventory\Services\InventoryService;
 use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
@@ -82,6 +85,7 @@ class MarketingDocumentService
         if (array_key_exists('document_lines', $data) && !empty($data['document_lines'])) {
             $documentLines = $data['document_lines'];
             foreach ($documentLines as $key => $line) {
+
                 $lineNum =   $key;
                 if (data_get($line, 'ItemCode')) {
                     $itemDetails = OITM::where('ItemCode', $line['ItemCode'])->first();
@@ -100,11 +104,11 @@ class MarketingDocumentService
                         $documentLines[$key]['OcrCode2'] = isset($line['OcrCode2']) && !empty($line['OcrCode2']) ? $line['OcrCode2'] : $dimensions['OcrCode2'];
                         $documentLines[$key]['OcrCode3'] = isset($line['OcrCode3']) && !empty($line['OcrCode3']) ? $line['OcrCode3'] : $dimensions['OcrCode3'];
                         $documentLines[$key]['U_AllowDisc'] = $dimensions['U_AllowDisc'] ?? null;
-                        $documentLines[$key]['OcrCode4'] = isset($line['OcrCode4']) && !empty($line['OcrCode4']) ? $line['OcrCode4'] : $dimensions['OcrCode4'];
-                        $documentLines[$key]['OcrCode5'] = isset($line['OcrCode5'])  && !empty($line['OcrCode5'])? $line['OcrCode5'] : $dimensions['OcrCode5'];
+                        $documentLines[$key]['OcrCode4'] = isset($line['OcrCode4']) && !empty($line['OcrCode4']) ? $line['OcrCode4'] : (isset($dimensions['OcrCode4']) ? $dimensions['OcrCode4'] : null);
+                        $documentLines[$key]['OcrCode5'] = isset($line['OcrCode5']) && !empty($line['OcrCode5']) ? $line['OcrCode5'] : (isset($dimensions['OcrCode5']) ? $dimensions['OcrCode5'] : null);
 
                         if ($user_data->oudg->SellFromBin && $data['ObjType'] == 13 && empty($value['bin_allocation'])) {
-                            if ($line['OcrCode4']) {
+                            if ($line['OcrCode4'] || $dimensions['OcrCode4']) {
                                 $defaults = OUDG::where('CogsOcrCo4',  $line['OcrCode4'])->first();
                                 $obin = OBIN::where('id', $defaults->DftBinLoc)->first();
                                 if ($defaults->DftBinLoc && $obin) {
@@ -117,7 +121,6 @@ class MarketingDocumentService
                                 }
                             }
                         }
-
                     }
                     if (data_get($line, 'Quantity')) {
                         if ($itemDetails) {
@@ -150,8 +153,34 @@ class MarketingDocumentService
                 if (!(data_get($line, 'OwnerCode'))) {
                     $documentLines[$key]['OwnerCode'] = $user_data->EmpID ?? null;
                 }
+                $res =  CSHS::where('ObjType', $data['ObjType'])->first();
+                if ($res) {
+                    $query =  OUQR::where('id', $res->QueryId)->first();
+                    $string = $query->QString;
+                    preg_match('/(\d+)(\.\w+)/', $string, $matches);
+                    $substring = $matches[0];
+                    $number = $matches[1];
+
+                    $matchSubstring = str_replace('.', '', $matches[2]);
+
+                    $replacementValue =   $documentLines[$key][$matchSubstring];
+
+                    $processedString = Str::replace('$[' . $substring . ']', '"' . $replacementValue . '"', $string);
+
+                    $result = DB::connection('tenant')->select($processedString);
+                    //   Log::info($result);
+                    $documentLines[$key]['Dscription'] = $result;
+                    if (is_array($result)) {
+                        if (!empty($result)) {
+                            $headers =  array_values((array)$result[0]);
+                            $documentLines[$key][$res->ItemID] =  $headers[0];
+                        }
+                    }
+                    // Log::info([$processedString, $res->ItemID, $headers, $number, $matchSubstring, $line]);
+                }
             }
             $data['document_lines'] = $documentLines;
+            Log::info($data['document_lines']);
         }
 
 
