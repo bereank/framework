@@ -17,6 +17,7 @@ use Leysco100\Shared\Models\Gpm\Models\OGMS;
 use Leysco100\Shared\Services\CommonService;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Models\Shared\Models\EODC;
+use Leysco100\Shared\Models\Banking\Models\OPDF;
 use Leysco100\Shared\Models\Banking\Models\ORCT;
 use Leysco100\Shared\Models\Banking\Models\PDF2;
 use Leysco100\Shared\Models\Banking\Models\RCT2;
@@ -163,7 +164,7 @@ class ITransactionController extends Controller
                     $record = (new UserFieldsService())->processUDF($data);
                 }
                 $userFields = (object)[];
-                if (array_key_exists('HeaderUserFields', $record)) {
+                if ($record) {
                     foreach ($record['HeaderUserFields'] as $headerField) {
                         $userFields->{$headerField['FieldName']} = $headerVal->{$headerField['FieldName']};
                     }
@@ -217,7 +218,7 @@ class ITransactionController extends Controller
                     // ];
                     // Return Udf's
                     $UserFields = (object)[];
-                    if (array_key_exists('LineUserFields', $record)) {
+                    if ($record) {
                         foreach ($record['LineUserFields'] as $lineField) {
                             $UserFields->{$lineField['FieldName']} = $val->{$lineField['FieldName']};
                         }
