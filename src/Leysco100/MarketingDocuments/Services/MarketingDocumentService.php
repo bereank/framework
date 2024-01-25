@@ -22,6 +22,7 @@ use Leysco100\Shared\Models\InventoryAndProduction\Models\OBTL;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OILM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITW;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OWHS;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
 use Leysco100\Shared\Models\Banking\Services\BankingDocumentService;
 use Leysco100\MarketingDocuments\Http\Controllers\API\PriceCalculationController;
@@ -63,7 +64,7 @@ class MarketingDocumentService
             $Numbering = (new DocumentsService())
                 ->getNumSerieByObjectId($data['ObjType']);
             $data['DocNum'] = $Numbering['NextNumber'];
-            $data['Series'] = $Numbering['id'];
+            $data['Series'] = $Numbering['ExtRef'];
         }
 
         /**
@@ -133,7 +134,8 @@ class MarketingDocumentService
 
                 if (!(data_get($line, 'WhsCode'))) {
                     if ($user_data->oudg->Warehouse) {
-                        $documentLines[$key]['WhsCode'] =  $user_data->oudg->Warehouse;
+                        $wareHouse =  OWHS::find($user_data->oudg->Warehouse);
+                        $documentLines[$key]['WhsCode'] = $wareHouse->WhsCode;
                     } else {
                         if (isset($itemDetails) && $itemDetails) {
                             $documentLines[$key]['WhsCode'] = $itemDetails['DfltWH'];
@@ -292,7 +294,8 @@ class MarketingDocumentService
 
             if (!isset($value['Dscription'])) {
                 return (new ApiResponseService())
-                    ->apiSuccessAbortProcessResponse("Dscription id Required for item:");
+                    ->apiSuccessAbortProcessResponse("Dscription is Required for item:" .
+                        array_key_exists('ItemCode', $value) ? $value["ItemCode"] : null);
             }
 
             /**
@@ -301,7 +304,7 @@ class MarketingDocumentService
 
             if ($docData['DocType'] == "I") {
                 if (!isset($value["ItemCode"])) {
-                    return (new ApiResponseService())->apiSuccessAbortProcessResponse("Item Is Required !");
+                    return (new ApiResponseService())->apiSuccessAbortProcessResponse("Item Code Is Required");
                 }
                 $product = OITM::Where('ItemCode', $value['ItemCode'])
                     ->first();
