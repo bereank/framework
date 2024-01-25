@@ -794,7 +794,8 @@ class DocumentsService
         if ($item->CogsOcrCodMthd == 'U') {
             $OcrCode = $user->oudg?->CogsOcrCod ?? null;
         } else {
-            $OcrCode = null;
+            $OcrCode = $item->oidg?->CogsOcrCod ?? null;
+            // $OcrCode = null;
         }
         if ($item->CogsOcrCo2Mthd == 'L') {
             // try {
@@ -810,10 +811,12 @@ class DocumentsService
             //         Log::error('Database query exception: ' . $e->getMessage());
             //     }
             // }
+            $OcrCode2 =  $item->oidg?->CogsOcrCo2 ?? null;
         } else {
             $OcrCode2 =  $user->oudg?->CogsOcrCo2 ?? null;
         }
         if ($item->CogsOcrCo3Mthd == 'L') {
+            $OcrCode3 =  $item->oidg?->CogsOcrCo3 ?? null;
             // try {
             //     $getOcrCode3 = DB::connection("tenant")->select('call PRODUCTLINE_AUTOCOGS(?)', array($item->ItemCode));
             //     $OcrCode3 =    $getOcrCode3[0]->OcrCode3 ?? null;
@@ -830,17 +833,17 @@ class DocumentsService
         } else {
             $OcrCode3 =  $user->oudg?->CogsOcrCo3 ?? null;
         }
-        //   if ($item->CogsOcrCo4Mthd == 'U') {
+        if ($item->CogsOcrCo4Mthd == 'U') {
 
-        $OcrCode4 = $user->oudg?->CogsOcrCo4 ?? null;
-        // } else {
-        //     $OcrCode4 = null;
-        // }
-        //  if ($item->CogsOcrCo5Mthd == 'U') {
-        $OcrCode5 = $user->oudg?->CogsOcrCo5 ?? null;
-        // } else {
-        //     $OcrCode5 = null;
-        // }
+            $OcrCode4 = $user->oudg?->CogsOcrCo4 ?? null;
+        } else {
+            $OcrCode4 = $item->oidg?->CogsOcrCo4 ?? null;
+        }
+        if ($item->CogsOcrCo5Mthd == 'U') {
+            $OcrCode5 = $user->oudg?->CogsOcrCo5 ?? null;
+        } else {
+            $OcrCode5 = $item->oidg?->CogsOcrCo4 ?? null;
+        }
 
 
         return [
