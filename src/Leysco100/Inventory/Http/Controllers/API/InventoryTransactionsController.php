@@ -32,6 +32,7 @@ use Leysco100\Shared\Models\InventoryAndProduction\Models\OITW;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OSRN;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\WTR19;
+use Leysco100\MarketingDocuments\Services\MarketingDocumentService;
 use Leysco100\MarketingDocuments\Services\DatabaseValidationServices;
 use Leysco100\MarketingDocuments\Http\Controllers\API\PriceCalculationController;
 use Leysco100\Shared\Models\MarketingDocuments\Services\GeneralDocumentValidationService;
@@ -81,9 +82,8 @@ class InventoryTransactionsController extends Controller
                 })
                 ->orderBy('id', 'desc')
                 ->take(100)
-
                 ->get();
-
+            Log::info($data);
             foreach ($data as $key => $val) {
                 $val->isDoc = (int) $isDoc;
                 $checkErrors = EOTS::where('ObjType', $tableObjType)
@@ -127,6 +127,7 @@ class InventoryTransactionsController extends Controller
 
         $user = Auth::user();
         $ObjType = (int) $request['ObjType'];
+        // $defaulted_data = (new MarketingDocumentService())->fieldsDefaulting($request->all());
 
         $saveToDraft = false;
         $TargetTables = APDI::with('pdi1')
@@ -257,6 +258,7 @@ class InventoryTransactionsController extends Controller
                 $ItemCode = $product->ItemCode;
                 if ($user->oudg->SellFromBin) {
                     //defaulting item dimensions
+
                     $dimensions =     (new PriceCalculationController())->getItemDefaultDimensions($product->id);
                 }
 
@@ -294,20 +296,22 @@ class InventoryTransactionsController extends Controller
                     }
                 }
                 if ($user->oudg->SellFromBin && $request['ObjType'] == 67 && empty($value['bin_allocation'])) {
-                    if ($value['CogsOcrCo4']) {
+                    if (array_key_exists('CogsOcrCo4', $value)) {
                         $defaults = OUDG::where('CogsOcrCo4', $value['CogsOcrCo4'])->first();
-                        $obin = OBIN::where('id', $defaults->DftBinLoc)->first();
+                        if ($defaults) {
+                            $obin = OBIN::where('id', $defaults->DftBinLoc)->first();
 
-                        $value['bin_allocation'] =  [
-                            [
-                                'BinCode' => $obin->BinCode,
-                                'QtyVar' => $value['Quantity']
-                            ]
-                        ];
+                            $value['bin_allocation'] =  [
+                                [
+                                    'BinCode' => $obin->BinCode,
+                                    'QtyVar' => $value['Quantity']
+                                ]
+                            ];
+                        }
                     }
                 }
-                
-           
+
+
                 $doctTotal = $doctTotal + $AvgPrice;
                 $rowdetails = [
                     'DocEntry' => $newDoc->id,

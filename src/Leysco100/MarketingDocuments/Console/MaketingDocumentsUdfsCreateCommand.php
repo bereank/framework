@@ -3,6 +3,7 @@
 namespace Leysco100\MarketingDocuments\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Models\Shared\Models\FM100;
 use Spatie\Multitenancy\Commands\Concerns\TenantAware;
@@ -45,7 +46,20 @@ class MaketingDocumentsUdfsCreateCommand extends Command
                 $fieldDescription =  $userField;
                 $fieldType =  "string";
                 $fieldSize =  255;
-                (new CreateUDFHelperAction($tableName, $fieldName, $fieldDescription, $fieldType, $fieldSize, $objType))->handle();
+                (new CreateUDFHelperAction(
+                    $tableName,
+                    $fieldName,
+                    $fieldDescription,
+                    $fieldType,
+                    $fieldSize,
+                    $RField = null,
+                    $RTable = null,
+                    $ValidRule = 1,
+                    $FldValue = null,
+                    $DispField = $fieldDescription,
+                    $Descr = $fieldDescription,
+                    $objType
+                ))->handle();
             }
         }
 
@@ -60,17 +74,32 @@ class MaketingDocumentsUdfsCreateCommand extends Command
         }
 
         $ChildTables = APDI::with('pdi1')->where('DocType', 1)->get();
-       
+
 
         foreach ($ChildTables as $table) {
             $objType = $table->ObjectID;
             $line_table = (new $table->pdi1[0]['ChildTable'])->getTable();
+
             foreach ($childUserFields as $key =>  $userField) {
+               
                 $fieldName =  $userField;
                 $fieldDescription =  $userField;
                 $fieldType =  "string";
                 $fieldSize =  255;
-                (new CreateUDFHelperAction($line_table, $fieldName, $fieldDescription, $fieldType, $fieldSize, $objType))->handle();
+                (new CreateUDFHelperAction(
+                    $line_table,
+                    $fieldName,
+                    $fieldDescription,
+                    $fieldType,
+                    $fieldSize,
+                    $RField = null,
+                    $RTable = null,
+                    $ValidRule = 1,
+                    $FldValue = null,
+                    $DispField = $fieldDescription,
+                    $Descr = $fieldDescription,
+                    $objType
+                ))->handle();
             }
         }
     }

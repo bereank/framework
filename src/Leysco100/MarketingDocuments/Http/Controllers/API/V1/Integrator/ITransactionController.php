@@ -4,7 +4,6 @@ namespace Leysco100\MarketingDocuments\Http\Controllers\API\V1\Integrator;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Leysco100\Shared\Models\MarketingDocuments\Services\GeneralDocumentService;
 use Leysco100\Shared\Models\OINS;
 use Leysco100\Shared\Models\OSCL;
 use Leysco100\Shared\Models\OSCO;
@@ -14,12 +13,15 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Leysco100\Shared\Models\Gpm\Models\OGMS;
 use Leysco100\Shared\Services\CommonService;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Models\Shared\Models\EODC;
+use Leysco100\Shared\Models\Banking\Models\OPDF;
 use Leysco100\Shared\Models\Banking\Models\ORCT;
 use Leysco100\Shared\Models\Banking\Models\PDF2;
 use Leysco100\Shared\Models\Banking\Models\RCT2;
+use Leysco100\Shared\Services\UserFieldsService;
 use Leysco100\MarketingDocuments\Jobs\NumberingSeries;
 use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
 use Leysco100\Shared\Models\Administration\Models\EOTS;
@@ -33,7 +35,6 @@ use Leysco100\Shared\Models\Administration\Models\TaxGroup;
 use Leysco100\Shared\Models\MarketingDocuments\Models\DRF1;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OATS;
 use Leysco100\Shared\Models\MarketingDocuments\Models\ODRF;
-use Leysco100\Shared\Models\Gpm\Models\OGMS;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OWDD;
 use Leysco100\Shared\Models\MarketingDocuments\Models\WDD1;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;
@@ -44,6 +45,7 @@ use Leysco100\Shared\Models\InventoryAndProduction\Models\OUOM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
 use Leysco100\Shared\Models\Shared\Services\ServiceCallService;
 use Leysco100\Shared\Models\Banking\Services\BankingDocumentService;
+use Leysco100\Shared\Models\MarketingDocuments\Services\GeneralDocumentService;
 
 
 class ITransactionController extends Controller
@@ -140,19 +142,35 @@ class ITransactionController extends Controller
 
                 //Custom Udfs
 
-                $userFields = (object)[
-                    "U_CashMail" => $headerVal->U_CashMail,
-                    "U_ControlCode" => $headerVal->U_ControlCode,
-                    "U_RelatedInv" => $headerVal->U_RelatedInv,
-                    "U_CUInvoiceNum" => $headerVal->U_CUInvoiceNum,
-                    "U_QRCode" => $headerVal->U_QRCode,
-                    "U_QrLocation" => $headerVal->U_QrLocation,
-                    "U_ReceiptNo" => $headerVal->U_ReceiptNo,
-                    "U_CommitedTime" => $headerVal->U_CommitedTime,
-                ];
+                // $userFields = (object)[
+                //     "U_CashMail" => $headerVal->U_CashMail,
+                //     "U_ControlCode" => $headerVal->U_ControlCode,
+                //     "U_RelatedInv" => $headerVal->U_RelatedInv,
+                //     "U_CUInvoiceNum" => $headerVal->U_CUInvoiceNum,
+                //     "U_QRCode" => $headerVal->U_QRCode,
+                //     "U_QrLocation" => $headerVal->U_QrLocation,
+                //     "U_ReceiptNo" => $headerVal->U_ReceiptNo,
+                //     "U_CommitedTime" => $headerVal->U_CommitedTime,
+                //     "U_IncoTerms" => $headerVal->U_IncoTerms,
+                //     "U_PCash" => $headerVal->U_PCash,
+                //     "U_Approval"=>"Pending"
+                // ];
 
-                $headerVal->UserFields = $userFields;
+                //Return UDF's Dynamically
 
+                $data =  APDI::with('pdi1')->where('ObjectID', $ObjType)->first();
+                $data['doctype'] = $ObjType;
+                if ($data) {
+                    $record = (new UserFieldsService())->processUDF($data);
+                }
+                $userFields = (object)[];
+                if ($record) {
+                    foreach ($record['HeaderUserFields'] as $headerField) {
+                        $userFields->{$headerField['FieldName']} = $headerVal->{$headerField['FieldName']};
+                    }
+
+                    $headerVal->UserFields = $userFields;
+                }
                 $rowData = $DocumentTables->pdi1[0]['ChildTable']::where('DocEntry', $headerVal->id)->get();
                 Log::info("TOTAL LINES FOUND : " . $rowData->count());
                 foreach ($rowData as $key => $val) {
@@ -194,9 +212,19 @@ class ITransactionController extends Controller
                     $val->VatGroup = $val->TaxCode;
                     $val->UoMEntry = OUOM::Where('id', $val->UomCode)->value('ExtRef') ?? null;
 
-                    $val->UserFields = (object)[
-                        "U_HSCode" => null
-                    ];
+                    // Return Udf's
+                    // $val->UserFields = (object)[
+                    //     "U_HSCode" => null
+                    // ];
+                    // Return Udf's
+                    $UserFields = (object)[];
+                    if ($record) {
+                        foreach ($record['LineUserFields'] as $lineField) {
+                            $UserFields->{$lineField['FieldName']} = $val->{$lineField['FieldName']};
+                        }
+
+                        $val->UserFields = $UserFields;
+                    }
                 }
                 $headerVal->document_lines = $rowData;
 
@@ -209,7 +237,7 @@ class ITransactionController extends Controller
 
 
             Log::info("  ********************************************* " . now() . "********************************************");
-           // Log::info($documents);
+            // Log::info($documents);
             return $documents;
             //    Log::info("  ********************************************* " . now() . "********************************************");
 
@@ -577,9 +605,11 @@ class ITransactionController extends Controller
         $DocumentTables = APDI::with('pdi1')
             ->where('ObjectID', $request['ObjType'])
             ->first();
-
+        Log::info("CREATING OBJECT: " . $request['ObjType']);
         if (!$DocumentTables) {
-            abort("Document object does not exist", 500);
+            Log::info("Document object does not exist: " . $request['ObjType']);
+
+            abort(500, 'Document object does not exist.');
         }
 
         $ExtRef = \Request::get('ExtRef');
@@ -595,7 +625,8 @@ class ITransactionController extends Controller
         }
 
         $businessPartner = [];
-        if ($ObjType != 205) {
+        if ($ObjType != 205 && $ObjType != 67 && $ObjType != 66 && $ObjType != 1250000001) {
+
             $businessPartner = OCRD::where('CardCode', $request['CardCode'])->first();
 
             if (!$businessPartner) {
@@ -629,29 +660,29 @@ class ITransactionController extends Controller
                 'ObjType' => $request['ObjType'],
                 'DocType' => $request['DocType'],
                 'DocNum' => $Numbering['NextNumber'],
-                'Series' => $Numbering['id'],
-                'CardCode' => $request['CardCode'],
-                'Requester' => $request['Requester'],
-                'ReqType' => $request['ReqType'],
-                'Department' => $request['Department'],
-                'DocStatus' => $request['DocStatus'],
-                'CANCELED' => $request['CANCELED'],
+                'Series' => $Numbering['id'] ?? null,
+                'CardCode' => $request['CardCode'] ?? null,
+                'Requester' => $request['Requester'] ?? null,
+                'ReqType' => $request['ReqType'] ?? null,
+                'Department' => $request['Department'] ?? null,
+                'DocStatus' => $request['DocStatus'] ?? null,
+                'CANCELED' => $request['CANCELED'] ?? null,
                 'CardName' => $businessPartner ? $businessPartner->CardName : null,
-                'SlpCode' => $request['SlpCode'], // Sales Employee
-                'U_SalePipe' => $request['U_SalePipe'], // Sales Pipe Line
-                'OwnerCode' => $request['OwnerCode'], //Owner Code
-                'U_CashName' => $request['U_CashName'], //Cash Customer  Name
-                'U_CashNo' => $request['U_CashNo'], // Cash Customer No
-                'U_IDNo' => $request['U_IDNo'], // Id no
-                'NumAtCard' => $request['NumAtCard'],
-                'CurSource' => $request['CurSource'],
-                'DocTotal' => $request['DocTotal'],
+                'SlpCode' => $request['SlpCode'] ?? null, // Sales Employee
+                'U_SalePipe' => $request['U_SalePipe'] ?? null, // Sales Pipe Line
+                'OwnerCode' => $request['OwnerCode'] ?? null, //Owner Code
+                'U_CashName' => $request['U_CashName'] ?? null, //Cash Customer  Name
+                'U_CashNo' => $request['U_CashNo'] ?? null, // Cash Customer No
+                'U_IDNo' => $request['U_IDNo'] ?? null, // Id no
+                'NumAtCard' => $request['NumAtCard'] ?? null,
+                'CurSource' => $request['CurSource'] ?? null,
+                'DocTotal' => $request['DocTotal'] ?? null,
                 'VatSum' => $request['VatSum'] ?? 0,
-                'DocDate' => $request['DocDate'], //PostingDate
-                'TaxDate' => $request['TaxDate'], //Document Date
-                'DocDueDate' => $request['DocDueDate'], // Delivery Date
+                'DocDate' => $request['DocDate'] ?? null, //PostingDate
+                'TaxDate' => $request['TaxDate'] ?? null, //Document Date
+                'DocDueDate' => $request['DocDueDate'] ?? null, // Delivery Date
                 'ReqDate' => $request['ReqDate'],
-                'CntctCode' => $request['CntctCode'], //Contact Person
+                'CntctCode' => $request['CntctCode'] ?? null, //Contact Person
                 'LicTradNum' => $request['LicTradNum'],
                 'BaseEntry' => $request['BaseEntry'] ? $request['BaseEntry'] : null, //BaseKey
                 'BaseType' => $request['BaseType'] ? $request['BaseType'] : null, //BaseKey
@@ -662,27 +693,27 @@ class ITransactionController extends Controller
                 'ToWhsCode' => $request['ToWhsCode'] ? $request['ToWhsCode'] : null, //To Warehouse Code
                 //SeriesDocument
                 'DiscPrcnt' => $request['DiscPrcnt'] ?? 0, //Discount Percentages
-                'DiscSum' => $request['DiscSum'], // Discount Sum
-                'BPLId' => $request['Branch'],
-                'U_SaleType' => $request['U_SaleType'], // Sale Type
-                'Comments' => $request['Comments'], //comments
-                'NumAtCard2' => $request['NumAtCard2'],
-                'JrnlMemo' => $request['JrnlMemo'], // Journal Remarks
+                'DiscSum' => $request['DiscSum'] ?? null, // Discount Sum
+                'BPLId' => $request['Branch'] ?? null,
+                'U_SaleType' => $request['U_SaleType'] ?? null, // Sale Type
+                'Comments' => $request['Comments'] ?? null, //comments
+                'NumAtCard2' => $request['NumAtCard2'] ?? null,
+                'JrnlMemo' => $request['JrnlMemo'] ?? null, // Journal Remarks
                 'UseShpdGd' => $request['UseShpdGd'] ?? "N",
-                'U_ServiceCall' => $request['U_ServiceCall'],
-                'U_DemoLocation' => $request['U_DemoLocation'],
-                'U_Technician' => $request['U_Technician'],
-                'U_Location' => $request['U_Location'],
-                'U_MpesaRefNo' => $request['U_MpesaRefNo'],
-                'U_PCash' => $request['U_PCash'],
-                'U_transferType' => $request['U_transferType'],
-                'U_SSerialNo' => $request['U_SSerialNo'],
-                'U_TypePur' => $request['U_TypePur'],
-                'U_NegativeMargin' => $request['U_NegativeMargin'],
-                'U_BaseDoc' => $request['U_BaseDoc'],
-                'ExtRef' => $request['ExtRef'],
-                'ExtRefDocNum' => $request['ExtRefDocNum'],
-                'ExtDocTotal' => $request['ExtDocTotal'],
+                'U_ServiceCall' => $request['U_ServiceCall'] ?? null,
+                'U_DemoLocation' => $request['U_DemoLocation'] ?? null,
+                'U_Technician' => $request['U_Technician'] ?? null,
+                'U_Location' => $request['U_Location'] ?? null,
+                'U_MpesaRefNo' => $request['U_MpesaRefNo'] ?? null,
+                'U_PCash' => $request['U_PCash'] ?? null,
+                'U_transferType' => $request['U_transferType'] ?? null,
+                'U_SSerialNo' => $request['U_SSerialNo'] ?? null,
+                'U_TypePur' => $request['U_TypePur'] ?? null,
+                'U_NegativeMargin' => $request['U_NegativeMargin'] ?? null,
+                'U_BaseDoc' => $request['U_BaseDoc'] ?? null,
+                'ExtRef' => $request['ExtRef'] ?? null,
+                'ExtRefDocNum' => $request['ExtRefDocNum'] ?? null,
+                'ExtDocTotal' => $request['ExtDocTotal'] ?? null,
                 'DataSource' => 'I',
                 'UserSign' => $user->id,
 
@@ -735,13 +766,13 @@ class ITransactionController extends Controller
                     'Price' => $value['Price'], //
                     'DiscPrcnt' => $value['DiscPrcnt'] ?? 0,
                     'Rate' => $value['Rate'] ?? 0,
-                    'TaxCode' => $value['VatGroup'],
+                    'TaxCode' => $value['VatGroup'] ?? null,
                     'PriceAfVAT' => $value['PriceAfVAT'],
                     'PriceBefDi' => $value['UnitPrice'],
                     'LineTotal' => $value['LineTotal'],
                     'VatSum' => $vatSum,
-                    'WhsCode' => $value['WhsCode'],
-                    'SlpCode' => $request['SlpCode'], //    Sales Employee
+                    'WhsCode' => $value['WhsCode'] ?? null,
+                    'SlpCode' => $request['SlpCode'] ?? null, //    Sales Employee
                     'Commission' => $value['Commission'] ?? null, //    Comm. %
                     'AcctCode' => $value['AcctCode'] ?? null, //    G/L Account
                     'OcrCode' => $value['OcrCode'], //    Dimension 1
