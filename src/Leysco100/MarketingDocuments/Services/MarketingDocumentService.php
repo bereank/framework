@@ -64,7 +64,7 @@ class MarketingDocumentService
             $Numbering = (new DocumentsService())
                 ->getNumSerieByObjectId($data['ObjType']);
             $data['DocNum'] = $Numbering['NextNumber'];
-            $data['Series'] = $Numbering['ExtRef'];
+            $data['Series'] = $Numbering['id'];
         }
 
         /**
@@ -292,11 +292,7 @@ class MarketingDocumentService
 
         foreach ($document_lines as $key => $value) {
 
-            if (!isset($value['Dscription'])) {
-                return (new ApiResponseService())
-                    ->apiSuccessAbortProcessResponse("Dscription is Required for item:" .
-                        array_key_exists('ItemCode', $value) ? $value["ItemCode"] : null);
-            }
+
 
             /**
              * Item VALIDATIONS
@@ -314,6 +310,11 @@ class MarketingDocumentService
 
                 if (array_key_exists('DiscPrcnt', $value) && $value['DiscPrcnt'] > 0 && $product->QryGroup61 == "Y") {
                     return (new ApiResponseService())->apiSuccessAbortProcessResponse("Following Item Does not allow discount:" . $value['Dscription']);
+                }
+                if (!isset($value['Dscription'])) {
+                    return (new ApiResponseService())
+                        ->apiSuccessAbortProcessResponse("Dscription is Required for item:" .
+                            array_key_exists('ItemCode', $value) ? $value["ItemCode"] : null);
                 }
             }
 
