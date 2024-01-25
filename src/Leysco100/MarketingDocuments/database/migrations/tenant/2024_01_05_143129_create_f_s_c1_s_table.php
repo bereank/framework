@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string("U_CommitedTime")->nullable();
             $table->integer("statusCode")->comment("0 for success, 1 for failed");
             $table->text("message");
+            $table->text("cache")->nullable();
             $table->timestamps();
         });
     }
