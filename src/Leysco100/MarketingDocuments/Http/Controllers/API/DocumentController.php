@@ -1020,12 +1020,12 @@ class DocumentController extends Controller
                 'Series' => $request['Series'],
                 'DocNum' => $DocNum,
                 'SlpCode' => $request['SlpCode'], // Sales Employee
-                'U_SalePipe' => $request['U_SalePipe'], // Sales Pipe Line
+//                'U_SalePipe' => $request['U_SalePipe'], // Sales Pipe Line
 
-                'U_CashName' => $request['U_CashName'], //Cash Customer  Name
-                'U_CashNo' => $request['U_CashNo'], // Cash Customer No
-                'U_CashMail' => $request['U_CashMail'], // Cash Customer Email
-                'U_IDNo' => $request['U_IDNo'], // Id no
+//                'U_CashName' => $request['U_CashName'], //Cash Customer  Name
+//                'U_CashNo' => $request['U_CashNo'], // Cash Customer No
+//                'U_CashMail' => $request['U_CashMail'], // Cash Customer Email
+//                'U_IDNo' => $request['U_IDNo'], // Id no
                 'NumAtCard' => $request['NumAtCard'] ? $request['NumAtCard'] : null,
                 'CurSource' => $request['CurSource'],
                 'DocTotal' => $request['DocTotal'] ?? 0,
@@ -1046,24 +1046,24 @@ class DocumentController extends Controller
                 'DiscPrcnt' => $request['DiscPrcnt'] ?? 0, //Discount Percentages
                 'DiscSum' => $request['DiscSum'] ?? 0, // Discount Sum
                 'BPLId' => $request['BPLId'],
-                'U_SaleType' => $request['U_SaleType'], // Sale Type
+//                'U_SaleType' => $request['U_SaleType'], // Sale Type
                 'Comments' => $request['Comments'], //comments
                 'NumAtCard2' => $request['NumAtCard2'],
                 'JrnlMemo' => $request['JrnlMemo'], // Journal Remarks
                 'UseShpdGd' => $request['UseShpdGd'] ?? "N",
                 'Rounding' => $request['Rounding'] ?? "N",
                 'RoundDif' => $request['RoundDif'] ?? 0,
-                'U_ServiceCall' => $request['U_ServiceCall'],
-                'U_DemoLocation' => $request['U_DemoLocation'],
-                'U_Technician' => $request['U_Technician'],
-                'U_Location' => $request['U_Location'],
-                'U_MpesaRefNo' => $request['U_MpesaRefNo'],
-                'U_PCash' => $request['U_PCash'],
-                'U_transferType' => $request['U_transferType'],
-                'U_SSerialNo' => $request['U_SSerialNo'],
-                'U_TypePur' => $request['U_TypePur'],
-                'U_NegativeMargin' => $request['U_NegativeMargin'],
-                'U_BaseDoc' => $request['U_BaseDoc'],
+//                'U_ServiceCall' => $request['U_ServiceCall'],
+//                'U_DemoLocation' => $request['U_DemoLocation'],
+//                'U_Technician' => $request['U_Technician'],
+//                'U_Location' => $request['U_Location'],
+//                'U_MpesaRefNo' => $request['U_MpesaRefNo'],
+//                'U_PCash' => $request['U_PCash'],
+//                'U_transferType' => $request['U_transferType'],
+//                'U_SSerialNo' => $request['U_SSerialNo'],
+//                'U_TypePur' => $request['U_TypePur'],
+//                'U_NegativeMargin' => $request['U_NegativeMargin'],
+//                'U_BaseDoc' => $request['U_BaseDoc'],
                 'Transfered' => "N",
             ]);
 
@@ -1274,13 +1274,13 @@ class DocumentController extends Controller
             }
 
             // Stored Procedure Validations
-            $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions($ObjType, "U", $DocEntry);
-
-            if ($storedProcedureResponse) {
-                if ($storedProcedureResponse->error != 0) {
-                    return (new ApiResponseService())->apiFailedResponseService($storedProcedureResponse->error_message);
-                }
-            }
+//            $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions($ObjType, "U", $DocEntry);
+//
+//            if ($storedProcedureResponse) {
+//                if ($storedProcedureResponse->error != 0) {
+//                    return (new ApiResponseService())->apiFailedResponseService($storedProcedureResponse->error_message);
+//                }
+//            }
 
             //Validating Draft using Oringal base type
             if ($ObjType == 112) {
@@ -1298,6 +1298,7 @@ class DocumentController extends Controller
             DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
+            dd($th);
             DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }

@@ -293,14 +293,14 @@ class GeneralDocumentValidationService
                 $rowItems->save();
             }
 
-            $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions($newDoc->ObjType, "A", $newDoc->id);
+//            $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions($newDoc->ObjType, "A", $newDoc->id);
 
             $message = null;
-            if ($storedProcedureResponse) {
-                if ($storedProcedureResponse->error != 0) {
-                    $message = $storedProcedureResponse->error_message;
-                }
-            }
+//            if ($storedProcedureResponse) {
+//                if ($storedProcedureResponse->error != 0) {
+//                    $message = $storedProcedureResponse->error_message;
+//                }
+//            }
 
             DB::connection("tenant")->rollback();
             return $message;
