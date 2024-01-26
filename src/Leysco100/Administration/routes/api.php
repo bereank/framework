@@ -131,6 +131,7 @@ Route::apiResources(['currency' => CurrencyController::class]);
 Route::apiResources(['chartofaccounts' => ChartOfAccountController::class]);
 Route::apiResources(['taxgroup' => TaxGroupController::class]);
 Route::apiResources(['credit-card' => CreditCardController::class]);
+Route::apiResources(['payment-methods' => CreditCardController::class]);
 Route::apiResources(['country' => CountryController::class]);
 Route::apiResources(['bp_properties' => BPPropertiesController::class]);
 // Route::apiResources(['paymentterm' => PaymentTermsController::class]);
