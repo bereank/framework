@@ -4,6 +4,8 @@ namespace Leysco100\Shared\Console\Setup;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
+use Leysco100\Shared\Models\Administration\Models\NNM1;
+use Leysco100\Shared\Models\Administration\Models\ONNM;
 use Leysco100\Shared\Models\Shared\Models\FI100;
 use Spatie\Multitenancy\Models\Tenant;
 use Illuminate\Support\Facades\Artisan;
@@ -78,6 +80,24 @@ class InstallSharedPackageCommand extends Command
                     ]);
                 }
             }
+
+            //Creating ONNM
+            $onnm = ONNM::updateOrCreate([
+                'ObjectCode' => $Header->id,
+            ]);
+
+            //creating NNM1
+            $nnm1 = NNM1::updateOrCreate([
+                'SeriesName' => "Manual",
+                'ObjectCode' => $onnm->id,
+            ], [
+                'IsManual' => "Y",
+            ]);
+
+            $detailsONNM = [
+                'DfltSeries' => $nnm1->id,
+            ];
+            ONNM::where('id', $onnm->id)->update($detailsONNM);
         }
 
         $this->info("Creating Default User");
