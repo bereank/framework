@@ -19,13 +19,11 @@ class CreditCardController extends Controller
     {
 
         try {
-            $data = OCRC::get();
+            $data = OCRC::with('paymentMetod')->get();
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
-
-        return TaxGroup::get();
     }
 
     /**
