@@ -81,8 +81,8 @@ class MDashboardController extends Controller
      */
     public function salesSummaryReports()
     {
-        $user_id = Auth::user()->id;
-        $oslp = OSLP::findOrFail($user_id);
+      //  $user_id = Auth::user()->id;
+    //  $oslp = OSLP::find($user_id);
 
         $totalOrders = ORDR::where(function ($q) {
             $user = Auth::user();
