@@ -329,7 +329,7 @@ class DocumentsService
             $documentDefaultSeries = $nnm1Data;
         } else {
             return (new ApiResponseService())
-                ->apiFailedResponseService("Document Numbering series not setup");
+                ->apiSuccessAbortProcessResponse("Document Numbering series not setup");
         }
         return $documentDefaultSeries;
     }
