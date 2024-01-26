@@ -309,11 +309,11 @@ class DocumentsService
     }
     public function getNumSerieByObjectId($ObjectCode)
     {
-        $form = APDI::with('pdi1')
+        $object = APDI::with('pdi1')
             ->where('ObjectID', $ObjectCode)
             ->first();
 
-        $currentUserDefaultSeries = NNM2::with('nnm1')->where('ObjectCode', $form->id)
+        $currentUserDefaultSeries = NNM2::with('nnm1')->where('ObjectCode', $object->id)
             ->whereHas('nnm1', function ($q) {
                 $q->where('Locked', 'N');
             })
@@ -327,6 +327,9 @@ class DocumentsService
             $nnm1Data->NextNumber = sprintf("%0" . $nnm1Data->NumSize . "s", $nnm1Data->NextNumber);
 
             $documentDefaultSeries = $nnm1Data;
+        } else {
+            return (new ApiResponseService())
+                ->apiSuccessAbortProcessResponse("Document Numbering series not setup");
         }
         return $documentDefaultSeries;
     }

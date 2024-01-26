@@ -17,6 +17,7 @@ use Leysco100\Shared\Models\Administration\Models\OADM;
 use Leysco100\Shared\Models\Administration\Models\OUDG;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
+use Leysco100\Shared\Models\Administration\Models\TaxGroup;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OBIN;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OBTL;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OILM;
@@ -51,8 +52,7 @@ class MarketingDocumentService
         if (!(data_get($data, 'DataSource'))) {
             $data['DataSource'] = 'I';
         }
-
-        if ((data_get($data, 'CardCode'))) {
+        if (array_key_exists('CardCode', $data)) {
             $customerDetails = OCRD::where('CardCode', $data['CardCode'])->first();
             if (!(data_get($data, 'CardName'))) {
                 if ($customerDetails) {
@@ -60,6 +60,7 @@ class MarketingDocumentService
                 }
             }
         }
+
         if (!(data_get($data, 'DocNum'))) {
             $Numbering = (new DocumentsService())
                 ->getNumSerieByObjectId($data['ObjType']);
@@ -108,21 +109,21 @@ class MarketingDocumentService
                         $documentLines[$key]['OcrCode4'] = isset($line['OcrCode4']) && !empty($line['OcrCode4']) ? $line['OcrCode4'] : (isset($dimensions['OcrCode4']) ? $dimensions['OcrCode4'] : null);
                         $documentLines[$key]['OcrCode5'] = isset($line['OcrCode5']) && !empty($line['OcrCode5']) ? $line['OcrCode5'] : (isset($dimensions['OcrCode5']) ? $dimensions['OcrCode5'] : null);
 
-                        if ($user_data->oudg->SellFromBin && $data['ObjType'] == 13 && empty($value['bin_allocation'])) {
-                            if (isset($line['OcrCode4']) || isset($dimensions['OcrCode4'])) {
-                                $lineOcrCode4 =  $line['OcrCode4'] ?? $dimensions['OcrCode4'];
-                                $defaults = OUDG::where('CogsOcrCo4',  $lineOcrCode4)->first();
-                                $obin = OBIN::where('id', $defaults->DftBinLoc)->first();
-                                if ($defaults->DftBinLoc && $obin) {
-                                    $documentLines[$key]['bin_allocation'] =  [
-                                        [
-                                            'BinCode' => $obin->BinCode,
-                                            'QtyVar' =>  $line['Quantity']
-                                        ]
-                                    ];
-                                }
-                            }
-                        }
+                        // if ($user_data->oudg->SellFromBin && $data['ObjType'] == 13 && empty($value['bin_allocation'])) {
+                        //     if (isset($line['OcrCode4']) || isset($dimensions['OcrCode4'])) {
+                        //         $lineOcrCode4 =  $line['OcrCode4'] ?? $dimensions['OcrCode4'];
+                        //         $defaults = OUDG::where('CogsOcrCo4',  $lineOcrCode4)->first();
+                        //         $obin = OBIN::where('id', $defaults->DftBinLoc)->first();
+                        //         if ($defaults->DftBinLoc && $obin) {
+                        //             $documentLines[$key]['bin_allocation'] =  [
+                        //                 [
+                        //                     'BinCode' => $obin->BinCode,
+                        //                     'QtyVar' =>  $line['Quantity']
+                        //                 ]
+                        //             ];
+                        //         }
+                        //     }
+                        // }
                     }
                     if (data_get($line, 'Quantity')) {
                         if ($itemDetails) {
@@ -156,6 +157,12 @@ class MarketingDocumentService
                 if (!(data_get($line, 'OwnerCode'))) {
                     $documentLines[$key]['OwnerCode'] = $user_data->EmpID ?? null;
                 }
+                if (!(data_get($line, 'TaxCode'))) {
+                    $taxGroup = TaxGroup::where('code', $itemDetails->VatGourpSa)->first();
+                    $documentLines[$key]['TaxCode'] = $taxGroup->code ?? null;
+                }
+
+
                 $res =  CSHS::where('ObjType', $data['ObjType'])->first();
                 if ($res) {
                     $query =  OUQR::where('id', $res->QueryId)->first();
@@ -172,7 +179,7 @@ class MarketingDocumentService
 
                     $result = DB::connection('tenant')->select($processedString);
                     //   Log::info($result);
-                    $documentLines[$key]['Dscription'] = $result;
+                    // $documentLines[$key]['Dscription'] = $result;
                     if (is_array($result)) {
                         if (!empty($result)) {
                             $headers =  array_values((array)$result[0]);
@@ -181,9 +188,19 @@ class MarketingDocumentService
                     }
                     // Log::info([$processedString, $res->ItemID, $headers, $number, $matchSubstring, $line]);
                 }
+
+                if (!(data_get($line, 'bin_allocation')) &&  data_get($documentLines[$key], 'ToBinCod')) {
+                    Log::info("CREATE BIN ALLOC");
+                    $documentLines[$key]['bin_allocation'] =  [
+                        [
+                            'BinCode' => $documentLines[$key]['ToBinCod'],
+                            'QtyVar' =>  $line['Quantity']
+                        ]
+                    ];
+                }
             }
             $data['document_lines'] = $documentLines;
-            Log::info($data['document_lines']);
+            //  Log::info($data['document_lines']);
         }
 
 
@@ -245,6 +262,7 @@ class MarketingDocumentService
         }
 
 
+
         if (array_key_exists('DiscPrcnt', $docData) && $docData['DiscPrcnt'] > 100) {
             return (new ApiResponseService())
                 ->apiSuccessAbortProcessResponse("Invalid Discount Percentage");
@@ -254,7 +272,15 @@ class MarketingDocumentService
             return (new ApiResponseService())
                 ->apiSuccessAbortProcessResponse("Delivery Date Required");
         }
+        if (!array_key_exists('DocTotal', $docData)) {
+            return (new ApiResponseService())
+                ->apiSuccessAbortProcessResponse("Document Total is required.");
 
+            if (!$docData['DocTotal'] <= 0) {
+                return (new ApiResponseService())
+                    ->apiSuccessAbortProcessResponse("Document Total Cannot be Less than 1.");
+            }
+        }
         if ($ObjType == 205) {
             if (!$docData['ReqType']) {
                 return (new ApiResponseService())
@@ -643,7 +669,7 @@ class MarketingDocumentService
                                 "LineNum" => $rowItems->id,
                                 "BaseType" => $data['saveToDraft'] ? 112 : $ObjType,
                                 "BaseEntry" => $newDoc->id,
-                                "CardCode" => $data['CardCode'],
+                                "CardCode" => $data['CardCode'] ?? null,
                                 "CardName" => $data['CardName'],
                                 "WhsCode" => $value['WhsCode'],
                                 "ItemName" => $value['Dscription'],
