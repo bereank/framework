@@ -602,6 +602,10 @@ class ITransactionController extends Controller
         if ($ObjType == 1470000113) {
             $ObjType = 205;
         }
+
+        if ($ObjType == 1250000001) {
+            $ObjType = 66;
+        }
         $DocumentTables = APDI::with('pdi1')
             ->where('ObjectID', $request['ObjType'])
             ->first();
