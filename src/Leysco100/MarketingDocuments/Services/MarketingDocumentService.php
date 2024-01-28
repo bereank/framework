@@ -690,7 +690,10 @@ class MarketingDocumentService
 
             //Record Payment data
             if (array_key_exists('payments', $data) && !empty($data['payments']) && $ObjType == 13 &&  $ObjType == 112) {
+                Log::payments([$data['payments']]);
+                Log::info("START Recording Payments");
                 foreach ($data['payments'] as $payment) {
+
                     //                $storedProcedureResponse = null;
                     if ($ObjType == 13) {
                         $newPayment = (new BankingDocumentService())->processIncomingPayment($newDoc, $payment);
@@ -705,6 +708,7 @@ class MarketingDocumentService
                     //                    }
                     //                }
                 }
+                Log::info("END Recording Payments");
             }
             DB::connection("tenant")->commit();
             $newDoc['document_lines'] = $documentRows;
