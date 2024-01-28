@@ -656,7 +656,7 @@ class ITransactionController extends Controller
         // $DocNum = (new DocumentsService())
         //     ->gettingNumberingSeries($request['ObjType']);
         $Numbering = (new DocumentsService())
-            ->getNumSerieByObjectId($request['ObjType']);
+            ->getNumSerieByObjectId($ObjType);
 
         DB::connection("tenant")->beginTransaction();
         try {
