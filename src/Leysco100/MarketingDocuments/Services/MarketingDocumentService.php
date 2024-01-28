@@ -453,7 +453,7 @@ class MarketingDocumentService
 
     public function createDoc($data, $TargetTables, $ObjType)
     {
-        Log::info([$data]);
+
         DB::connection("tenant")->beginTransaction();
         //If Base Type Exist
         if (isset($data['BaseType']) && isset($data['BaseEntry'])) {
@@ -466,8 +466,8 @@ class MarketingDocumentService
         }
         try {
             $NewDocDetails = [
-                'ObjType' => $data['ObjType']  ?? null,
-                'DocType' => $data['DocType']  ?? null,
+                'ObjType' => $data['ObjType'],
+                'DocType' => $data['DocType']  ?? "I",
                 'DocNum' => $data['DocNum'] ?? null,
                 'Series' => $data['Series']  ?? null,
                 'CardCode' => $data['CardCode'] ?? null,
@@ -689,13 +689,17 @@ class MarketingDocumentService
             (new SystemDefaults())->updateNextNumberNumberingSeries($data['Series']);
 
             //Record Payment data
-            if (array_key_exists('payments', $data) && !empty($data['payments']) && $ObjType == 13 &&  $ObjType == 112) {
-                Log::payments([$data['payments']]);
+            if (
+                array_key_exists('payments', $data)
+                && !empty($data['payments'])
+                && ($data['ObjType'] == 13 ||  $data['ObjType'] == 112)
+            ) {
+              
                 Log::info("START Recording Payments");
                 foreach ($data['payments'] as $payment) {
 
                     //                $storedProcedureResponse = null;
-                    if ($ObjType == 13) {
+                    if ($data['ObjType'] == 13) {
                         $newPayment = (new BankingDocumentService())->processIncomingPayment($newDoc, $payment);
                         //                        $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions(140, "A", $newPayment->id);
                     } else {
