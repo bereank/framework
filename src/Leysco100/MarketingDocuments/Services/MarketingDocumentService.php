@@ -453,7 +453,7 @@ class MarketingDocumentService
 
     public function createDoc($data, $TargetTables, $ObjType)
     {
-
+        Log::info([$data]);
         DB::connection("tenant")->beginTransaction();
         //If Base Type Exist
         if (isset($data['BaseType']) && isset($data['BaseEntry'])) {
