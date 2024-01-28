@@ -607,11 +607,11 @@ class ITransactionController extends Controller
             $ObjType = 66;
         }
         $DocumentTables = APDI::with('pdi1')
-            ->where('ObjectID', $request['ObjType'])
+            ->where('ObjectID', $ObjType)
             ->first();
-        Log::info("CREATING OBJECT: " . $request['ObjType']);
+        Log::info("CREATING OBJECT: " . $ObjType);
         if (!$DocumentTables) {
-            Log::info("Document object does not exist: " . $request['ObjType']);
+            Log::info("Document object does not exist: " . $ObjType);
 
             abort(500, 'Document object does not exist.');
         }
