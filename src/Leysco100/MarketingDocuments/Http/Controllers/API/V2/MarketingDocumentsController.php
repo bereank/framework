@@ -76,7 +76,7 @@ class MarketingDocumentsController extends Controller
                     ->with('CreatedBy:name', 'ohem:id,empID,firstName,middleName,lastName')
                     ->with(['document_lines' => function ($query) {
                         $query->with('ItemDetails:id,ItemCode,ItemName')
-                            ->select('id', 'DocEntry', 'Quantity', 'Price', 'LineTotal', 'ItemCode');
+                            ->select('id', 'DocEntry', 'LineNum','Quantity', 'Price', 'LineTotal', 'ItemCode','Dscription');
                     }])
                     ->where(function ($q) use ($StartDate, $EndDate) {
                         if ($StartDate && $EndDate) {
@@ -335,26 +335,26 @@ class MarketingDocumentsController extends Controller
                 ->apiFailedResponseService("Not found document with objtype " . $request['ObjType']);
         }
 
-//        if ($TargetTables->hasExtApproval == 1) {
-//            $TargetTables = APDI::with('pdi1')
-//                ->where('ObjectID', 112)
-//                ->first();
-//            $ObjType = 112;
-//        }
+        //        if ($TargetTables->hasExtApproval == 1) {
+        //            $TargetTables = APDI::with('pdi1')
+        //                ->where('ObjectID', 112)
+        //                ->first();
+        //            $ObjType = 112;
+        //        }
 
         // Step 2: Default Fields
         $defaulted_data = (new MarketingDocumentService())->fieldsDefaulting($request->all());
- 
+  
         // Step 3: Validate Document Fields
         $validatedFields  = (new MarketingDocumentService())->validateFields($defaulted_data, $request['ObjType']);
 
         // Step 4: Validate UDF'S
         $docData = (new MapApiFieldAction())->handle($validatedFields, $TargetTables);
-    
+
         // Step 5: Create Document
         $newDoc =  (new MarketingDocumentService())->createDoc($docData, $TargetTables, $ObjType);
 
-      
+
         return (new ApiResponseService())->apiSuccessResponseService($newDoc);
     }
 }
