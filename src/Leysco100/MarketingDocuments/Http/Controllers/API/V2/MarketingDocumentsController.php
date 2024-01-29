@@ -4,12 +4,13 @@ namespace Leysco100\MarketingDocuments\Http\Controllers\API\V2;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Leysco100\Shared\Models\Banking\Services\BankingDocumentService;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Models\Banking\Models\PDF2;
 use Leysco100\Shared\Models\Banking\Models\RCT2;
+use Leysco100\Shared\Services\UserFieldsService;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Services\AuthorizationService;
 use Leysco100\Shared\Models\Administration\Models\EOTS;
@@ -24,6 +25,7 @@ use Leysco100\MarketingDocuments\Http\Controllers\Controller;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OSRN;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
 use Leysco100\MarketingDocuments\Services\MarketingDocumentService;
+use Leysco100\Shared\Models\Banking\Services\BankingDocumentService;
 use Leysco100\Shared\Models\MarketingDocuments\Services\GeneralDocumentService;
 
 
@@ -62,13 +64,28 @@ class MarketingDocumentsController extends Controller
             $ownerData =  (new AuthorizationService())->getDataOwnershipAuth($ObjType, 1);
         }
 
+
+
         try {
-            $data = $DocumentTables->ObjectHeaderTable::where('ObjType', $ObjType)
-                ->with('CreatedBy.ohem')
-                ->latest()
-                ->paginate($perPage, ['*'], 'page', $page);
+
             if ($ObjType != 205) {
-                $data = $DocumentTables->ObjectHeaderTable::select('id', 'CardCode', 'DocNum', 'CardName', 'ExtRef', 'ExtRefDocNum', 'UserSign', 'SlpCode', 'DataSource', 'DocStatus', 'ObjType', 'OwnerCode', 'DocDate', 'DocTotal', 'created_at')
+                $data = $DocumentTables->ObjectHeaderTable::select(
+                    'id',
+                    'CardCode',
+                    'DocNum',
+                    'CardName',
+                    'ExtRef',
+                    'ExtRefDocNum',
+                    'UserSign',
+                    'SlpCode',
+                    'DataSource',
+                    'DocStatus',
+                    'ObjType',
+                    'OwnerCode',
+                    'DocDate',
+                    'DocTotal',
+                    'created_at'
+                )
                     ->where('ObjType', $ObjType)
                     ->when($dataOwnership && $dataOwnership->Active, function ($query) use ($ownerData) {
                         $query->wherein('OwnerCode', $ownerData);
@@ -76,7 +93,7 @@ class MarketingDocumentsController extends Controller
                     ->with('CreatedBy:name', 'ohem:id,empID,firstName,middleName,lastName')
                     ->with(['document_lines' => function ($query) {
                         $query->with('ItemDetails:id,ItemCode,ItemName')
-                            ->select('id', 'DocEntry', 'LineNum','Quantity', 'Price', 'LineTotal', 'ItemCode','Dscription');
+                            ->select('id', 'DocEntry', 'LineNum', 'Quantity', 'Price', 'LineTotal', 'ItemCode', 'Dscription');
                     }])
                     ->where(function ($q) use ($StartDate, $EndDate) {
                         if ($StartDate && $EndDate) {
@@ -106,6 +123,24 @@ class MarketingDocumentsController extends Controller
                     })
                     ->latest()
                     ->paginate($perPage, ['*'], 'page', $page);
+
+                $DocumentTables['doctype'] = $ObjType;
+                foreach ($data as $key => $singleRcd) {
+                    if ($singleRcd->count() > 0) {
+                        $record = (new UserFieldsService())->processUDF($DocumentTables);
+
+                        $userFields = (object)[];
+
+                        if ($record) {
+                            foreach ($record['HeaderUserFields'] as $headerField) {
+                                Log::info($singleRcd);
+                                $userFields->{$headerField['FieldName']} = $singleRcd->{$headerField['FieldName']};
+                            }
+
+                            $singleRcd->UserFields = $userFields;
+                        }
+                    }
+                }
             }
             foreach ($data as $key => $val) {
                 $val->isDoc = (int) $isDoc;
@@ -344,7 +379,7 @@ class MarketingDocumentsController extends Controller
 
         // Step 2: Default Fields
         $defaulted_data = (new MarketingDocumentService())->fieldsDefaulting($request->all());
-  
+
         // Step 3: Validate Document Fields
         $validatedFields  = (new MarketingDocumentService())->validateFields($defaulted_data, $request['ObjType']);
 
