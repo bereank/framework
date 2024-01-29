@@ -2,6 +2,7 @@
 
 namespace Leysco100\MarketingDocuments\Services;
 
+use stdClass;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Leysco100\Shared\Models\OUQR;
@@ -83,6 +84,41 @@ class MarketingDocumentService
             }
         }
 
+        $fmsquery =  CSHS::where('ObjType', $data['ObjType'])->where('IndexID', 1)->get();
+        if ($fmsquery) {
+            foreach ($fmsquery as $res) {
+                // Log::info($res);
+                $query =  OUQR::where('id', $res->QueryId)->first();
+
+                $string = $query->QString;
+                preg_match('/(\d+)(\.\w+)/', $string, $matches);
+                $substring = $matches[0];
+                $number = $matches[1];
+
+                $matchSubstring = str_replace('.', '', $matches[2]);
+
+                $replacementValue =   $data[$matchSubstring];
+
+                $processedString = Str::replace('$[' . $substring . ']', '"' . $replacementValue . '"', $string);
+
+                $result = DB::connection('tenant')->select($processedString);
+
+                if (is_array($result)) {
+                    if (!empty($result)) {
+                        $headers = array_values((array)$result[0]);
+
+                        if (Str::startsWith($res->ItemID, 'U_')) {
+                            $userField = new stdClass();
+                            $userField->{$res->ItemID} = $headers[0];
+                            $userFields[] = (array) $userField;
+                            $data['udfs'] = array_merge($userFields, $data['udfs']);
+                            //   Log::info([$$data['udfs']]);
+                        }
+                        $data[$res->ItemID] = $headers[0];
+                    }
+                }
+            }
+        }
         // Document lines defaulting
         if (array_key_exists('document_lines', $data) && !empty($data['document_lines'])) {
             $documentLines = $data['document_lines'];
@@ -160,37 +196,49 @@ class MarketingDocumentService
                 if (!(data_get($line, 'TaxCode'))) {
                     $taxGroup = TaxGroup::where('code', $itemDetails->VatGourpSa)->first();
                     $documentLines[$key]['TaxCode'] = $taxGroup->code ?? null;
+                } else {
+                    $documentLines[$key]['TaxCode'] = $itemDetails->VatGourpSa;
                 }
+                //   Log::info($itemDetails->VatGourpSa);
 
+                $fmsquery =  CSHS::where('ObjType', $data['ObjType'])->where('IndexID', 2)->get();
+                if ($fmsquery) {
+                    foreach ($fmsquery as $res) {
+                        // Log::info($res);
+                        $query =  OUQR::where('id', $res->QueryId)->first();
 
-                $res =  CSHS::where('ObjType', $data['ObjType'])->first();
-                if ($res) {
-                    $query =  OUQR::where('id', $res->QueryId)->first();
-                    $string = $query->QString;
-                    preg_match('/(\d+)(\.\w+)/', $string, $matches);
-                    $substring = $matches[0];
-                    $number = $matches[1];
+                        $string = $query->QString;
+                        preg_match('/(\d+)(\.\w+)/', $string, $matches);
+                        $substring = $matches[0];
+                        $number = $matches[1];
 
-                    $matchSubstring = str_replace('.', '', $matches[2]);
+                        $matchSubstring = str_replace('.', '', $matches[2]);
 
-                    $replacementValue =   $documentLines[$key][$matchSubstring];
+                        $replacementValue =   $documentLines[$key][$matchSubstring];
 
-                    $processedString = Str::replace('$[' . $substring . ']', '"' . $replacementValue . '"', $string);
+                        $processedString = Str::replace('$[' . $substring . ']', '"' . $replacementValue . '"', $string);
 
-                    $result = DB::connection('tenant')->select($processedString);
-                    //   Log::info($result);
-                    // $documentLines[$key]['Dscription'] = $result;
-                    if (is_array($result)) {
-                        if (!empty($result)) {
-                            $headers =  array_values((array)$result[0]);
-                            $documentLines[$key][$res->ItemID] =  $headers[0];
+                        $result = DB::connection('tenant')->select($processedString);
+
+                        if (is_array($result)) {
+                            if (!empty($result)) {
+                                $headers = array_values((array)$result[0]);
+
+                                if (Str::startsWith($res->ItemID, 'U_')) {
+                                    $userField = new stdClass();
+                                    $userField->{$res->ItemID} = $headers[0];
+                                    $userFields[] = (array) $userField;
+                                    $documentLines[$key]['udfs'] = array_merge($userFields, $documentLines[$key]['udfs']);
+                                    //   Log::info([$documentLines[$key]['udfs']]);
+                                }
+                                $documentLines[$key][$res->ItemID] = $headers[0];
+                            }
                         }
                     }
-                    // Log::info([$processedString, $res->ItemID, $headers, $number, $matchSubstring, $line]);
                 }
 
                 if (!(data_get($line, 'bin_allocation')) &&  data_get($documentLines[$key], 'ToBinCod')) {
-                    Log::info("CREATE BIN ALLOC");
+
                     $documentLines[$key]['bin_allocation'] =  [
                         [
                             'BinCode' => $documentLines[$key]['ToBinCod'],
@@ -342,6 +390,20 @@ class MarketingDocumentService
                         ->apiSuccessAbortProcessResponse("Dscription is Required for item:" .
                             array_key_exists('ItemCode', $value) ? $value["ItemCode"] : null);
                 }
+
+                if (!array_key_exists('WhsCode', $value) && !isset($value["WhsCode"])) {
+                    return (new ApiResponseService())->apiSuccessAbortProcessResponse("Select warehouse for item: " .  $value['ItemCode'] ?? null);
+                }
+                $warehouse = OWHS::Where('WhsCode', $value['WhsCode'])
+                    ->first();
+
+                if (!$warehouse) {
+                    return (new ApiResponseService())->apiSuccessAbortProcessResponse("Warehouse " .  $value['WhsCode'] .  " Does Not Exist");
+                }
+
+                if ($warehouse->Inactive == "Y") {
+                    return (new ApiResponseService())->apiSuccessAbortProcessResponse("Warehouse" . $warehouse->WhsName .  "  is inactive");
+                }
             }
 
             if (!isset($value['Quantity']) || $value['Quantity'] <= 0) {
@@ -355,10 +417,7 @@ class MarketingDocumentService
             }
 
 
-            if (!isset($value['WhsCode'])) {
-                return (new ApiResponseService())
-                    ->apiSuccessAbortProcessResponse("Warehouse (WhsCode) Required for item:");
-            }
+
 
             /**
              * Mapping Req Name
@@ -377,10 +436,16 @@ class MarketingDocumentService
 
             $checkStockAvailabilty = false;
 
-            if (isset($docData['BaseType'])) {
-                if (($ObjType == 13 && $docData['BaseType'] != 15) || $ObjType == 15) {
-                    $checkStockAvailabilty = true;
-                }
+            if (
+                array_key_exists('BaseType', $docData) && isset($docData['BaseType']) ||
+                $ObjType == 15 || $ObjType == 13
+            ) {
+                //    if (($ObjType == 13 && $docData['BaseType'] != 15) || $ObjType == 15) {
+                $checkStockAvailabilty = true;
+                // }
+            }
+            if (($ObjType == 13 && (array_key_exists('BaseType', $docData) && $docData['BaseType'] != 15))) {
+                $checkStockAvailabilty = true;
             }
 
             if (array_key_exists('DiscPrcnt', $value) && $value['DiscPrcnt'] > 100) {
@@ -407,13 +472,17 @@ class MarketingDocumentService
             if ($checkStockAvailabilty) {
 
                 if ($product->InvntItem == "Y") {
+
                     $inventoryDetails = OITW::where('ItemCode',  $value['ItemCode'])
                         ->where('WhsCode', $value['WhsCode'])
                         ->first();
 
                     if (!$inventoryDetails || $inventoryDetails->OnHand < $value['Quantity']) {
                         return (new ApiResponseService())
-                            ->apiSuccessAbortProcessResponse("Insufficient stock for item:" . $value['Dscription']);
+                            ->apiSuccessAbortProcessResponse(
+                                "Insufficient stock for item: " . $value['Dscription'] . "  " .
+                                    "Available Quantity is: " . $inventoryDetails?->OnHand ?? 0
+                            );
                     }
                 }
             }
@@ -694,7 +763,7 @@ class MarketingDocumentService
                 && !empty($data['payments'])
                 && ($data['ObjType'] == 13 ||  $data['ObjType'] == 112)
             ) {
-              
+
                 Log::info("START Recording Payments");
                 foreach ($data['payments'] as $payment) {
 
