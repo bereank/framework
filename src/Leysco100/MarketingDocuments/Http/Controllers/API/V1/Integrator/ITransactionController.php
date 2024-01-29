@@ -93,9 +93,9 @@ class ITransactionController extends Controller
                 $ObjType = 1470000113;
             }
 
-            if ($ObjType == 66) {
-                $ObjType = 1250000001;
-            }
+            // if ($ObjType == 66) {
+            //     $ObjType = 1250000001;
+            // }
             foreach ($documents as $key => $headerVal) {
                 /**
                  * Mark The document not transferred
@@ -228,7 +228,7 @@ class ITransactionController extends Controller
                 }
                 $headerVal->document_lines = $rowData;
 
-                $headerVal->deals = $rowData;
+                //$headerVal->deals = $rowData;
 
                 if ($headerVal->ObjType == 13) {
                     $headerVal->payments = [(new BankingDocumentService())->getInvoicePayment($headerVal->id)];
