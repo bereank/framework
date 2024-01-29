@@ -602,12 +602,16 @@ class ITransactionController extends Controller
         if ($ObjType == 1470000113) {
             $ObjType = 205;
         }
+
+        if ($ObjType == 1250000001) {
+            $ObjType = 66;
+        }
         $DocumentTables = APDI::with('pdi1')
-            ->where('ObjectID', $request['ObjType'])
+            ->where('ObjectID', $ObjType)
             ->first();
-        Log::info("CREATING OBJECT: " . $request['ObjType']);
+        Log::info("CREATING OBJECT: " . $ObjType);
         if (!$DocumentTables) {
-            Log::info("Document object does not exist: " . $request['ObjType']);
+            Log::info("Document object does not exist: " . $ObjType);
 
             abort(500, 'Document object does not exist.');
         }
@@ -652,7 +656,7 @@ class ITransactionController extends Controller
         // $DocNum = (new DocumentsService())
         //     ->gettingNumberingSeries($request['ObjType']);
         $Numbering = (new DocumentsService())
-            ->getNumSerieByObjectId($request['ObjType']);
+            ->getNumSerieByObjectId($ObjType);
 
         DB::connection("tenant")->beginTransaction();
         try {

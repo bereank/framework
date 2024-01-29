@@ -170,7 +170,7 @@ class InventoryTransactionsController extends Controller
                 $Series =    $request['Series'];
             } else {
                 $DocNum  = (new DocumentsService())
-                    ->getNumSerieByObjectId($request['ObjType']);
+                    ->getNumSerieByObjectId($ObjType);
                 $doc_number =  $DocNum['NextNumber'];
                 $Series =  $DocNum['id'];
             }

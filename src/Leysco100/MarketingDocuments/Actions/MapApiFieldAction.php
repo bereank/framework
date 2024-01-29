@@ -2,78 +2,125 @@
 
 namespace Leysco100\MarketingDocuments\Actions;
 
-use Illuminate\Support\Arr;
 use Leysco100\Shared\Models\CUFD;
+use Illuminate\Support\Facades\Log;
 use Leysco100\Shared\Services\ApiResponseService;
+
 
 class MapApiFieldAction
 {
   public  function handle($data, $TargetTables)
   {
 
-    //Header UDF  validation
+    // Header UDF validation
     $table = (new $TargetTables->ObjectHeaderTable)->getTable();
-    $headerUdfs = CUFD::where('TableName', $table)->get();
+    $headerUdfs = CUFD::where('TableName', $table)->get(['FieldName', 'NotNull'])->keyBy('FieldName')->toArray();
+
     if ($headerUdfs) {
       $documentData = [];
+
       if (!isset($data['udfs'])) {
-        return (new ApiResponseService())->apiSuccessAbortProcessResponse("UDF is required Field");
+        return (new ApiResponseService())->apiSuccessAbortProcessResponse("UDF is a required field");
       }
+
       foreach ($data['udfs'] as $item) {
-        foreach ($headerUdfs as $headerUdf) {
-          $exists = Arr::has($item, $headerUdf['FieldName']);
+        $key = array_key_first($item);
+        $exists = array_key_exists($key, $headerUdfs);
 
-          if (!$exists && $headerUdf->NotNull) {
-            return (new ApiResponseService())->apiSuccessAbortProcessResponse($headerUdf['FieldName'] . " Is a required Field");
-          }
-
-          if ($exists) {
-            $documentData[$headerUdf['FieldName']] = $item[$headerUdf['FieldName']];
-          }
+        if ($exists) {
+          $documentData[$key] = $item[$key];
         }
       }
 
       $data['udfs'] = $documentData;
-    } else {
-      return;
+
+      $notNullUdfs = array_filter($headerUdfs, function ($item) {
+        return $item['NotNull'] == 1;
+      });
+
+      $keysOfInnerArrays = array_map('array_keys', $notNullUdfs);
+      $keysNotInArrayB = array_diff(array_keys($keysOfInnerArrays), array_keys($data['udfs']));
+
+      $commonKeys = array_intersect(array_keys($keysOfInnerArrays), array_keys($data['udfs']));
+
+      foreach ($commonKeys as  $key => $value) {
+
+        if (empty($data['udfs'][$value])) {
+          $missingField = $value;
+          return (new ApiResponseService())->apiSuccessAbortProcessResponse("$missingField Cannot be null");
+        }
+      }
+      if (!empty($keysNotInArrayB)) {
+        $missingField = $keysNotInArrayB[0];
+        return (new ApiResponseService())->apiSuccessAbortProcessResponse("$missingField is a required field");
+      }
+      // $udfsArrayOfObjects = [];
+
+      // foreach ($data['udfs'] as $key => $value) {
+      //   $udfsArrayOfObjects[] = [
+      //     $key => $value,
+      //   ];
+      // }
+
+      // $data['udfs'] = $udfsArrayOfObjects;
     }
+
 
     // Lines UDF validation
     $line_table = (new $TargetTables->pdi1[0]['ChildTable'])->getTable();
-    $line_fields = CUFD::where('TableName', $line_table)->get();
+    $line_fields =  CUFD::where('TableName', $line_table)->get(['FieldName', 'NotNull'])->keyBy('FieldName')->toArray();
 
     if ($line_fields) {
 
       foreach ($data['document_lines'] as &$doc_lines) {
+        $lineData = [];
         if (!isset($doc_lines['udfs'])) {
+
           return (new ApiResponseService())->apiSuccessAbortProcessResponse("UDF is required Field");
         }
-        $lineData = [];
 
-        foreach ($line_fields as $line_field) {
-          $exists = false;
+        foreach ($doc_lines['udfs'] as $item) {
 
-          foreach ($doc_lines['udfs'] as $item) {
-            if (Arr::has($item, $line_field['FieldName'])) {
-              $exists = true;
-              break;
-            }
-
-            if (!$exists && $line_field->NotNull) {
-              return (new ApiResponseService())->apiSuccessAbortProcessResponse($line_field['FieldName'] . " Is a required Field");
-            }
-          }
+          $key = array_key_first($item);
+          $exists = array_key_exists($key,  $line_fields);
 
           if ($exists) {
-            $lineData[$line_field['FieldName']] = Arr::get($doc_lines['udfs'], $line_field['FieldName']);
+
+            $lineData[$key] = $item[$key];
           }
         }
 
         $doc_lines['udfs'] = $lineData;
-      }
-    } else {
+        $notNullUdfs = array_filter($line_fields, function ($item) {
+          return $item['NotNull'] == 1;
+        });
 
-      return;
+        $keysOfInnerArrays = array_map('array_keys', $notNullUdfs);
+        $keysNotInArrayB = array_diff(array_keys($keysOfInnerArrays), array_keys($doc_lines['udfs']));
+
+        $commonKeys = array_intersect(array_keys($keysOfInnerArrays), array_keys($doc_lines['udfs']));
+
+        foreach ($commonKeys as  $key => $value) {
+
+          if (empty($doc_lines['udfs'][$value])) {
+            $missingField = $value;
+            return (new ApiResponseService())->apiSuccessAbortProcessResponse("$missingField Cannot be null");
+          }
+        }
+        if (!empty($keysNotInArrayB)) {
+          $missingField = $keysNotInArrayB[array_key_first($keysNotInArrayB)];
+          return (new ApiResponseService())->apiSuccessAbortProcessResponse("$missingField is a required field");
+        }
+        // $udfsArrayOfObjects = [];
+
+        // foreach ($doc_lines['udfs'] as $key => $value) {
+        //   $udfsArrayOfObjects[] = [
+        //     $key => $value,
+        //   ];
+        // }
+
+        // $doc_lines['udfs'] = $udfsArrayOfObjects;
+      }
     }
 
     return $data;
