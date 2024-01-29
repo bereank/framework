@@ -2,6 +2,7 @@
 
 namespace Leysco100\MarketingDocuments\Http\Controllers\API\V2;
 
+use stdClass;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -136,23 +137,25 @@ class MarketingDocumentsController extends Controller
 
                 $DocumentTables['doctype'] = $ObjType;
                 $udf = [];
+
                 foreach ($data as $key => $singleRcd) {
                     if ($singleRcd->count() > 0) {
                         $record = (new UserFieldsService())->processUDF($DocumentTables);
 
-                        $userFields = (object)[];
+                        $userFields = [];
 
                         if ($record) {
                             foreach ($record['HeaderUserFields'] as $headerField) {
-                                $udf[] =    $headerField['FieldName'];
-                                $userFields->{$headerField['FieldName']} = $singleRcd->{$headerField['FieldName']};
+                                $udf[] = $headerField['FieldName'];
+                                $userField = new stdClass();
+                                $userField->{$headerField['FieldName']} = $singleRcd->{$headerField['FieldName']};
+                                $userFields[] = $userField;
                             }
 
                             $singleRcd->UserFields = $userFields;
                         }
                     }
                 }
-            
             }
             foreach ($data as $key => $val) {
                 $val->isDoc = (int) $isDoc;
