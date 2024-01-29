@@ -5,6 +5,7 @@ namespace Leysco100\MarketingDocuments\Http\Controllers\API\V1\Integrator;
 
 use App\Models\THRDP;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Leysco100\Shared\Models\Banking\Models\ORCT;
 use Leysco100\Shared\Models\Banking\Models\RCT1;
 use Leysco100\Shared\Models\Banking\Models\RCT2;
@@ -32,7 +33,9 @@ class IIncomingPaymentController extends Controller
             ->whereNull('ExtRef')
 
             ->pluck('id');
-
+        Log::info("__________________PAYMENTS ID'S____________");
+        Log::info([$paymentIDs]);
+        Log::info("__________________PAYMENTS ID'S END____________");
         $data = ORCT::whereIn('id', $paymentIDs)->get();
         foreach ($data as $key => $value) {
             $value->DocType = "C";
@@ -56,7 +59,9 @@ class IIncomingPaymentController extends Controller
             $value->paymentChecksLines = RCT1::where('DocNum', $value->id)->get();
             $value->paymentCreditCardLines = RCT3::where('DocNum', $value->id)->get();
         }
-
+        Log::info("__________________PAYMENTS DATA____________");
+        Log::info([$data]);
+        Log::info("__________________PAYMENTS DATA END____________");
         return $data;
     }
 
