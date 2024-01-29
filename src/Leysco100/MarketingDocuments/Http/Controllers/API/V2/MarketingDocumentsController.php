@@ -69,6 +69,15 @@ class MarketingDocumentsController extends Controller
         try {
 
             if ($ObjType != 205) {
+
+                $DocumentTables['doctype'] = $ObjType;
+                $record = (new UserFieldsService())->processUDF($DocumentTables);
+                $udf = [];
+                if ($record) {
+                    foreach ($record['HeaderUserFields'] as $headerField) {
+                        $udf[] =    $headerField['FieldName'];
+                    }
+                }
                 $data = $DocumentTables->ObjectHeaderTable::select(
                     'id',
                     'CardCode',
@@ -84,7 +93,8 @@ class MarketingDocumentsController extends Controller
                     'OwnerCode',
                     'DocDate',
                     'DocTotal',
-                    'created_at'
+                    'created_at',
+                    ...$udf
                 )
                     ->where('ObjType', $ObjType)
                     ->when($dataOwnership && $dataOwnership->Active, function ($query) use ($ownerData) {
@@ -125,6 +135,7 @@ class MarketingDocumentsController extends Controller
                     ->paginate($perPage, ['*'], 'page', $page);
 
                 $DocumentTables['doctype'] = $ObjType;
+                $udf = [];
                 foreach ($data as $key => $singleRcd) {
                     if ($singleRcd->count() > 0) {
                         $record = (new UserFieldsService())->processUDF($DocumentTables);
@@ -133,7 +144,7 @@ class MarketingDocumentsController extends Controller
 
                         if ($record) {
                             foreach ($record['HeaderUserFields'] as $headerField) {
-                                Log::info($singleRcd);
+                                $udf[] =    $headerField['FieldName'];
                                 $userFields->{$headerField['FieldName']} = $singleRcd->{$headerField['FieldName']};
                             }
 
@@ -141,6 +152,7 @@ class MarketingDocumentsController extends Controller
                         }
                     }
                 }
+            
             }
             foreach ($data as $key => $val) {
                 $val->isDoc = (int) $isDoc;
