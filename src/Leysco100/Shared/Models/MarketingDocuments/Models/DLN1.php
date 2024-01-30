@@ -17,7 +17,7 @@ class DLN1 extends Model
 
     public function ItemDetails()
     {
-        return $this->belongsTo(OITM::class, 'ItemCode');
+        return $this->belongsTo(OITM::class, 'ItemCode', 'ItemCode');
     }
 
     public function oitm()

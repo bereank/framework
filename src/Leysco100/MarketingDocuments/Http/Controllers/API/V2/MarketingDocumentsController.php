@@ -2,14 +2,16 @@
 
 namespace Leysco100\MarketingDocuments\Http\Controllers\API\V2;
 
+use stdClass;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Leysco100\Shared\Models\Banking\Services\BankingDocumentService;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Models\Banking\Models\PDF2;
 use Leysco100\Shared\Models\Banking\Models\RCT2;
+use Leysco100\Shared\Services\UserFieldsService;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Services\AuthorizationService;
 use Leysco100\Shared\Models\Administration\Models\EOTS;
@@ -24,6 +26,7 @@ use Leysco100\MarketingDocuments\Http\Controllers\Controller;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OSRN;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
 use Leysco100\MarketingDocuments\Services\MarketingDocumentService;
+use Leysco100\Shared\Models\Banking\Services\BankingDocumentService;
 use Leysco100\Shared\Models\MarketingDocuments\Services\GeneralDocumentService;
 
 
@@ -62,13 +65,38 @@ class MarketingDocumentsController extends Controller
             $ownerData =  (new AuthorizationService())->getDataOwnershipAuth($ObjType, 1);
         }
 
+
+
         try {
-            $data = $DocumentTables->ObjectHeaderTable::where('ObjType', $ObjType)
-                ->with('CreatedBy.ohem')
-                ->latest()
-                ->paginate($perPage, ['*'], 'page', $page);
+
             if ($ObjType != 205) {
-                $data = $DocumentTables->ObjectHeaderTable::select('id', 'CardCode', 'DocNum', 'CardName', 'ExtRef', 'ExtRefDocNum', 'UserSign', 'SlpCode', 'DataSource', 'DocStatus', 'ObjType', 'OwnerCode', 'DocDate', 'DocTotal', 'created_at')
+
+                $DocumentTables['doctype'] = $ObjType;
+                $record = (new UserFieldsService())->processUDF($DocumentTables);
+                $udf = [];
+                if ($record) {
+                    foreach ($record['HeaderUserFields'] as $headerField) {
+                        $udf[] =    $headerField['FieldName'];
+                    }
+                }
+                $data = $DocumentTables->ObjectHeaderTable::select(
+                    'id',
+                    'CardCode',
+                    'DocNum',
+                    'CardName',
+                    'ExtRef',
+                    'ExtRefDocNum',
+                    'UserSign',
+                    'SlpCode',
+                    'DataSource',
+                    'DocStatus',
+                    'ObjType',
+                    'OwnerCode',
+                    'DocDate',
+                    'DocTotal',
+                    'created_at',
+                    ...$udf
+                )
                     ->where('ObjType', $ObjType)
                     ->when($dataOwnership && $dataOwnership->Active, function ($query) use ($ownerData) {
                         $query->wherein('OwnerCode', $ownerData);
@@ -76,7 +104,7 @@ class MarketingDocumentsController extends Controller
                     ->with('CreatedBy:name', 'ohem:id,empID,firstName,middleName,lastName')
                     ->with(['document_lines' => function ($query) {
                         $query->with('ItemDetails:id,ItemCode,ItemName')
-                            ->select('id', 'DocEntry', 'Quantity', 'Price', 'LineTotal', 'ItemCode');
+                            ->select('id', 'DocEntry', 'LineNum', 'Quantity', 'Price', 'LineTotal', 'ItemCode', 'Dscription');
                     }])
                     ->where(function ($q) use ($StartDate, $EndDate) {
                         if ($StartDate && $EndDate) {
@@ -106,6 +134,28 @@ class MarketingDocumentsController extends Controller
                     })
                     ->latest()
                     ->paginate($perPage, ['*'], 'page', $page);
+
+                $DocumentTables['doctype'] = $ObjType;
+                $udf = [];
+
+                foreach ($data as $key => $singleRcd) {
+                    if ($singleRcd->count() > 0) {
+                        $record = (new UserFieldsService())->processUDF($DocumentTables);
+
+                        $userFields = [];
+
+                        if ($record) {
+                            foreach ($record['HeaderUserFields'] as $headerField) {
+                                $udf[] = $headerField['FieldName'];
+                                $userField = new stdClass();
+                                $userField->{$headerField['FieldName']} = $singleRcd->{$headerField['FieldName']};
+                                $userFields[] = $userField;
+                            }
+
+                            $singleRcd->UserFields = $userFields;
+                        }
+                    }
+                }
             }
             foreach ($data as $key => $val) {
                 $val->isDoc = (int) $isDoc;
@@ -335,26 +385,26 @@ class MarketingDocumentsController extends Controller
                 ->apiFailedResponseService("Not found document with objtype " . $request['ObjType']);
         }
 
-//        if ($TargetTables->hasExtApproval == 1) {
-//            $TargetTables = APDI::with('pdi1')
-//                ->where('ObjectID', 112)
-//                ->first();
-//            $ObjType = 112;
-//        }
+        //        if ($TargetTables->hasExtApproval == 1) {
+        //            $TargetTables = APDI::with('pdi1')
+        //                ->where('ObjectID', 112)
+        //                ->first();
+        //            $ObjType = 112;
+        //        }
 
         // Step 2: Default Fields
         $defaulted_data = (new MarketingDocumentService())->fieldsDefaulting($request->all());
- 
+
         // Step 3: Validate Document Fields
         $validatedFields  = (new MarketingDocumentService())->validateFields($defaulted_data, $request['ObjType']);
 
         // Step 4: Validate UDF'S
         $docData = (new MapApiFieldAction())->handle($validatedFields, $TargetTables);
-    
+
         // Step 5: Create Document
         $newDoc =  (new MarketingDocumentService())->createDoc($docData, $TargetTables, $ObjType);
 
-      
+
         return (new ApiResponseService())->apiSuccessResponseService($newDoc);
     }
 }

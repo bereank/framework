@@ -3,6 +3,7 @@
 namespace Leysco100\MarketingDocuments\Http\Controllers\API\V1\Integrator;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRG;
@@ -72,6 +73,7 @@ class CustomerController extends Controller
             'CreditLine' => $request['CreditLine'],
             'Balance' => $request['Balance'],
             'LicTradNum' => $request['LicTradNum'],
+            'UserSign' => Auth::user()->id,
             'SlpCode' => $request['SlpCode'] != -1 ? $request['SlpCode'] : null,
         ]);
 
