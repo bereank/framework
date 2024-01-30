@@ -75,7 +75,7 @@ class CreateOUDGSTable extends Migration
             $table->string('CogsOcrCo4', 8)->nullable()->comment("COGS Distribution Rule Code4");
             $table->string('CogsOcrCo5', 8)->nullable()->comment("COGS Distribution Rule Code5");
             $table->boolean('AddToFavourites')->default(0);
-            $table->integer('EtstCode', 1)->nullable();
+            $table->string('EtstCode', 1)->nullable();
             $table->boolean('ClockIn')->default(0)->nullable();
             $table->timestamps();
         });
