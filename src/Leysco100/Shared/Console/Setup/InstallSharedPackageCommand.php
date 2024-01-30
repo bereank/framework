@@ -23,6 +23,7 @@ class InstallSharedPackageCommand extends Command
      * @var string
      */
     use TenantAware;
+
     protected $signature = 'leysco100:shared:initial_setup {--tenant=*}';
 
     /**
@@ -48,7 +49,9 @@ class InstallSharedPackageCommand extends Command
         $modelsJsonString = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'models.json');
 
         $models = json_decode($modelsJsonString, true);
+
         foreach ($models as $key => $value) {
+
             $Header = APDI::updateOrCreate([
                 'ObjectID' => $value['ObjectID'],
             ], [
@@ -60,6 +63,7 @@ class InstallSharedPackageCommand extends Command
                 'ObjAcronym' => $value['ObjAcronym'] ?? null,
                 'DrftObj' => $value['DrftObj'] ?? null
             ]);
+
             if (array_key_exists('ChildTable', $value) && !empty($value['ChildTable'])) {
                 $Row = PDI1::updateOrCreate([
                     'DocEntry' => $Header->id,
@@ -68,6 +72,7 @@ class InstallSharedPackageCommand extends Command
                     'ChildTable' => $value['ChildTable'],
                 ]);
             }
+
             if (array_key_exists('children', $value) && !empty($value['children'])) {
                 foreach ($value['children'] as $childModel) {
 
