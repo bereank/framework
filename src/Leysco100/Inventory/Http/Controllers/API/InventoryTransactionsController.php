@@ -4,12 +4,15 @@
 
 namespace Leysco100\Inventory\Http\Controllers\API;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Leysco100\Shared\Models\OUQR;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Shared\Models\Shared\Models\APDI;
+use Leysco100\Shared\Models\Shared\Models\CSHS;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Inventory\Services\InventoryService;
 use Leysco100\Shared\Services\AuthorizationService;
@@ -127,7 +130,6 @@ class InventoryTransactionsController extends Controller
 
         $user = Auth::user();
         $ObjType = (int) $request['ObjType'];
-        // $defaulted_data = (new MarketingDocumentService())->fieldsDefaulting($request->all());
 
         $saveToDraft = false;
         $TargetTables = APDI::with('pdi1')
@@ -153,82 +155,63 @@ class InventoryTransactionsController extends Controller
             return (new ApiResponseService())
                 ->apiFailedResponseService("From Warehouse Required");
         }
+        // Step Default Fields
+        $defaulted_data = (new MarketingDocumentService())->fieldsDefaulting($request->all());
+
 
         DB::connection("tenant")->beginTransaction();
         try {
-
-            /**
-             * Handling  Document Numbering
-             */
-            if ($request['DocNum'] && $request['Series']) {
-                $DocNum = (new DocumentsService())
-                    ->documentNumberingService(
-                        $request['DocNum'],
-                        $request['Series']
-                    );
-                $doc_number = $DocNum;
-                $Series =    $request['Series'];
-            } else {
-                $DocNum  = (new DocumentsService())
-                    ->getNumSerieByObjectId($ObjType);
-                $doc_number =  $DocNum['NextNumber'];
-                $Series =  $DocNum['id'];
-            }
-
-
             $NewDocDetails = [
-                'ObjType' => $request['ObjType'],
-                'DocType' => $request['DocType'],
-                'DocNum' => $doc_number ?? null,
-                'Series' => $Series ?? null,
-                //                'ToWhsCode' => $request['ToWhsCode'],
-                'Filler' => $request['FromWhsCod'],
-
-                'SlpCode' => $request['SlpCode'], // Sales Employee
-                'U_SalePipe' => $request['U_SalePipe'], // Sales Pipe Line
-                'OwnerCode' => $user->EmpID, //Owner Code
-                'U_CashName' => $request['U_CashName'], //Cash Customer  Name
-                'U_CashNo' => $request['U_CashNo'], // Cash Customer No
-                'U_IDNo' => $request['U_IDNo'], // Id no
-                'NumAtCard' => $request['NumAtCard'] ? $request['NumAtCard'] : null,
-                'CurSource' => $request['CurSource'],
-                'DocTotal' => $request['DocTotal'],
-                'VatSum' => $request['VatSum'] ?? 0,
-                'DocDate' => $request['DocDate'], //PostingDate
-                'TaxDate' => $request['TaxDate'] ?? now(), //Document Date
-                'DocDueDate' => $request['DocDueDate'] ?? now(), // Delivery Date
-                'ReqDate' => $request['DocDueDate'],
-                'CntctCode' => $request['CntctCode'], //Contact Person
-                'AgrNo' => $request['AgrNo'],
-                'LicTradNum' => $request['LicTradNum'],
-                'BaseEntry' => $request['BaseEntry'] ? $request['BaseEntry'] : null, //BaseKey
-                'BaseType' => $request['BaseType'] ? $request['BaseType'] : null, //BaseKey
+                'ObjType' =>  $defaulted_data['ObjType'],
+                'DocType' =>  $defaulted_data['DocType'] ?? null,
+                'DocNum' => $defaulted_data['DocNum'] ?? null,
+                'Series' => $defaulted_data['Series'] ?? null,
+                //                'ToWhsCode' => $request['ToWhsCode'] ?? null,
+                'Filler' => $defaulted_data['FromWhsCod'] ?? null,
+                'SlpCode' => $defaulted_data['SlpCode'] ?? null, // Sales Employee       
+                'OwnerCode' => $defaulted_data['OwnerCode'] ?? null, //Owner Code
+                'NumAtCard' =>  $defaulted_data['NumAtCard'] ??  null,
+                'CurSource' =>  $defaulted_data['CurSource'] ?? null,
+                'DocTotal' =>  $defaulted_data['DocTotal'] ?? null,
+                'VatSum' =>  $defaulted_data['VatSum'] ?? 0,
+                'DocDate' =>  $defaulted_data['DocDate'] ?? null, //PostingDate
+                'TaxDate' =>  $defaulted_data['TaxDate'] ?? now(), //Document Date
+                'DocDueDate' =>  $defaulted_data['DocDueDate'] ?? now(), // Delivery Date
+                'ReqDate' =>  $defaulted_data['DocDueDate'] ?? null,
+                'CntctCode' =>  $defaulted_data['CntctCode'] ?? null, //Contact Person
+                'AgrNo' =>  $defaulted_data['AgrNo'] ?? null,
+                'LicTradNum' =>  $defaulted_data['LicTradNum'] ?? null,
+                'BaseEntry' =>  $defaulted_data['BaseEntry'] ??  null, //BaseKey
+                'BaseType' =>  $defaulted_data['BaseType'] ??   null, //BaseKey
                 'UserSign' => $user->id,
                 //Inventory Transaction Values
-                'Ref2' => $request['Ref2'] ? $request['Ref2'] : null, // Ref2
-                'GroupNum' => $request['GroupNum'] ? $request['GroupNum'] : null, //[Price List]
-                'ToWhsCode' => $request['ToWhsCode'] ? $request['ToWhsCode'] : null, //To Warehouse Code
+                'Ref2' =>  $defaulted_data['Ref2'] ?? null, // Ref2
+                'GroupNum' =>  $defaulted_data['GroupNum'] ?? null, //[Price List]
+                'ToWhsCode' =>  $defaulted_data['ToWhsCode'] ?? null, //To Warehouse Code
                 //SeriesDocument
-                'DiscPrcnt' => $request['DiscPrcnt'] ?? 0, //Discount Percentages
-                'DiscSum' => $request['DiscSum'], // Discount Sum
-                'BPLId' => $request['BPLId'],
-                'U_SaleType' => $request['U_SaleType'], // Sale Type
-                'Comments' => $request['Comments'], //comments
-                'NumAtCard2' => $request['NumAtCard2'],
-                'JrnlMemo' => $request['JrnlMemo'], // Journal Remarks
-                'UseShpdGd' => $request['UseShpdGd'] ?? "N",
-                'U_ServiceCall' => $request['U_ServiceCall'],
-                'U_DemoLocation' => $request['U_DemoLocation'],
-                'U_Technician' => $request['U_Technician'],
-                'U_Location' => $request['U_Location'],
-                'U_MpesaRefNo' => $request['U_MpesaRefNo'],
-                'U_PCash' => $request['U_PCash'],
-                'U_transferType' => $request['U_transferType'],
-                'U_SSerialNo' => $request['U_SSerialNo'],
-                'U_TypePur' => $request['U_TypePur'],
-                'U_NegativeMargin' => $request['U_NegativeMargin'],
-                'U_BaseDoc' => $request['U_BaseDoc'],
-
+                'DiscPrcnt' =>  $defaulted_data['DiscPrcnt'] ?? 0, //Discount Percentages
+                'DiscSum' =>  $defaulted_data['DiscSum'] ?? null, // Discount Sum
+                'BPLId' =>  $defaulted_data['BPLId'] ?? null,
+                'Comments' =>  $defaulted_data['Comments'] ?? null, //comments
+                'NumAtCard2' =>  $defaulted_data['NumAtCard2'] ?? null,
+                'JrnlMemo' =>  $defaulted_data['JrnlMemo'] ?? null, // Journal Remarks
+                'UseShpdGd' =>  $defaulted_data['UseShpdGd'] ?? "N",
+                'U_SaleType' =>  $defaulted_data['U_SaleType'] ?? null, // Sale Type
+                'U_ServiceCall' =>  $defaulted_data['U_ServiceCall'] ?? null,
+                'U_DemoLocation' =>  $defaulted_data['U_DemoLocation'] ?? null,
+                'U_Technician' =>  $defaulted_data['U_Technician'] ?? null,
+                'U_Location' =>  $defaulted_data['U_Location'] ?? null,
+                'U_MpesaRefNo' =>  $defaulted_data['U_MpesaRefNo'] ?? null,
+                'U_PCash' =>  $defaulted_data['U_PCash'] ?? null,
+                'U_transferType' =>  $defaulted_data['U_transferType'] ?? null,
+                'U_SSerialNo' =>  $defaulted_data['U_SSerialNo'] ?? null,
+                'U_TypePur' =>  $defaulted_data['U_TypePur'] ?? null,
+                'U_NegativeMargin' =>  $defaulted_data['U_NegativeMargin'] ?? null,
+                'U_BaseDoc' =>  $defaulted_data['U_BaseDoc'] ?? null,
+                'U_SalePipe' => $defaulted_data['U_SalePipe'] ?? null, // Sales Pipe Line
+                'U_CashName' =>  $defaulted_data['U_CashName'] ?? null, //Cash Customer  Name
+                'U_CashNo' =>  $defaulted_data['U_CashNo'] ?? null, // Cash Customer No
+                'U_IDNo' =>  $defaulted_data['U_IDNo'] ?? null, // Id no
                 'DataSource' => "I",
                 'ExtDocTotal' => 0,
 
@@ -239,11 +222,11 @@ class InventoryTransactionsController extends Controller
             $documentdocument_lines = [];
             $doctTotal = 0;
 
-            if (count($request['document_lines']) <= 0) {
+            if (count($defaulted_data['document_lines']) <= 0) {
                 return (new ApiResponseService())
                     ->apiFailedResponseService("Items Required");
             }
-            foreach ($request['document_lines'] as $key => $value) {
+            foreach ($defaulted_data['document_lines'] as $key => $value) {
                 $LineNum = ++$key;
                 $ItemCode = null;
                 $Dscription = $value['Dscription'];
@@ -255,6 +238,7 @@ class InventoryTransactionsController extends Controller
                     return (new ApiResponseService())
                         ->apiFailedResponseService("Items Required");
                 }
+
                 $ItemCode = $product->ItemCode;
                 if ($user->oudg->SellFromBin) {
                     //defaulting item dimensions
@@ -282,34 +266,52 @@ class InventoryTransactionsController extends Controller
                         }
                     }
                 }
+                $checkStockAvailabilty = true;
+                if ($checkStockAvailabilty) {
 
+                    if ($product->InvntItem == "Y") {
+
+                        $inventoryDetails = OITW::where('ItemCode',  $value['ItemCode'])
+                            ->where('WhsCode', $value['FromWhsCod'])
+                            ->first();
+
+                        if (!$inventoryDetails || $inventoryDetails->OnHand < $value['Quantity']) {
+                            return (new ApiResponseService())
+                                ->apiFailedResponseService(
+                                    "Insufficient stock for item: " . $value['Dscription'] . "  " .
+                                        "Available Quantity is: " . $inventoryDetails?->OnHand ?? 0
+                                );
+                        }
+                    }
+                }
                 //Validate Bin-locations
-                if (array_key_exists('bin_allocation', $value) && !empty($value['bin_allocation'])) {
-                    foreach ($value['bin_allocation'] as $key => $BinVal) {
-                        if (!empty($BinVal)) {
-                            $obin = OBIN::where('BinCode', $BinVal['BinCode'])->first();
-                            if (!$obin) {
-                                return (new ApiResponseService())
-                                    ->apiNotFoundResponse("Bin Code Does Not Exist");
-                            }
-                        }
-                    }
-                }
-                if ($user->oudg->SellFromBin && $request['ObjType'] == 67 && empty($value['bin_allocation'])) {
-                    if (array_key_exists('CogsOcrCo4', $value)) {
-                        $defaults = OUDG::where('CogsOcrCo4', $value['CogsOcrCo4'])->first();
-                        if ($defaults) {
-                            $obin = OBIN::where('id', $defaults->DftBinLoc)->first();
+                // if (array_key_exists('bin_allocation', $value) && !empty($value['bin_allocation'])) {
+                //     foreach ($value['bin_allocation'] as $key => $BinVal) {
+                //         if (!empty($BinVal)) {
+                //             $obin = OBIN::where('BinCode', $BinVal['BinCode'])->first();
+                //             if (!$obin) {
+                //                 return (new ApiResponseService())
+                //                     ->apiNotFoundResponse("Bin Code Does Not Exist");
+                //             }
+                //         }
+                //     }
+                // }
+                // if ($user->oudg->SellFromBin && $request['ObjType'] == 67 && empty($value['bin_allocation'])) {
+                //     if (array_key_exists('CogsOcrCo4', $value)) {
+                //         $defaults = OUDG::where('CogsOcrCo4', $value['CogsOcrCo4'])->first();
+                //         if ($defaults) {
+                //             $obin = OBIN::where('id', $defaults->DftBinLoc)->first();
 
-                            $value['bin_allocation'] =  [
-                                [
-                                    'BinCode' => $obin->BinCode,
-                                    'QtyVar' => $value['Quantity']
-                                ]
-                            ];
-                        }
-                    }
-                }
+                //             $value['bin_allocation'] =  [
+                //                 [
+                //                     'BinCode' => $obin->BinCode,
+                //                     'QtyVar' => $value['Quantity']
+                //                 ]
+                //             ];
+                //         }
+                //     }
+                // }
+
 
 
                 $doctTotal = $doctTotal + $AvgPrice;
@@ -332,9 +334,9 @@ class InventoryTransactionsController extends Controller
                     'PriceAfVAT' => $AvgPrice, //       Gross Price after Discount
                     'PriceBefDi' => $AvgPrice, // Unit Price
                     'LineTotal' => $value['LineTotal'] ?? $value['Price'], //    Total (LC)
-                    'WhsCode' => $request['ToWhsCode'] ?? null, //    Warehouse Code
+                    'WhsCode' => $defaulted_data['ToWhsCode'] ?? null, //    Warehouse Code
                     'ShipDate' => array_key_exists('ShipDate', $value) ? $value['ShipDate'] : null, //    Del. Date
-                    'SlpCode' => $request['SlpCode'], //    Sales Employee
+                    'SlpCode' => $defaulted_data['SlpCode'], //    Sales Employee
                     'Commission' => array_key_exists('Commission', $value) ? $value['Commission'] : null, //    Comm. %
                     'AcctCode' => array_key_exists('AcctCode', $value) ? $value['AcctCode'] : null, //    G/L Account
                     'OcrCode' => isset($value['OcrCode']) ? $value['OcrCode'] : null, //    Dimension 1
@@ -346,11 +348,11 @@ class InventoryTransactionsController extends Controller
                     'GrossBuyPr' => array_key_exists('GrossBuyPr', $value) ? $value['GrossBuyPr'] : null, //   Gross Profit Base Price
                     'GPTtlBasPr' => array_key_exists('GPTtlBasPr', $value) ? $value['GPTtlBasPr'] : null, //    Gross Profit Total Base Price
 
-                    'ObjType' => $request['ObjType'] ?? null,
-                    'BaseType' => $request['BaseType'] ?? $request['BaseType'], //    Base Type
-                    'BaseRef' => $request['BaseRef'] ? $request['BaseRef'] : null, //    Base Ref.
-                    'BaseEntry' => $request['BaseEntry'] ? $request['BaseEntry'] : null, //    Base Key
-                    'BaseLine' => $value['LineNum'], //    Base Row
+                    'ObjType' => $ObjType ?? null,
+                    'BaseType' => array_key_exists('BaseType', $value)  ?  $value['BaseType'] : null, //    Base Type
+                    'BaseRef' =>  array_key_exists('BaseRef', $value) ?  $value['BaseRef'] : null, //    Base Ref.
+                    'BaseEntry' => array_key_exists('BaseEntry', $value) ?   $value['BaseEntry'] :  null, //    Base Key
+                    'BaseLine' => array_key_exists('BaseLine', $value)  ? $value['BaseLine'] : null,  //    Base Row
                     'SpecPrice' => array_key_exists('SpecPrice', $value) ? $value['SpecPrice'] : null, //    Price Source
                     'VatSum' => array_key_exists('VatSum', $value) ? $value['VatSum'] : null, //    Tax Amount (LC)
                     'GrssProfit' => array_key_exists('GrssProfit', $value) ? $value['GrssProfit'] : null, //    Gross Profit (LC)
@@ -369,15 +371,15 @@ class InventoryTransactionsController extends Controller
                     'LinePoPrss' => array_key_exists('LinePoPrss', $value) ? $value['LinePoPrss'] : null, //    Allow Procmnt. Doc.
 
                     //Cogs Values
-                    'CogsOcrCod' => isset($value['OcrCode']) ? $value['OcrCode'] : (isset($dimensions['OcrCode']) ? $dimensions['OcrCode'] : null),
-                    'CogsOcrCo2' => isset($value['OcrCode2']) ? $value['OcrCode2'] : (isset($dimensions['OcrCode2']) ? $dimensions['OcrCode2'] : null),
-                    'CogsOcrCo3' => isset($value['OcrCode3']) ? $value['OcrCode3'] : (isset($dimensions['OcrCode3']) ? $dimensions['OcrCode3'] : null),
-                    'CogsOcrCo4' => isset($value['OcrCode4']) ? $value['OcrCode4'] : (isset($dimensions['OcrCode4']) ? $dimensions['OcrCode4'] : null),
-                    'CogsOcrCo5' => isset($value['OcrCode5']) ? $value['OcrCode5'] : (isset($dimensions['OcrCode5']) ? $dimensions['OcrCode5'] : null),
+                    'CogsOcrCod' => isset($value['OcrCode']) ? $value['OcrCode'] :  null,
+                    'CogsOcrCo2' => isset($value['OcrCode2']) ? $value['OcrCode2'] :  null,
+                    'CogsOcrCo3' => isset($value['OcrCode3']) ? $value['OcrCode3'] : null,
+                    'CogsOcrCo4' => isset($value['OcrCode4']) ? $value['OcrCode4'] : null,
+                    'CogsOcrCo5' => isset($value['OcrCode5']) ? $value['OcrCode5'] : null,
                     //Inventory Transaction  Value
-                    'PQTReqDate' => $request['ReqDate'] ?? null,
+                    'PQTReqDate' => $defaulted_data['ReqDate'] ?? null,
 
-                    'BPLId' => $request['BPLId'],
+                    'BPLId' => $defaulted_data['BPLId'],
                     'U_StockWhse' => isset($value['U_StockWhse']) ? $value['U_StockWhse'] : null,
                     'WhsName' => isset($value['WhsName']) ? $value['WhsName'] : null,
                     'StockPrice' => $StockPrice,
@@ -418,14 +420,14 @@ class InventoryTransactionsController extends Controller
                                 'BinAbs' =>  $obin->id,
                                 'Quantity' =>  $BinVal['QtyVar'],
                                 'ItemCode' => $ItemCode,
-                                'WhsCode' =>  $request['ToWhsCode'],
-                                'ObjType' =>  $request['ObjType'],
+                                'WhsCode' =>  $defaulted_data['ToWhsCode'],
+                                'ObjType' =>  $ObjType,
                                 'AllowNeg' => 'N',
                                 'BinActTyp' => 1
                             ]);
 
                             $resdata =    (new InventoryService())->binAllocations(
-                                $request['ObjType'],
+                                $ObjType,
                                 $ItemCode,
                                 $BinVal,
                                 $value['ToWhsCode'],
@@ -457,9 +459,9 @@ class InventoryTransactionsController extends Controller
                  * Saving Serial Numbers
                  */
 
-                if ($request['DocType'] == "I" && $product->ManSerNum == "Y") {
+                if ($defaulted_data['DocType'] == "I" && $product->ManSerNum == "Y") {
                     $saveSerialDetails = false;
-                    if ($request['ObjType'] == 67) {
+                    if ($ObjType == 67) {
                         $saveSerialDetails = true;
                     }
 
@@ -510,7 +512,7 @@ class InventoryTransactionsController extends Controller
                 }
             }
             if ($objectTypePassedToTns != 112) {
-                NumberingSeries::dispatch($Series);
+                NumberingSeries::dispatch($defaulted_data['Series']);
             }
 
             $newDoc->newObjType = $objectTypePassedToTns;
@@ -518,7 +520,6 @@ class InventoryTransactionsController extends Controller
             $documentForDirecPostingToSAP = (new DocumentsService())->getDocumentForDirectPostingToSAP($newDoc->ObjType, $newDoc->id);
             $newDoc->documentForDirecPostingToSAP = $documentForDirecPostingToSAP;
 
-            //            return (new ApiResponseService())->apiSuccessResponseService($newDoc);
             return (new ApiResponseService())->apiSuccessResponseService($newDoc);
         } catch (\Throwable $th) {
             Log::info($th);
