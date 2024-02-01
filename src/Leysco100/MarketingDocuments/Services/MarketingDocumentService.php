@@ -42,10 +42,17 @@ class MarketingDocumentService
             $data['SlpCode'] = $user_data->oudg->SalePerson ?? null;
         }
         if (!(data_get($data, 'OwnerCode'))) {
+
             $data['OwnerCode'] = $user_data->EmpID ?? null;
         }
         if (!(data_get($data, 'DocDate'))) {
             $data['DocDate'] =  Carbon::now()->format('Y-m-d');
+        }
+        if (!(data_get($data, 'DocDueDate'))) {
+            $data['DocDueDate'] =  Carbon::now()->format('Y-m-d');
+        }
+        if (!(data_get($data, 'ReqDate'))) {
+            $data['ReqDate'] =  Carbon::now()->format('Y-m-d');
         }
         if (!(data_get($data, 'UserSign'))) {
             $data['UserSign'] =   $user_data->id;
@@ -107,16 +114,28 @@ class MarketingDocumentService
                     if (!empty($result)) {
                         $headers = array_values((array)$result[0]);
 
-                        if (Str::startsWith($res->ItemID, 'U_')) {
-                            $userField = new stdClass();
-                            $userField->{$res->ItemID} = $headers[0];
-                            $userFields[] = (array) $userField;
-                            $data['udfs'] = array_merge($userFields, $data['udfs']);
-                            //   Log::info([$$data['udfs']]);
+                        if (array_key_exists('udfs', $data)) {
+                            if (Str::startsWith($res->ItemID, 'U_')) {
+                                $userField = new stdClass();
+                                $userField->{$res->ItemID} = $headers[0];
+                                $userFields[] = (array) $userField;
+                                $data['udfs'] = array_merge($userFields, $data['udfs']);
+                                //   Log::info([$$data['udfs']]);
+                            }
+                        }
+                        if (array_key_exists('UserFields', $data)) {
+                            if (Str::startsWith($res->ItemID, 'U_')) {
+                                $userField=[];
+                                $userField[$res->ItemID] = $headers[0];
+                               
+                                $data['UserFields'] = array_merge($userField, $data['UserFields']);
+                                //   Log::info([$$data['udfs']]);
+                            }
                         }
                         $data[$res->ItemID] = $headers[0];
                     }
                 }
+                
             }
         }
         // Document lines defaulting
@@ -188,16 +207,28 @@ class MarketingDocumentService
                     $documentLines[$key]['LineNum'] = ++$lineNum;
                 }
                 if (!(data_get($line, 'SlpCode'))) {
-                    $documentLines[$key]['SlpCode'] = $user_data->oudg->SalePerson ?? null;
+                    if (!empty($data['SlpCode'])) {
+                        $documentLines[$key]['SlpCode'] = $data['SlpCode'];
+                    } else {
+                        $documentLines[$key]['SlpCode'] = $user_data->oudg->SalePerson ?? null;
+                    }
                 }
                 if (!(data_get($line, 'OwnerCode'))) {
-                    $documentLines[$key]['OwnerCode'] = $user_data->EmpID ?? null;
+
+                    if (!empty($data['OwnerCode'])) {
+                        $documentLines[$key]['OwnerCode'] = $data['OwnerCode'];
+                    } else {
+                        $documentLines[$key]['OwnerCode'] = $user_data->EmpID ?? null;
+                    }
                 }
-                if (!(data_get($line, 'TaxCode'))) {
-                    $taxGroup = TaxGroup::where('code', $itemDetails->VatGourpSa)->first();
-                    $documentLines[$key]['TaxCode'] = $taxGroup->code ?? null;
-                } else {
-                    $documentLines[$key]['TaxCode'] = $itemDetails->VatGourpSa;
+                if ($itemDetails) {
+                    if (!(data_get($line, 'TaxCode'))) {
+
+                        $taxGroup = TaxGroup::where('code', $itemDetails->VatGourpSa)->first();
+                        $documentLines[$key]['TaxCode'] = $taxGroup->code ?? null;
+                    } else {
+                        $documentLines[$key]['TaxCode'] = $itemDetails->VatGourpSa;
+                    }
                 }
                 //   Log::info($itemDetails->VatGourpSa);
 
@@ -213,25 +244,28 @@ class MarketingDocumentService
                         $number = $matches[1];
 
                         $matchSubstring = str_replace('.', '', $matches[2]);
+                        if (array_key_exists($matchSubstring, $documentLines[$key]) && !empty($documentLines[$key][$matchSubstring])) {
 
-                        $replacementValue =   $documentLines[$key][$matchSubstring];
+                            $replacementValue =   $documentLines[$key][$matchSubstring];
 
-                        $processedString = Str::replace('$[' . $substring . ']', '"' . $replacementValue . '"', $string);
+                            $processedString = Str::replace('$[' . $substring . ']', '"' . $replacementValue . '"', $string);
 
-                        $result = DB::connection('tenant')->select($processedString);
+                            $result = DB::connection('tenant')->select($processedString);
 
-                        if (is_array($result)) {
-                            if (!empty($result)) {
-                                $headers = array_values((array)$result[0]);
-
-                                if (Str::startsWith($res->ItemID, 'U_')) {
-                                    $userField = new stdClass();
-                                    $userField->{$res->ItemID} = $headers[0];
-                                    $userFields[] = (array) $userField;
-                                    $documentLines[$key]['udfs'] = array_merge($userFields, $documentLines[$key]['udfs']);
-                                    //   Log::info([$documentLines[$key]['udfs']]);
+                            if (is_array($result)) {
+                                if (!empty($result)) {
+                                    $headers = array_values((array)$result[0]);
+                                    if (array_key_exists('udfs', $data)) {
+                                        if (Str::startsWith($res->ItemID, 'U_')) {
+                                            $userField = new stdClass();
+                                            $userField->{$res->ItemID} = $headers[0];
+                                            $userFields[] = (array) $userField;
+                                            $documentLines[$key]['udfs'] = array_merge($userFields, $documentLines[$key]['udfs']);
+                                            //  Log::info([$documentLines[$key]['udfs']]);
+                                        }
+                                    }
+                                    $documentLines[$key][$res->ItemID] = $headers[0];
                                 }
-                                $documentLines[$key][$res->ItemID] = $headers[0];
                             }
                         }
                     }
