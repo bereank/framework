@@ -142,9 +142,9 @@ class GeneralDocumentValidationService
                 (new ApiResponseService())->apiSuccessAbortProcessResponse("Specify Required date");
             }
 
-            if (!$request['U_PCash']) {
-                (new ApiResponseService())->apiSuccessAbortProcessResponse("Specify Petty Cash Request");
-            }
+//            if (!$request['U_PCash']) {
+//                (new ApiResponseService())->apiSuccessAbortProcessResponse("Specify Petty Cash Request");
+//            }
         }
 
         if ($request['DiscPrcnt'] > 100) {

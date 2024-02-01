@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Leysco100\Administration\Http\Controllers\Approvals\ApprovalStagesControlller;
 use Leysco100\Administration\Http\Controllers\Approvals\ApprovalTemplatesControlller;
 use Leysco100\Administration\Http\Controllers\Setup\Banking\BankController;
+use Leysco100\Administration\Http\Controllers\Setup\General\InitialSetUpController;
 use Leysco100\Administration\Http\Controllers\Setup\General\UserController;
 use Leysco100\Administration\Http\Controllers\Setup\Inventory\UoMController;
 use Leysco100\Administration\Http\Controllers\Setup\General\DriverController;
@@ -147,3 +148,11 @@ Route::apiResources(['data-ownerships' => DataOwnershipController::class]);
 Route::apiResources(['approval_stages' => ApprovalStagesControlller::class]);
 Route::apiResources(['approval_templates' => ApprovalTemplatesControlller::class]);
 Route::apiResources(['timesheets-master-data' => TimeSheetsMasterController::class]);
+
+
+
+
+Route::apiResources(['initial_setup' => InitialSetUpController::class]);
+
+
+
