@@ -365,6 +365,7 @@ class MarketingDocumentsController extends Controller
      */
     public function store(Request $request)
     {
+        Log::info($request);
         // Step 1: Object Validation
         $validator = Validator::make($request->all(), [
             'ObjType' => 'required',
