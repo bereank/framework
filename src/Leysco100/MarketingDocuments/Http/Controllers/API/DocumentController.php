@@ -193,6 +193,7 @@ class DocumentController extends Controller
      */
     public function getSingleDocData($ObjType, $DocEntry)
     {
+
         $isDoc = \Request::get('isDoc');
         $isForPrint = \Request::get('isForPrint');
         $copyTo = \Request::get('copyTo');
@@ -226,19 +227,18 @@ class DocumentController extends Controller
             ->with("document_lines.oitm")
             ->first();
 
-        $userFields = (object)[
-//             "U_CashMail" => $headerVal->U_CashMail,
-             "U_ControlCode" => $data->U_ControlCode,
-             "U_RelatedInv" => $data->U_RelatedInv,
-             "U_CUInvoiceNum" => $data->U_CUInvoiceNum,
-             "U_QRCode" => $data->U_QRCode,
-             "U_QrLocation" => $data->U_QrLocation,
-             "U_ReceiptNo" => $data->U_ReceiptNo,
-             "U_CommitedTime" => $data->U_CommitedTime,
-//             "U_IncoTerms" => $headerVal->U_IncoTerms,
-//             "U_PCash" => $headerVal->U_PCash,
-//             "U_Approval"=>"Pending"
-         ];
+            $userFields = (object)[
+                "U_ControlCode" => $data->U_ControlCode,
+                "U_RelatedInv" => $data->U_RelatedInv,
+                "U_CUInvoiceNum" => $data->U_CUInvoiceNum,
+                "U_QRCode" => $data->U_QRCode,
+                "U_QrLocation" => $data->U_QrLocation,
+                "U_ReceiptNo" => $data->U_ReceiptNo,
+                "U_CommitedTime" => $data->U_CommitedTime,
+            ];
+
+
+
 
 //        $data['doctype'] = $ObjType;
 //        if ($data) {
@@ -257,7 +257,9 @@ class DocumentController extends Controller
 
 
         $rows = $data->document_lines;
+
         $generalObjects = [205, 66];
+
         if (!in_array($ObjType, $generalObjects)) {
 //            $data = $DocumentTables->ObjectHeaderTable::with(
 //                'CreatedBy',
@@ -417,6 +419,7 @@ class DocumentController extends Controller
         if ($ObjType == 15) {
             // $data->qrcode = "data:image/jpeg;base64," . base64_encode(QrCode::format('png')->size(100)->generate('LS100-DN-' . $data->DocNum));
         }
+        $data->UserFields = $userFields;
         return $data;
     }
 
