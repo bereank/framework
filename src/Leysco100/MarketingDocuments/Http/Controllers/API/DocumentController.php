@@ -3,6 +3,7 @@
 namespace Leysco100\MarketingDocuments\Http\Controllers\API;
 
 use Illuminate\Http\Request;
+use Leysco100\Shared\Models\Administration\Models\TaxGroup;
 use Leysco100\Shared\Models\OSCL;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -330,6 +331,13 @@ class DocumentController extends Controller
                 ];
             }
             $row->oitm = $row->oitm()->select("UgpEntry","SUoMEntry")->get()->first();
+            $taxGroup = TaxGroup::where('category', 'O')->where("code", $row->TaxCode)->first();
+            if ($ObjType == "205") {
+                $taxGroup = TaxGroup::where('category', 'I')->where("code", $row->TaxCode)->first();
+            }
+
+            $row->VatGroup = $row->TaxCode;
+            $row->VatPrcnt = $taxGroup?->rate;
 
             $row->UserFields = (object)[
                  "U_HSCode" => null
