@@ -20,7 +20,7 @@ class CreateOITBSTable extends Migration
             $table->string('Locked')->default('N');
             $table->string('DataSource')->default('N');
             $table->integer('UserSign')
-                ->references('id')->on('users');
+                ->references('id')->on('users')->nullable();
             $table->integer('BalInvntAc')
                 ->references('id')->on('chart_of_accounts')->nullable();
             $table->integer('SaleCostAc')
