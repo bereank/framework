@@ -196,8 +196,13 @@ class DocumentController extends Controller
         $isForPrint = \Request::get('isForPrint');
         $copyTo = \Request::get('copyTo');
 
+        if (!$isDoc ) {
+            $isDoc = 1;
+        }
+
         $originalObjType = $ObjType;
         $isDraft = 0;
+
         if ($isDoc == 0) {
             $isDraft = 1;
             $ObjType = 112;
@@ -218,6 +223,7 @@ class DocumentController extends Controller
         $data = $DocumentTables->ObjectHeaderTable::where('id', $DocEntry)
             ->with("document_lines.oitm")
             ->first();
+
 
 
 
