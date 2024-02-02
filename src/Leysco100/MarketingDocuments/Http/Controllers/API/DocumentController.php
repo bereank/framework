@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Artisan;
+use Leysco100\Shared\Services\UserFieldsService;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Models\Banking\Models\PDF2;
@@ -220,9 +221,37 @@ class DocumentController extends Controller
 //        $data = $DocumentTables->ObjectHeaderTable::with('objecttype', 'department', 'document_lines.taxgroup', 'branch', 'CreatedBy', 'location')
 //            ->where('id', $DocEntry)
 //            ->first();
+
         $data = $DocumentTables->ObjectHeaderTable::where('id', $DocEntry)
             ->with("document_lines.oitm")
             ->first();
+
+        $userFields = (object)[
+//             "U_CashMail" => $headerVal->U_CashMail,
+             "U_ControlCode" => $data->U_ControlCode,
+             "U_RelatedInv" => $data->U_RelatedInv,
+             "U_CUInvoiceNum" => $data->U_CUInvoiceNum,
+             "U_QRCode" => $data->U_QRCode,
+             "U_QrLocation" => $data->U_QrLocation,
+             "U_ReceiptNo" => $data->U_ReceiptNo,
+             "U_CommitedTime" => $data->U_CommitedTime,
+//             "U_IncoTerms" => $headerVal->U_IncoTerms,
+//             "U_PCash" => $headerVal->U_PCash,
+//             "U_Approval"=>"Pending"
+         ];
+
+//        $data['doctype'] = $ObjType;
+//        if ($data) {
+//            $record = (new UserFieldsService())->processUDF($data);
+//        }
+//        $userFields = (object)[];
+//        if ($record) {
+//            foreach ($record['HeaderUserFields'] as $headerField) {
+//                $userFields->{$headerField['FieldName']} = $headerVal->{$headerField['FieldName']};
+//            }
+//
+//            $headerVal->UserFields = $userFields;
+//        }
 
 
 
@@ -299,6 +328,10 @@ class DocumentController extends Controller
                 ];
             }
             $row->oitm = $row->oitm()->select("UgpEntry","SUoMEntry")->get()->first();
+
+            $row->UserFields = (object)[
+                 "U_HSCode" => null
+             ];
         }
 
         $oats = ATC1::where('AbsEntry', $data->AtcEntry)
