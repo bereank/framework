@@ -344,37 +344,43 @@ class MOrderController extends Controller
                     "id" => 1,
                     "Type" => "Order",
                     "Name" => "Sales Order",
-                    "doctype" => 17
+                    "doctype" => 17,
+                    "sequence" => 2
                 ],
                 [
                     "id" => 2,
                     "Type" => "Delivery",
                     "Name" => "Delivery",
                     "doctype" => 15,
+                    "sequence" => 3
                 ],
                 [
                     "id" => 3,
                     "Type" => "Invoice",
                     "Name" => "Invoice",
                     "doctype" => 13,
+                    "sequence" => 4
                 ],
                 [
                     "id" => 4,
                     "Type" => "Payments",
                     "Name" => "invoice and Payments",
                     "doctype" => 13,
+                    "sequence" => 5
                 ],
                 [
                     "id" => 5,
                     "Type" => "Quotation",
                     "Name" => "Sales Quotation",
-                    "doctype" => 23
+                    "doctype" => 23,
+                    "sequence" => 1
                 ],
                 [
                     "id" => 6,
                     "Type" => "ARCreditMemo",
                     "Name" => "A/R Credit Memo",
-                    "doctype" => 14
+                    "doctype" => 14,
+                    "sequence" => 6
                 ],
 
 
