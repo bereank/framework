@@ -3,11 +3,13 @@
 namespace Leysco100\MarketingDocuments\Http\Controllers\API;
 
 use Illuminate\Http\Request;
+use Leysco100\Shared\Models\Administration\Models\TaxGroup;
 use Leysco100\Shared\Models\OSCL;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Artisan;
+use Leysco100\Shared\Services\UserFieldsService;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Models\Banking\Models\PDF2;
@@ -192,12 +194,18 @@ class DocumentController extends Controller
      */
     public function getSingleDocData($ObjType, $DocEntry)
     {
+
         $isDoc = \Request::get('isDoc');
         $isForPrint = \Request::get('isForPrint');
         $copyTo = \Request::get('copyTo');
 
+        if (!$isDoc ) {
+            $isDoc = 1;
+        }
+
         $originalObjType = $ObjType;
         $isDraft = 0;
+
         if ($isDoc == 0) {
             $isDraft = 1;
             $ObjType = 112;
@@ -215,14 +223,44 @@ class DocumentController extends Controller
 //        $data = $DocumentTables->ObjectHeaderTable::with('objecttype', 'department', 'document_lines.taxgroup', 'branch', 'CreatedBy', 'location')
 //            ->where('id', $DocEntry)
 //            ->first();
+
         $data = $DocumentTables->ObjectHeaderTable::where('id', $DocEntry)
             ->with("document_lines.oitm")
             ->first();
 
+            $userFields = (object)[
+                "U_ControlCode" => $data->U_ControlCode,
+                "U_RelatedInv" => $data->U_RelatedInv,
+                "U_CUInvoiceNum" => $data->U_CUInvoiceNum,
+                "U_QRCode" => $data->U_QRCode,
+                "U_QrLocation" => $data->U_QrLocation,
+                "U_ReceiptNo" => $data->U_ReceiptNo,
+                "U_CommitedTime" => $data->U_CommitedTime,
+            ];
+
+
+
+
+//        $data['doctype'] = $ObjType;
+//        if ($data) {
+//            $record = (new UserFieldsService())->processUDF($data);
+//        }
+//        $userFields = (object)[];
+//        if ($record) {
+//            foreach ($record['HeaderUserFields'] as $headerField) {
+//                $userFields->{$headerField['FieldName']} = $headerVal->{$headerField['FieldName']};
+//            }
+//
+//            $headerVal->UserFields = $userFields;
+//        }
+
+
 
 
         $rows = $data->document_lines;
+
         $generalObjects = [205, 66];
+
         if (!in_array($ObjType, $generalObjects)) {
 //            $data = $DocumentTables->ObjectHeaderTable::with(
 //                'CreatedBy',
@@ -293,6 +331,17 @@ class DocumentController extends Controller
                 ];
             }
             $row->oitm = $row->oitm()->select("UgpEntry","SUoMEntry")->get()->first();
+            $taxGroup = TaxGroup::where('category', 'O')->where("code", $row->TaxCode)->first();
+            if ($ObjType == "205") {
+                $taxGroup = TaxGroup::where('category', 'I')->where("code", $row->TaxCode)->first();
+            }
+
+            $row->VatGroup = $row->TaxCode;
+            $row->VatPrcnt = $taxGroup?->rate;
+
+            $row->UserFields = (object)[
+                 "U_HSCode" => null
+             ];
         }
 
         $oats = ATC1::where('AbsEntry', $data->AtcEntry)
@@ -378,6 +427,7 @@ class DocumentController extends Controller
         if ($ObjType == 15) {
             // $data->qrcode = "data:image/jpeg;base64," . base64_encode(QrCode::format('png')->size(100)->generate('LS100-DN-' . $data->DocNum));
         }
+        $data->UserFields = $userFields;
         return $data;
     }
 

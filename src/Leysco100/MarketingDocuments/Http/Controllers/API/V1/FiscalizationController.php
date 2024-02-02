@@ -18,7 +18,9 @@ class FiscalizationController extends Controller
     {
         try {
             DB::connection("tenant")->beginTransaction();
-            $data = OFSC::all();
+            $data = OFSC::all()->toArray();
+//            $data = OFSC::select("InvoiceId")->get()->toArray();
+
             DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService($data);
         }
