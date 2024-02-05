@@ -1348,7 +1348,7 @@ class DocumentController extends Controller
             DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
-            dd($th);
+//            dd($th);
             DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
