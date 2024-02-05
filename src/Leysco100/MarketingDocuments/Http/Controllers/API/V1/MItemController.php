@@ -11,6 +11,7 @@ use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\Administration\Models\ITG1;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
+use Leysco100\Shared\Models\Administration\Models\TaxGroup;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OPLN;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\ITM1;
@@ -164,7 +165,7 @@ class MItemController extends Controller
                 //Get Default Sales Unit
                 $SALESUNIT = $ITEM->SUoMEntry;
             }
-
+            $ovtg = TaxGroup::where('code', $ITEM->VatGourpSa)->first();
             /**
              * Check IF there is a price in ITM9
              */
@@ -175,6 +176,13 @@ class MItemController extends Controller
                 ->first();
 
             if ($itm9) {
+                if ($itm9) {
+                    if ($bpPriceList->isGrossPrc == 'Y') {
+                        return $itm9->Price;
+                    } else if ($bpPriceList->isGrossPrc == 'N') {
+                        return (($ovtg->rate / 100) + 1) *  $itm9->Price;
+                    }
+                }
                 $details = [
                     "SUoMEntry" => $ugp1 ? $ugp1->id : null,
                     'FINALSALESPRICE' => $itm9->Price,
@@ -228,9 +236,16 @@ class MItemController extends Controller
             $INVUNITCONVERTEDTOBASEUOM = $INVUNITCONVERTEDTOBASEUOM == null || 0 ? 1 : $INVUNITCONVERTEDTOBASEUOM;
             $PRICINGUNITCONVERTEDTOBASEUOM = $PRICINGUNITCONVERTEDTOBASEUOM == null || 0 ? 1 : $PRICINGUNITCONVERTEDTOBASEUOM;
 
+            $PRICE = ($PRICEPERPRICEUNIT * $SALESUNITCONVERTEDTOBASEUOM) / $PRICINGUNITCONVERTEDTOBASEUOM;
+
+            if ($opln->isGrossPrc == 'Y') {
+                return  $PRICE;
+            } else if ($opln->isGrossPrc == 'N') {
+                return (($ovtg->rate / 100) + 1) *   $PRICE;
+            }
             $details = [
                 "SUoMEntry" => $ugp1 ? $ugp1->id : null,
-                'FINALSALESPRICE' => ($PRICEPERPRICEUNIT * $SALESUNITCONVERTEDTOBASEUOM) / $PRICINGUNITCONVERTEDTOBASEUOM,
+                'FINALSALESPRICE' => $PRICE
             ];
 
             return $details;
