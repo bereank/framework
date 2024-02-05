@@ -52,7 +52,7 @@ class DocumentsService
 
     public function documentNumberingService($newDocNum, $series)
     {
-        dd($series);
+//        dd($series);
         $nnm1 = NNM1::where('id', $series)->first();
 
         /**
