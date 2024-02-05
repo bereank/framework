@@ -2,8 +2,10 @@
 
 namespace Leysco100\MarketingDocuments\Services;
 
+use App\Domains\Finance\Models\OVTG;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Leysco100\Shared\Models\Administration\Models\TaxGroup;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OPLN;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\ITM1;
@@ -28,7 +30,7 @@ class PriceCalculationService
         $this->PriceList = $PriceList;
         $this->SUoMEntry = $SUoMEntry;
     }
-
+    // GET NET DEFAULT PRICE
     public function getDefaultPrice()
     {
         try {
@@ -38,7 +40,7 @@ class PriceCalculationService
                 ->where('UgpEntry', $ITEM->UgpEntry)
                 ->first();
             $opln = OPLN::where('id', $this->PriceList)->first();
-
+            $ovtg = TaxGroup::where('code', $ITEM->VatGourpSa)->first();
             // If there is a change on  sUOMTRY
             //This are OUOMS
             $PRICINGUNIT = $ITEM->PriceUnit; //IF OUM IS MANUAL THIS VALUE WILL BE NULL
@@ -55,7 +57,13 @@ class PriceCalculationService
                 ->first();
 
             if ($itm9) {
-                return $itm9->Price;
+                if ($opln->isGrossPrc == 'N') {
+                    return $itm9->Price;
+                } else if ($opln->isGrossPrc == 'Y') {
+                    //RATE * PRICE (1 + RATE/100) * PRICE
+
+                    return (($ovtg->rate / 100) + 1) *  $itm9->Price;
+                }
             }
 
             //Get Inventor Uom
@@ -101,7 +109,14 @@ class PriceCalculationService
             $INVUNITCONVERTEDTOBASEUOM = $INVUNITCONVERTEDTOBASEUOM == null || 0 ? 1 : $INVUNITCONVERTEDTOBASEUOM;
             $PRICINGUNITCONVERTEDTOBASEUOM = $PRICINGUNITCONVERTEDTOBASEUOM == null || 0 ? 1 : $PRICINGUNITCONVERTEDTOBASEUOM;
 
-            return ($PRICEPERPRICEUNIT * $SALESUNITCONVERTEDTOBASEUOM) / $PRICINGUNITCONVERTEDTOBASEUOM;
+            $PRICE = ($PRICEPERPRICEUNIT * $SALESUNITCONVERTEDTOBASEUOM) / $PRICINGUNITCONVERTEDTOBASEUOM;
+
+            if ($opln->isGrossPrc == 'N') {
+                return  $PRICE;
+            } else if ($opln->isGrossPrc == 'Y') {
+                //RATE * PRICE (1 + RATE/100) * PRICE
+                return (($ovtg->rate / 100) + 1) *   $PRICE;
+            }
         } catch (\Throwable $th) {
             Log::error($th);
             return (new ApiResponseService())->apiMobileFailedResponseService($th->getMessage());
