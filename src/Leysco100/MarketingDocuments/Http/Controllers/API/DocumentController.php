@@ -1217,9 +1217,9 @@ class DocumentController extends Controller
                     'ItemCode' => $ItemCode, //    Item ID from OITM AUTO INCREMENT
                     'Dscription' => $Dscription, // Item Description
                     'CodeBars' => $value['CodeBars'] ?? null, //    Bar Code
-                    'SerialNum' => $value['SerialNum'], //    Serial No.
+                    'SerialNum' => $value['SerialNum']?? null, //    Serial No.
                     'Quantity' => $value['Quantity'] ?? 1, //    Quantity
-                    'DelivrdQty' => $value['DelivrdQty'], //    Delivered Qty
+                    'DelivrdQty' => $value['DelivrdQty'] ?? null, //    Delivered Qty
                     'InvQty' => $value['InvQty'], //   Qty(Inventory UoM)
                     'OpenInvQty' => $value['OpenInvQty'], //Open Inv. Qty ------
                     'PackQty' => $value['PackQty'], //    No. of Packages
@@ -1235,9 +1235,9 @@ class DocumentController extends Controller
                     'SlpCode' => $request['SlpCode'], //    Sales Employee
                     'Commission' => array_key_exists('Commission', $value) ? $value['Commission'] : null, //    Comm. %
                     'AcctCode' => array_key_exists('AcctCode', $value) ? $value['AcctCode'] : null, //    G/L Account
-                    'OcrCode' => $value['OcrCode'], //    Dimension 1
-                    'OcrCode2' => $value['OcrCode2'], //    Dimension 2
-                    'OcrCode3' => $value['OcrCode3'], //    Dimension 3
+                    'OcrCode' => $value['OcrCode'] ?? null, //    Dimension 1
+                    'OcrCode2' => $value['OcrCode2'] ?? null, //    Dimension 2
+                    'OcrCode3' => $value['OcrCode3'] ?? null, //    Dimension 3
                     'OcrCode4' => $value['OcrCode4'] ?? null, //    Dimension 4
                     'OcrCode5' => $value['OcrCode5'] ?? null, //    Dimension 5
                     'OpenQty' => array_key_exists('Quantity', $value) ? $value['Quantity'] : null, //    Open Inv. Qty
