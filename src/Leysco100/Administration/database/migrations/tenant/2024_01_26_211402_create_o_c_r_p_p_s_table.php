@@ -17,9 +17,9 @@ return new class extends Migration
             $table->string('CrTypeName')->nullable();
             $table->string('CreditCard')->nullable();
             $table->integer('DueTerms')->nullable();
-            $table->decimal('MinCredit', 10, 2)->nullable();
-            $table->decimal('MinToPay', 10, 2)->nullable();
-            $table->string('MaxValid')->nullable();
+            $table->double('MinCredit', 10, 2)->nullable();
+            $table->double('MinToPay', 10, 2)->nullable();
+            $table->double('MaxValid', 10, 2)->nullable();
             $table->integer('InstalMent')->nullable();
             $table->string('Locked', 1)->default('N')->nullable();
             $table->string('DataSource')->default('I')->nullable();
