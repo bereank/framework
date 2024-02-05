@@ -140,7 +140,7 @@ class DocumentController extends Controller
                             }
 
                             if (!$showAll) {
-//                                $q->where('UserSign', $createdBy);
+                                //                                $q->where('UserSign', $createdBy);
                                 $q->where('OwnerCode', Auth::user()->EmpID);
                             }
                         }
@@ -199,7 +199,7 @@ class DocumentController extends Controller
         $isForPrint = \Request::get('isForPrint');
         $copyTo = \Request::get('copyTo');
 
-        if (!$isDoc ) {
+        if (!$isDoc) {
             $isDoc = 1;
         }
 
@@ -218,41 +218,41 @@ class DocumentController extends Controller
         $DocumentTables = APDI::with('pdi1')
             ->where('ObjectID', $ObjType)
             ->first();
-//        (new AuthorizationService())->checkIfAuthorize($DocumentTables->id, 'view');
+        //        (new AuthorizationService())->checkIfAuthorize($DocumentTables->id, 'view');
 
-//        $data = $DocumentTables->ObjectHeaderTable::with('objecttype', 'department', 'document_lines.taxgroup', 'branch', 'CreatedBy', 'location')
-//            ->where('id', $DocEntry)
-//            ->first();
+        //        $data = $DocumentTables->ObjectHeaderTable::with('objecttype', 'department', 'document_lines.taxgroup', 'branch', 'CreatedBy', 'location')
+        //            ->where('id', $DocEntry)
+        //            ->first();
 
         $data = $DocumentTables->ObjectHeaderTable::where('id', $DocEntry)
             ->with("document_lines.oitm")
             ->first();
 
-            $userFields = (object)[
-                "U_ControlCode" => $data->U_ControlCode,
-                "U_RelatedInv" => $data->U_RelatedInv,
-                "U_CUInvoiceNum" => $data->U_CUInvoiceNum,
-                "U_QRCode" => $data->U_QRCode,
-                "U_QrLocation" => $data->U_QrLocation,
-                "U_ReceiptNo" => $data->U_ReceiptNo,
-                "U_CommitedTime" => $data->U_CommitedTime,
-            ];
+        $userFields = (object)[
+            "U_ControlCode" => $data->U_ControlCode,
+            "U_RelatedInv" => $data->U_RelatedInv,
+            "U_CUInvoiceNum" => $data->U_CUInvoiceNum,
+            "U_QRCode" => $data->U_QRCode,
+            "U_QrLocation" => $data->U_QrLocation,
+            "U_ReceiptNo" => $data->U_ReceiptNo,
+            "U_CommitedTime" => $data->U_CommitedTime,
+        ];
 
 
 
 
-//        $data['doctype'] = $ObjType;
-//        if ($data) {
-//            $record = (new UserFieldsService())->processUDF($data);
-//        }
-//        $userFields = (object)[];
-//        if ($record) {
-//            foreach ($record['HeaderUserFields'] as $headerField) {
-//                $userFields->{$headerField['FieldName']} = $headerVal->{$headerField['FieldName']};
-//            }
-//
-//            $headerVal->UserFields = $userFields;
-//        }
+        //        $data['doctype'] = $ObjType;
+        //        if ($data) {
+        //            $record = (new UserFieldsService())->processUDF($data);
+        //        }
+        //        $userFields = (object)[];
+        //        if ($record) {
+        //            foreach ($record['HeaderUserFields'] as $headerField) {
+        //                $userFields->{$headerField['FieldName']} = $headerVal->{$headerField['FieldName']};
+        //            }
+        //
+        //            $headerVal->UserFields = $userFields;
+        //        }
 
 
 
@@ -262,24 +262,24 @@ class DocumentController extends Controller
         $generalObjects = [205, 66];
 
         if (!in_array($ObjType, $generalObjects)) {
-//            $data = $DocumentTables->ObjectHeaderTable::with(
-//                'CreatedBy',
-//                'location',
-//                'BusinessPartner.octg',
-//                'branch.location',
-//                'objecttype',
-//                'oslp',
-//                'document_lines.oitm',
-//                'document_lines.unitofmeasure',
-//                'document_lines.oitm.itm1',
-//                'document_lines.oitm.oitw',
-//                'document_lines.oitm.inventoryuom',
-//                'document_lines.oitm.ougp.ouom',
-//                'document_lines.oitm.oitb',
-//                'document_lines.taxgroup'
-//            )
-//                ->where('id', $DocEntry)
-//                ->first();
+            //            $data = $DocumentTables->ObjectHeaderTable::with(
+            //                'CreatedBy',
+            //                'location',
+            //                'BusinessPartner.octg',
+            //                'branch.location',
+            //                'objecttype',
+            //                'oslp',
+            //                'document_lines.oitm',
+            //                'document_lines.unitofmeasure',
+            //                'document_lines.oitm.itm1',
+            //                'document_lines.oitm.oitw',
+            //                'document_lines.oitm.inventoryuom',
+            //                'document_lines.oitm.ougp.ouom',
+            //                'document_lines.oitm.oitb',
+            //                'document_lines.taxgroup'
+            //            )
+            //                ->where('id', $DocEntry)
+            //                ->first();
             $data = $DocumentTables->ObjectHeaderTable::with(
                 'document_lines.oitm',
                 'BusinessPartner.octg',
@@ -319,18 +319,18 @@ class DocumentController extends Controller
             $row->formattedLineTotal = number_format($row->LineTotal, 2);
             $row->formattedPrice = number_format($row->Price, 2);
             $row->formattedPriceBefDisc = number_format($row->PriceBefDi, 2);
-            if ($copyTo){
+            if ($copyTo) {
 
                 $row->BaseDocObj = (object)[
-                    "id"=> $data->id,
-                    "ExtRef"=> $data->ExtRef,
+                    "id" => $data->id,
+                    "ExtRef" => $data->ExtRef,
                 ];
                 $row->BaseLineObj = (object)[
-                    "DocEntry"=>$row->id,
-                    "LineNum"=>$row->LineNum
+                    "DocEntry" => $row->id,
+                    "LineNum" => $row->LineNum
                 ];
             }
-            $row->oitm = $row->oitm()->select("UgpEntry","SUoMEntry")->get()->first();
+            $row->oitm = $row->oitm()->select("UgpEntry", "SUoMEntry")->get()->first();
             $taxGroup = TaxGroup::where('category', 'O')->where("code", $row->TaxCode)->first();
             if ($ObjType == "205") {
                 $taxGroup = TaxGroup::where('category', 'I')->where("code", $row->TaxCode)->first();
@@ -340,8 +340,8 @@ class DocumentController extends Controller
             $row->VatPrcnt = $taxGroup?->rate;
 
             $row->UserFields = (object)[
-                 "U_HSCode" => null
-             ];
+                "U_HSCode" => null
+            ];
         }
 
         $oats = ATC1::where('AbsEntry', $data->AtcEntry)
@@ -387,8 +387,8 @@ class DocumentController extends Controller
             $data->approvers = $approvers;
         }
 
-        if ($copyTo){
-            $data->makeHidden(["id","ExtRef","ExtRefDocNum","ExtDocTotal"]);
+        if ($copyTo) {
+            $data->makeHidden(["id", "ExtRef", "ExtRefDocNum", "ExtDocTotal"]);
         }
         /**
          * Format Values for Reports;
@@ -416,12 +416,11 @@ class DocumentController extends Controller
             } else {
                 $data->timsPayload =  (new DocumentsService())->getDocumentForDirectPostingToTims($ObjType, $DocEntry);
             }
-            if ($isDoc == 0){
+            if ($isDoc == 0) {
                 $data->payments = PDF2::with('opdf')->where('DocEntry', $data->id)->get();
-            }else{
+            } else {
                 $data->payments = RCT2::with('orct')->where('DocEntry', $data->id)->get();
             }
-
         }
 
         if ($ObjType == 15) {
@@ -516,7 +515,7 @@ class DocumentController extends Controller
         /**
          * Check If Authorized
          */
-//        (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'write');
+        //        (new AuthorizationService())->checkIfAuthorize($TargetTables->id, 'write');
 
         //If Base Type Exist
         if ($request['BaseType'] && $request['BaseEntry']) {
@@ -589,7 +588,7 @@ class DocumentController extends Controller
                 'Department' => $request['Department'],
                 'CardName' => $customerDetails ? $customerDetails->CardName : null,
                 'SlpCode' => $request['SlpCode'], // Sales Employee
-//                'OwnerCode' => $user->EmpID, //Owner Code
+                //                'OwnerCode' => $user->EmpID, //Owner Code
                 'OwnerCode' => $request['OwnerCode'], //Owner Code
                 'NumAtCard' => $request['NumAtCard'] ? $request['NumAtCard'] : null,
                 'CurSource' => $request['CurSource'],
@@ -629,7 +628,7 @@ class DocumentController extends Controller
 
             $newDoc->save();
 
-            if (is_array($request->UserFields)){
+            if (is_array($request->UserFields)) {
                 $newDoc->update($request->UserFields);
             }
             $documentRows = [];
@@ -853,20 +852,20 @@ class DocumentController extends Controller
                 $objectTypePassedToTns = 112;
             }
 
-//            $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions($objectTypePassedToTns, "A", $newDoc->id);
-//            if ($storedProcedureResponse) {
-//                if ($storedProcedureResponse->error != 0) {
-//                    return $apiResponseService->apiFailedResponseService($storedProcedureResponse->error_message);
-//                }
-//            }
+            //            $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions($objectTypePassedToTns, "A", $newDoc->id);
+            //            if ($storedProcedureResponse) {
+            //                if ($storedProcedureResponse->error != 0) {
+            //                    return $apiResponseService->apiFailedResponseService($storedProcedureResponse->error_message);
+            //                }
+            //            }
 
             //Validating Draft using Oringal base type
-//            if ($objectTypePassedToTns == 112) {
-//                $mockedDataDraftMessage = (new GeneralDocumentValidationService())->draftValidation($newDoc, $documentRows);
-//                if ($mockedDataDraftMessage) {
-//                    return $apiResponseService->apiFailedResponseService($mockedDataDraftMessage);
-//                }
-//            }
+            //            if ($objectTypePassedToTns == 112) {
+            //                $mockedDataDraftMessage = (new GeneralDocumentValidationService())->draftValidation($newDoc, $documentRows);
+            //                if ($mockedDataDraftMessage) {
+            //                    return $apiResponseService->apiFailedResponseService($mockedDataDraftMessage);
+            //                }
+            //            }
 
             if ($newDoc->ObjType == 13 && $request['payments']) {
                 $bankingDocumentService = new BankingDocumentService();
@@ -874,10 +873,10 @@ class DocumentController extends Controller
                     $storedProcedureResponse = null;
                     if ($saveToDraft) {
                         $newPayment = $bankingDocumentService->processDraftIncomingPayment($newDoc, $payment);
-//                        $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions(140, "A", $newPayment->id);
+                        //                        $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions(140, "A", $newPayment->id);
                     } else {
                         $newPayment = $bankingDocumentService->processIncomingPayment($newDoc, $payment);
-//                        $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions(24, "A", $newPayment->id);
+                        //                        $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions(24, "A", $newPayment->id);
                     }
                     if ($storedProcedureResponse) {
                         if ($storedProcedureResponse->error != 0) {
@@ -909,9 +908,9 @@ class DocumentController extends Controller
             }
 
             //            dd($saveToDraft);
-//            if ($saveToDraft == false) {
-//                (new TransactionInventoryEffectAction())->transactionInventoryEffect($ObjType, $newDoc->id);
-//            }
+            //            if ($saveToDraft == false) {
+            //                (new TransactionInventoryEffectAction())->transactionInventoryEffect($ObjType, $newDoc->id);
+            //            }
             DB::connection("tenant")->commit();
             //            $documentForDirecPostingToSAP = (new DocumentsService())->getDocumentForDirectPostingToSAP($newDoc->ObjType, $newDoc->id);
             //            $newDoc->documentForDirecPostingToSAP = $documentForDirecPostingToSAP;
@@ -929,7 +928,7 @@ class DocumentController extends Controller
         $ObjType = $request->ObjType;
         $DocEntry = $request->DocEntry;
 
-        if (!$DocEntry && $request->id){
+        if (!$DocEntry && $request->id) {
             $DocEntry = $request->id;
         }
 
@@ -944,13 +943,13 @@ class DocumentController extends Controller
                 ->apiFailedResponseService("Not found document with objtype " . $ObjType);
         }
 
-        $data = $TargetTables->ObjectHeaderTable::where("id",$DocEntry)
+        $data = $TargetTables->ObjectHeaderTable::where("id", $DocEntry)
             ->first();
-        if (!$data){
+        if (!$data) {
             return (new ApiResponseService())->apiFailedResponseService("Error Document not found");
         }
 
-        if (isset($request['files'])){
+        if (isset($request['files'])) {
             try {
                 $attachment = new OATC();
                 $attachment->ExtRef = $ExtRefAtcEntry;
@@ -983,6 +982,9 @@ class DocumentController extends Controller
     //UpdateDocument
     public function updateSingleDocument(Request $request)
     {
+
+
+        Log::info($request);
         $user = Auth::user();
 
         $isDoc = \Request::get('isDoc');
@@ -1002,7 +1004,7 @@ class DocumentController extends Controller
             ->first();
 
         //check if document is closed
-//        if (($data->ExtRef && strtolower($data->ExtRef) != "n/a")  || $data->DocStatus == "C") {
+        //        if (($data->ExtRef && strtolower($data->ExtRef) != "n/a")  || $data->DocStatus == "C") {
         if ($data->DocStatus == "C") {
             return (new ApiResponseService())
                 ->apiFailedResponseService("You Cannot Edit the document,Its Closed");
@@ -1070,12 +1072,12 @@ class DocumentController extends Controller
                 'Series' => $request['Series'],
                 'DocNum' => $DocNum,
                 'SlpCode' => $request['SlpCode'], // Sales Employee
-//                'U_SalePipe' => $request['U_SalePipe'], // Sales Pipe Line
+                //                'U_SalePipe' => $request['U_SalePipe'], // Sales Pipe Line
 
-//                'U_CashName' => $request['U_CashName'], //Cash Customer  Name
-//                'U_CashNo' => $request['U_CashNo'], // Cash Customer No
-//                'U_CashMail' => $request['U_CashMail'], // Cash Customer Email
-//                'U_IDNo' => $request['U_IDNo'], // Id no
+                //                'U_CashName' => $request['U_CashName'], //Cash Customer  Name
+                //                'U_CashNo' => $request['U_CashNo'], // Cash Customer No
+                //                'U_CashMail' => $request['U_CashMail'], // Cash Customer Email
+                //                'U_IDNo' => $request['U_IDNo'], // Id no
                 'NumAtCard' => $request['NumAtCard'] ? $request['NumAtCard'] : null,
                 'CurSource' => $request['CurSource'],
                 'DocTotal' => $request['DocTotal'] ?? 0,
@@ -1096,24 +1098,24 @@ class DocumentController extends Controller
                 'DiscPrcnt' => $request['DiscPrcnt'] ?? 0, //Discount Percentages
                 'DiscSum' => $request['DiscSum'] ?? 0, // Discount Sum
                 'BPLId' => $request['BPLId'],
-//                'U_SaleType' => $request['U_SaleType'], // Sale Type
+                //                'U_SaleType' => $request['U_SaleType'], // Sale Type
                 'Comments' => $request['Comments'], //comments
                 'NumAtCard2' => $request['NumAtCard2'],
                 'JrnlMemo' => $request['JrnlMemo'], // Journal Remarks
                 'UseShpdGd' => $request['UseShpdGd'] ?? "N",
                 'Rounding' => $request['Rounding'] ?? "N",
                 'RoundDif' => $request['RoundDif'] ?? 0,
-//                'U_ServiceCall' => $request['U_ServiceCall'],
-//                'U_DemoLocation' => $request['U_DemoLocation'],
-//                'U_Technician' => $request['U_Technician'],
-//                'U_Location' => $request['U_Location'],
-//                'U_MpesaRefNo' => $request['U_MpesaRefNo'],
-//                'U_PCash' => $request['U_PCash'],
-//                'U_transferType' => $request['U_transferType'],
-//                'U_SSerialNo' => $request['U_SSerialNo'],
-//                'U_TypePur' => $request['U_TypePur'],
-//                'U_NegativeMargin' => $request['U_NegativeMargin'],
-//                'U_BaseDoc' => $request['U_BaseDoc'],
+                //                'U_ServiceCall' => $request['U_ServiceCall'],
+                //                'U_DemoLocation' => $request['U_DemoLocation'],
+                //                'U_Technician' => $request['U_Technician'],
+                //                'U_Location' => $request['U_Location'],
+                //                'U_MpesaRefNo' => $request['U_MpesaRefNo'],
+                //                'U_PCash' => $request['U_PCash'],
+                //                'U_transferType' => $request['U_transferType'],
+                //                'U_SSerialNo' => $request['U_SSerialNo'],
+                //                'U_TypePur' => $request['U_TypePur'],
+                //                'U_NegativeMargin' => $request['U_NegativeMargin'],
+                //                'U_BaseDoc' => $request['U_BaseDoc'],
                 'Transfered' => "N",
             ]);
 
@@ -1209,7 +1211,7 @@ class DocumentController extends Controller
                         ->apiFailedResponseService("Description Required");
                 }
 
-                $DiscPrcn = $value['DiscPrcn'] ?? 0;
+                $DiscPrcn = $value['DiscPrcnt'] ?? 0;
                 $rowdetails = [
                     'DocEntry' => $data->id,
                     'OwnerCode' => $request['OwnerCode'], //Owner Code
@@ -1324,13 +1326,13 @@ class DocumentController extends Controller
             }
 
             // Stored Procedure Validations
-//            $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions($ObjType, "U", $DocEntry);
-//
-//            if ($storedProcedureResponse) {
-//                if ($storedProcedureResponse->error != 0) {
-//                    return (new ApiResponseService())->apiFailedResponseService($storedProcedureResponse->error_message);
-//                }
-//            }
+            //            $storedProcedureResponse = (new DatabaseValidationServices())->validateTransactions($ObjType, "U", $DocEntry);
+            //
+            //            if ($storedProcedureResponse) {
+            //                if ($storedProcedureResponse->error != 0) {
+            //                    return (new ApiResponseService())->apiFailedResponseService($storedProcedureResponse->error_message);
+            //                }
+            //            }
 
             //Validating Draft using Oringal base type
             if ($ObjType == 112) {
@@ -1348,7 +1350,7 @@ class DocumentController extends Controller
             DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
-//            dd($th);
+            //            dd($th);
             DB::connection("tenant")->rollback();
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
@@ -1766,7 +1768,7 @@ class DocumentController extends Controller
         $DocumentTables = APDI::with('pdi1')
             ->where('ObjectID', $ObjType)
             ->first();
-//        (new AuthorizationService())->checkIfAuthorize($DocumentTables->id, 'update');
+        //        (new AuthorizationService())->checkIfAuthorize($DocumentTables->id, 'update');
         try {
             $data = $DocumentTables->ObjectHeaderTable::where('id', $DocEntry)->first();
             if (!$data) {
@@ -1808,7 +1810,7 @@ class DocumentController extends Controller
                 ->where('ObjectID', $ObjType)
                 ->first();
 
-//            (new AuthorizationService())->checkIfAuthorize($DocumentTables->id, 'view');
+            //            (new AuthorizationService())->checkIfAuthorize($DocumentTables->id, 'view');
 
             $data = $DocumentTables->ObjectHeaderTable::where('id', $DocEntry)
                 ->first();
