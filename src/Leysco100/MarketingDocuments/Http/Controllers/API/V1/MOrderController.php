@@ -364,9 +364,9 @@ class MOrderController extends Controller
                 [
                     "id" => 4,
                     "Type" => "Payments",
-                    "Name" => "invoice and Payments",
+                    "Name" => "Invoice + Payments",
                     "doctype" => 13,
-                    "sequence" => 5
+                    "sequence" => 4
                 ],
                 [
                     "id" => 5,
@@ -380,7 +380,7 @@ class MOrderController extends Controller
                     "Type" => "ARCreditMemo",
                     "Name" => "A/R Credit Memo",
                     "doctype" => 14,
-                    "sequence" => 6
+                    "sequence" => 5
                 ],
 
 
