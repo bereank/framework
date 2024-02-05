@@ -983,8 +983,6 @@ class DocumentController extends Controller
     public function updateSingleDocument(Request $request)
     {
 
-
-        Log::info($request);
         $user = Auth::user();
 
         $isDoc = \Request::get('isDoc');
@@ -1225,7 +1223,7 @@ class DocumentController extends Controller
                     'InvQty' => $value['InvQty'], //   Qty(Inventory UoM)
                     'OpenInvQty' => $value['OpenInvQty'], //Open Inv. Qty ------
                     'PackQty' => $value['PackQty'], //    No. of Packages
-                    'Price' => $DiscPrcn == 0 ? $request['Price'] : $value['PriceBefDi'], //    Price After Discount
+                    'Price' => $DiscPrcn == 0 ? $value['Price'] : $value['PriceBefDi'], //    Price After Discount
                     'DiscPrcnt' => array_key_exists('DiscPrcnt', $value) ? $value['DiscPrcnt'] : 0, //    Discount %
                     'Rate' => array_key_exists('Rate', $value) ? $value['Rate'] : null, //    Rate
                     'TaxCode' => array_key_exists('TaxCode', $value) ? $value['TaxCode'] : null, //    Tax Code
