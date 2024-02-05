@@ -178,14 +178,14 @@ class MItemController extends Controller
             if ($itm9) {
                 if ($itm9) {
                     if ($bpPriceList->isGrossPrc == 'Y') {
-                        return $itm9->Price;
+                        $PRICE = $itm9->Price;
                     } else if ($bpPriceList->isGrossPrc == 'N') {
-                        return (($ovtg->rate / 100) + 1) *  $itm9->Price;
+                        $PRICE = round((($ovtg->rate / 100) + 1) *  $itm9->Price, 2);
                     }
                 }
                 $details = [
                     "SUoMEntry" => $ugp1 ? $ugp1->id : null,
-                    'FINALSALESPRICE' => $itm9->Price,
+                    'FINALSALESPRICE' => $PRICE,
                 ];
                 return $details;
             }
@@ -239,9 +239,9 @@ class MItemController extends Controller
             $PRICE = ($PRICEPERPRICEUNIT * $SALESUNITCONVERTEDTOBASEUOM) / $PRICINGUNITCONVERTEDTOBASEUOM;
 
             if ($opln->isGrossPrc == 'Y') {
-                return  $PRICE;
+                $PRICE = $PRICE;
             } else if ($opln->isGrossPrc == 'N') {
-                return (($ovtg->rate / 100) + 1) *   $PRICE;
+                $PRICE = round((($ovtg->rate / 100) + 1) *   $PRICE, 2);
             }
             $details = [
                 "SUoMEntry" => $ugp1 ? $ugp1->id : null,
