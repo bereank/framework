@@ -5,6 +5,7 @@ namespace Leysco100\MarketingDocuments\Http\Controllers\API\V2;
 use stdClass;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -14,6 +15,7 @@ use Leysco100\Shared\Models\Banking\Models\RCT2;
 use Leysco100\Shared\Services\UserFieldsService;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Services\AuthorizationService;
+use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
 use Leysco100\Shared\Models\Administration\Models\EOTS;
 use Leysco100\Shared\Models\Administration\Models\OADM;
 use Leysco100\Shared\Models\Administration\Models\User;
@@ -23,11 +25,14 @@ use Leysco100\Shared\Models\MarketingDocuments\Models\ATC1;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OWDD;
 use Leysco100\Shared\Models\MarketingDocuments\Models\WDD1;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OSRN;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
 use Leysco100\MarketingDocuments\Services\MarketingDocumentService;
 use Leysco100\Shared\Models\Banking\Services\BankingDocumentService;
+use Leysco100\MarketingDocuments\Services\DatabaseValidationServices;
 use Leysco100\Shared\Models\MarketingDocuments\Services\GeneralDocumentService;
+use Leysco100\Shared\Models\MarketingDocuments\Services\GeneralDocumentValidationService;
 
 
 
@@ -87,6 +92,7 @@ class MarketingDocumentsController extends Controller
                     'ExtRef',
                     'ExtRefDocNum',
                     'UserSign',
+                    'Series',
                     'SlpCode',
                     'DataSource',
                     'DocStatus',
@@ -395,7 +401,7 @@ class MarketingDocumentsController extends Controller
 
         // Step 2: Default Fields
         $defaulted_data = (new MarketingDocumentService())->fieldsDefaulting($request->all());
-
+       // return  $defaulted_data;
         // Step 3: Validate Document Fields
         $validatedFields  = (new MarketingDocumentService())->validateFields($defaulted_data, $request['ObjType']);
 
@@ -405,6 +411,91 @@ class MarketingDocumentsController extends Controller
         // Step 5: Create Document
         $newDoc =  (new MarketingDocumentService())->createDoc($docData, $TargetTables, $ObjType);
 
+
+        return (new ApiResponseService())->apiSuccessResponseService($newDoc);
+    }
+
+    //UpdateDocument
+    public function updateSingleDocument(Request $request)
+    {
+        $isDoc = \Request::get('isDoc');
+        $ObjType = $request["ObjType"];
+
+        if ($isDoc == 0) {
+            $ObjType = 112;
+        } else {
+            $isDoc = 1;
+        }
+        $DocumentTables = APDI::with('pdi1')
+            ->where('ObjectID', $ObjType)
+            ->first();
+
+        $Headerdata = $DocumentTables->ObjectHeaderTable::where('id', $request["id"])
+            ->first();
+        if (!$Headerdata) {
+            return (new ApiResponseService())
+                ->apiFailedResponseService("Specified Document Not Found");
+        }
+        //check if document is closed
+        if ($Headerdata->DocStatus == "C") {
+            return (new ApiResponseService())
+                ->apiFailedResponseService("You Cannot Edit the document,Its Closed");
+        }
+
+        if (!$request['DocDueDate'] && $ObjType != 205) {
+            return (new ApiResponseService())
+                ->apiFailedResponseService("Delivery Date Required");
+        }
+
+        if (!$DocumentTables) {
+            return (new ApiResponseService())
+                ->apiFailedResponseService("Not found document with objtype " . $ObjType);
+        }
+
+        if ($ObjType == 205) {
+            if (!$request['ReqType']) {
+                return (new ApiResponseService())
+                    ->apiFailedResponseService("Request Type is required");
+            }
+
+            if (!$request['Requester']) {
+                return (new ApiResponseService())
+                    ->apiFailedResponseService("Requester is required");
+            }
+
+            if (!$request['ReqDate']) {
+                return (new ApiResponseService())
+                    ->apiFailedResponseService("Required date is required");
+            }
+        }
+
+        /**
+         * Mapping Req Name
+         */
+        $ReqName = null;
+        if ($ObjType == 205) {
+            if ($request['ReqType'] == 12) {
+                $ReqName = User::where('id', $request['Requester'])->value('name');
+            }
+
+            if ($request['ReqType'] == 171) {
+                $employee = OHEM::where('id', $request['Requester'])->first();
+                $ReqName = $employee->firstName . " " . $employee->lastName;
+            }
+        }
+        // Step 1: Default Fields
+        $defaulted_data = (new MarketingDocumentService())->fieldsDefaulting($request->all());
+
+        // Step 2: Validate Document Fields
+        //   $validatedFields  = (new MarketingDocumentService())->validateFields($defaulted_data, $request['ObjType']);
+
+        // Step 3: Validate UDF'S
+        $docData = (new MapApiFieldAction())->handle($defaulted_data, $DocumentTables);
+        // Update  Document
+
+
+        return   $docData;
+        $newDoc =  (new MarketingDocumentService())->updateDoc($docData, $ObjType, $Headerdata);
 
         return (new ApiResponseService())->apiSuccessResponseService($newDoc);
     }
