@@ -405,48 +405,57 @@ class InventoryTransactionsController extends Controller
                     $lineModel = collect($result)->first();
 
                     $FromBinCod =    $value['FromBinCod'] ?? null;
-
+                    $WhsCode =  $defaulted_data['ToWhsCode'] ?? $defaulted_data['WhsCode'];
                     foreach ($value['bin_allocation'] as $key => $BinVal) {
-                    //     if (!empty($BinVal)) {
-                    //         $SubLineNum = ++$key;
-                    //         $obin = OBIN::where('BinCode', $BinVal['BinCode'])->first();
-                    //         $bindata = $lineModel['ChildTable']::create([
-                    //             'DocEntry' => $newDoc->id,
-                    //             'BinAllocSe' => $LineNum,
-                    //             'LineNum' => $LineNum,
-                    //             'SubLineNum' => $SubLineNum,
-                    //             'SnBType' => null,
-                    //             'SnBMDAbs' => null,
-                    //             'BinAbs' =>  $obin->id,
-                    //             'Quantity' =>  $BinVal['QtyVar'],
-                    //             'ItemCode' => $ItemCode,
-                    //             'WhsCode' =>  $defaulted_data['ToWhsCode'] ?? $defaulted_data['WhsCode'],
-                    //             'ObjType' =>  $ObjType,
-                    //             'AllowNeg' => 'N',
-                    //             'BinActTyp' => 1
-                    //         ]);
+                        //     if (!empty($BinVal)) {
+                        //         $SubLineNum = ++$key;
+                        //         $obin = OBIN::where('BinCode', $BinVal['BinCode'])->first();
+                        //         $bindata = $lineModel['ChildTable']::create([
+                        //             'DocEntry' => $newDoc->id,
+                        //             'BinAllocSe' => $LineNum,
+                        //             'LineNum' => $LineNum,
+                        //             'SubLineNum' => $SubLineNum,
+                        //             'SnBType' => null,
+                        //             'SnBMDAbs' => null,
+                        //             'BinAbs' =>  $obin->id,
+                        //             'Quantity' =>  $BinVal['QtyVar'],
+                        //             'ItemCode' => $ItemCode,
+                        //             'WhsCode' =>  $defaulted_data['ToWhsCode'] ?? $defaulted_data['WhsCode'],
+                        //             'ObjType' =>  $ObjType,
+                        //             'AllowNeg' => 'N',
+                        //             'BinActTyp' => 1
+                        //         ]);
 
-                    //         $resdata =    (new InventoryService())->binAllocations(
-                    //             $ObjType,
-                    //             $ItemCode,
-                    //             $BinVal,
-                    //             $value['ToWhsCode'],
-                    //             $FromBinCod,
-                    //         );
-                    //     }
-                    // }
-                    // if (isset($defaulted_data['ToWhsCode']) && $defaulted_data['ToWhsCode'] !== null) {
-                    //     $WhsCode = $defaulted_data['ToWhsCode'];
-                    // } elseif (isset($defaulted_data['WhsCode']) && $defaulted_data['WhsCode'] !== null) {
-                    //     $WhsCode = $defaulted_data['WhsCode'];
-                    // } else {
-                    //     $WhsCode = null;
-                    // }
+                        //         $resdata =    (new InventoryService())->binAllocations(
+                        //             $ObjType,
+                        //             $ItemCode,
+                        //             $BinVal,
+                        //             $value['ToWhsCode'],
+                        //             $FromBinCod,
+                        //         );
+                        //     }
+                        // }
+                        // if (isset($defaulted_data['ToWhsCode']) && $defaulted_data['ToWhsCode'] !== null) {
+                        //     $WhsCode = $defaulted_data['ToWhsCode'];
+                        // } elseif (isset($defaulted_data['WhsCode']) && $defaulted_data['WhsCode'] !== null) {
+                        //     $WhsCode = $defaulted_data['WhsCode'];
+                        // } else {
+                        //     $WhsCode = null;
+                        // }
 
-                    (new InventoryService())->binQuantities($value, $lineModel, $newDoc->id, $LineNum, $ItemCode,
-                     $WhsCode, $ObjType, $FromBinCod,$newDoc);
+                        (new InventoryService())->binQuantities(
+                            $value,
+                            $lineModel,
+                            $newDoc->id,
+                            $LineNum,
+                            $ItemCode,
+                            $WhsCode,
+                            $ObjType,
+                            $FromBinCod,
+                            $newDoc
+                        );
+                    }
                 }
-
                 /**
                  * Saving Serial Numbers
                  */
