@@ -141,9 +141,9 @@ class GUserController extends Controller
         try {
             $settings = OADM::first();
 
-            $password_changed = true;
+            $change_password = true;
             if ($settings->PswdChangeOnReset) {
-                $password_changed = false;
+                $change_password = false;
             }
             $user = User::where('id', $id)->first();
             $user->update(array_filter([
@@ -165,7 +165,7 @@ class GUserController extends Controller
                 'useLocalSearch' => $request['useLocalSearch'] == true ? 1 : 0,
                 'SUPERUSER' => $request['SUPERUSER'] == true ? 1 : 0,
                 'status' => $request['status'] == true ? 1 : 0,
-                'password_changed' =>   $password_changed,
+                'change_password' =>   $change_password,
             ]);
             return (new ApiResponseService())->apiSuccessResponseService("Created Successfully");
         } catch (\Throwable $th) {

@@ -407,52 +407,44 @@ class InventoryTransactionsController extends Controller
                     $FromBinCod =    $value['FromBinCod'] ?? null;
 
                     foreach ($value['bin_allocation'] as $key => $BinVal) {
-                        if (!empty($BinVal)) {
-                            $SubLineNum = ++$key;
-                            $obin = OBIN::where('BinCode', $BinVal['BinCode'])->first();
-                            $bindata = $lineModel['ChildTable']::create([
-                                'DocEntry' => $newDoc->id,
-                                'BinAllocSe' => $LineNum,
-                                'LineNum' => $LineNum,
-                                'SubLineNum' => $SubLineNum,
-                                'SnBType' => null,
-                                'SnBMDAbs' => null,
-                                'BinAbs' =>  $obin->id,
-                                'Quantity' =>  $BinVal['QtyVar'],
-                                'ItemCode' => $ItemCode,
-                                'WhsCode' =>  $defaulted_data['ToWhsCode'],
-                                'ObjType' =>  $ObjType,
-                                'AllowNeg' => 'N',
-                                'BinActTyp' => 1
-                            ]);
+                    //     if (!empty($BinVal)) {
+                    //         $SubLineNum = ++$key;
+                    //         $obin = OBIN::where('BinCode', $BinVal['BinCode'])->first();
+                    //         $bindata = $lineModel['ChildTable']::create([
+                    //             'DocEntry' => $newDoc->id,
+                    //             'BinAllocSe' => $LineNum,
+                    //             'LineNum' => $LineNum,
+                    //             'SubLineNum' => $SubLineNum,
+                    //             'SnBType' => null,
+                    //             'SnBMDAbs' => null,
+                    //             'BinAbs' =>  $obin->id,
+                    //             'Quantity' =>  $BinVal['QtyVar'],
+                    //             'ItemCode' => $ItemCode,
+                    //             'WhsCode' =>  $defaulted_data['ToWhsCode'] ?? $defaulted_data['WhsCode'],
+                    //             'ObjType' =>  $ObjType,
+                    //             'AllowNeg' => 'N',
+                    //             'BinActTyp' => 1
+                    //         ]);
 
-                            $resdata =    (new InventoryService())->binAllocations(
-                                $ObjType,
-                                $ItemCode,
-                                $BinVal,
-                                $value['ToWhsCode'],
-                                $FromBinCod,
-                            );
+                    //         $resdata =    (new InventoryService())->binAllocations(
+                    //             $ObjType,
+                    //             $ItemCode,
+                    //             $BinVal,
+                    //             $value['ToWhsCode'],
+                    //             $FromBinCod,
+                    //         );
+                    //     }
+                    // }
+                    // if (isset($defaulted_data['ToWhsCode']) && $defaulted_data['ToWhsCode'] !== null) {
+                    //     $WhsCode = $defaulted_data['ToWhsCode'];
+                    // } elseif (isset($defaulted_data['WhsCode']) && $defaulted_data['WhsCode'] !== null) {
+                    //     $WhsCode = $defaulted_data['WhsCode'];
+                    // } else {
+                    //     $WhsCode = null;
+                    // }
 
-
-
-                            // $oilm =  OILM::create([
-                            //     'DocEntry' => $newDoc->id,
-                            //     'TransType' => $ObjType,
-                            //     'DocLineNum' => $LineNum,
-                            //     'Quantity' => $BinVal['QtyVar'],
-                            //     'ItemCode' => $ItemCode,
-                            //     'UserSign' => Auth::user()->id
-                            // ]);
-                            // OBTL::create([
-                            //     'MessageID' => $oilm->id,
-                            //     'BinAbs' => $Bindata->id,
-                            //     'SnBMDAbs' => NULL,
-                            //     'Quantity' => $BinVal['QtyVar'],
-                            //     'ITLEntry' => NULL,
-                            // ]);
-                        }
-                    }
+                    (new InventoryService())->binQuantities($value, $lineModel, $newDoc->id, $LineNum, $ItemCode,
+                     $WhsCode, $ObjType, $FromBinCod,$newDoc);
                 }
 
                 /**

@@ -249,11 +249,23 @@ class MarketingDocumentService
                         $documentLines[$key]['Price']  = $grossPrice;
                         $documentLines[$key]['PriceBefDi']  = $unitPrice ?? null;
                         $documentLines[$key]['PriceAfVAT']  = $grossPrice;
+                        if ($line['formattedPrice']) {
+                            $documentLines[$key]['Price']  = $line['formattedPrice'];
+                        }
+                        if ($line['formattedPriceBefDisc']) {
+                            $documentLines[$key]['PriceBefDi']  = $line['formattedPriceBefDisc'];
+                        }
                         if ($line['Quantity']  && isset($unitPrice)) {
                             $documentLines[$key]['LineTotal']  =  round($line['Quantity']  * $unitPrice, 2);
                         }
+                        if ($line['formattedLineTotal']) {
+                            $documentLines[$key]['LineTotal']  =  $line['formattedLineTotal'];
+                        }
                         if ($line['Quantity']  &&  isset($grossPrice)) {
                             $documentLines[$key]['GTotal']  = round($line['Quantity']  * $grossPrice, 2);
+                        }
+                        if ($line['GTotal']) {
+                            $documentLines[$key]['GTotal']  = $line['GTotal'];
                         }
                         $documentLines[$key]['VatSum']  = $vatSum;
                     }
@@ -481,8 +493,6 @@ class MarketingDocumentService
             }
 
 
-
-
             /**
              * Mapping Req Name
              */
@@ -499,16 +509,7 @@ class MarketingDocumentService
             }
 
             $checkStockAvailabilty = false;
-
-            if (
-                array_key_exists('BaseType', $docData) && isset($docData['BaseType']) ||
-                $ObjType == 15 || $ObjType == 13
-            ) {
-                //    if (($ObjType == 13 && $docData['BaseType'] != 15) || $ObjType == 15) {
-                $checkStockAvailabilty = true;
-                // }
-            }
-            if (($ObjType == 13 && (array_key_exists('BaseType', $docData) && $docData['BaseType'] != 15))) {
+            if (($ObjType == 13 && (array_key_exists('BaseType', $docData) && $docData['BaseType'] != 15)) || $ObjType == 15) {
                 $checkStockAvailabilty = true;
             }
 
@@ -609,7 +610,7 @@ class MarketingDocumentService
                 'ReqType' => $data['ReqType']  ?? null,
                 'Department' => $data['Department']  ?? null,
                 'CardName' => $data['CardName'] ?? null,
-                'SlpCode' => $data['SlpCode']  ?? null,  
+                'SlpCode' => $data['SlpCode']  ?? null,
                 'OwnerCode' => $data['OwnerCode']  ?? null, //Owner Code
                 'NumAtCard' => $data['NumAtCard'] ?? null,
                 'CurSource' => $data['CurSource']  ?? null,
@@ -765,7 +766,8 @@ class MarketingDocumentService
                             $value['ItemCode'],
                             $BinVal,
                             $WhsCode = null,
-                            $FromBinCod
+                            $FromBinCod,
+                            $newDoc->toArray()
                         );
                     }
                 }
@@ -794,7 +796,7 @@ class MarketingDocumentService
                     }
                     if ($saveSerialDetails) {
                         foreach ($value['SerialNumbers'] as $key => $serial) {
-                          
+
                             $LineNum = $key;
                             SRI1::create([
                                 "ItemCode" => $value['ItemCode'],

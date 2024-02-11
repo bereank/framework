@@ -42,7 +42,7 @@ class CreateUsersTable extends Migration
             $table->string('localUrl')->nullable();
             $table->string("account_type")->default("POS")->comment("GPM = gate pass users,POS = Main Pos Users");
             $table->integer("gate_id")->nullable();
-            $table->boolean('password_changed')->default(false);
+            $table->boolean('change_password')->default(false);
             $table->dateTime('last_login_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
