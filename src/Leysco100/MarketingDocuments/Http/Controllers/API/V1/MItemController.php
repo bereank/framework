@@ -154,7 +154,7 @@ class MItemController extends Controller
                 return (new ApiResponseService())
                     ->apiMobileFailedResponseService("Customer does not have pricelist");
             }
-
+            $opln = OPLN::where('id', $bpPriceList)->first();
             // If there is a change on  sUOMTRY
             //This are OUOMS
             $PRICINGUNIT = $ITEM->PriceUnit; //IF OUM IS MANUAL THIS VALUE WILL BE NULL
@@ -177,10 +177,11 @@ class MItemController extends Controller
 
             if ($itm9) {
                 if ($itm9) {
-                    if ($bpPriceList->isGrossPrc == 'Y') {
+                    if ($opln->isGrossPrc == 'Y') {
                         $PRICE = $itm9->Price;
-                    } else if ($bpPriceList->isGrossPrc == 'N') {
+                    } else if ($opln->isGrossPrc == 'N') {
                         $PRICE = round((($ovtg->rate / 100) + 1) *  $itm9->Price, 2);
+                     //   (0.16 + 1) * 100 = 116;
                     }
                 }
                 $details = [
@@ -220,7 +221,7 @@ class MItemController extends Controller
                 ->first();
             $INVUNITCONVERTEDTOBASEUOM = $INVUNITCONVERTEDTOBASEUOM_QUERY ? $INVUNITCONVERTEDTOBASEUOM_QUERY->INVUNITCONVERTEDTOBASEUOM : null;
 
-            $opln = OPLN::where('id', $bpPriceList)->first();
+
 
             //Getting Current Price and Curreny
             $ITM1_DATA = ITM1::select('Price', 'Currency')

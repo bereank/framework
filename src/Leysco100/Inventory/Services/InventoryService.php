@@ -177,7 +177,51 @@ class InventoryService
         return $rowData;
     }
 
-    public function binAllocations($ObjType, $ItemCode, $bin_allocation, $ToWhsCode, $FromBinCod)
+    public function binQuantities(
+        $value,
+        $lineModel,
+        $newDocID,
+        $LineNum,
+        $ItemCode,
+        $ToWhsCode,
+        $ObjType,
+        $FromBinCod,
+        $docData
+    ) {
+        foreach ($value['bin_allocation'] as $key => $BinVal) {
+            if (!empty($BinVal)) {
+                $SubLineNum = ++$key;
+                $obin = OBIN::where('BinCode', $BinVal['BinCode'])->first();
+                $bindata = $lineModel['ChildTable']::create([
+                    'DocEntry' => $newDocID,
+                    'BinAllocSe' => $LineNum,
+                    'LineNum' => $LineNum,
+                    'SubLineNum' => $SubLineNum,
+                    'SnBType' => null,
+                    'SnBMDAbs' => null,
+                    'BinAbs' =>  $obin->id,
+                    'Quantity' =>  $BinVal['QtyVar'],
+                    'ItemCode' => $ItemCode,
+                    'WhsCode' =>  $ToWhsCode,
+                    'ObjType' =>  $ObjType,
+                    'AllowNeg' => 'N',
+                    'BinActTyp' => 1
+                ]);
+
+                $res =   $this->binAllocations(
+                    $ObjType,
+                    $ItemCode,
+                    $BinVal,
+                    $ToWhsCode,
+                    $FromBinCod,
+                    $docData
+                );
+                return $res;
+            }
+        }
+    }
+
+    public function binAllocations($ObjType, $ItemCode, $bin_allocation, $ToWhsCode, $FromBinCod, $docData)
     {
 
         $obin = OBIN::where('BinCode', $bin_allocation['BinCode'])->first();
@@ -188,7 +232,7 @@ class InventoryService
 
         if ($FromBinCod) {
             $fromobin = OBIN::where('BinCode', $FromBinCod)->first();
-         
+
             if ($fromobin) {
                 $fromoibq = OIBQ::where('ItemCode', $ItemCode)
                     ->where('BinAbs', $fromobin->id)
@@ -215,12 +259,22 @@ class InventoryService
                     "OnHandQty" => $bin_allocation['QtyVar'] + $oibq->OnHandQty
                 ]);
             }
-            if ($ObjType == 13) {
+            $checkStockAvailabilty = false;
+
+            if (($ObjType == 13 || (array_key_exists('BaseType', $docData) &&
+                $docData['BaseType'] != 15 && $ObjType == 13)) || $ObjType == 15) {
+                $checkStockAvailabilty = true;
+                Log::info(["checkStockAvailabilty" => $checkStockAvailabilty]);
+            }
+
+            if ($checkStockAvailabilty) {
                 $oibq->update([
-                    "OnHandQty" => $oibq->OnHandQty-$bin_allocation['QtyVar']
+                    "OnHandQty" => $oibq->OnHandQty - $bin_allocation['QtyVar']
                 ]);
             }
         }
+
+
 
         return $obin;
     }
