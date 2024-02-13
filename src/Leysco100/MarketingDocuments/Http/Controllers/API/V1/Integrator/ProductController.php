@@ -170,14 +170,15 @@ class ProductController extends Controller
 
                     ITM12::create([
                         'ItemCode' => $request['ItemCode'],
-                        'UomType' => $value['UomType'],
-                        'UomEntry' => $value['UomEntry'],
+                        'UomType' => $value['UomType'] ?? null,
+                        'UomEntry' => $value['UomEntry'] ?? null,
                     ]);
                 }
             }
 
             return $data;
         } catch (\Throwable $th) {
+            Log::info($th->getMessage());
             info($th);
             return (new ApiResponseService())->apiIntegratorFailedResponseService($th->getMessage(), -1, "Unkown");
         }
@@ -340,6 +341,7 @@ class ProductController extends Controller
 
             return $data;
         } catch (\Throwable $th) {
+            Log::info($th->getMessage());
             return (new ApiResponseService())->apiIntegratorFailedResponseService($th->getMessage(), -1, "Unkown");
         }
     }
@@ -569,20 +571,22 @@ class ProductController extends Controller
         $data = $request['data'];
 
         $totalSynced = 0;
+        $errRes = [];
         foreach ($data as $key => $value) {
             try {
                 $priceList = OPLN::where('ExtRef', $value['PriceList'])->first();
 
                 if (!$priceList) {
-
-                    $responseData = (new ApiResponseService())
-                        ->apiIntegratorFailedResponseService(
-                            "Pricelist doest not exist",
-                            404,
-                            "Pricelist doest not exist: " . $value['PriceList']
-                        );
-
-                    return $responseData;
+                    if ($value['PriceList'] == 0) {
+                        ITM9::where('ItemCode', $value['ItemCode'])->delete();
+                    } else {
+                        $errRes = (new ApiResponseService())
+                            ->apiIntegratorFailedResponseService(
+                                "Pricelist doest not exist",
+                                404,
+                                "Pricelist doest not exist: " . $value['PriceList']
+                            );
+                    }
                 }
 
                 ITM9::updateOrCreate(
@@ -609,6 +613,9 @@ class ProductController extends Controller
                         "Unkown"
                     );
             }
+        }
+        if (empty($errRes)) {
+            return $errRes;
         }
 
         return (new ApiResponseService())->apiSuccessResponseService($totalSynced);
