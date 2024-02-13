@@ -11,7 +11,6 @@ use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\Administration\Models\ITG1;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
-use Leysco100\Shared\Models\Administration\Models\TaxGroup;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OPLN;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\ITM1;
@@ -39,12 +38,12 @@ class MItemController extends Controller
         $all = \Request::get('all');
 
         $user = User::where('id', Auth::user()->id)->with('oudg')->first();
-        $SellFromBin =   $user->oudg?->SellFromBin ?? false;
-        $BinItems=[];
-        if ($SellFromBin) {
-            $BIN = OBIN::where('id', $user->oudg->DftBinLoc)->first();
-            $BinItems = OIBQ::where('BinAbs', $BIN->id)->pluck('ItemCode');
-        }
+        // $SellFromBin =   $user->oudg?->SellFromBin ?? false;
+        // $BinItems=[];
+        // if ($SellFromBin) {
+        //     $BIN = OBIN::where('id', $user->oudg->DftBinLoc)->first();
+        //     $BinItems = OIBQ::where('BinAbs', $BIN->id)->pluck('ItemCode');
+        // }
         $data = OITM::select(
             'id',
             'ItemName',
@@ -65,19 +64,19 @@ class MItemController extends Controller
                 $query->where('frozenFor', "N")
                     ->where('OnHand', '>', 0);
             })
-            ->when($SellFromBin, function ($query2) use ($BinItems) {
-                $query2->whereIn('ItemCode', $BinItems);
-            })
+            // ->when($SellFromBin, function ($query2) use ($BinItems) {
+            //     $query2->whereIn('ItemCode', $BinItems);
+            // })
             ->get();
-        if ($SellFromBin) {
-            foreach ($data as $d) {
-                $items = OIBQ::where('BinAbs', $BIN->id)->where('ItemCode', $d->ItemCode)->first();
+        // if ($SellFromBin) {
+        //     foreach ($data as $d) {
+        //         $items = OIBQ::where('BinAbs', $BIN->id)->where('ItemCode', $d->ItemCode)->first();
 
-                $d->BinAbs = $items->BinAbs;
-                $d->OnHandQty = $items->OnHandQty;
-                $d->Freezed = $items->Freezed;
-            }
-        }
+        //         $d->BinAbs = $items->BinAbs;
+        //         $d->OnHandQty = $items->OnHandQty;
+        //         $d->Freezed = $items->Freezed;
+        //     }
+        // }
         return $data;
     }
     /**
@@ -154,7 +153,7 @@ class MItemController extends Controller
                 return (new ApiResponseService())
                     ->apiMobileFailedResponseService("Customer does not have pricelist");
             }
-            $opln = OPLN::where('id', $bpPriceList)->first();
+
             // If there is a change on  sUOMTRY
             //This are OUOMS
             $PRICINGUNIT = $ITEM->PriceUnit; //IF OUM IS MANUAL THIS VALUE WILL BE NULL
@@ -165,7 +164,7 @@ class MItemController extends Controller
                 //Get Default Sales Unit
                 $SALESUNIT = $ITEM->SUoMEntry;
             }
-            $ovtg = TaxGroup::where('code', $ITEM->VatGourpSa)->first();
+
             /**
              * Check IF there is a price in ITM9
              */
@@ -176,17 +175,9 @@ class MItemController extends Controller
                 ->first();
 
             if ($itm9) {
-                if ($itm9) {
-                    if ($opln->isGrossPrc == 'Y') {
-                        $PRICE = $itm9->Price;
-                    } else if ($opln->isGrossPrc == 'N') {
-                        $PRICE = round((($ovtg->rate / 100) + 1) *  $itm9->Price, 2);
-                     //   (0.16 + 1) * 100 = 116;
-                    }
-                }
                 $details = [
                     "SUoMEntry" => $ugp1 ? $ugp1->id : null,
-                    'FINALSALESPRICE' => $PRICE,
+                    'FINALSALESPRICE' => $itm9->Price,
                 ];
                 return $details;
             }
@@ -221,7 +212,7 @@ class MItemController extends Controller
                 ->first();
             $INVUNITCONVERTEDTOBASEUOM = $INVUNITCONVERTEDTOBASEUOM_QUERY ? $INVUNITCONVERTEDTOBASEUOM_QUERY->INVUNITCONVERTEDTOBASEUOM : null;
 
-
+            $opln = OPLN::where('id', $bpPriceList)->first();
 
             //Getting Current Price and Curreny
             $ITM1_DATA = ITM1::select('Price', 'Currency')
@@ -237,16 +228,9 @@ class MItemController extends Controller
             $INVUNITCONVERTEDTOBASEUOM = $INVUNITCONVERTEDTOBASEUOM == null || 0 ? 1 : $INVUNITCONVERTEDTOBASEUOM;
             $PRICINGUNITCONVERTEDTOBASEUOM = $PRICINGUNITCONVERTEDTOBASEUOM == null || 0 ? 1 : $PRICINGUNITCONVERTEDTOBASEUOM;
 
-            $PRICE = ($PRICEPERPRICEUNIT * $SALESUNITCONVERTEDTOBASEUOM) / $PRICINGUNITCONVERTEDTOBASEUOM;
-
-            if ($opln->isGrossPrc == 'Y') {
-                $PRICE = $PRICE;
-            } else if ($opln->isGrossPrc == 'N') {
-                $PRICE = round((($ovtg->rate / 100) + 1) *   $PRICE, 2);
-            }
             $details = [
                 "SUoMEntry" => $ugp1 ? $ugp1->id : null,
-                'FINALSALESPRICE' => $PRICE
+                'FINALSALESPRICE' => ($PRICEPERPRICEUNIT * $SALESUNITCONVERTEDTOBASEUOM) / $PRICINGUNITCONVERTEDTOBASEUOM,
             ];
 
             return $details;
