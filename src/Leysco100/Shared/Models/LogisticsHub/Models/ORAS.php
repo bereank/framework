@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Leysco100\Shared\Models\Administration\Models\OSLP;
+use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class ORAS extends Model

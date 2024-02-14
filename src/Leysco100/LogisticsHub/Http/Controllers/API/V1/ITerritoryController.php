@@ -5,6 +5,7 @@ namespace Leysco100\LogisticsHub\Http\Controllers\API\V1;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Leysco100\Shared\Services\ApiResponseService;
+use Leysco100\Shared\Models\LogisticsHub\Models\ORPS;
 use Leysco100\Shared\Models\Administration\Models\OTER;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;
 use Leysco100\Shared\Models\LogisticsHub\Models\RoutePlanning;
@@ -114,7 +115,7 @@ class ITerritoryController extends Controller
      */
     public function destroy($id)
     {
-        $data = Territory::findOrFail($id);
+        $data = OTER::findOrFail($id);
         $data->delete();
     }
 
@@ -139,7 +140,7 @@ class ITerritoryController extends Controller
     {
         $user = Auth::user();
 
-        return RoutePlanning::create([
+        return ORPS::create([
             'name' => $request['name'],
             'user_id' => $user->id,
             'description' => $request['description'],
