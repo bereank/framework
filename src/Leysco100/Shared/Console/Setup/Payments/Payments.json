@@ -1,0 +1,119 @@
+[
+    {
+        "OTPP": {
+            "Name": "KCB Bank",
+            "Description": "Lipa na KCB",
+            "Code": "KCB01",
+            "ObjCode": 320,
+            "Active": true,
+            "children": [
+                {
+                    "DocEntry": null,
+                    "Name": "Lipa na KCB Integration",
+                    "Code": 100,
+                    "AuthMth": 2,
+                    "HasStkPush": false,
+                    "CallBackUrl": null,
+                    "ValidationUrl": "payments/incoming/third-party/kcb/query",
+                    "ConfirmUrl": "payments/incoming/third-party/kcb/notification",
+                    "Active": true,
+                    "PassKey": null,
+                    "PublicKeyPath": "/../../../resources/kcb_uat_publickey.pem",
+                    "TPP2": {
+                        "Code": 100,
+                        "MobileActive": true,
+                        "Status": 1,
+                        "Shortcode": null,
+                        "Username/ConsumerKey": null,
+                        "Password/ConsumerSecret": null
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "OTPP": {
+            "Name": "Equity Bank",
+            "Description": "Lipa na Equity",
+            "Code": "Equity01",
+            "ObjCode": 320,
+            "Active": true,
+            "children": [
+                {
+                    "DocEntry": null,
+                    "Name": "Lipa na Equity Integration",
+                    "Code": 102,
+                    "AuthMth": 1,
+                    "HasStkPush": false,
+                    "CallBackUrl": null,
+                    "ValidationUrl": "payments/incoming/third-party/eqb/validation",
+                    "ConfirmUrl": "payments/incoming/third-party/eqb/notification",
+                    "Active": true,
+                    "PassKey": null,
+                    "PublicKeyPath": null,
+                    "TPP2": {
+                        "Code": 102,
+                        "MobileActive": true,
+                        "Status": 1,
+                        "Shortcode": null,
+                        "Username": null,
+                        "Password": null
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "OTPP": {
+            "Name": "Safaricom M-pesa",
+            "Description": "Safaricom M-pesa services",
+            "Code": "SAF01",
+            "ObjCode": 320,
+            "Active": true,
+            "children": [
+                {
+                    "DocEntry": null,
+                    "Name": "Mpesa paybill integration",
+                    "Code": 103,
+                    "AuthMth": 3,
+                    "HasStkPush": false,
+                    "CallBackUrl": null,
+                    "ValidationUrl": "payments/incoming/third-party/daraja/validation",
+                    "ConfirmUrl": "payments/incoming/third-party/daraja/confirmation",
+                    "Active": true,
+                    "PassKey": null,
+                    "PublicKeyPath": null,
+                    "TPP2": {
+                        "Code": 103,
+                        "MobileActive": true,
+                        "Status": 1,
+                        "Shortcode": null,
+                        "Username": null,
+                        "Password": null
+                    }
+                },
+                {
+                    "DocEntry": null,
+                    "Name": "Mpesa StkPush",
+                    "Code": 103,
+                    "AuthMth": 3,
+                    "HasStkPush": true,
+                    "CallBackUrl": null,
+                    "ValidationUrl": null,
+                    "ConfirmUrl": null,
+                    "Active": true,
+                    "PassKey": null,
+                    "PublicKeyPath": null,
+                    "TPP2": {
+                        "Code": 103,
+                        "MobileActive": true,
+                        "Status": 1,
+                        "Shortcode": null,
+                        "Username": null,
+                        "Password": null
+                    }
+                }
+            ]
+        }
+    }
+]
