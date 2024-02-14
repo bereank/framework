@@ -8,6 +8,7 @@ use Leysco100\Shared\Console\Setup\DocumentFormSettings;
 use Leysco100\Shared\Console\Setup\CreateDefaultUserCommand;
 use Leysco100\Shared\Console\Setup\InstallSharedPackageCommand;
 use Leysco100\Shared\Console\Setup\RecurringTransactionCommand;
+use Leysco100\Shared\Console\Setup\Payments\CreateThirdPartyPayments;
 
 class SharedServiceProvider extends ServiceProvider
 {
@@ -24,8 +25,8 @@ class SharedServiceProvider extends ServiceProvider
                 InstallSharedPackageCommand::class,
                 CreateDefaultUserCommand::class,
                 DocumentFormSettings::class,
-                RecurringTransactionCommand::class
-                
+                RecurringTransactionCommand::class,
+                CreateThirdPartyPayments::class
             ]);
         }
     }

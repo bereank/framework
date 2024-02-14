@@ -230,4 +230,4 @@ Route::post('v2-create-document', [DocumentControllerPOC::class, 'store']);
 
 
 //fiscalization Apis
-Route::apiResources(['documents/fiscalization' => FiscalizationController::class]);
+Route::apiResources(['document/fiscalization' => FiscalizationController::class]);
