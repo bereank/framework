@@ -633,5 +633,25 @@
     "isDoc": "N",
     "JrnStatus": "Y",
     "ObjAcronym": ""
+  },
+  {
+    "ObjectID": 305,
+    "ObjectHeaderTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\OFSC",
+    "DocumentName": "Documents Fiscalization",
+    "PermissionName": "document_fiscalization",
+    "RowStatus": "A",
+    "isDoc": "N",
+    "JrnStatus": "N",
+    "children": [
+      {
+        "ChildTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\FSC1",
+        "ChildType": "fiscalization_lines"
+      },
+      {
+        "ChildTable": "Leysco100\\Shared\\Models\\MarketingDocuments\\Models\\FSC2",
+        "ChildType": "document_lines"
+      }
+    ],
+    "ObjAcronym": ""
   }
 ]
