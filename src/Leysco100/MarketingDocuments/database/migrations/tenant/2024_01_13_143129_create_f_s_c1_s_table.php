@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::create('f_s_c1_s', function (Blueprint $table) {
             $table->bigIncrements("id");
-            $table->integer("InvoiceId");
+            $table->integer("DocId");
+            $table->integer('ObjCode')->nullable();
+            $table->integer("DocEntry");
             $table->string("U_ControlCode")->nullable();
             $table->string("U_RelatedInv")->nullable();
             $table->string("U_CUInvoiceNum")->nullable();
