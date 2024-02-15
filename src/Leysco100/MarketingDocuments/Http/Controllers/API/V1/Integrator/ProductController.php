@@ -571,6 +571,55 @@ class ProductController extends Controller
         $data = $request['data'];
 
         $totalSynced = 0;
+        foreach ($data as $key => $value) {
+            try {
+                $priceList = OPLN::where('ExtRef', $value['PriceList'])->first();
+
+                if (!$priceList) {
+
+                    $responseData = (new ApiResponseService())
+                        ->apiIntegratorFailedResponseService(
+                            "Pricelist doest not exist",
+                            404,
+                            "Pricelist doest not exist: " . $value['PriceList']
+                        );
+
+                    return $responseData;
+                }
+
+                ITM9::updateOrCreate(
+                    [
+                        'ItemCode' => $value['ItemCode'],
+                        'PriceList' => $priceList->id,
+                        'UomEntry' => OUOM::where('ExtRef', $value['UomEntry'])->value('id'),
+                        'Currency' => 1,
+                    ],
+                    [
+                        'Price' => $value['Price'],
+                    ]
+                );
+
+
+
+                $totalSynced = $totalSynced + 1;
+            } catch (\Throwable $th) {
+
+                return (new ApiResponseService())
+                    ->apiIntegratorFailedResponseService(
+                        $th->getMessage(),
+                        -1,
+                        "Unkown"
+                    );
+            }
+        }
+
+        return (new ApiResponseService())->apiSuccessResponseService($totalSynced);
+    }
+    public function updateProductUomPricesOld(Request $request)
+    {
+        $data = $request['data'];
+
+        $totalSynced = 0;
         $errRes = [];
         foreach ($data as $key => $value) {
             try {
