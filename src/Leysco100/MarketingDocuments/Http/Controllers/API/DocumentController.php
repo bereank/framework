@@ -997,27 +997,15 @@ class DocumentController extends Controller
             ->where('ObjectID', $ObjType)
             ->first();
 
-        $data = $DocumentTables->ObjectHeaderTable::with('objecttype', 'document_lines')
+        $data = $DocumentTables->ObjectHeaderTable::with(
+            'document_lines:id,DocEntry,LineNum,ItemCode,Dscription,OwnerCode,SerialNum,Quantity,DelivrdQty,InvQty,OpenInvQty,PackQty,Price,DiscPrcnt,Rate,TaxCode,PriceAfVAT,PriceBefDi,LineTotal,WhsCode,ShipDate,SlpCode,Commission,AcctCode,OcrCode,OcrCode2,OcrCode3,OcrCode4,OcrCode5,OpenQty,GrossBuyPr,GPTtlBasPr,BaseType,BaseRef,BaseEntry,BaseLine,VatSum,GrssProfit,PoTrgNum,OrigItem,BackOrdr,FreeTxt,TrnsCode,UomCode,unitMsr,NumPerMsr,Text,GTotal,AgrNo,CogsOcrCod,CogsOcrCo2,CogsOcrCo3,CogsOcrCo4,CogsOcrCo5,PQTReqDate,FromWhsCod,BPLId,WhsName'
+        )
             ->where('id', $request["id"])
             ->first();
 
         //check if document is closed
         //        if (($data->ExtRef && strtolower($data->ExtRef) != "n/a")  || $data->DocStatus == "C") {
-        if ($data->DocStatus == "C") {
-            return (new ApiResponseService())
-                ->apiFailedResponseService("You Cannot Edit the document,Its Closed");
-        }
 
-        // if (!$request['BPLId'] && $ObjType != 205) {
-
-        //     return (new ApiResponseService())
-        //         ->apiFailedResponseService("Branch is Required");
-        // }
-
-        if (!$request['DocDueDate'] && $ObjType != 205) {
-            return (new ApiResponseService())
-                ->apiFailedResponseService("Delivery Date Required");
-        }
 
         if (!$DocumentTables) {
             return (new ApiResponseService())
@@ -1040,6 +1028,21 @@ class DocumentController extends Controller
                     ->apiFailedResponseService("Required date is required");
             }
         }
+        if ($data->DocStatus == "C") {
+            return (new ApiResponseService())
+                ->apiFailedResponseService("You Cannot Edit the document,Its Closed");
+        }
+
+        if (array_key_exists('BPLId', $request->all()) && empty($request['BPLId']) && $ObjType != 205) {
+
+            return (new ApiResponseService())
+                ->apiFailedResponseService("Branch is Required");
+        }
+
+        if (array_key_exists('DocDueDate', $request->all()) && empty($request['DocDueDate'] && $ObjType != 205)) {
+            return (new ApiResponseService())
+                ->apiFailedResponseService("Delivery Date Required");
+        }
 
         /**
          * Mapping Req Name
@@ -1056,64 +1059,42 @@ class DocumentController extends Controller
             }
         }
 
-        $CardCode = $request['CardCode'];
+        $CardCode =  $request['CardCode'] ??  $data->CardCode;
         $customerDetails = OCRD::where('CardCode', $CardCode)->first();
 
-        $DocNum = (new DocumentsService())
-            ->documentNumberingService(
-                $request['DocNum'],
-                $request['Series']
-            );
+
         DB::connection("tenant")->beginTransaction();
         try {
-            $data->update([
-                'Series' => $request['Series'],
-                'DocNum' => $DocNum,
-                'SlpCode' => $request['SlpCode'], // Sales Employee
-                //                'U_SalePipe' => $request['U_SalePipe'], // Sales Pipe Line
+            $request = $request->all();
 
-                //                'U_CashName' => $request['U_CashName'], //Cash Customer  Name
-                //                'U_CashNo' => $request['U_CashNo'], // Cash Customer No
-                //                'U_CashMail' => $request['U_CashMail'], // Cash Customer Email
-                //                'U_IDNo' => $request['U_IDNo'], // Id no
-                'NumAtCard' => $request['NumAtCard'] ? $request['NumAtCard'] : null,
-                'CurSource' => $request['CurSource'],
-                'DocTotal' => $request['DocTotal'] ?? 0,
-                'VatSum' => $request['VatSum'] ?? 0,
-                'DocDate' => $request['DocDate'], //PostingDate
-                'TaxDate' => $request['TaxDate'], //Document Date
-                'DocDueDate' => $request['DocDueDate'], // Delivery Date
-                'ReqDate' => $request['DocDueDate'],
-                'CntctCode' => $request['CntctCode'], //Contact Person
-                'AgrNo' => $request['AgrNo'],
-                'LicTradNum' => $request['LicTradNum'],
-                'BaseEntry' => $request['BaseEntry'] ? $request['BaseEntry'] : null, //BaseKey
-                'BaseType' => $request['BaseType'] ? $request['BaseType'] : null, //BaseKey
+            $data->update([
+                'SlpCode' => array_key_exists('SlpCode', $request) ? $request['SlpCode'] : $data->SlpCode,
+                'NumAtCard' => array_key_exists('NumAtCard', $request) ? $request['NumAtCard'] : $data->NumAtCard,
+                'CurSource' => array_key_exists('CurSource', $request) ? $request['CurSource'] : $data->CurSource,
+                'DocTotal' => array_key_exists('DocTotal', $request) ? $request['DocTotal'] : $data->DocTotal,
+                'VatSum' => array_key_exists('VatSum', $request) ? $request['VatSum'] : $data->VatSum,
+                'DocDate' => array_key_exists('DocDate', $request) ? $request['DocDate'] : $data->DocDate,
+                'TaxDate' => array_key_exists('TaxDate', $request) ? $request['TaxDate'] : $data->TaxDate,
+                'DocDueDate' => array_key_exists('DocDueDate', $request) ? $request['DocDueDate'] : $data->DocDueDate,
+                'ReqDate' => array_key_exists('ReqDate', $request) ? $request['ReqDate'] : $data->ReqDate,
+                'CntctCode' => array_key_exists('CntctCode', $request) ? $request['CntctCode'] : $data->CntctCode,
+                'AgrNo' => array_key_exists('AgrNo', $request) ? $request['AgrNo'] : $data->AgrNo,
+                'LicTradNum' => array_key_exists('LicTradNum', $request) ? $request['LicTradNum'] : $data->LicTradNum,
+                'BaseEntry' => array_key_exists('BaseEntry', $request) ? $request['BaseEntry'] : $data->BaseEntry,
+                'BaseType' => array_key_exists('BaseType', $request) ? $request['BaseType'] : $data->BaseType,
                 'UserSign2' => $user->id,
-                'Ref2' => $request['Ref2'] ? $request['Ref2'] : null, // Ref2
-                'GroupNum' => $request['GroupNum'] ? $request['GroupNum'] : null, //[Price List]
-                'ToWhsCode' => $request['ToWhsCode'] ? $request['ToWhsCode'] : null, //To Warehouse Code
-                'DiscPrcnt' => $request['DiscPrcnt'] ?? 0, //Discount Percentages
-                'DiscSum' => $request['DiscSum'] ?? 0, // Discount Sum
-                'BPLId' => $request['BPLId'],
-                //                'U_SaleType' => $request['U_SaleType'], // Sale Type
-                'Comments' => $request['Comments'], //comments
-                'NumAtCard2' => $request['NumAtCard2'],
-                'JrnlMemo' => $request['JrnlMemo'], // Journal Remarks
-                'UseShpdGd' => $request['UseShpdGd'] ?? "N",
-                'Rounding' => $request['Rounding'] ?? "N",
-                'RoundDif' => $request['RoundDif'] ?? 0,
-                //                'U_ServiceCall' => $request['U_ServiceCall'],
-                //                'U_DemoLocation' => $request['U_DemoLocation'],
-                //                'U_Technician' => $request['U_Technician'],
-                //                'U_Location' => $request['U_Location'],
-                //                'U_MpesaRefNo' => $request['U_MpesaRefNo'],
-                //                'U_PCash' => $request['U_PCash'],
-                //                'U_transferType' => $request['U_transferType'],
-                //                'U_SSerialNo' => $request['U_SSerialNo'],
-                //                'U_TypePur' => $request['U_TypePur'],
-                //                'U_NegativeMargin' => $request['U_NegativeMargin'],
-                //                'U_BaseDoc' => $request['U_BaseDoc'],
+                'Ref2' => array_key_exists('Ref2', $request) ? $request['Ref2'] : $data->Ref2,
+                'GroupNum' => array_key_exists('GroupNum', $request) ? $request['GroupNum'] : $data->GroupNum,
+                'ToWhsCode' => array_key_exists('ToWhsCode', $request) ? $request['ToWhsCode'] : $data->ToWhsCode,
+                'DiscPrcnt' => array_key_exists('DiscPrcnt', $request) ? $request['DiscPrcnt'] : $data->DiscPrcnt,
+                'DiscSum' => array_key_exists('DiscSum', $request) ? $request['DiscSum'] : $data->DiscSum,
+                'BPLId' => array_key_exists('BPLId', $request) ? $request['BPLId'] : $data->BPLId,
+                'Comments' => array_key_exists('Comments', $request) ? $request['Comments'] : $data->Comments,
+                'NumAtCard2' => array_key_exists('NumAtCard2', $request) ? $request['NumAtCard2'] : $data->NumAtCard2,
+                'JrnlMemo' => array_key_exists('JrnlMemo', $request) ? $request['JrnlMemo'] : $data->JrnlMemo,
+                'UseShpdGd' => array_key_exists('UseShpdGd', $request) ? $request['UseShpdGd'] : $data->UseShpdGd,
+                'Rounding' => array_key_exists('Rounding', $request) ? $request['Rounding'] : $data->Rounding,
+                'RoundDif' => array_key_exists('RoundDif', $request) ? $request['RoundDif'] : $data->RoundDif,
                 'Transfered' => "N",
             ]);
 
@@ -1122,18 +1103,38 @@ class DocumentController extends Controller
                 foreach ($request["UserFields"] as $key => $field) {
                     $userFields[$key] = $field;
                 }
-                $data->update($userFields);
+
+                if (!empty($userFields)) {
+                    $data->update($userFields);
+                }
             }
 
-            $DocumentTables->pdi1[0]['ChildTable']::where('DocEntry', $DocEntry)->delete();
+            $documentOldLines = $data->document_lines->pluck('id');
+
+            $documentNewLines = collect($request['document_lines'])->pluck('id')->all();
+
+
+            $difference = $documentOldLines->diff($documentNewLines);
+
+            $ToupdateLines = collect($request['document_lines'])->filter(function ($item) use ($documentOldLines) {
+                return isset($item['id']) && $documentOldLines->contains($item['id']);
+            })->values()->all();
+
+
+            foreach ($difference as $id) {
+                $DocumentTables->pdi1[0]['ChildTable']::where('id', $id)->delete();
+            }
 
             //Updating Line Details
 
             $documentRows = [];
-            foreach ($request['document_lines'] as $key => $value) {
+            foreach ($ToupdateLines as $key => $value) {
+                //$oldLine= $documentOldLines->contains($value['id']);
+
+                $documentOldLinesData = $data->document_lines->where('id', $value['id'])->values();
+
                 $LineNum = $key;
                 $ItemCode = null;
-                $Dscription = $value['Dscription'];
 
                 if ($request['DocType'] == "I") {
                     $product = OITM::Where('ItemCode', $value['ItemCode'])
@@ -1193,98 +1194,90 @@ class DocumentController extends Controller
                         }
                     }
 
-                    if ($value['Quantity'] <= 0) {
+                    if (array_key_exists('Quantity', $value) && $value <= 0) {
                         return (new ApiResponseService())
                             ->apiFailedResponseService("Invalid quantity   for item:" . $value['Dscription']);
                     }
 
-                    if ($value['Price'] < 0) {
+                    if (array_key_exists('Price', $value) && $value['Price'] < 0) {
                         return (new ApiResponseService())
                             ->apiFailedResponseService("Invalid price for item:" . $value['Dscription']);
                     }
                 }
 
-                if (!isset($value['Dscription'])) {
-                    return (new ApiResponseService())
-                        ->apiFailedResponseService("Description Required");
-                }
-
                 $DiscPrcn = $value['DiscPrcnt'] ?? 0;
                 $rowdetails = [
                     'DocEntry' => $data->id,
-                    'OwnerCode' => $request['OwnerCode'], //Owner Code
+                    'OwnerCode' => array_key_exists('OwnerCode', $value) ? $value['OwnerCode'] : $documentOldLinesData[0]->OwnerCode,
                     'LineNum' => $LineNum, //    Row Number
                     'ItemCode' => $ItemCode, //    Item ID from OITM AUTO INCREMENT
-                    'Dscription' => $Dscription, // Item Description
-                    'CodeBars' => $value['CodeBars'] ?? null, //    Bar Code
-                    'SerialNum' => $value['SerialNum']?? null, //    Serial No.
-                    'Quantity' => $value['Quantity'] ?? 1, //    Quantity
-                    'DelivrdQty' => $value['DelivrdQty'] ?? null, //    Delivered Qty
-                    'InvQty' => $value['InvQty'], //   Qty(Inventory UoM)
-                    'OpenInvQty' => $value['OpenInvQty'], //Open Inv. Qty ------
-                    'PackQty' => $value['PackQty'], //    No. of Packages
-                    'Price' => $DiscPrcn == 0 ? $value['Price'] : $value['PriceBefDi'], //    Price After Discount
-                    'DiscPrcnt' => array_key_exists('DiscPrcnt', $value) ? $value['DiscPrcnt'] : 0, //    Discount %
-                    'Rate' => array_key_exists('Rate', $value) ? $value['Rate'] : null, //    Rate
-                    'TaxCode' => array_key_exists('TaxCode', $value) ? $value['TaxCode'] : null, //    Tax Code
-                    'PriceAfVAT' => array_key_exists('PriceAfVAT', $value) ? $value['PriceAfVAT'] : 0, //       Gross Price after Discount
-                    'PriceBefDi' => array_key_exists('PriceBefDi', $value) ? $value['PriceBefDi'] : 0, // Unit Price
-                    'LineTotal' => $value['LineTotal'] ?? $value['Price'], //    Total (LC)
-                    'WhsCode' => $value['WhsCode'] ?? null, //    Warehouse Code
-                    'ShipDate' => array_key_exists('ShipDate', $value) ? $value['ShipDate'] : null, //    Del. Date
-                    'SlpCode' => $request['SlpCode'], //    Sales Employee
-                    'Commission' => array_key_exists('Commission', $value) ? $value['Commission'] : null, //    Comm. %
-                    'AcctCode' => array_key_exists('AcctCode', $value) ? $value['AcctCode'] : null, //    G/L Account
-                    'OcrCode' => $value['OcrCode'] ?? null, //    Dimension 1
-                    'OcrCode2' => $value['OcrCode2'] ?? null, //    Dimension 2
-                    'OcrCode3' => $value['OcrCode3'] ?? null, //    Dimension 3
-                    'OcrCode4' => $value['OcrCode4'] ?? null, //    Dimension 4
-                    'OcrCode5' => $value['OcrCode5'] ?? null, //    Dimension 5
-                    'OpenQty' => array_key_exists('Quantity', $value) ? $value['Quantity'] : null, //    Open Inv. Qty
-                    'GrossBuyPr' => array_key_exists('GrossBuyPr', $value) ? $value['GrossBuyPr'] : null, //   Gross Profit Base Price
-                    'GPTtlBasPr' => array_key_exists('GPTtlBasPr', $value) ? $value['GPTtlBasPr'] : null, //    Gross Profit Total Base Price
+                    'Dscription' => array_key_exists('Dscription', $value) ? $value['Dscription'] : $documentOldLinesData[0]->Dscription,
+                    // 'CodeBars' => array_key_exists('CodeBars', $value) ? $value['CodeBars'] : $documentOldLinesData[0]->CodeBars, //    Bar Code
+                    'SerialNum' => array_key_exists('SerialNum', $value) ? $value['SerialNum'] : $documentOldLinesData[0]->SerialNum,
+                    //    Serial No.
+                    'Quantity' => array_key_exists('Quantity', $value) ? $value['Quantity'] : $documentOldLinesData[0]->Quantity,
+                    'DelivrdQty' => array_key_exists('DelivrdQty', $value) ? $value['DelivrdQty'] : $documentOldLinesData[0]->DelivrdQty,
+                    'InvQty' => array_key_exists('InvQty', $value) ? $value['InvQty'] : $documentOldLinesData[0]->InvQty,
+                    'OpenInvQty' => array_key_exists('OpenInvQty', $value) ? $value['OpenInvQty'] : $documentOldLinesData[0]->OpenInvQty,
+                    'PackQty' => array_key_exists('PackQty', $value) ? $value['PackQty'] : $documentOldLinesData[0]->PackQty,
+                    'Price' => array_key_exists('Price', $value) ? $value['Price'] : $documentOldLinesData[0]->Price,
+                    'DiscPrcnt' => array_key_exists('DiscPrcnt', $value) ? $value['DiscPrcnt'] : $documentOldLinesData[0]->DiscPrcnt,
+                    'Rate' => array_key_exists('Rate', $value) ? $value['Rate'] : $documentOldLinesData[0]->Rate,
+                    'TaxCode' => array_key_exists('TaxCode', $value) ? $value['TaxCode'] : $documentOldLinesData[0]->TaxCode,
+                    'PriceAfVAT' => array_key_exists('PriceAfVAT', $value) ? $value['PriceAfVAT'] : $documentOldLinesData[0]->PriceAfVAT,
+                    'PriceBefDi' => array_key_exists('PriceBefDi', $value) ? $value['PriceBefDi'] : $documentOldLinesData[0]->PriceBefDi,
+                    'LineTotal' => array_key_exists('LineTotal', $value) ? $value['LineTotal'] : $documentOldLinesData[0]->LineTotal,
+                    'WhsCode' => array_key_exists('WhsCode', $value) ? $value['WhsCode'] : $documentOldLinesData[0]->WhsCode,
+                    'ShipDate' => array_key_exists('ShipDate', $value) ? $value['ShipDate'] : $documentOldLinesData[0]->ShipDate,
+                    'SlpCode' => array_key_exists('SlpCode', $value) ? $value['SlpCode'] : $documentOldLinesData[0]->SlpCode,
+                    'Commission' => array_key_exists('Commission', $value) ? $value['Commission'] : $documentOldLinesData[0]->Commission,
+                    'AcctCode' => array_key_exists('AcctCode', $value) ? $value['AcctCode'] : $documentOldLinesData[0]->AcctCode,
+                    'OcrCode' => array_key_exists('OcrCode', $value) ? $value['OcrCode'] : $documentOldLinesData[0]->OcrCode,
+                    'OcrCode2' => array_key_exists('OcrCode2', $value) ? $value['OcrCode2'] : $documentOldLinesData[0]->OcrCode2,
+                    'OcrCode3' => array_key_exists('OcrCode3', $value) ? $value['OcrCode3'] : $documentOldLinesData[0]->OcrCode3,
 
-                    'BaseType' => $request['BaseType'] ?? null, //    Base Type
-                    'BaseRef' => $request['BaseRef'] ?? null, //    Base Ref.
-                    'BaseEntry' => $request['BaseEntry'] ?? null, //    Base Key
-                    'BaseLine' => $value['BaseLine'] ?? null, //    Base Row
+                    'OcrCode4' => array_key_exists('OcrCode4', $value) ? $value['OcrCode4'] : $documentOldLinesData[0]->OcrCode4,
+                    'OcrCode5' => array_key_exists('OcrCode5', $value) ? $value['OcrCode5'] : $documentOldLinesData[0]->OcrCode5,
+                    'OpenQty' => array_key_exists('OpenQty', $value) ? $value['OpenQty'] : $documentOldLinesData[0]->OpenQty,
 
-                    'SpecPrice' => array_key_exists('SpecPrice', $value) ? $value['SpecPrice'] : null, //    Price Source
-                    'VatSum' => array_key_exists('VatSum', $value) ? $value['VatSum'] : null, //    Tax Amount (LC)
-                    'GrssProfit' => array_key_exists('GrssProfit', $value) ? $value['GrssProfit'] : null, //    Gross Profit (LC)
-                    'PoTrgNum' => array_key_exists('PoTrgNum', $value) ? $value['PoTrgNum'] : null, //    Procurement Doc.
-                    'OrigItem' => array_key_exists('OrigItem', $value) ? $value['OrigItem'] : null, //    Original Item
-                    'BackOrdr' => array_key_exists('BackOrdr', $value) ? $value['BackOrdr'] : null, //    Partial Delivery
-                    'FreeTxt' => array_key_exists('FreeTxt', $value) ? $value['FreeTxt'] : null, //    Free Text
-                    'TrnsCode' => array_key_exists('TrnsCode', $value) ? $value['TrnsCode'] : null, //    Shipping Type
-                    'UomCode' => $value['UomCode'] ?? null, //    UoM Code
-                    'unitMsr' => array_key_exists('unitMsr', $value) ? $value['unitMsr'] : null, //    UoM Name
-                    'NumPerMsr' => array_key_exists('NumPerMsr', $value) ? $value['NumPerMsr'] : null, //    Items per Unit
-                    'Text' => array_key_exists('Text', $value) ? $value['Text'] : null, //    Item Details
-                    'OwnerCode' => $value['OwnerCode'] ?? null, //    Owner
-                    'GTotal' => array_key_exists('GTotal', $value) ? $value['GTotal'] : null, //    Gross Total
-                    'AgrNo' => array_key_exists('AgrNo', $value) ? $value['AgrNo'] : null, //    Blanket Agreement No.
-                    'LinePoPrss' => array_key_exists('LinePoPrss', $value) ? $value['LinePoPrss'] : null, //    Allow Procmnt. Doc.
+                    'GrossBuyPr' => array_key_exists('GrossBuyPr', $value) ? $value['GrossBuyPr'] : $documentOldLinesData[0]->GrossBuyPr,
+                    'GPTtlBasPr' => array_key_exists('GPTtlBasPr', $value) ? $value['GPTtlBasPr'] : $documentOldLinesData[0]->GPTtlBasPr,
+                    'BaseType' => array_key_exists('BaseType', $value) ? $value['BaseType'] : $documentOldLinesData[0]->BaseType,
+                    'BaseRef' => array_key_exists('BaseRef', $value) ? $value['BaseRef'] : $documentOldLinesData[0]->BaseRef,
+                    'BaseLine' => array_key_exists('BaseLine', $value) ? $value['BaseLine'] : $documentOldLinesData[0]->BaseLine,
+                    'BaseEntry' => array_key_exists('BaseEntry', $value) ? $value['BaseEntry'] : $documentOldLinesData[0]->BaseEntry,
 
-                    //Cogs Values
-                    'CogsOcrCod' => $value['OcrCode'],
-                    'CogsOcrCo2' => $value['OcrCode2'],
-                    'CogsOcrCo3' => $value['OcrCode3'],
-                    'CogsOcrCo4' => $value['OcrCode4'] ?? null,
-                    'CogsOcrCo5' => $value['OcrCode5'] ?? null,
-                    //Inventory Transaction  Value
-                    'PQTReqDate' => $request['ReqDate'],
-                    'FromWhsCod' => $value['FromWhsCod'] ?? null, // // From Warehouse Code
-                    'BPLId' => $request['BPLId'],
-                    'U_StockWhse' => isset($value['U_StockWhse']) ? $value['U_StockWhse'] : null,
-                    'NoInvtryMv' => $value['NoInvtryMv'] ?? "N",
-                    'U_Promotion' => $value['U_Promotion'] ?? 'Charged',
-                    'WhsName' => isset($value['WhsName']) ? $value['WhsName'] : null,
+                    // 'SpecPrice' => array_key_exists('SpecPrice', $value) ? $value['SpecPrice'] : $documentOldLinesData[0]->SpecPrice,
+                    'VatSum' => array_key_exists('VatSum', $value) ? $value['VatSum'] : $documentOldLinesData[0]->VatSum,
+                    'GrssProfit' => array_key_exists('GrssProfit', $value) ? $value['GrssProfit'] : $documentOldLinesData[0]->GrssProfit,
 
+                    'PoTrgNum' => array_key_exists('PoTrgNum', $value) ? $value['PoTrgNum'] : $documentOldLinesData[0]->PoTrgNum,
+                    'OrigItem' => array_key_exists('OrigItem', $value) ? $value['OrigItem'] : $documentOldLinesData[0]->OrigItem,
+                    'BackOrdr' => array_key_exists('BackOrdr', $value) ? $value['BackOrdr'] : $documentOldLinesData[0]->BackOrdr,
+                    'FreeTxt' => array_key_exists('FreeTxt', $value) ? $value['FreeTxt'] : $documentOldLinesData[0]->FreeTxt,
+                    'TrnsCode' => array_key_exists('TrnsCode', $value) ? $value['TrnsCode'] : $documentOldLinesData[0]->TrnsCode,
+                    'UomCode' => array_key_exists('UomCode', $value) ? $value['UomCode'] : $documentOldLinesData[0]->UomCode,
+                    'unitMsr' => array_key_exists('unitMsr', $value) ? $value['unitMsr'] : $documentOldLinesData[0]->unitMsr,
+                    'NumPerMsr' => array_key_exists('NumPerMsr', $value) ? $value['NumPerMsr'] : $documentOldLinesData[0]->NumPerMsr,
+                    'Text' => array_key_exists('Text', $value) ? $value['Text'] : $documentOldLinesData[0]->Text,
+                    'GTotal' => array_key_exists('GTotal', $value) ? $value['GTotal'] : $documentOldLinesData[0]->GTotal,
+                    'AgrNo' => array_key_exists('AgrNo', $value) ? $value['AgrNo'] : $documentOldLinesData[0]->AgrNo,
+                    // 'LinePoPrss' => array_key_exists('LinePoPrss', $value) ? $value['LinePoPrss'] : $documentOldLinesData[0]->LinePoPrss,
+
+                    'CogsOcrCod' => array_key_exists('CogsOcrCod', $value) ? $value['CogsOcrCod'] : $documentOldLinesData[0]->CogsOcrCod,
+                    'CogsOcrCo2' => array_key_exists('CogsOcrCo2', $value) ? $value['CogsOcrCo2'] : $documentOldLinesData[0]->CogsOcrCo2,
+                    'CogsOcrCo3' => array_key_exists('CogsOcrCo3', $value) ? $value['CogsOcrCo3'] : $documentOldLinesData[0]->CogsOcrCo3,
+                    'CogsOcrCo4' => array_key_exists('CogsOcrCo4', $value) ? $value['CogsOcrCo4'] : $documentOldLinesData[0]->CogsOcrCo4,
+                    'CogsOcrCo5' => array_key_exists('CogsOcrCo5', $value) ? $value['CogsOcrCo5'] : $documentOldLinesData[0]->CogsOcrCo5,
+                    'PQTReqDate' => array_key_exists('PQTReqDate', $value) ? $value['PQTReqDate'] : $documentOldLinesData[0]->PQTReqDate,
+                    'FromWhsCod' => array_key_exists('FromWhsCod', $value) ? $value['FromWhsCod'] : $documentOldLinesData[0]->FromWhsCod,
+                    'BPLId' => array_key_exists('BPLId', $value) ? $value['BPLId'] : $documentOldLinesData[0]->BPLId,
+                    // 'NoInvtryMv' => array_key_exists('NoInvtryMv', $value) ? $value['NoInvtryMv'] : $documentOldLinesData[0]->NoInvtryMv,
+                    'WhsName' => array_key_exists('WhsName', $value) ? $value['WhsName'] : $documentOldLinesData[0]->WhsName,
                 ];
 
-                $rowItems = new $DocumentTables->pdi1[0]['ChildTable']($rowdetails);
-                $rowItems->save();
+                $rowItems =  $DocumentTables->pdi1[0]['ChildTable']::where('id', $value['id'])->update($rowdetails);
+
 
                 /**
                  * Saving Serial Numbers
@@ -1314,7 +1307,7 @@ class DocumentController extends Controller
                                 "CardCode" => $CardCode,
                                 "CardName" => $customerDetails ? $customerDetails->CardName : null,
                                 "WhsCode" => $value['WhsCode'],
-                                "ItemName" => $Dscription,
+                                "ItemName" => array_key_exists('Dscription', $value) ? $value['Dscription'] : $documentOldLinesData[0]->Dscription,
                             ]);
                         }
                     }
