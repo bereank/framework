@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('o_f_s_c_s', function (Blueprint $table) {
+        Schema::create('f_s_c2_s', function (Blueprint $table) {
             $table->bigIncrements("id");
-            $table->integer("InvoiceId");
+            $table->integer("DocId");
+            $table->integer("DocEntry");
+            $table->integer('ObjType')->default(305)->nullable();
+            $table->integer('ObjCode')->nullable();
             $table->timestamps();
         });
     }
@@ -23,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('o_f_s_c_s');
+        Schema::dropIfExists('f_s_c2_s');
     }
 };
