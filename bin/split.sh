@@ -24,9 +24,11 @@ remote gpm git@github.com:leysco100/gpm.git
 remote administration git@github.com:leysco100/administration.git
 remote business-partner git@github.com:leysco100/business-partner.git
 remote inventory git@github.com:leysco100/inventory.git
+remote payments git@github.com:leysco100/payments.git
 
 split 'src/Leysco100/Shared' shared
 split 'src/Leysco100/Gpm' gpm
 split 'src/Leysco100/Administration' administration
 split 'src/Leysco100/BusinessPartner' business-partner
 split 'src/Leysco100/Inventory' inventory
+split 'src/Leysco100/Payments' payments
