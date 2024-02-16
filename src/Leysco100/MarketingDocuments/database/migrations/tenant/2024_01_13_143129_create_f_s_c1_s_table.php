@@ -13,18 +13,18 @@ return new class extends Migration
     {
         Schema::create('f_s_c1_s', function (Blueprint $table) {
             $table->bigIncrements("id");
-            $table->integer("DocId");
-            $table->integer('ObjCode')->nullable();
             $table->integer("DocEntry");
-            $table->string("U_ControlCode")->nullable();
-            $table->string("U_RelatedInv")->nullable();
-            $table->string("U_CUInvoiceNum")->nullable();
-            $table->string("U_QRCode")->nullable();
-            $table->string("U_QrLocation")->nullable();
-            $table->string("U_ReceiptNo")->nullable();
-            $table->string("U_CommitedTime")->nullable();
-            $table->integer("statusCode")->comment("0 for success, 1 for failed");
+            $table->string("ControlCode")->nullable();
+            $table->string("RelatedInvNum")->nullable();
+            $table->string("BaseInvNum")->nullable();
+            $table->string("RAuthorityURL")->nullable();
+            $table->string("CUInvNum")->nullable();
+            $table->string("ReceiptNo")->nullable();
+            $table->string("DeviceSerialNo")->nullable();
             $table->text("message");
+            $table->integer('Status')->nullable()->comment("0 for success, 1 for failed");
+            $table->string('Canceled',50)->nullable();
+            $table->integer('LogInst',50)->nullable();
             $table->text("cache")->nullable();
             $table->timestamps();
         });
