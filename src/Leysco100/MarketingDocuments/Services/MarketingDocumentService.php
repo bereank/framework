@@ -249,22 +249,22 @@ class MarketingDocumentService
                         $documentLines[$key]['Price']  = $grossPrice;
                         $documentLines[$key]['PriceBefDi']  = $unitPrice ?? null;
                         $documentLines[$key]['PriceAfVAT']  = $grossPrice;
-                        if ($line['formattedPrice']) {
+                        if (data_get($line ,'formattedPrice')) {
                             $documentLines[$key]['Price']  = $line['formattedPrice'];
                         }
-                        if ($line['formattedPriceBefDisc']) {
+                        if (data_get($line,'formattedPriceBefDisc')) {
                             $documentLines[$key]['PriceBefDi']  = $line['formattedPriceBefDisc'];
                         }
-                        if ($line['Quantity']  && isset($unitPrice)) {
+                        if (data_get($line,'Quantity')  && isset($unitPrice)) {
                             $documentLines[$key]['LineTotal']  =  round($line['Quantity']  * $unitPrice, 2);
                         }
-                        if ($line['formattedLineTotal']) {
+                        if (data_get($line,'formattedLineTotal')) {
                             $documentLines[$key]['LineTotal']  =  $line['formattedLineTotal'];
                         }
-                        if ($line['Quantity']  &&  isset($grossPrice)) {
+                        if (data_get($line,'Quantity')  &&  isset($grossPrice)) {
                             $documentLines[$key]['GTotal']  = round($line['Quantity']  * $grossPrice, 2);
                         }
-                        if ($line['GTotal']) {
+                        if (data_get($line,'GTotal')) {
                             $documentLines[$key]['GTotal']  = $line['GTotal'];
                         }
                         $documentLines[$key]['VatSum']  = $vatSum;
