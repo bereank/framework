@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('f_s_c2_s', function (Blueprint $table) {
             $table->bigIncrements("id");
-            $table->integer("DocId");
+            $table->integer('BaseDocEntry')->nullable();
             $table->integer("DocEntry");
             $table->integer('ObjType')->default(305)->nullable();
-            $table->integer('ObjCode')->nullable();
+            $table->integer('ObjectCode')->nullable();    
             $table->timestamps();
         });
     }

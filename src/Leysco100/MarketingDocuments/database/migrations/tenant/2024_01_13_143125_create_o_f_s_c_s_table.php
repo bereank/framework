@@ -13,11 +13,14 @@ return new class extends Migration
     {
         Schema::create('o_f_s_c_s', function (Blueprint $table) {
             $table->bigIncrements("id");
-            $table->integer("DocEntry");
-            $table->integer("UserSign")->nullable();
-            $table->string("OwnerCode", 50)->nullable();
             $table->integer('ObjType')->default(305)->nullable();
-            $table->integer('ObjCode')->nullable();
+            $table->integer('ObjectCode')->nullable();
+            $table->integer('BaseDocEntry')->nullable();
+            $table->integer("UserSign")->nullable();    
+            $table->string("OwnerCode", 50)->nullable();
+            $table->integer('Status')->nullable();
+            $table->string('Canceled',50)->nullable();
+            $table->integer('LogInst',50)->nullable();
             $table->timestamps();
         });
     }

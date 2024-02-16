@@ -86,22 +86,22 @@ class FiscalizationController extends Controller
             return (new ApiResponseService())
                 ->apiFailedResponseService("The Document is Closed");
         }
-
+      
 
         try {
             DB::connection("tenant")->beginTransaction();
             $ofsc = new OFSC();
 
             if (!is_array($doc_ids)) {
-                $ofsc->DocEntry = $request->DocEntry;
-                $ofsc->ObjCode = $request['ObjType'];
+                $ofsc->BaseDocEntry = $request->DocEntry;
+                $ofsc->ObjectCode = $request['ObjType'];
                 $ofsc->UserSign = Auth::user()->id;
                 $ofsc->OwnerCode = Auth::user()->EmpID;
                 $ofsc->save();
                 FSC2::create([
                     "DocEntry" => $ofsc->id,
-                    'ObjCode' => $request['ObjType'],
-                    'DocId' => $request->DocEntry,
+                    'ObjectCode' => $request['ObjType'],
+                    'BaseDocEntry' => $request->DocEntry,
                 ]);
             } else {
                 $data = [];
@@ -115,8 +115,8 @@ class FiscalizationController extends Controller
                     ]);
                     FSC2::create([
                         "DocEntry" => $ofsc->id,
-                        'ObjCode' =>  $request['ObjType'],
-                        'DocId' => $doc_id,
+                        'ObjectCode' =>  $request['ObjType'],
+                        'BaseDocEntry' => $doc_id,
                     ]);
                 }
             }
@@ -153,7 +153,7 @@ class FiscalizationController extends Controller
 
         try {
             DB::connection("tenant")->beginTransaction();
-            $ofsc = OFSC::where('id', $id)->first();
+            $ofsc = OFSC::where('id', $request["DocEntry"])->first();
 
             if (!$ofsc) {
 
@@ -162,24 +162,18 @@ class FiscalizationController extends Controller
             //step one: create new record on fsc1 table
             $fsc1 = FSC1::firstOrCreate(
                 [
-                    'DocId' => $id,
-                    'ObjCode' => $request["ObjCode"],
-                    'DocEntry' => $request["DocEntry"]
-                ],
-                [
+                    'DocEntry' => $request["DocEntry"],
                     'cache' => json_encode($request->all()),
-                    'U_ControlCode' => $request["U_ControlCode"],
-                    'U_RelatedInv' => $request["U_RelatedInv"],
-                    'U_CUInvoiceNum' => $request["U_CUInvoiceNum"],
-                    'U_QRCode' => $request["U_QRCode"],
-                    'U_QrLocation' => $request["U_QrLocation"],
-                    'U_ReceiptNo' => $request["U_ReceiptNo"],
-                    'U_CommitedTime' => $request["U_CommitedTime"],
+                    'RelatedInvNum' => $request["RelatedInvNum"],
+                    'BaseInvNum' => $request["BaseInvNum"],
+                    'ControlCode' => $request["ControlCode"],
+                    'RAuthorityURL' => $request["RAuthorityURL"],
+                    'CUInvNum' => $request["CUInvNum"],
+                    'ReceiptNo' => $request["ReceiptNo"],
                     'message' => $request["message"],
                     'statusCode' => $request["statusCode"],
                 ]
             );
-
             //step two: delete existing fsc2 record
             FSC2::where('DocEntry', $request["DocEntry"])->delete();
             DB::connection("tenant")->commit();
