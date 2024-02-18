@@ -18,17 +18,23 @@ class FiscalizationController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        try {
-            DB::connection("tenant")->beginTransaction();
-            $data = FSC2::all()->toArray();
-            //            $data = OFSC::select("InvoiceId")->get()->toArray();
+        $object_type = $request->query('object_type',  13);
 
+        try {
+            $data = FSC2::where('ObjectCode', $object_type)
+                ->select(
+                    "id",
+                    "BaseDocEntry",
+                    "DocEntry",
+                    "ObjType",
+                    "ObjectCode"
+                )
+                ->get()->toArray();
             return (new ApiResponseService())->apiSuccessResponseService($data);
-        } catch (\Throwable $th) {
-            DB::connection("tenant")->rollBack();
-            return (new ApiResponseService())->apiFailedResponseService($th);
+        } catch (\Exception $e) {
+            return (new ApiResponseService())->apiFailedResponseService($e->getMessage());
         }
     }
 
@@ -86,7 +92,7 @@ class FiscalizationController extends Controller
             return (new ApiResponseService())
                 ->apiFailedResponseService("The Document is Closed");
         }
-      
+
 
         try {
             DB::connection("tenant")->beginTransaction();
@@ -160,18 +166,18 @@ class FiscalizationController extends Controller
                 return (new ApiResponseService())->apiFailedResponseService("Data not found");
             }
             //step one: create new record on fsc1 table
-            $fsc1 = FSC1::firstOrCreate(
+            $fsc1 = FSC1::create(
                 [
                     'DocEntry' => $request["DocEntry"],
                     'cache' => json_encode($request->all()),
-                    'RelatedInvNum' => $request["RelatedInvNum"],
-                    'BaseInvNum' => $request["BaseInvNum"],
-                    'ControlCode' => $request["ControlCode"],
-                    'RAuthorityURL' => $request["RAuthorityURL"],
-                    'CUInvNum' => $request["CUInvNum"],
-                    'ReceiptNo' => $request["ReceiptNo"],
-                    'message' => $request["message"],
-                    'statusCode' => $request["statusCode"],
+                    'RelatedInvNum' => $request["RelatedInvNum"] ?? null,
+                    'BaseInvNum' => $request["BaseInvNum"] ?? null,
+                    'ControlCode' => $request["ControlCode"] ?? null,
+                    'RAuthorityURL' => $request["RAuthorityURL"] ?? null,
+                    'CUInvNum' => $request["CUInvNum"] ?? null,
+                    'ReceiptNo' => $request["ReceiptNo"] ?? null,
+                    'message' => $request["message"] ?? null,
+                    'Status' => $request["statusCode"] ?? null,
                 ]
             );
             //step two: delete existing fsc2 record
