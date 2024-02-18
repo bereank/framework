@@ -233,11 +233,11 @@ class DocumentController extends Controller
             "RelatedInvNum" => $data->U_RelatedInv,
             "CUInvNum" => $data->U_CUInvoiceNum,
             "RAuthorityURL" => $data->U_QRCode,
-           // "U_QrLocation" => $data->U_QrLocation,
+            // "U_QrLocation" => $data->U_QrLocation,
             "ReceiptNo" => $data->U_ReceiptNo,
             // "U_CommitedTime" => $data->U_CommitedTime,
-            "DeviceSerialNo"=> null,
-            "BaseInvNum"=>$data->id
+            "DeviceSerialNo" => null,
+            "BaseInvNum" => $data->id
         ];
 
         //        $data['doctype'] = $ObjType;
@@ -957,22 +957,36 @@ class DocumentController extends Controller
                 $data->update([
                     "AtcEntry" => $attachment->id
                 ]);
-                foreach ($request['files'] as $key => $value) {
-                    $fileUpload = new ATC1();
-                    $fileUpload->AbsEntry = $attachment->id;
-                    $file_name = $DocEntry . rand(1, 100000) . "." . $value->getClientOriginalExtension();
-                    $file_path = $value->storeAs("attachments/" . $ObjType . "/" . $DocEntry, $file_name, 'public');
-                    $fileUpload->FileName = $value->getClientOriginalName();
-                    $fileUpload->FileExt = $value->getClientOriginalExtension();
-                    $fileUpload->trgtPath = '/storage/' . $file_path;
-                    $fileUpload->Date = date("Y-m-d");
-                    $fileUpload->UsrID = Auth::user()->id;
-                    $fileUpload->save();
+                // Check if the request contains JSON data
+                if ($request->isJson()) {
+                    foreach ($request['files'] as $key => $value) {
+                        $fileUpload = new ATC1();
+                        $fileUpload->AbsEntry = $attachment->id;
+                        $fileUpload->FileName = $value['file_name'] ?? null;
+                        $fileUpload->FileExt = $value['FileExt'] ?? $key;
+                        $fileUpload->trgtPath = $value['trgtPath'] ?? null;
+                        $fileUpload->Date = date("Y-m-d");
+                        $fileUpload->UsrID = Auth::user()->id;
+                        $fileUpload->save();
+                    }
+                } else {
+                    foreach ($request['files'] as $key => $value) {
+                        $fileUpload = new ATC1();
+                        $fileUpload->AbsEntry = $attachment->id;
+                        $file_name = $DocEntry . rand(1, 100000) . "." . $value->getClientOriginalExtension();
+                        $file_path = $value->storeAs("attachments/" . $ObjType . "/" . $DocEntry, $file_name, 'public');
+                        $fileUpload->FileName = $value->getClientOriginalName();
+                        $fileUpload->FileExt = $value->getClientOriginalExtension();
+                        $fileUpload->trgtPath = '/storage/' . $file_path;
+                        $fileUpload->Date = date("Y-m-d");
+                        $fileUpload->UsrID = Auth::user()->id;
+                        $fileUpload->save();
+                    }
                 }
                 return (new ApiResponseService())->apiSuccessResponseService("Uploaded Successfully");
             } catch (\Throwable $th) {
                 Log::info($th);
-                return (new ApiResponseService())->apiFailedResponseService("Error uploading attachment");
+                return (new ApiResponseService())->apiFailedResponseService("Error uploading attachment".$th->getMessage());
             }
         }
         return (new ApiResponseService())->apiFailedResponseService("No attachment files found");

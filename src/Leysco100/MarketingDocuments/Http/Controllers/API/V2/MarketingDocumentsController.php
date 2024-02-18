@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Models\Banking\Models\PDF2;
 use Leysco100\Shared\Models\Banking\Models\RCT2;
@@ -493,8 +494,6 @@ class MarketingDocumentsController extends Controller
         $docData = (new MapApiFieldAction())->handle($defaulted_data, $DocumentTables);
         // Update  Document
 
-
-        return   $docData;
         $newDoc =  (new MarketingDocumentService())->updateDoc($docData, $ObjType, $Headerdata);
 
         return (new ApiResponseService())->apiSuccessResponseService($newDoc);
