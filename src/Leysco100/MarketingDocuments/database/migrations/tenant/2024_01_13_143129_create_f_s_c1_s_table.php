@@ -23,8 +23,8 @@ return new class extends Migration
             $table->string("DeviceSerialNo")->nullable();
             $table->text("message");
             $table->integer('Status')->nullable()->comment("0 for success, 1 for failed");
-            $table->string('Canceled',50)->nullable();
-            $table->integer('LogInst',50)->nullable();
+            $table->string('Canceled', 1)->default('N')->nullable();
+            $table->integer('LogInst')->nullable();
             $table->text("cache")->nullable();
             $table->timestamps();
         });

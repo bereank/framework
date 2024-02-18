@@ -19,8 +19,8 @@ return new class extends Migration
             $table->integer("UserSign")->nullable();    
             $table->string("OwnerCode", 50)->nullable();
             $table->integer('Status')->nullable();
-            $table->string('Canceled',50)->nullable();
-            $table->integer('LogInst',50)->nullable();
+            $table->string('Canceled', 1)->default('N')->nullable();
+            $table->integer('LogInst')->nullable();
             $table->timestamps();
         });
     }
