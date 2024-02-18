@@ -229,17 +229,16 @@ class DocumentController extends Controller
             ->first();
 
         $userFields = (object)[
-            "U_ControlCode" => $data->U_ControlCode,
-            "U_RelatedInv" => $data->U_RelatedInv,
-            "U_CUInvoiceNum" => $data->U_CUInvoiceNum,
-            "U_QRCode" => $data->U_QRCode,
-            "U_QrLocation" => $data->U_QrLocation,
-            "U_ReceiptNo" => $data->U_ReceiptNo,
-            "U_CommitedTime" => $data->U_CommitedTime,
+            "ControlCode" => $data->U_ControlCode,
+            "RelatedInvNum" => $data->U_RelatedInv,
+            "CUInvNum" => $data->U_CUInvoiceNum,
+            "RAuthorityURL" => $data->U_QRCode,
+           // "U_QrLocation" => $data->U_QrLocation,
+            "ReceiptNo" => $data->U_ReceiptNo,
+            // "U_CommitedTime" => $data->U_CommitedTime,
+            "DeviceSerialNo"=> null,
+            "BaseInvNum"=>$data->id
         ];
-
-
-
 
         //        $data['doctype'] = $ObjType;
         //        if ($data) {
