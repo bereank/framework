@@ -159,7 +159,7 @@ class FiscalizationController extends Controller
 
         try {
             DB::connection("tenant")->beginTransaction();
-            $ofsc = OFSC::where('id', $request["DocEntry"])->first();
+            $ofsc = OFSC::where('id',  $id)->first();
 
             if (!$ofsc) {
 
@@ -168,7 +168,7 @@ class FiscalizationController extends Controller
             //step one: create new record on fsc1 table
             $fsc1 = FSC1::create(
                 [
-                    'DocEntry' => $request["DocEntry"],
+                    'DocEntry' =>  $id,
                     'cache' => json_encode($request->all()),
                     'RelatedInvNum' => $request["RelatedInvNum"] ?? null,
                     'BaseInvNum' => $request["BaseInvNum"] ?? null,
@@ -181,7 +181,7 @@ class FiscalizationController extends Controller
                 ]
             );
             //step two: delete existing fsc2 record
-            FSC2::where('DocEntry', $request["DocEntry"])->delete();
+            FSC2::where('DocEntry',  $id)->delete();
             DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService($fsc1->message);
         } catch (\Throwable $th) {
