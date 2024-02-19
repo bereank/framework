@@ -334,18 +334,18 @@ class PaymentsProcessingController extends Controller
                     "responseMessage" => "MISSING BANKREFERENCE"
                 ]);
             }
-            $code = $paymentData['bankreference'];
+            // $code = $paymentData['bankreference'];
 
-            $dateString = substr($paymentData['bankreference'], 0, 8);
+            // $dateString = substr($paymentData['bankreference'], 0, 8);
 
-            $date = Carbon::createFromFormat('Ymd', $dateString);
+            // $date = Carbon::createFromFormat('Ymd', $dateString);
 
-            // Check if the parsed date is valid
-            if ($date && $date->isValid()) {
-                $code = substr($paymentData['bankreference'], 8);
-            }
+            // // Check if the parsed date is valid
+            // if ($date && $date->isValid()) {
+            //     $code = substr($paymentData['bankreference'], 8);
+            // }
 
-            $exists = OCRP::where('TransID', $code)->exists();
+            $exists = OCRP::where('TransID', $paymentData['bankreference'])->exists();
 
             if ($exists) {
                 return response()->json([
@@ -373,7 +373,7 @@ class PaymentsProcessingController extends Controller
             $payment['TransactType'] = $paymentData['paymentMode'] ?? "";
             $payment['ContactName'] = $paymentData['debitcustname'] ?? "";
             $payment['debitAccNo'] = $paymentData['debitaccount'] ?? "";
-            $payment['TransID'] = $code;
+            $payment['TransID'] = $paymentData['bankreference'];
             $payment['DocNum'] =  $Numbering['NextNumber'];
             $payment['BusinessShortCode'] = null;
             $payment['Balance'] =  $paymentData['billAmount'] ?? 0;
