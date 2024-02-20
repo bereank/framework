@@ -614,7 +614,7 @@ class ITransactionController extends Controller
             ->first();
         $defaulted_data = (new MarketingDocumentService())->fieldsDefaulting($request->all());
         $request =  $defaulted_data;
-
+        Log::info(["defaulted_data" =>  $defaulted_data]);
         Log::info("CREATING OBJECT: " . $ObjType);
         if (!$DocumentTables) {
             Log::info("Document object does not exist: " . $ObjType);
@@ -821,7 +821,7 @@ class ITransactionController extends Controller
                 ];
                 $rowItems = new $DocumentTables->pdi1[0]['ChildTable']($rowdetails);
                 $rowItems->save();
-              //  return $value['bin_allocation'];
+                Log::info(["BIN-ALLOC" => $value['bin_allocation']]);
                 //bin allocations
                 if (array_key_exists('bin_allocation', $value)) {
                     LOG::info('array_key_exists');
