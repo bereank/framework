@@ -124,6 +124,7 @@ class InventoryTransactionsController extends Controller
      */
     public function store(Request $request)
     {
+        Log::info([$request]);
         $this->validate($request, [
             'ObjType' => 'required',
         ]);
