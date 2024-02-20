@@ -249,22 +249,22 @@ class MarketingDocumentService
                         $documentLines[$key]['Price']  = $grossPrice;
                         $documentLines[$key]['PriceBefDi']  = $unitPrice ?? null;
                         $documentLines[$key]['PriceAfVAT']  = $grossPrice;
-                        if (data_get($line ,'formattedPrice')) {
+                        if (data_get($line, 'formattedPrice')) {
                             $documentLines[$key]['Price']  = $line['formattedPrice'];
                         }
-                        if (data_get($line,'formattedPriceBefDisc')) {
+                        if (data_get($line, 'formattedPriceBefDisc')) {
                             $documentLines[$key]['PriceBefDi']  = $line['formattedPriceBefDisc'];
                         }
-                        if (data_get($line,'Quantity')  && isset($unitPrice)) {
+                        if (data_get($line, 'Quantity')  && isset($unitPrice)) {
                             $documentLines[$key]['LineTotal']  =  round($line['Quantity']  * $unitPrice, 2);
                         }
-                        if (data_get($line,'formattedLineTotal')) {
+                        if (data_get($line, 'formattedLineTotal')) {
                             $documentLines[$key]['LineTotal']  =  $line['formattedLineTotal'];
                         }
-                        if (data_get($line,'Quantity')  &&  isset($grossPrice)) {
+                        if (data_get($line, 'Quantity')  &&  isset($grossPrice)) {
                             $documentLines[$key]['GTotal']  = round($line['Quantity']  * $grossPrice, 2);
                         }
-                        if (data_get($line,'GTotal')) {
+                        if (data_get($line, 'GTotal')) {
                             $documentLines[$key]['GTotal']  = $line['GTotal'];
                         }
                         $documentLines[$key]['VatSum']  = $vatSum;
@@ -276,10 +276,11 @@ class MarketingDocumentService
 
                 $fmsquery =  CSHS::where('ObjType', $data['ObjType'])->where('IndexID', 2)->get();
                 if ($fmsquery) {
+                    Log::info(["FMS" =>  $fmsquery]);
                     foreach ($fmsquery as $res) {
-                        // Log::info($res);
+                        Log::info([$res]);
                         $query =  OUQR::where('id', $res->QueryId)->first();
-
+                        Log::info(["QUERY" => $query]);
                         $string = $query->QString;
                         preg_match('/(\d+)(\.\w+)/', $string, $matches);
                         $substring = $matches[0];
@@ -293,7 +294,7 @@ class MarketingDocumentService
                             $processedString = Str::replace('$[' . $substring . ']', '"' . $replacementValue . '"', $string);
 
                             $result = DB::connection('tenant')->select($processedString);
-
+                            Log::info(["RESULTS-QUERY" =>  $result]);
                             if (is_array($result)) {
                                 if (!empty($result)) {
                                     $headers = array_values((array)$result[0]);
