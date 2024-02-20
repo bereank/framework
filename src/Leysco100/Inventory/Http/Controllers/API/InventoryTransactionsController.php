@@ -258,7 +258,10 @@ class InventoryTransactionsController extends Controller
                     ->first();
 
                 $AvgPrice = $inventoryDetails ? $inventoryDetails->AvgPrice : 0;
-
+                $checkStockAvailabilty = false;
+                if ($request['ObjType'] == 67) {
+                    $checkStockAvailabilty = true;
+                }
                 if ($product->ManSerNum == "Y" && $request['ObjType'] != 66) {
                     if ($request['ObjType'] == 67) {
                         if (!isset($value['SerialNumbers']) || $value['Quantity'] != count($value['SerialNumbers'])) {
@@ -267,7 +270,7 @@ class InventoryTransactionsController extends Controller
                         }
                     }
                 }
-                $checkStockAvailabilty = true;
+
                 if ($checkStockAvailabilty) {
 
                     if ($product->InvntItem == "Y") {

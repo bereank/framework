@@ -821,7 +821,7 @@ class ITransactionController extends Controller
                 ];
                 $rowItems = new $DocumentTables->pdi1[0]['ChildTable']($rowdetails);
                 $rowItems->save();
-                Log::info(["BIN-ALLOC" => $value['bin_allocation']]);
+                Log::info(["BIN-ALLOC" => $value]);
                 //bin allocations
                 if (array_key_exists('bin_allocation', $value)) {
                     LOG::info('array_key_exists');
