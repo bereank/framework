@@ -88,4 +88,8 @@ class ODISPASS extends Model
     {
         return $this->hasMany(OATC::class, 'id', 'AtcEntry');
     }
+    public function ofscs()
+    {
+        return $this->hasOne(OFSC::class, 'BaseDocEntry');
+    }
 }

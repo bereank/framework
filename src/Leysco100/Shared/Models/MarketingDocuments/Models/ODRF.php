@@ -95,4 +95,8 @@ class ODRF extends Model
     {
         return $this->belongsTo(OHEM::class, 'OwnerCode', 'empID');
     }
+    public function ofscs()
+    {
+        return $this->hasOne(OFSC::class, 'BaseDocEntry');
+    }
 }

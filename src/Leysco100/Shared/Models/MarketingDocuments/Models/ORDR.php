@@ -4,11 +4,17 @@ namespace Leysco100\Shared\Models\MarketingDocuments\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
-use Leysco100\Shared\Models\Administration\Models\User;
-use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
-use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
 use Leysco100\Shared\Models\Shared\Models\APDI;
+use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
+use Leysco100\Shared\Models\Administration\Models\OSLP;
+use Leysco100\Shared\Models\Administration\Models\OUDP;
+use Leysco100\Shared\Models\Administration\Models\User;
+use Leysco100\Shared\Models\BusinessPartner\Models\OBPL;
+use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
+use Leysco100\Shared\Models\MarketingDocuments\Models\OFSC;
+use Leysco100\Shared\Models\MarketingDocuments\Models\RDR1;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OLCT;
 
 class ORDR extends Model
 {
@@ -86,5 +92,10 @@ class ORDR extends Model
         if ($this->status == "C") {
             return "Closed";
         }
+    }
+
+    public function ofscs()
+    {
+        return $this->hasOne(OFSC::class, 'BaseDocEntry');
     }
 }

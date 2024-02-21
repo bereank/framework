@@ -13,9 +13,9 @@ class OFSC extends Model
     protected $guarded = ['id'];
     protected $table = "o_f_s_c_s";
 
-    public function doc_header()
+    public function fsc1()
     {
-        return $this->hasMany(FSC1::class, 'DocEntry', 'id');
+        return $this->hasMany(FSC1::class, 'DocEntry');
     }
     public function objecttype()
     {

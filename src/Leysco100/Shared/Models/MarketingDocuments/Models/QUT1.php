@@ -40,4 +40,8 @@ class QUT1 extends Model
     {
         return $this->belongsTo(TaxGroup::class, 'TaxCode', 'code');
     }
+    public function ofscs()
+    {
+        return $this->hasOne(OFSC::class, 'BaseDocEntry');
+    }
 }

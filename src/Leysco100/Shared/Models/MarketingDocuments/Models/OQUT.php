@@ -46,4 +46,9 @@ class OQUT extends Model
     {
         return $this->belongsTo(User::class, 'UserSign');
     }
+
+    public function ofscs()
+    {
+        return $this->hasOne(OFSC::class, 'BaseDocEntry');
+    }
 }

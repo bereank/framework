@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string("CUInvNum")->nullable();
             $table->string("ReceiptNo")->nullable();
             $table->string("DeviceSerialNo")->nullable();
-            $table->text("message");
+            $table->text("message")->nullable();
             $table->integer('Status')->nullable()->comment("0 for success, 1 for failed");
             $table->string('Canceled', 1)->default('N')->nullable();
             $table->integer('LogInst')->nullable();
