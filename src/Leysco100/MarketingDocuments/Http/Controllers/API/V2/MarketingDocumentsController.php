@@ -20,6 +20,7 @@ use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
 use Leysco100\Shared\Models\Administration\Models\EOTS;
 use Leysco100\Shared\Models\Administration\Models\OADM;
 use Leysco100\Shared\Models\Administration\Models\User;
+use Leysco100\MarketingDocuments\Services\SystemDefaults;
 use Leysco100\MarketingDocuments\Actions\MapApiFieldAction;
 use Leysco100\MarketingDocuments\Services\DocumentsService;
 use Leysco100\Shared\Models\MarketingDocuments\Models\ATC1;
@@ -108,7 +109,7 @@ class MarketingDocumentsController extends Controller
                     ->when($dataOwnership && $dataOwnership->Active, function ($query) use ($ownerData) {
                         $query->wherein('OwnerCode', $ownerData);
                     })
-                    ->with('CreatedBy:name', 'ohem:id,empID,firstName,middleName,lastName')
+                    ->with('CreatedBy:name', 'ofscs.fsc1', 'ohem:id,empID,firstName,middleName,lastName')
                     ->with(['document_lines' => function ($query) {
                         $query->with('ItemDetails:id,ItemCode,ItemName')
                             ->select('id', 'DocEntry', 'LineNum', 'Quantity', 'Price', 'LineTotal', 'ItemCode', 'Dscription');
@@ -402,7 +403,7 @@ class MarketingDocumentsController extends Controller
 
         // Step 2: Default Fields
         $defaulted_data = (new MarketingDocumentService())->fieldsDefaulting($request->all());
-       // return  $defaulted_data;
+        // return  $defaulted_data;
         // Step 3: Validate Document Fields
         $validatedFields  = (new MarketingDocumentService())->validateFields($defaulted_data, $request['ObjType']);
 
@@ -497,5 +498,116 @@ class MarketingDocumentsController extends Controller
         $newDoc =  (new MarketingDocumentService())->updateDoc($docData, $ObjType, $Headerdata);
 
         return (new ApiResponseService())->apiSuccessResponseService($newDoc);
+    }
+
+    public function documentCancellation($ObjType, $id)
+    {
+        $DocTables = APDI::with('pdi1')
+            ->where('ObjectID', $ObjType)
+            ->first();
+
+        if (!$DocTables) {
+            return (new ApiResponseService())->apiFailedResponseService("Not found document with base type ");
+        }
+        /**
+         * Check If Authorized
+         */
+        //        (new AuthorizationService())->checkIfAuthorize($DocTables->id, 'update');
+
+
+        $DocHeader = $DocTables->ObjectHeaderTable::where('id', $id)
+            ->with('document_lines')
+            ->first();
+        if (!$DocHeader) {
+            return (new ApiResponseService())->apiFailedResponseService("Document Not Found");
+        }
+
+        if ($DocHeader->DocStatus == "C") {
+            return (new ApiResponseService())
+                ->apiFailedResponseService("Operation not Possible, Document is closed");
+        }
+        if ($DocHeader->CANCELED == "Y") {
+            return (new ApiResponseService())
+                ->apiFailedResponseService("Operation not Possible, Document already cancelled");
+        }
+        if ($DocHeader->CANCELED == "C") {
+            return (new ApiResponseService())
+                ->apiFailedResponseService("Operation not Possible on a Cancellation Document");
+        }
+        $DocLines = $DocTables->pdi1[0]['ChildTable']::where('DocEntry', $id)
+            ->where(function ($query) {
+                $query
+                    //->orWhereColumn('OpenQty', '!=', 'Quantity')
+                    ->orWhere('LineStatus', '!=', 'O');
+            })
+            ->exists();
+        if (!$DocLines) {
+            try {
+
+                DB::connection("tenant")->beginTransaction();
+                $Numbering = (new DocumentsService())
+                    ->getNumSerieByObjectId($ObjType);
+                $cancellation_header =  new $DocTables->ObjectHeaderTable($DocHeader->toArray());
+                $cancellation_header->CANCELED = 'C';
+                $cancellation_header->DocStatus = 'C';
+                $cancellation_header->DocNum = $Numbering['NextNumber'];
+                $cancellation_header->BaseType = $DocHeader->ObjType;
+                $cancellation_header->BaseEntry = $DocHeader->id;
+                $cancellation_header->OwnerCode =   Auth::user()->EmpID ?? "";
+                $cancellation_header->save();
+                //Close Current document
+                $DocTables->ObjectHeaderTable::where('id', $DocHeader->id)
+                    ->update([
+                        'DocStatus' => 'C'
+                    ]);
+                foreach ($DocHeader->document_lines as $key => $line) {
+
+                    $LineNum = ++$key;
+                    $cancellation_line = new  $DocTables->pdi1[0]['ChildTable']($line->toArray());
+                    $cancellation_line->DocEntry = $cancellation_header->id;
+                    $cancellation_line->BaseType = $DocHeader->ObjType;
+                    $cancellation_line->BaseEntry = $DocHeader->id;
+                    $cancellation_line->BaseLine = $line->LineNum;
+                    $cancellation_line->LineNum =  $LineNum;
+                    $cancellation_line->LineStatus = "C";
+                    $cancellation_line->save();
+                    $BaseTables = APDI::with('pdi1')
+                        ->where('ObjectID', $line->BaseType)
+                        ->first();
+                    //Open base document header
+                    $baseHeader =   $BaseTables->ObjectHeaderTable::where('id', $line->BaseEntry)
+                        ->update([
+                            'DocStatus' => "O"
+                        ]);
+
+
+                    $baseLine = $BaseTables->pdi1[0]['ChildTable']::where('DocEntry', $line->BaseEntry)
+                        ->where('LineNum', $line->BaseLine)->first();
+                    //Open base line
+                    $BaseTables->pdi1[0]['ChildTable']::where('DocEntry', $line->BaseEntry)
+                        ->where('LineNum', $line->BaseLine)
+                        ->update([
+                            'LineStatus' => "O",
+                            'OpenQty' => $line->OpenQty + $baseLine->OpenQty,
+                        ]);
+                    Log::info([$line->OpenQty, "BASE" => $baseLine->OpenQty]);
+                    //Close current line
+                    $DocTables->pdi1[0]['ChildTable']::where('id', $line->id)
+                        ->update([
+                            'LineStatus' => "C",
+                        ]);
+                }
+                (new SystemDefaults())->updateNextNumberNumberingSeries($Numbering['id']);
+                DB::connection("tenant")->commit();
+                return (new ApiResponseService())->apiSuccessResponseService(['message' =>
+                "Successfully Canceled"]);
+            } catch (\Throwable $th) {
+                DB::connection("tenant")->rollback();
+                return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+            }
+        } else {
+            return (new ApiResponseService())
+                ->apiFailedResponseService("Operation not Possible, Document Lines Not Open");
+        }
     }
 }
