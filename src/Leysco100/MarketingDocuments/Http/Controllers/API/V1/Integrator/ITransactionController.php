@@ -606,9 +606,9 @@ class ITransactionController extends Controller
             $ObjType = 205;
         }
 
-        if ($ObjType == 1250000001) {
-            $ObjType = 66;
-        }
+        // if ($ObjType == 1250000001) {
+        //     $ObjType = 66;
+        // }
         $DocumentTables = APDI::with('pdi1')
             ->where('ObjectID', $ObjType)
             ->first();
@@ -648,7 +648,7 @@ class ITransactionController extends Controller
                     ], 422);
             }
         }
-
+        Log::info(['ObjType' => $ObjType]);
         // $nnm1 = NNM1::where('ExtRef', $request['Series'])->first();
         // if (!$nnm1) {
         //     return response()
