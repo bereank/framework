@@ -59,7 +59,6 @@ Route::apiResources(['gps-setup' => GpsSetUpController::class]);
 |--------------------------------------------------------------------------
 |
 */
-Route::put('document/cancellation/{ObjType}/{id}', [DispatchController::class, 'documentCancellation']);
 Route::get('/dispatch/summary-reports', [DispatchController::class, 'getSummaries']);
 Route::apiResources(['/dispatch/documents' => DispatchController::class]);
 

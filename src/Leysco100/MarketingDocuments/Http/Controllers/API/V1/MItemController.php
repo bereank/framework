@@ -38,12 +38,12 @@ class MItemController extends Controller
         $all = \Request::get('all');
 
         $user = User::where('id', Auth::user()->id)->with('oudg')->first();
-        // $SellFromBin =   $user->oudg?->SellFromBin ?? false;
-        // $BinItems=[];
-        // if ($SellFromBin) {
-        //     $BIN = OBIN::where('id', $user->oudg->DftBinLoc)->first();
-        //     $BinItems = OIBQ::where('BinAbs', $BIN->id)->pluck('ItemCode');
-        // }
+        $SellFromBin =   $user->oudg?->SellFromBin ?? false;
+        $BinItems=[];
+        if ($SellFromBin) {
+            $BIN = OBIN::where('id', $user->oudg->DftBinLoc)->first();
+            $BinItems = OIBQ::where('BinAbs', $BIN->id)->pluck('ItemCode');
+        }
         $data = OITM::select(
             'id',
             'ItemName',
@@ -64,19 +64,19 @@ class MItemController extends Controller
                 $query->where('frozenFor', "N")
                     ->where('OnHand', '>', 0);
             })
-            // ->when($SellFromBin, function ($query2) use ($BinItems) {
-            //     $query2->whereIn('ItemCode', $BinItems);
-            // })
+            ->when($SellFromBin, function ($query2) use ($BinItems) {
+                $query2->whereIn('ItemCode', $BinItems);
+            })
             ->get();
-        // if ($SellFromBin) {
-        //     foreach ($data as $d) {
-        //         $items = OIBQ::where('BinAbs', $BIN->id)->where('ItemCode', $d->ItemCode)->first();
+        if ($SellFromBin) {
+            foreach ($data as $d) {
+                $items = OIBQ::where('BinAbs', $BIN->id)->where('ItemCode', $d->ItemCode)->first();
 
-        //         $d->BinAbs = $items->BinAbs;
-        //         $d->OnHandQty = $items->OnHandQty;
-        //         $d->Freezed = $items->Freezed;
-        //     }
-        // }
+                $d->BinAbs = $items->BinAbs;
+                $d->OnHandQty = $items->OnHandQty;
+                $d->Freezed = $items->Freezed;
+            }
+        }
         return $data;
     }
     /**
