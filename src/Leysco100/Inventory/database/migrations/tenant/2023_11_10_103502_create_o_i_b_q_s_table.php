@@ -16,7 +16,7 @@ return new class extends Migration
             $table->integer('AbsEntry')->nullable();
             $table->string('ItemCode', 20)->nullable();
             $table->integer('BinAbs')->nullable();
-            $table->decimal('OnHandQty', 19, 6)->nullable();
+            $table->float('OnHandQty', 19, 6)->nullable();
             $table->string('WhsCode',50)->nullable();
             $table->boolean('Freezed')->default(0);
             $table->integer('FreezeDoc')->nullable();

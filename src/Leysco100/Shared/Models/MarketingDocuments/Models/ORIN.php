@@ -75,4 +75,8 @@ class ORIN extends Model
     {
         return $this->belongsTo(OCRD::class, 'CardCode', 'CardCode');
     }
+    public function ofscs()
+    {
+        return $this->hasOne(OFSC::class, 'BaseDocEntry');
+    }
 }

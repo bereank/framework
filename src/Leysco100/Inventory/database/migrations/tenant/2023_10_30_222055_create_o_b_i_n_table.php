@@ -65,13 +65,13 @@ return new class extends Migration
             $table->integer('UserSign2')->nullable();
             $table->date('UpdateDate')->nullable();
             $table->char('Deleted', 1)->nullable();
-            $table->decimal('MinLevel', 19, 6)->nullable();
-            $table->decimal('MaxLevel', 19, 6)->nullable();
+            $table->float('MinLevel', 19, 6)->nullable();
+            $table->float('MaxLevel', 19, 6)->nullable();
             $table->char('ReceiveBin', 1)->nullable();
             $table->char('NoAutoAllc', 1)->nullable();
-            $table->decimal('MaxWeight1', 19, 6)->nullable();
+            $table->float('MaxWeight1', 19, 6)->nullable();
             $table->integer('Wght1Unit')->nullable();
-            $table->decimal('MaxWeight2', 19, 6)->nullable();
+            $table->float('MaxWeight2', 19, 6)->nullable();
             $table->integer('Wght2Unit')->nullable();
             $table->integer('UoMRtrict')->nullable();
             $table->integer('SpcUoMCode')->nullable();

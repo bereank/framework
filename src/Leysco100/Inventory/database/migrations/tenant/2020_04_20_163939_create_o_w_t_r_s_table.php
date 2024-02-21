@@ -49,7 +49,7 @@ class CreateOWTRSTable extends Migration
             $table->string('GrosProfFC', 1)->nullable();
             $table->string('Ref1', 11)->nullable();
             $table->string('Ref2', 11)->nullable();
-            $table->string('Comments', 100)->nullable();
+            $table->string('Comments', 255)->nullable();
             $table->string('JrnlMemo', 100)->nullable();
             $table->integer('TransId')->nullable();
             $table->string('ReceiptNum', 1)->nullable();

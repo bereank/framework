@@ -13,6 +13,7 @@ use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\BusinessPartner\Models\OBPL;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Leysco100\Shared\Models\Administration\Models\Vehicle;
+use Leysco100\Shared\Models\MarketingDocuments\Models\OFSC;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OLCT;
 
@@ -96,5 +97,9 @@ class OINV extends Model
     public function attachments()
     {
         return $this->hasMany(OATC::class, 'id', 'AtcEntry');
+    }
+    public function ofscs()
+    {
+        return $this->hasOne(OFSC::class, 'BaseDocEntry');
     }
 }
