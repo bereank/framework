@@ -191,7 +191,7 @@ class FiscalizationController extends Controller
             //step two: delete existing fsc2 record
             FSC2::where('DocEntry',  $id)->delete();
             OFSC::where('id',  $id)->update([
-                'Status' => 'Y'
+                'Status' => 1
             ]);
             DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService($fsc1->message);
