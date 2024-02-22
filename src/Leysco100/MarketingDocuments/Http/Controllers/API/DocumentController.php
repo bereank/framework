@@ -1046,16 +1046,16 @@ class DocumentController extends Controller
                 ->apiFailedResponseService("You Cannot Edit the document,Its Closed");
         }
 
-        if (array_key_exists('BPLId', $request->all()) && empty($request['BPLId']) && $ObjType != 205) {
+        // if (array_key_exists('BPLId', $request->all()) && empty($request['BPLId']) && $ObjType != 205) {
 
-            return (new ApiResponseService())
-                ->apiFailedResponseService("Branch is Required");
-        }
+        //     return (new ApiResponseService())
+        //         ->apiFailedResponseService("Branch is Required");
+        // }
 
-        if (array_key_exists('DocDueDate', $request->all()) && empty($request['DocDueDate'] && $ObjType != 205)) {
-            return (new ApiResponseService())
-                ->apiFailedResponseService("Delivery Date Required");
-        }
+        // if (array_key_exists('DocDueDate', $request->all()) && empty($request['DocDueDate'] && $ObjType != 205)) {
+        //     return (new ApiResponseService())
+        //         ->apiFailedResponseService("Delivery Date Required");
+        // }
 
         /**
          * Mapping Req Name
