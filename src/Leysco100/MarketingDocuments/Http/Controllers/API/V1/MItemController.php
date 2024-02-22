@@ -40,7 +40,7 @@ class MItemController extends Controller
 
         $user = User::where('id', Auth::user()->id)->with('oudg')->first();
         $SellFromBin =   $user->oudg?->SellFromBin ?? false;
-        $BinItems = [];
+        $BinItems=[];
         if ($SellFromBin) {
             $BIN = OBIN::where('id', $user->oudg->DftBinLoc)->first();
             $BinItems = OIBQ::where('BinAbs', $BIN->id)->pluck('ItemCode');
@@ -177,23 +177,16 @@ class MItemController extends Controller
 
             if ($itm9) {
                 if ($itm9) {
-                    $TAXTOTAL = 0;
                     if ($opln->isGrossPrc == 'Y') {
                         $PRICE = $itm9->Price;
-                        $rate = $ovtg->rate + 100;
-                        $unitPrice = round($PRICE * (100 / $rate), 2);
-                        $TAXTOTAL = $PRICE - $unitPrice;
                     } else if ($opln->isGrossPrc == 'N') {
                         $PRICE = round((($ovtg->rate / 100) + 1) *  $itm9->Price, 2);
-                        $TAXTOTAL =  $PRICE - $itm9->Price;
+                     //   (0.16 + 1) * 100 = 116;
                     }
                 }
                 $details = [
                     "SUoMEntry" => $ugp1 ? $ugp1->id : null,
                     'FINALSALESPRICE' => $PRICE,
-                    'TAXTOTAL' => $TAXTOTAL,
-                    'UNITPRICE' => round($PRICE - $TAXTOTAL, 2),
-                    'isGrossPrc' => $opln->isGrossPrc
                 ];
                 return $details;
             }
@@ -247,19 +240,13 @@ class MItemController extends Controller
             $PRICE = ($PRICEPERPRICEUNIT * $SALESUNITCONVERTEDTOBASEUOM) / $PRICINGUNITCONVERTEDTOBASEUOM;
 
             if ($opln->isGrossPrc == 'Y') {
-                $rate = $ovtg->rate + 100;
-                $unitPrice = round($PRICE * (100 / $rate), 2);
-                $TAXTOTAL = $PRICE - $unitPrice;
+                $PRICE = $PRICE;
             } else if ($opln->isGrossPrc == 'N') {
                 $PRICE = round((($ovtg->rate / 100) + 1) *   $PRICE, 2);
-                $TAXTOTAL =  $PRICE - $itm9->Price;
             }
             $details = [
                 "SUoMEntry" => $ugp1 ? $ugp1->id : null,
-                'FINALSALESPRICE' => $PRICE,
-                'TAXTOTAL' => $TAXTOTAL,
-                'UNITPRICE' => round($PRICE - $TAXTOTAL, 2),
-                'isGrossPrc' => $opln->isGrossPrc
+                'FINALSALESPRICE' => $PRICE
             ];
 
             return $details;
