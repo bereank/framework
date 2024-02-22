@@ -315,13 +315,14 @@ class MarketingDocumentService
                 }
 
                 if (!(data_get($line, 'bin_allocation')) &&  data_get($documentLines[$key], 'ToBinCod')) {
-
-                    $documentLines[$key]['bin_allocation'] =  [
-                        [
-                            'BinCode' => $documentLines[$key]['ToBinCod'],
-                            'QtyVar' =>  $line['Quantity']
-                        ]
-                    ];
+                    if ($documentLines[$key]['ToBinCod'] != null) {
+                        $documentLines[$key]['bin_allocation'] =  [
+                            [
+                                'BinCode' => $documentLines[$key]['ToBinCod'],
+                                'QtyVar' =>  $line['Quantity']
+                            ]
+                        ];
+                    }
                 }
             }
             $data['document_lines'] = $documentLines;
@@ -525,10 +526,12 @@ class MarketingDocumentService
             if (array_key_exists('bin_allocation', $value) && !empty($value['bin_allocation'])) {
                 foreach ($value['bin_allocation'] as $key => $BinVal) {
                     if (!empty($BinVal)) {
-                        $obin = OBIN::where('BinCode', $BinVal['BinCode'])->first();
-                        if (!$obin) {
-                            return (new ApiResponseService())
-                                ->apiNotFoundResponse("Bin Code Does Not Exist");
+                        if ($BinVal['BinCode'] != null) {
+                            $obin = OBIN::where('BinCode', $BinVal['BinCode'])->first();
+                            if (!$obin) {
+                                return (new ApiResponseService())
+                                    ->apiNotFoundResponse("Bin Code Does Not Exist");
+                            }
                         }
                     }
                 }
@@ -743,33 +746,35 @@ class MarketingDocumentService
                     $FromBinCod =    $value['WhsCode'] ?? null;
 
                     foreach ($value['bin_allocation'] as $key => $BinVal) {
-                        $SubLineNum = ++$key;
-                        $obin = OBIN::where('BinCode', $BinVal['BinCode'])->first();
+                        if ($BinVal['BinCode'] != null) {
+                            $SubLineNum = ++$key;
+                            $obin = OBIN::where('BinCode', $BinVal['BinCode'])->first();
 
-                        $bindata = $lineModel['ChildTable']::create([
-                            'DocEntry' => $newDoc->id,
-                            'BinAllocSe' => $LineNum,
-                            'LineNum' => $LineNum,
-                            'SubLineNum' => $SubLineNum,
-                            'SnBType' => null,
-                            'SnBMDAbs' => null,
-                            'BinAbs' =>  $obin->id,
-                            'Quantity' =>  $BinVal['QtyVar'],
-                            'ItemCode' => $value['ItemCode'],
-                            'WhsCode' =>  $value['WhsCode'] ?? $obin->WhsCode,
-                            'ObjType' => $ObjType,
-                            'AllowNeg' => 'N',
-                            'BinActTyp' => 1
-                        ]);
+                            $bindata = $lineModel['ChildTable']::create([
+                                'DocEntry' => $newDoc->id,
+                                'BinAllocSe' => $LineNum,
+                                'LineNum' => $LineNum,
+                                'SubLineNum' => $SubLineNum,
+                                'SnBType' => null,
+                                'SnBMDAbs' => null,
+                                'BinAbs' =>  $obin->id,
+                                'Quantity' =>  $BinVal['QtyVar'],
+                                'ItemCode' => $value['ItemCode'],
+                                'WhsCode' =>  $value['WhsCode'] ?? $obin->WhsCode,
+                                'ObjType' => $ObjType,
+                                'AllowNeg' => 'N',
+                                'BinActTyp' => 1
+                            ]);
 
-                        $resdata =    (new InventoryService())->binAllocations(
-                            $ObjType,
-                            $value['ItemCode'],
-                            $BinVal,
-                            $WhsCode = null,
-                            $FromBinCod,
-                            $newDoc->toArray()
-                        );
+                            $resdata =    (new InventoryService())->binAllocations(
+                                $ObjType,
+                                $value['ItemCode'],
+                                $BinVal,
+                                $WhsCode = null,
+                                $FromBinCod,
+                                $newDoc->toArray()
+                            );
+                        }
                     }
                 }
 
