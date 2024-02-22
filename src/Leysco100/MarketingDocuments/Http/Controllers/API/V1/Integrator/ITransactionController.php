@@ -83,10 +83,13 @@ class ITransactionController extends Controller
             $documents = $DocumentTables->ObjectHeaderTable::whereNull('ExtRef')
                 ->where('ObjType', $ObjType)
                 //  ->where('Transfered', 'N')
-                ->where(function ($q) use ($docEntry) {
+                ->where(function ($q) use ($docEntry, $ObjType) {
                     if ($docEntry != null) {
                         $q->where('id', $docEntry);
                     }
+                })
+                ->when($ObjType == 13, function ($q) {
+                    $q->where('U_ControlCode', '!=', null);
                 })
                 ->take(5)
                 ->get();
@@ -765,8 +768,11 @@ class ITransactionController extends Controller
                 $quantity = $value['Quantity'];
                 $PriceAfVAT = $value['PriceAfVAT'];
                 $price = $value['Price'];
+                $vatSum = 0;
 
-                $vatSum = $quantity * ($PriceAfVAT - $price);
+                if (is_numeric($quantity) || is_numeric($PriceAfVAT) || is_numeric($price)) {
+                    $vatSum = $quantity * ($PriceAfVAT - $price);
+                }
 
                 $rowdetails = [
                     'DocEntry' => $newDoc->id,

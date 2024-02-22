@@ -59,7 +59,15 @@ class FiscalizationController extends Controller
         if ($validator->fails()) {
             return (new ApiResponseService())->apiSuccessAbortProcessResponse($validator->errors());
         }
-
+        $fiscal = FSC2::where('BaseDocEntry', $request['DocEntry'])->where('ObjectCode', $request['ObjType'])->first();
+        if ($fiscal) {
+            return (new ApiResponseService())->apiSuccessAbortProcessResponse("Document Fiscalizing.....");
+        }
+        $fiscal_success = OFSC::where('BaseDocEntry', $request['DocEntry'])->where('ObjectCode', $request['ObjType'])
+            ->where('Status', 'Y')->first();
+        if ($fiscal_success) {
+            return (new ApiResponseService())->apiSuccessAbortProcessResponse("Document already Fiscalized Successfully");
+        }
         $DocumentTables = APDI::with('pdi1')
             ->where('ObjectID', $request['ObjType'])
             ->first();
@@ -182,6 +190,9 @@ class FiscalizationController extends Controller
             );
             //step two: delete existing fsc2 record
             FSC2::where('DocEntry',  $id)->delete();
+            OFSC::where('id',  $id)->update([
+                'Status' => 'Y'
+            ]);
             DB::connection("tenant")->commit();
             return (new ApiResponseService())->apiSuccessResponseService($fsc1->message);
         } catch (\Throwable $th) {
