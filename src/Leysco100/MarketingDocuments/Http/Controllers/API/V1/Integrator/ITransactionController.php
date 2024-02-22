@@ -83,14 +83,17 @@ class ITransactionController extends Controller
             $documents = $DocumentTables->ObjectHeaderTable::whereNull('ExtRef')
                 ->where('ObjType', $ObjType)
                 //  ->where('Transfered', 'N')
-                ->where(function ($q) use ($docEntry, $ObjType) {
+                ->where(function ($q) use ($docEntry, $DocumentTables, $ObjType) {
                     if ($docEntry != null) {
                         $q->where('id', $docEntry);
                     }
+                    if ($ObjType == 13) {
+                       $q->whereHas('ofscs', function ($q) {
+                            $q->where('Status', 1);
+                        });
+                    }
                 })
-                ->when($ObjType == 13, function ($q) {
-                    $q->where('U_ControlCode', '!=', null);
-                })
+
                 ->take(5)
                 ->get();
 
