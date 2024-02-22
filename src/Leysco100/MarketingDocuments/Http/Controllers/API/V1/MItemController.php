@@ -11,6 +11,7 @@ use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\Administration\Models\ITG1;
 use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
+use Leysco100\Shared\Models\Administration\Models\TaxGroup;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OPLN;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\ITM1;
@@ -39,7 +40,7 @@ class MItemController extends Controller
 
         $user = User::where('id', Auth::user()->id)->with('oudg')->first();
         $SellFromBin =   $user->oudg?->SellFromBin ?? false;
-        $BinItems=[];
+        $BinItems = [];
         if ($SellFromBin) {
             $BIN = OBIN::where('id', $user->oudg->DftBinLoc)->first();
             $BinItems = OIBQ::where('BinAbs', $BIN->id)->pluck('ItemCode');
@@ -153,7 +154,7 @@ class MItemController extends Controller
                 return (new ApiResponseService())
                     ->apiMobileFailedResponseService("Customer does not have pricelist");
             }
-
+            $opln = OPLN::where('id', $bpPriceList)->first();
             // If there is a change on  sUOMTRY
             //This are OUOMS
             $PRICINGUNIT = $ITEM->PriceUnit; //IF OUM IS MANUAL THIS VALUE WILL BE NULL
@@ -164,7 +165,7 @@ class MItemController extends Controller
                 //Get Default Sales Unit
                 $SALESUNIT = $ITEM->SUoMEntry;
             }
-
+            $ovtg = TaxGroup::where('code', $ITEM->VatGourpSa)->first();
             /**
              * Check IF there is a price in ITM9
              */
@@ -175,9 +176,24 @@ class MItemController extends Controller
                 ->first();
 
             if ($itm9) {
+                if ($itm9) {
+                    $TAXTOTAL = 0;
+                    if ($opln->isGrossPrc == 'Y') {
+                        $PRICE = $itm9->Price;
+                        $rate = $ovtg->rate + 100;
+                        $unitPrice = round($PRICE * (100 / $rate), 2);
+                        $TAXTOTAL = $PRICE - $unitPrice;
+                    } else if ($opln->isGrossPrc == 'N') {
+                        $PRICE = round((($ovtg->rate / 100) + 1) *  $itm9->Price, 2);
+                        $TAXTOTAL =  $PRICE - $itm9->Price;
+                    }
+                }
                 $details = [
                     "SUoMEntry" => $ugp1 ? $ugp1->id : null,
-                    'FINALSALESPRICE' => $itm9->Price,
+                    'FINALSALESPRICE' => $PRICE,
+                    'TAXTOTAL' => $TAXTOTAL,
+                    'UNITPRICE' => round($PRICE - $TAXTOTAL, 2),
+                    'isGrossPrc' => $opln->isGrossPrc
                 ];
                 return $details;
             }
@@ -212,7 +228,7 @@ class MItemController extends Controller
                 ->first();
             $INVUNITCONVERTEDTOBASEUOM = $INVUNITCONVERTEDTOBASEUOM_QUERY ? $INVUNITCONVERTEDTOBASEUOM_QUERY->INVUNITCONVERTEDTOBASEUOM : null;
 
-            $opln = OPLN::where('id', $bpPriceList)->first();
+
 
             //Getting Current Price and Curreny
             $ITM1_DATA = ITM1::select('Price', 'Currency')
@@ -228,9 +244,22 @@ class MItemController extends Controller
             $INVUNITCONVERTEDTOBASEUOM = $INVUNITCONVERTEDTOBASEUOM == null || 0 ? 1 : $INVUNITCONVERTEDTOBASEUOM;
             $PRICINGUNITCONVERTEDTOBASEUOM = $PRICINGUNITCONVERTEDTOBASEUOM == null || 0 ? 1 : $PRICINGUNITCONVERTEDTOBASEUOM;
 
+            $PRICE = ($PRICEPERPRICEUNIT * $SALESUNITCONVERTEDTOBASEUOM) / $PRICINGUNITCONVERTEDTOBASEUOM;
+
+            if ($opln->isGrossPrc == 'Y') {
+                $rate = $ovtg->rate + 100;
+                $unitPrice = round($PRICE * (100 / $rate), 2);
+                $TAXTOTAL = $PRICE - $unitPrice;
+            } else if ($opln->isGrossPrc == 'N') {
+                $PRICE = round((($ovtg->rate / 100) + 1) *   $PRICE, 2);
+                $TAXTOTAL =  $PRICE - $itm9->Price;
+            }
             $details = [
                 "SUoMEntry" => $ugp1 ? $ugp1->id : null,
-                'FINALSALESPRICE' => ($PRICEPERPRICEUNIT * $SALESUNITCONVERTEDTOBASEUOM) / $PRICINGUNITCONVERTEDTOBASEUOM,
+                'FINALSALESPRICE' => $PRICE,
+                'TAXTOTAL' => $TAXTOTAL,
+                'UNITPRICE' => round($PRICE - $TAXTOTAL, 2),
+                'isGrossPrc' => $opln->isGrossPrc
             ];
 
             return $details;
