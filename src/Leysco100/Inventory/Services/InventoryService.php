@@ -260,7 +260,11 @@ class InventoryService
                 ]);
             }
             $checkStockAvailabilty = false;
-            $docData = $docData->toArray();
+
+            if (!is_array($docData)) {
+                $docData = $docData->toArray();
+            }
+
             if (($ObjType == 13 || (array_key_exists('BaseType', $docData) &&
                 $docData['BaseType'] != 15 && $ObjType == 13)) || $ObjType == 15) {
                 $checkStockAvailabilty = true;
