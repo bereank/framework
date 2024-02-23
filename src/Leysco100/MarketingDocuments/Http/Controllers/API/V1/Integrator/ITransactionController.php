@@ -62,9 +62,9 @@ class ITransactionController extends Controller
             $ObjType = 205;
         }
 
-        if ($ObjType == 1250000001) {
-            $ObjType = 66;
-        }
+        // if ($ObjType == 1250000001) {
+        //     $ObjType = 66;
+        // }
 
         $isDraft = 0;
         $DocumentTables = APDI::with('pdi1')
