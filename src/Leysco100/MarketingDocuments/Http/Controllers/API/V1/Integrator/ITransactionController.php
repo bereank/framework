@@ -88,7 +88,7 @@ class ITransactionController extends Controller
                         $q->where('id', $docEntry);
                     }
                     if ($ObjType == 13) {
-                       $q->whereHas('ofscs', function ($q) {
+                        $q->whereHas('ofscs', function ($q) {
                             $q->where('Status', 1);
                         });
                     }
@@ -339,7 +339,9 @@ class ITransactionController extends Controller
                 foreach ($request["UserFields"] as $key => $field) {
                     $userFields[$key] = $field;
                 }
-                $record->update($userFields);
+                if ($userFields) {
+                    $record->update($userFields);
+                }
             }
 
             if ($ObjType == 205) {
