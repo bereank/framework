@@ -6,9 +6,11 @@ use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Shared\Models\LogisticsHub\Models\OCLG;
 use Leysco100\Shared\Models\Administration\Models\OSLP;
+use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\Shared\Models\BusinessPartner\Models\OCRD;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OINV;
 use Leysco100\Shared\Models\MarketingDocuments\Models\ORDR;
@@ -26,6 +28,10 @@ class MDashboardController extends Controller
     public function index()
     {
         try {
+            $user = Auth::user();
+            $user = User::with('oudg')->where('id', $user->id)->First();
+            $SlpCode =  request()->filled('SlpCode') ?  request('SlpCode') : false;
+
             $calls = OCLG::whereDate('created_at', Carbon::today())
                 ->latest()
                 ->count();
@@ -38,7 +44,14 @@ class MDashboardController extends Controller
 
             $CurrentWeekCallsSummary = [];
             foreach ($period as $key => $value) {
-                $TotalCalls = OCLG::whereDate('CallDate', $value)->count();
+                $TotalCalls = OCLG::whereDate('CallDate', $value)
+                    ->when(!$user->SUPERUSER, function ($query) use ($user) {
+                        $query->where("UserSign", $user->id);
+                    })
+                    ->when($SlpCode, function ($query) use ($SlpCode) {
+                        $query->where("SlpCode",  $SlpCode);
+                    })
+                    ->count();
                 $details = [
                     "CallDate" => $value->format('Y-m-d'),
                     "TotalCalls " => $TotalCalls,
@@ -46,27 +59,33 @@ class MDashboardController extends Controller
 
                 array_push($CurrentWeekCallsSummary, $details);
             }
-            $startMONTH = now()->startOfWeek()->format('Y-m-d');
-            $endMONTH = now()->endOfWeek()->format('Y-m-d');
-            $user_id = Auth::user()->id;
+            $startMONTH = now()->startOfMonth()->format('Y-m-d');
+            $endMONTH = now()->endOfMonth()->format('Y-m-d');
+
             $results = OINV::select(DB::raw('SUM(VatSum) as VatSum'), DB::raw('SUM(DocTotal) as TotalDocTotal'))
-                ->where("UserSign", $user_id)
+                ->when(!$user->SUPERUSER, function ($query) use ($user) {
+                    $query->where("UserSign", $user->id);
+                })
+                ->when($SlpCode, function ($query) use ($SlpCode) {
+                    $query->where("SlpCode",  $SlpCode);
+                })
                 ->where('CANCELED', "=", 'N')
                 ->whereBetween('DocDate', [$startMONTH, $endMONTH])->get();
             $results = $results->first();
             $TotalMonthlySales =  ($results->TotalDocTotal  - $results->VatSum);
 
-            $userSummaryData = $this->salesSummaryReports();
+            $userSummaryData = $this->salesSummaryReports($startMONTH,  $endMONTH, $SlpCode, $user);
             $data = [
                 'CallsToday' => $calls,
                 'SalesWeekPerc' =>  0,
                 'SalestargetMonthly' => 0,
                 'SalesTargetDaily' => 0,
                 'TotalOutlets' => $TotalOutlets,
-                'TotalOrders' => $userSummaryData['totalOrders'],
-                'AllOrdersTotalValue' => $userSummaryData['totalOrdersValue'],
-                'TotalOrdersToday' => $userSummaryData['totalOrdersToday'],
-                'TodayOrdersTotalValue' => $userSummaryData['totalOrdersValueToday'],
+                'SummaryData' => $userSummaryData,
+                'TotalOrders' => 0,
+                'AllOrdersTotalValue' => 0,
+                'TotalOrdersToday' => 0,
+                'TodayOrdersTotalValue' => 0,
                 'TotalMonthlySales' =>     $TotalMonthlySales ?? 0,
                 'CurrentWeekCallsSummary' => $CurrentWeekCallsSummary,
             ];
@@ -79,72 +98,65 @@ class MDashboardController extends Controller
     /**
      * User Summary Data
      */
-    public function salesSummaryReports()
+    public function salesSummaryReports($startMONTH, $endMONTH, $SlpCode, $user)
     {
-      //  $user_id = Auth::user()->id;
-    //  $oslp = OSLP::find($user_id);
 
-        $totalOrders = ORDR::where(function ($q) {
-            $user = Auth::user();
-            if ($user->id != 8 || $user->id != 1) {
-                $q->where('UserSign', $user->id);
-            }
-        })->count();
+        $objects = [13, 17, 15, 14];
 
-        $totalOrdersValue = ORDR::where(function ($q) {
-            $user = Auth::user();
-            // $oslp = OSLP::findOrFail($user->id);
-            if ($user->id != 8 || $user->id != 1) {
-                $q->where('UserSign', $user->id);
-            }
-        })->sum('ExtDocTotal');
+        $docSummary = [];
 
-        $totalOrdersToday = ORDR::where(function ($q) {
-            $user = Auth::user();
-            if ($user->id != 8 || $user->id != 1) {
-                $q->where('UserSign', $user->id);
-            }
-        })->whereDate('created_at', Carbon::today())->count();
+        $tables = APDI::with('pdi1')
+            ->whereIn('ObjectID', $objects)
+            ->get();
 
-        $totalOrdersValueToday = ORDR::where(function ($q) {
-            $user = Auth::user();
-            if ($user->id != 8 || $user->id != 1) {
-                $q->where('UserSign', $user->id);
-            }
-        })->whereDate('created_at', Carbon::today())
-            ->sum('ExtDocTotal');
+        foreach ($tables as $table) {
+            $startWeek = now()->startOfWeek()->format('Y-m-d');
+            $endWeek = now()->endOfWeek()->format('Y-m-d');
 
+            $ordersQuery = $table->ObjectHeaderTable::when(!$user->SUPERUSER, function ($query) use ($user) {
+                $query->where("UserSign", $user->id);
+            })
+                ->when($SlpCode, function ($query) use ($SlpCode) {
+                    $query->where("SlpCode",  $SlpCode);
+                });
 
+            $total = $ordersQuery->count();
+            $totalValue = $ordersQuery->sum('DocTotal');
+            $totalToday = $ordersQuery->whereDate('created_at', Carbon::today())->count();
+            $totalValueToday = $ordersQuery->whereDate('created_at', Carbon::today())->sum('DocTotal');
 
-        // $now = Carbon::now();
+            $monthlyResults = $this->getSalesResults($table, $user, $startMONTH, $endMONTH, $SlpCode);
+            $weeklyResults = $this->getSalesResults($table, $user, $startWeek, $endWeek, $SlpCode);
 
-        // $targets = TargetSetup::with('document_lines')->whereMonth('TtoDate',  $now->month)->where('SlpCode', $oslp->SlpCode)->where('RecurPat', 'M')->get();
-        // $TotalMonthlyTargets = $targets->sum(function ($target) {
-        //     return $target->document_lines->sum('Tvalue');
-        // });
+            $details = [
+                'object' => $table->ObjectID,
+                'documentName' => $table->DocumentName,
+                'total' => $total,
+                'totalValue' => $totalValue,
+                'totalToday' => $totalToday,
+                'totalValueToday' => $totalValueToday,
+                'TotalMonthly' => $monthlyResults,
+                'TotalWeekly' => $weeklyResults,
+            ];
 
+            $docSummary[] = $details;
+        }
 
-        // $totalDays = date('t');
+        return $docSummary;
+    }
 
-
-        // $TotalDailyTargets = round($TotalMonthlyTargets / $totalDays);
-
-        // if ($TotalMonthlyTargets != 0) {
-        //     $SalesWeekPerc = round(($totalOrdersValue / $TotalMonthlyTargets) * $totalDays);
-        // } else {
-        //     $SalesWeekPerc = 0;
-        // }
-
-        $details = [
-            'totalOrders' => $totalOrders,
-            'totalOrdersValue' => $totalOrdersValue,
-            'totalOrdersToday' => $totalOrdersToday,
-            'totalOrdersValueToday' => $totalOrdersValueToday,
-            // 'TotalMonthlyTargets' => $TotalMonthlyTargets,
-            // 'TotalDailyTargets' => $TotalDailyTargets,
-            // 'SalesWeekPerc' => $SalesWeekPerc,
-        ];
-
-        return $details;
+    private function getSalesResults($table, $user, $startDate, $endDate, $SlpCode)
+    {
+        $results = $table->ObjectHeaderTable::select(DB::raw('SUM(VatSum) as VatSum'), DB::raw('SUM(DocTotal) as TotalDocTotal'))
+            ->when(!$user->SUPERUSER, function ($query) use ($user) {
+                $query->where("UserSign", $user->id);
+            })
+            ->when($SlpCode, function ($query) use ($SlpCode) {
+                $query->where("SlpCode",  $SlpCode);
+            })
+            ->where('CANCELED', '=', 'N')
+            ->whereBetween('DocDate', [$startDate, $endDate])
+            ->first();
+        return ($results->TotalDocTotal  - $results->VatSum);
     }
 }
