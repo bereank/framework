@@ -265,11 +265,22 @@ class InventoryService
                 $docData = $docData->toArray();
             }
 
-            if (($ObjType == 13 || (array_key_exists('BaseType', $docData) &&
-                $docData['BaseType'] != 15 && $ObjType == 13)) || $ObjType == 15) {
+            if ($ObjType == 13) {
+
                 $checkStockAvailabilty = true;
-                Log::info(["checkStockAvailabilty" => $checkStockAvailabilty]);
             }
+            if ($ObjType == 15) {
+
+                $checkStockAvailabilty = true;
+            }
+            if (
+                $ObjType == 13 &&  array_key_exists('BaseType', $docData) &&
+                $docData['BaseType'] == 15
+            ) {
+                $checkStockAvailabilty = false;
+            }
+
+
 
             if ($checkStockAvailabilty) {
                 $oibq->update([
