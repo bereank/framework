@@ -37,7 +37,7 @@ Route::any('attachments', [DocumentController::class, 'upload']);
 Route::post('documents/{ObjType}', [DocumentController::class, 'getDocData']);
 Route::post('marketing-doc-approvers/{ObjType}/{DocEntry}', [DocumentController::class, 'getDocumentApprovalStatus']);
 // Route::post('marketing-doc-close/{ObjType}/{DocEntry}', [DocumentController::class, 'closeSingleDocument']);
- Route::post('marketing-doc-printed/{ObjType}/{DocEntry}', [DocumentController::class, 'markDocumentPrinted']);
+Route::post('marketing-doc-printed/{ObjType}/{DocEntry}', [DocumentController::class, 'markDocumentPrinted']);
 Route::get('documents/{ObjType}/{DocEntry}', [DocumentController::class, 'getSingleDocData']);
 // //update Transferred to no after api for direct posting to sap fails
 // Route::post('sales_doc_update/{ObjType}/{docEntry}', [DocumentController::class, 'updateSingleDocData']);
@@ -62,6 +62,7 @@ Route::put('marketing/docs', [MarketingDocumentsController::class, 'updateSingle
 Route::put('marketing/attachments', [MarketingDocumentsController::class, 'upload']);
 Route::get('marketing/docs/{ObjType}', [MarketingDocumentsController::class, 'getDocumentData']);
 Route::get('marketing/docs/{ObjType}/{id}', [MarketingDocumentsController::class, 'getSingleDocData']);
+Route::put('document/cancellation/{ObjType}/{id}', [MarketingDocumentsController::class, 'documentCancellation']);
 
 
 
@@ -76,7 +77,7 @@ Route::post('password-change', [ApiAuthController::class, 'promptPasswordChange'
 
 //        Route::post('login', [ApiAuthController::class, 'login']);
 Route::group(['middleware' => ['auth:sanctum']], function () {
-  
+
 
     //DifferentOrders
     Route::post('CashOrder', [MOrderController::class, 'CashOrder']);
@@ -107,18 +108,18 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     //Orders
     Route::get('order-types', [MOrderController::class, 'getOrderTypes']);
 
-    
+
     //Get All Prices:
     Route::get('all-item-prices', [MPricelistController::class, 'itemPrices']);
 
     //Company
     Route::get('settings', [ApiAuthController::class, 'companySetupData']);
 
-    
+
     Route::apiResources(['dashboard' => MDashboardController::class]);
     Route::apiResources(['outlet' => OutletController::class]);
     Route::apiResources(['item' => MItemController::class]);
-   
+
     Route::apiResources(['order' => MOrderController::class]);
     // Route::apiResources(['invoice' => 'API\V1\InvoiceController']);
     // Route::apiResources(['CashOrder' => 'API\V1\OrderController']);
@@ -150,7 +151,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/object-update-status', [ProductController::class, 'getObjectUpdateStatus']);
 
     Route::get('/retailers/search', [CustomerController::class, 'searchRetailer']);
-    
+
     Route::get('/customergroups/search', [CustomerController::class, 'searchCustomerGroup']);
     Route::post('/customergroups/create', [CustomerController::class, 'createCustomerGroup']);
 
@@ -208,11 +209,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     //POST INTEGRATOR
     Route::get('/service-calls', [ITransactionController::class, 'getServiceCall']);
 
- 
+
 
     Route::apiResources(['inventory' => IInventoryController::class]);
     Route::apiResources(['retailers' => CustomerController::class]);
-  
+
     Route::apiResources(['products' => ProductController::class]);
     //   Route::apiResources(['iusers' => IUsersController::class]);
     //  Route::apiResources(['purchase-requests' => IPurchaeRequestController::class]);
