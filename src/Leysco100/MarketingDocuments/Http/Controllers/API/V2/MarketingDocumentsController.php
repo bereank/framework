@@ -91,6 +91,7 @@ class MarketingDocumentsController extends Controller
                     'CardCode',
                     'DocNum',
                     'CardName',
+                    'NumAtCard',
                     'ExtRef',
                     'ExtRefDocNum',
                     'UserSign',
