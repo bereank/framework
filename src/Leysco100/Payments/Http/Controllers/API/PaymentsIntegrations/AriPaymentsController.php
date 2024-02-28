@@ -37,13 +37,17 @@ class AriPaymentsController extends Controller
             $reqData = array(
                 "phone_no" => $request->phone_no,
                 "amount" => $request->amount,
-                "payingshortcode" => "payingShortcode",
-                "callback_url" => $baseUrl . "/mpesa-callback",
-                "reference" => $request->amount,
+                "payingshortcode" => $request->payingshortcode,
+                "callback_url" => $baseUrl . "/payments/incoming/third-party/ari/mpesa-callback",
+                "reference" => $request->reference,
             );
 
             $res =  $this->dataHydration($partyURL, $reqData);
-            return (new ApiResponseService())->apiSuccessResponseService($res);
+            if ($res['status_code'] == 200) {
+                return (new ApiResponseService())->apiSuccessResponseService($res['response']);
+            } else {
+                return (new ApiResponseService())->apiFailedResponseService("Failed To initiate Stk push");
+            }
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
@@ -66,7 +70,16 @@ class AriPaymentsController extends Controller
 
         try {
             $res =  $this->dataHydration($partyURL, $reqData);
-            return (new ApiResponseService())->apiSuccessResponseService($res);
+            if ($res['status_code'] == 200) {
+                $res = [
+                    "record" =>  $res['response']->payload[0],
+                    "balance" => $res['response']->balance,
+                    "message" => $res['response']->message
+                ];
+                return (new ApiResponseService())->apiSuccessResponseService($res);
+            } else {
+                return (new ApiResponseService())->apiFailedResponseService("Failed To Fetch Transaction");
+            }
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
@@ -79,7 +92,7 @@ class AriPaymentsController extends Controller
 
         $Numbering = (new DocumentsService())
             ->getNumSerieByObjectId(218);
-        
+
         $data = [
             'MSISDN' => $request["data"]["Body"]["stkCallback"]["CallbackMetadata"]["Item"][3],
             'TransAmount' => $request["data"]["Body"]["stkCallback"]["CallbackMetadata"]["Item"][0]["Value"] ?? 0,
@@ -119,6 +132,7 @@ class AriPaymentsController extends Controller
     }
     public function dataHydration($partyURL, $reqData)
     {
+
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
@@ -138,7 +152,12 @@ class AriPaymentsController extends Controller
 
         $response = curl_exec($curl);
         curl_close($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
 
-        return json_decode($response);
+        return [
+            'status_code' => $httpCode,
+            'response' => json_decode($response),
+        ];
     }
 }
