@@ -15,6 +15,7 @@ use Leysco100\Shared\Models\Administration\Models\NNM1;
 use Leysco100\Shared\Models\Finance\Models\ChartOfAccount;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OINV;
 use Leysco100\MarketingDocuments\Http\Controllers\Controller;
+use Leysco100\Shared\Models\Payments\Models\OCRP;
 
 class IIncomingPaymentController extends Controller
 {
@@ -82,6 +83,38 @@ class IIncomingPaymentController extends Controller
 
         $nnm1 = NNM1::where('id', $document->Series)->first();
         $document->Series = $nnm1 ? $nnm1->ExtRef : 289;
+
+
+        if ($document) {
+            $payment = RCT3::where('DocNum', $id)->first();
+
+            $curl = curl_init();
+
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://cargen.pit.co.ke/api/v1/pit/updatepayresp',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => json_encode(array(
+                    "TransID" => $payment->U_MpesaTxnNo,
+                    "Amount" => $payment->CreditSum,
+                )),
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/json'
+                ),
+            ));
+
+            $response = curl_exec($curl);
+
+            curl_close($curl);
+            Log::info(["PAYMENT UPDATED" => $response]);
+        }
+
+
         return $document;
     }
 
@@ -89,7 +122,7 @@ class IIncomingPaymentController extends Controller
     {
         $data = $request['data'];
         foreach ($data as $key => $val) {
-            $data = THRDP::updateOrCreate([
+            $data = OCRP::updateOrCreate([
                 'TransID' => $val['TransID'],
                 'ExtRef' => $val['ExtRef'],
             ], [
