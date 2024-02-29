@@ -5,6 +5,7 @@ namespace Leysco100\MarketingDocuments\Services;
 use stdClass;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
+use Leysco100\Shared\Models\CUFD;
 use Leysco100\Shared\Models\OUQR;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -22,6 +23,7 @@ use Leysco100\Shared\Models\Administration\Models\TaxGroup;
 use Leysco100\Shared\Models\MarketingDocuments\Models\OPLN;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OBIN;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OBTL;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OIBQ;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OILM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITW;
@@ -522,7 +524,7 @@ class MarketingDocumentService
                 return (new ApiResponseService())
                     ->apiSuccessAbortProcessResponse("Select Tax Code for item " . $value['ItemCode'] ?? "");
             }
-            //Validate Bin-locations
+            //Validate Bin-locations  UserSign
             if (array_key_exists('bin_allocation', $value) && !empty($value['bin_allocation'])) {
                 foreach ($value['bin_allocation'] as $key => $BinVal) {
                     if (!empty($BinVal)) {
@@ -532,11 +534,28 @@ class MarketingDocumentService
                                 return (new ApiResponseService())
                                     ->apiNotFoundResponse("Bin Code Does Not Exist");
                             }
+                            $user = User::where('id', $docData['UserSign'])->with('oudg')->first();
+                            $SellFromBin =   $user->oudg?->SellFromBin ?? false;
+
+                            if ($SellFromBin && $checkStockAvailabilty) {
+                                $BinItem = OIBQ::where('BinAbs', $obin->id)->where('ItemCode', $value['ItemCode'])->first();
+                                if ($BinItem) {
+                                    if ($BinItem['OnHandQty'] < $BinVal['QtyVar']) {
+                                        return (new ApiResponseService())
+                                            ->apiNotFoundResponse("Insufficient Bin-stock for item: " . $value['Dscription'] . "  ");
+                                    }
+                                } else {
+                                    return (new ApiResponseService())
+                                        ->apiNotFoundResponse("Insufficient/No Bin-stock for item: " . $value['Dscription'] . "  ");
+                                }
+                            }
                         }
                     }
                 }
             }
+
             // If Not Sales Order the Inventory Quantities should be Greater
+
 
             if ($checkStockAvailabilty) {
 
