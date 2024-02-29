@@ -4,13 +4,15 @@ namespace Leysco100\Inventory\Http\Controllers\API;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Leysco100\Shared\Models\Shared\Models\APDI;
 use Leysco100\Inventory\Http\Controllers\Controller;
+use Leysco100\MarketingDocuments\Services\DocumentsService;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITB;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OWHS;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OWTQ;
-use Leysco100\Shared\Models\Shared\Models\APDI;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\WTQ1;
 
 class MInventoryController extends Controller
 {

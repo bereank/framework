@@ -772,7 +772,8 @@ class MarketingDocumentService
                                 $BinVal,
                                 $WhsCode = null,
                                 $FromBinCod,
-                                $newDoc->toArray()
+                                $newDoc->toArray(),
+                                $rowItems->toArray()
                             );
                         }
                     }

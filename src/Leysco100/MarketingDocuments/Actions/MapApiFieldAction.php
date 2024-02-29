@@ -11,119 +11,122 @@ class MapApiFieldAction
 {
   public  function handle($data, $TargetTables)
   {
+    try {
+      // Header UDF validation
+      $table = (new $TargetTables->ObjectHeaderTable)->getTable();
+      $headerUdfs = CUFD::where('TableName', $table)->get(['FieldName', 'NotNull'])->keyBy('FieldName')->toArray();
 
-    // Header UDF validation
-    $table = (new $TargetTables->ObjectHeaderTable)->getTable();
-    $headerUdfs = CUFD::where('TableName', $table)->get(['FieldName', 'NotNull'])->keyBy('FieldName')->toArray();
+      if ($headerUdfs) {
+        $documentData = [];
 
-    if ($headerUdfs) {
-      $documentData = [];
-
-      if (!isset($data['udfs'])) {
-        return (new ApiResponseService())->apiSuccessAbortProcessResponse("UDF is a required field");
-      }
-
-      foreach ($data['udfs'] as $item) {
-        $key = array_key_first($item);
-        $exists = array_key_exists($key, $headerUdfs);
-
-        if ($exists) {
-          $documentData[$key] = $item[$key];
-        }
-      }
-
-      $data['udfs'] = $documentData;
-
-      $notNullUdfs = array_filter($headerUdfs, function ($item) {
-        return $item['NotNull'] == 1;
-      });
-
-      $keysOfInnerArrays = array_map('array_keys', $notNullUdfs);
-      $keysNotInArrayB = array_diff(array_keys($keysOfInnerArrays), array_keys($data['udfs']));
-
-      $commonKeys = array_intersect(array_keys($keysOfInnerArrays), array_keys($data['udfs']));
-
-      foreach ($commonKeys as  $key => $value) {
-
-        if (empty($data['udfs'][$value])) {
-          $missingField = $value;
-          return (new ApiResponseService())->apiSuccessAbortProcessResponse("$missingField Cannot be null");
-        }
-      }
-      if (!empty($keysNotInArrayB)) {
-        $missingField = $keysNotInArrayB[0];
-        return (new ApiResponseService())->apiSuccessAbortProcessResponse("$missingField is a required field");
-      }
-      // $udfsArrayOfObjects = [];
-
-      // foreach ($data['udfs'] as $key => $value) {
-      //   $udfsArrayOfObjects[] = [
-      //     $key => $value,
-      //   ];
-      // }
-
-      // $data['udfs'] = $udfsArrayOfObjects;
-    }
-
-
-    // Lines UDF validation
-    $line_table = (new $TargetTables->pdi1[0]['ChildTable'])->getTable();
-    $line_fields =  CUFD::where('TableName', $line_table)->get(['FieldName', 'NotNull'])->keyBy('FieldName')->toArray();
-
-    if ($line_fields) {
-
-      foreach ($data['document_lines'] as &$doc_lines) {
-        $lineData = [];
-        if (!isset($doc_lines['udfs'])) {
-
-          return (new ApiResponseService())->apiSuccessAbortProcessResponse("UDF is required Field");
+        if (!isset($data['udfs'])) {
+          return (new ApiResponseService())->apiSuccessAbortProcessResponse("UDF is a required field");
         }
 
-        foreach ($doc_lines['udfs'] as $item) {
-
+        foreach ($data['udfs'] as $item) {
           $key = array_key_first($item);
-          $exists = array_key_exists($key,  $line_fields);
+          $exists = array_key_exists($key, $headerUdfs);
 
           if ($exists) {
-
-            $lineData[$key] = $item[$key];
+            $documentData[$key] = $item[$key];
           }
         }
 
-        $doc_lines['udfs'] = $lineData;
-        $notNullUdfs = array_filter($line_fields, function ($item) {
+        $data['udfs'] = $documentData;
+
+        $notNullUdfs = array_filter($headerUdfs, function ($item) {
           return $item['NotNull'] == 1;
         });
 
         $keysOfInnerArrays = array_map('array_keys', $notNullUdfs);
-        $keysNotInArrayB = array_diff(array_keys($keysOfInnerArrays), array_keys($doc_lines['udfs']));
+        $keysNotInArrayB = array_diff(array_keys($keysOfInnerArrays), array_keys($data['udfs']));
 
-        $commonKeys = array_intersect(array_keys($keysOfInnerArrays), array_keys($doc_lines['udfs']));
+        $commonKeys = array_intersect(array_keys($keysOfInnerArrays), array_keys($data['udfs']));
 
         foreach ($commonKeys as  $key => $value) {
 
-          if (empty($doc_lines['udfs'][$value])) {
+          if (empty($data['udfs'][$value])) {
             $missingField = $value;
             return (new ApiResponseService())->apiSuccessAbortProcessResponse("$missingField Cannot be null");
           }
         }
         if (!empty($keysNotInArrayB)) {
-          $missingField = $keysNotInArrayB[array_key_first($keysNotInArrayB)];
+          $missingField = $keysNotInArrayB[0];
           return (new ApiResponseService())->apiSuccessAbortProcessResponse("$missingField is a required field");
         }
         // $udfsArrayOfObjects = [];
 
-        // foreach ($doc_lines['udfs'] as $key => $value) {
+        // foreach ($data['udfs'] as $key => $value) {
         //   $udfsArrayOfObjects[] = [
         //     $key => $value,
         //   ];
         // }
 
-        // $doc_lines['udfs'] = $udfsArrayOfObjects;
+        // $data['udfs'] = $udfsArrayOfObjects;
       }
-    }
 
-    return $data;
+
+      // Lines UDF validation
+      $line_table = (new $TargetTables->pdi1[0]['ChildTable'])->getTable();
+      $line_fields =  CUFD::where('TableName', $line_table)->get(['FieldName', 'NotNull'])->keyBy('FieldName')->toArray();
+
+      if ($line_fields) {
+
+        foreach ($data['document_lines'] as &$doc_lines) {
+          $lineData = [];
+          if (!isset($doc_lines['udfs'])) {
+
+            return (new ApiResponseService())->apiSuccessAbortProcessResponse("UDF is required Field");
+          }
+
+          foreach ($doc_lines['udfs'] as $item) {
+
+            $key = array_key_first($item);
+            $exists = array_key_exists($key,  $line_fields);
+
+            if ($exists) {
+
+              $lineData[$key] = $item[$key];
+            }
+          }
+
+          $doc_lines['udfs'] = $lineData;
+          $notNullUdfs = array_filter($line_fields, function ($item) {
+            return $item['NotNull'] == 1;
+          });
+
+          $keysOfInnerArrays = array_map('array_keys', $notNullUdfs);
+          $keysNotInArrayB = array_diff(array_keys($keysOfInnerArrays), array_keys($doc_lines['udfs']));
+
+          $commonKeys = array_intersect(array_keys($keysOfInnerArrays), array_keys($doc_lines['udfs']));
+
+          foreach ($commonKeys as  $key => $value) {
+
+            if (empty($doc_lines['udfs'][$value])) {
+              $missingField = $value;
+              return (new ApiResponseService())->apiSuccessAbortProcessResponse("$missingField Cannot be null");
+            }
+          }
+          if (!empty($keysNotInArrayB)) {
+            $missingField = $keysNotInArrayB[array_key_first($keysNotInArrayB)];
+            return (new ApiResponseService())->apiSuccessAbortProcessResponse("$missingField is a required field");
+          }
+          // $udfsArrayOfObjects = [];
+
+          // foreach ($doc_lines['udfs'] as $key => $value) {
+          //   $udfsArrayOfObjects[] = [
+          //     $key => $value,
+          //   ];
+          // }
+
+          // $doc_lines['udfs'] = $udfsArrayOfObjects;
+        }
+      }
+      return $data;
+    } catch (\Throwable $th) {
+      Log::info($th);
+      return (new ApiResponseService())->apiSuccessAbortProcessResponse($th->getMessage());
+    }
   }
 
   // public function docValidator($data, $table, $fields)
