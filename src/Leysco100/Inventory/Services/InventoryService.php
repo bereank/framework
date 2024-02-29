@@ -186,7 +186,8 @@ class InventoryService
         $ToWhsCode,
         $ObjType,
         $FromBinCod,
-        $docData
+        $docData,
+        $rowItems
     ) {
         foreach ($value['bin_allocation'] as $key => $BinVal) {
             if (!empty($BinVal)) {
@@ -214,14 +215,15 @@ class InventoryService
                     $BinVal,
                     $ToWhsCode,
                     $FromBinCod,
-                    $docData
+                    $docData,
+                    $rowItems
                 );
                 return $res;
             }
         }
     }
 
-    public function binAllocations($ObjType, $ItemCode, $bin_allocation, $ToWhsCode, $FromBinCod, $docData)
+    public function binAllocations($ObjType, $ItemCode, $bin_allocation, $ToWhsCode, $FromBinCod, $docData, $rowItems)
     {
 
         $obin = OBIN::where('BinCode', $bin_allocation['BinCode'])->first();
@@ -261,8 +263,8 @@ class InventoryService
             }
             $checkStockAvailabilty = false;
 
-            if (!is_array($docData)) {
-                $docData = $docData->toArray();
+            if (!is_array($rowItems)) {
+                $rowItems = $rowItems->toArray();
             }
 
             if ($ObjType == 13) {
@@ -274,12 +276,12 @@ class InventoryService
                 $checkStockAvailabilty = true;
             }
             if (
-                $ObjType == 13 &&  array_key_exists('BaseType', $docData) &&
-                $docData['BaseType'] == 15
+                $ObjType == 13 &&  array_key_exists('BaseType', $rowItems) &&
+                $rowItems['BaseType'] == 15
             ) {
                 $checkStockAvailabilty = false;
             }
-
+            Log::info(["checkStockAvailabilty" => $checkStockAvailabilty]);
 
 
             if ($checkStockAvailabilty) {

@@ -40,8 +40,8 @@ class MItemController extends Controller
 
         $user = User::where('id', Auth::user()->id)->with('oudg')->first();
         $SellFromBin =   $user->oudg?->SellFromBin ?? false;
-        $BinItems=[];
-        if ($SellFromBin) {
+        $BinItems = [];
+        if ($SellFromBin && !$all) {
             $BIN = OBIN::where('id', $user->oudg->DftBinLoc)->first();
             $BinItems = OIBQ::where('BinAbs', $BIN->id)->pluck('ItemCode');
         }
@@ -65,11 +65,11 @@ class MItemController extends Controller
                 $query->where('frozenFor', "N")
                     ->where('OnHand', '>', 0);
             })
-            ->when($SellFromBin, function ($query2) use ($BinItems) {
+            ->when(!$all && $SellFromBin, function ($query2) use ($BinItems) {
                 $query2->whereIn('ItemCode', $BinItems);
             })
             ->get();
-        if ($SellFromBin) {
+        if (!$all && $SellFromBin) {
             foreach ($data as $d) {
                 $items = OIBQ::where('BinAbs', $BIN->id)->where('ItemCode', $d->ItemCode)->first();
 
@@ -181,7 +181,7 @@ class MItemController extends Controller
                         $PRICE = $itm9->Price;
                     } else if ($opln->isGrossPrc == 'N') {
                         $PRICE = round((($ovtg->rate / 100) + 1) *  $itm9->Price, 2);
-                     //   (0.16 + 1) * 100 = 116;
+                        //   (0.16 + 1) * 100 = 116;
                     }
                 }
                 $details = [
