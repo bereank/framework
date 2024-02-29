@@ -20,7 +20,7 @@ class MapApiFieldAction
         $documentData = [];
 
         if (!isset($data['udfs'])) {
-          return (new ApiResponseService())->apiSuccessAbortProcessResponse("UDF is a required field");
+          return ["data" => "UDF is a required field", "status" => -1];
         }
 
         foreach ($data['udfs'] as $item) {
@@ -47,12 +47,20 @@ class MapApiFieldAction
 
           if (empty($data['udfs'][$value])) {
             $missingField = $value;
-            return (new ApiResponseService())->apiSuccessAbortProcessResponse("$missingField Cannot be null");
+            $missingField = $missingField . " Cannot be null";
+            return ["data" => $missingField, "status" => -1];
           }
         }
         if (!empty($keysNotInArrayB)) {
-          $missingField = $keysNotInArrayB[0];
-          return (new ApiResponseService())->apiSuccessAbortProcessResponse("$missingField is a required field");
+          $missingField = implode(",", $keysNotInArrayB);
+          $size = count($keysNotInArrayB);
+
+          if ($size > 1) {
+            $missingField = $missingField . " are required fields";
+            return ["data" => $missingField, "status" => -1];
+          }
+          $missingField = $missingField . " is a required field";
+          return ["data" => $missingField, "status" => -1];
         }
         // $udfsArrayOfObjects = [];
 
@@ -75,8 +83,7 @@ class MapApiFieldAction
         foreach ($data['document_lines'] as &$doc_lines) {
           $lineData = [];
           if (!isset($doc_lines['udfs'])) {
-
-            return (new ApiResponseService())->apiSuccessAbortProcessResponse("UDF is required Field");
+            return ["data" => " UDF is required Field", "status" => -1];
           }
 
           foreach ($doc_lines['udfs'] as $item) {
@@ -104,12 +111,12 @@ class MapApiFieldAction
 
             if (empty($doc_lines['udfs'][$value])) {
               $missingField = $value;
-              return (new ApiResponseService())->apiSuccessAbortProcessResponse("$missingField Cannot be null");
+              return ["data" => $missingField . " Cannot be null", "status" => -1];
             }
           }
           if (!empty($keysNotInArrayB)) {
             $missingField = $keysNotInArrayB[array_key_first($keysNotInArrayB)];
-            return (new ApiResponseService())->apiSuccessAbortProcessResponse("$missingField is a required field");
+            return ["data" => $missingField . " is a required field", "status" => -1];
           }
           // $udfsArrayOfObjects = [];
 
@@ -122,10 +129,10 @@ class MapApiFieldAction
           // $doc_lines['udfs'] = $udfsArrayOfObjects;
         }
       }
-      return $data;
+      return ["data" => $data, "status" => 1];
     } catch (\Throwable $th) {
       Log::info($th);
-      return (new ApiResponseService())->apiSuccessAbortProcessResponse($th->getMessage());
+      return ["data" => $th->getMessage(), "status" => -1];
     }
   }
 
