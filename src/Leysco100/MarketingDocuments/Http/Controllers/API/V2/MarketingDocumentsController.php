@@ -411,6 +411,11 @@ class MarketingDocumentsController extends Controller
         // Step 4: Validate UDF'S
         $docData = (new MapApiFieldAction())->handle($validatedFields, $TargetTables);
 
+        if ($docData["status"] == -1) {
+            return (new ApiResponseService())->apiSuccessAbortProcessResponse($docData['data']);
+        } else {
+            $docData = $docData['data'];
+        }
         // Step 5: Create Document
         $newDoc =  (new MarketingDocumentService())->createDoc($docData, $TargetTables, $ObjType);
 
