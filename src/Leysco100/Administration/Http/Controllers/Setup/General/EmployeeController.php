@@ -16,8 +16,10 @@ class EmployeeController extends Controller
      */
     public function index()
     {
+
         try {
-            $data = OHEM::select('id', 'firstName', 'lastName', 'empID')->get();
+            $data = OHEM::with('managr:id,jobTitle,firstName,lastName,empID,dept,branch,manager', 'department:id,Code,Name,Remarks')
+                ->select('id', 'jobTitle', 'firstName', 'lastName', 'empID', 'dept', 'branch', 'manager')->get();
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());

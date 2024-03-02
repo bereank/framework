@@ -5,6 +5,7 @@ namespace Leysco100\Shared\Models\HumanResourse\Models;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
 use Leysco100\Shared\Models\Administration\Models\OUDP;
+use Leysco100\Shared\Models\BusinessPartner\Models\OBPL;
 use Spatie\Multitenancy\Models\Concerns\UsesTenantConnection;
 
 class OHEM extends Model
@@ -15,7 +16,12 @@ class OHEM extends Model
 
     public function department()
     {
-        return $this->belongsTo(OUDP::class, 'Code', 'dept');
+        return $this->belongsTo(OUDP::class, 'dept', 'Code');
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo(OBPL::class, 'branch', 'BPLId');
     }
 
     protected $appends = array('full_name');

@@ -3,9 +3,8 @@
 namespace Leysco100\Administration\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Artisan;
-use Leysco100\Shared\Services\CommonService;
-use Leysco100\Shared\Models\Shared\Models\FM100;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
 use Spatie\Multitenancy\Commands\Concerns\TenantAware;
 
 
