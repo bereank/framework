@@ -71,6 +71,34 @@
       },
       {
         "icon": "mdi-con",
+        "Label": "Dispatch Management",
+        "Visible": "Y",
+        "children": [
+          {
+            "icon": "mdi-con",
+            "Label": "Dashboard",
+            "link": "/dispatch/dashboard",
+            "Visible": "N",
+            "children": []
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Vehicles",
+            "link": "/vehicles",
+            "Visible": "Y",
+            "children": []
+          },
+          {
+            "icon": "mdi-con",
+            "Label": "Dispatch",
+            "link": "/dispatch",
+            "Visible": "N",
+            "children": []
+          }
+        ]
+      },
+      {
+        "icon": "mdi-con",
         "Label": "Employee Timesheet",
         "link": "/employee-timesheet",
         "Visible": "Y",
@@ -102,20 +130,6 @@
         "Label": "Distributors",
         "link": "/distributors",
         "Visible": "Y",
-        "children": []
-      },
-      {
-        "icon": "mdi-con",
-        "Label": "Vehicles",
-        "link": "/vehicles",
-        "Visible": "Y",
-        "children": []
-      },
-      {
-        "icon": "mdi-con",
-        "Label": "Dispatch",
-        "link": "/dispatch",
-        "Visible": "N",
         "children": []
       }
     ]

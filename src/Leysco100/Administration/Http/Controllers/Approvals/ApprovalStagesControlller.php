@@ -70,10 +70,14 @@ class ApprovalStagesControlller extends Controller
      */
     public function show($id)
     {
-        $data = OWST::with('wst1.users')
-            ->where('id', $id)
-            ->first();
-        return $data;
+        try {
+            $data = OWST::with('wst1.users')
+                ->where('id', $id)
+                ->first();
+            return (new ApiResponseService())->apiSuccessResponseService($data);
+        } catch (\Throwable $th) {
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+        }
     }
 
     /**

@@ -44,6 +44,22 @@ class MarketingDocumentsController extends Controller
     public function getDocumentData(Request $request, $ObjType)
     {
 
+        // Query params validation rules
+        $rules = [
+            'StartDate' => 'nullable|date_format:Y-m-d',
+            'EndDate' => 'nullable|date_format:Y-m-d',
+            'per_page' => 'nullable|integer',
+            'isDoc' => 'nullable|integer',
+            'page' => 'nullable|integer'
+        ];
+
+        // Validate the request
+        $validator = Validator::make($request->query(), $rules);
+
+        if ($validator->fails()) {
+            return (new ApiResponseService())->apiValidationFailedResponse($validator->errors());
+        }
+
         $isDoc = \Request::get('isDoc');
         $docNum = \Request::get('docNum');
         $page = $request->input('page', 1);
@@ -64,7 +80,7 @@ class MarketingDocumentsController extends Controller
         $DocumentTables = APDI::with('pdi1')
             ->where('ObjectID', $tableObjType)
             ->first();
-        //    (new AuthorizationService())->checkIfAuthorize($DocumentTables->id, 'read');
+        (new AuthorizationService())->checkIfAuthorize($DocumentTables->id, 'read');
         $ownerData = [];
         $dataOwnership = (new AuthorizationService())->CheckIfActive($ObjType, $user->EmpID);
 

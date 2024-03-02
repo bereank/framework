@@ -36,7 +36,7 @@ class CreatePermissions extends Command
     {
 
         // Default Roles
-        $roles = ['Finance', 'Sales', 'Purchase', 'Inventory'];
+        $roles = ['Finance', 'Sales', 'Purchase', 'Inventory','Gate Pass'];
 
         //Creating Roles
         foreach ($roles as $key => $role) {

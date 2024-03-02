@@ -53,7 +53,7 @@ Route::get('mpesa/transaction/data', [MpesaCallbackController::class, "getTransD
 /*
  -------------------------------------------------------------------------
  |                           
- | MARKETING DOCS SINGLE API'S
+ | MARKETING DOCS API'S
  |    
  --------------------------------------------------------------------------
  */
