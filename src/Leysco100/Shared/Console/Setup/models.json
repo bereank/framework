@@ -273,6 +273,27 @@
     "ObjAcronym": ""
   },
   {
+    "ObjectID": 1250000001,
+    "ObjectHeaderTable": "Leysco100\\Shared\\Models\\InventoryAndProduction\\Models\\OWTQ",
+    "DocumentName": "Inventory Transfer Request",
+    "PermissionName": "inventory_transfer_request",
+    "RowStatus": "A",
+    "isDoc": "Y",
+    "JrnStatus": "N",
+    "DrftObj": 112,
+    "children": [
+      {
+        "ChildTable": "Leysco100\\Shared\\Models\\InventoryAndProduction\\Models\\WTQ1",
+        "ChildType": "document_lines"
+      },
+      {
+        "ChildTable": "Leysco100\\Shared\\Models\\InventoryAndProduction\\Models\\WTQ19",
+        "ChildType": "bin_allocations"
+      }
+    ],
+    "ObjAcronym": ""
+  },
+  {
     "ObjectID": 67,
     "ObjectHeaderTable": "Leysco100\\Shared\\Models\\InventoryAndProduction\\Models\\OWTR",
     "DocumentName": "Inventory Transfer",

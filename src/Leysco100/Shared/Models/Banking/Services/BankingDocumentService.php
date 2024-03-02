@@ -51,7 +51,7 @@ class BankingDocumentService
             'TrsfrDate' => $request['TrsfrDate'] ?? now(), // Transfer Date
             'Ref1' => $request['Ref1'] ?? null, // ORCT reference
             'TrsfrRef' => $request['TrsfrRef'] ?? null, // Reference for Back Transfer
-            'Comments' => $request['Comments'] ?? "Testing", // Remarks
+            'Comments' => $request['Comments'] ?? "Incoming Payment", // Remarks
             "U_Mpesa" => $request['U_Mpesa'] ?? null,
             "U_MRef" => $request['U_MRef'] ?? null,
             'UserSign' => $document->UserSign,
