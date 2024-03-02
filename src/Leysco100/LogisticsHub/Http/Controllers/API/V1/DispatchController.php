@@ -19,6 +19,8 @@ use Leysco100\Shared\Models\Administration\Models\User;
 use Leysco100\MarketingDocuments\Jobs\DocStatusUpdateJob;
 use Leysco100\MarketingDocuments\Services\SystemDefaults;
 use Leysco100\MarketingDocuments\Services\DocumentsService;
+use Leysco100\Shared\Models\Administration\Models\Vehicle;
+use Leysco100\Shared\Models\LogisticsHub\Models\ORAS;
 
 class DispatchController extends Controller
 {
@@ -470,7 +472,9 @@ class DispatchController extends Controller
 
                 if ($item['ObjType'] && $item['id']) {
                     DocStatusUpdateJob::dispatch(
-                        $BaseTables, $item['id'], $baseDocHeader
+                        $BaseTables,
+                        $item['id'],
+                        $baseDocHeader
                     );
                 }
 
@@ -745,46 +749,67 @@ class DispatchController extends Controller
         $vehicle_id = \Request::has('vehicle_id') ? explode(",", \Request::get('vehicle_id')) : [];
         $CallId =  request()->filled('CallId') ? request()->input('CallId') : false;
 
-        $objects = [13, 211, 212, 213, 214];
+        $objects = [13, 211, 212, 214,213];
+        try {
+            $DocSummaries = [];
+            foreach ($objects as $OBJType) {
+                $DocumentTables = APDI::with('pdi1')
+                    ->where('ObjectID', $OBJType)
+                    ->first();
+                $doc_status = ['Open' => 'O', 'Closed' => 'C'];
+                $status = [];
+                foreach ($doc_status as $key => $DocStatus) {
 
-        $summaries = [];
-        foreach ($objects as $OBJType) {
-            $DocumentTables = APDI::with('pdi1')
-                ->where('ObjectID', $OBJType)
-                ->first();
-            $doc_status = ['Open' => 'O', 'Closed' => 'C'];
-            $status = [];
-            foreach ($doc_status as $key => $DocStatus) {
+                    $dispItems = $DocumentTables->ObjectHeaderTable::with([
+                        'document_lines' => function ($query) use ($DocStatus) {
+                            $query->where('LineStatus',  $DocStatus);
+                        },
+                    ])
+                        ->when(!empty($salesEmp), function ($query) use ($salesEmp) {
+                            return $query->whereIn('SlpCode', $salesEmp);
+                        })
+                        ->when(!empty($driverCode), function ($query) use ($driverCode) {
+                            return $query->whereIn('RlpCode', $driverCode);
+                        })
+                        ->when(!empty($vehicle_id), function ($query) use ($vehicle_id) {
+                            return $query->whereIn('vehicle_id', $vehicle_id);
+                        })
+                        ->when($CallId, function ($query) use ($CallId) {
+                            return $query->where('ClgCode', $CallId);
+                        })
+                        ->whereBetween('created_at', [$startDate, $endDate])
+                        ->when(!$user->SUPERUSER, function ($query) use ($RlpCode) {
+                            $query->where('RlpCode',  $RlpCode);
+                        })
+                        ->where('DocStatus', $DocStatus)->orderBy('id', 'desc');
 
-                $dispItems = $DocumentTables->ObjectHeaderTable::with([
-                    'document_lines' => function ($query) use ($DocStatus) {
-                        $query->where('LineStatus',  $DocStatus);
-                    },
-                ])
-                    ->when(!empty($salesEmp), function ($query) use ($salesEmp) {
-                        return $query->whereIn('SlpCode', $salesEmp);
-                    })
-                    ->when(!empty($driverCode), function ($query) use ($driverCode) {
-                        return $query->whereIn('RlpCode', $driverCode);
-                    })
-                    ->when(!empty($vehicle_id), function ($query) use ($vehicle_id) {
-                        return $query->whereIn('vehicle_id', $vehicle_id);
-                    })
-                    ->when($CallId, function ($query) use ($CallId) {
-                        return $query->where('ClgCode', $CallId);
-                    })
-                    ->whereBetween('created_at', [$startDate, $endDate])
-                    ->when(!$user->SUPERUSER, function ($query) use ($RlpCode) {
-                        $query->where('RlpCode',  $RlpCode);
-                    })
-                    ->where('DocStatus', $DocStatus)->orderBy('id', 'desc')->count();
+                    $Items = $dispItems->count();
+                    $drivers = $dispItems->select('RlpCode')->distinct('RlpCode')->count();
+                    $vehicles = $dispItems->select('vehicle_id')->distinct('vehicle_id')->count();
 
-                $status[$key] = $dispItems;
+                    $status[$key] = [
+                        "Documents"=>$Items, 
+                        "drivers"=>$drivers,
+                        "vehicles"=> $vehicles,
+                    ];
+                }
+
+                $status['Document'] =  $DocumentTables->DocumentName;
+                array_push($DocSummaries, $status);
             }
-
-            $status['Document'] =  $DocumentTables->DocumentName;
-            array_push($summaries, $status);
+            $vehicles = Vehicle::count();
+            $drivers = ORLP::count();
+            $routes = ORAS::count();
+            $summaries = [
+                "Documents" => $DocSummaries,
+                "drivers" => $drivers,
+                "vehicles" => $vehicles,
+                "routes" => $routes
+            ];
+            return (new ApiResponseService())->apiSuccessResponseService($summaries);
+        } catch (\Throwable $th) {
+            Log::info($th->getMessage());
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }
-        return $summaries;
     }
 }

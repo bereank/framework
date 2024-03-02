@@ -57,9 +57,9 @@ class PriceCalculationService
                 ->first();
 
             if ($itm9) {
-                if ($opln->isGrossPrc == 'N') {
+                if ($opln->isGrossPrc == 'Y') {
                     return $itm9->Price;
-                } else if ($opln->isGrossPrc == 'Y') {
+                } else if ($opln->isGrossPrc == 'N') {
                     //RATE * PRICE (1 + RATE/100) * PRICE
 
                     return (($ovtg->rate / 100) + 1) *  $itm9->Price;
@@ -111,9 +111,9 @@ class PriceCalculationService
 
             $PRICE = ($PRICEPERPRICEUNIT * $SALESUNITCONVERTEDTOBASEUOM) / $PRICINGUNITCONVERTEDTOBASEUOM;
 
-            if ($opln->isGrossPrc == 'N') {
+            if ($opln->isGrossPrc == 'Y') {
                 return  $PRICE;
-            } else if ($opln->isGrossPrc == 'Y') {
+            } else if ($opln->isGrossPrc == 'N') {
                 //RATE * PRICE (1 + RATE/100) * PRICE
                 return (($ovtg->rate / 100) + 1) *   $PRICE;
             }

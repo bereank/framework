@@ -67,12 +67,21 @@ class InventoryTransactionsController extends Controller
         $DocumentTables = APDI::with('pdi1')
             ->where('ObjectID', $tableObjType)
             ->first();
+        $user = Auth::user();
+        (new AuthorizationService())->checkIfAuthorize($DocumentTables->id, 'read');
+        $ownerData = [];
+        $dataOwnership = (new AuthorizationService())->CheckIfActive($ObjType, $user->EmpID);
 
-        // (new AuthorizationService())->checkIfAuthorize($DocumentTables->id, 'read');
+        if ($dataOwnership) {
+            $ownerData =  (new AuthorizationService())->getDataOwnershipAuth($ObjType, 1);
+        }
 
         try {
             $data = $DocumentTables->ObjectHeaderTable::where('ObjType', $ObjType)
                 ->with('objecttype', 'branch', 'CreatedBy')
+                ->when($dataOwnership && $dataOwnership->Active, function ($query) use ($ownerData) {
+                    $query->wherein('OwnerCode', $ownerData);
+                })
                 ->where(function ($q) use ($isDoc) {
                     if ($isDoc == 2) {
                         $q->where('DataSource', "E")->where('DocStatus', "O");
