@@ -22,7 +22,6 @@ use Leysco100\Shared\Models\Banking\Models\ORCT;
 use Leysco100\Shared\Models\Banking\Models\PDF2;
 use Leysco100\Shared\Models\Banking\Models\RCT2;
 use Leysco100\Shared\Services\UserFieldsService;
-use Leysco100\Inventory\Services\InventoryService;
 use Leysco100\MarketingDocuments\Jobs\NumberingSeries;
 use Leysco100\Shared\Models\HumanResourse\Models\OHEM;
 use Leysco100\Shared\Models\Administration\Models\EOTS;
@@ -45,7 +44,6 @@ use Leysco100\Shared\Models\InventoryAndProduction\Models\OSRN;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OUOM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\SRI1;
 use Leysco100\Shared\Models\Shared\Services\ServiceCallService;
-use Leysco100\MarketingDocuments\Services\MarketingDocumentService;
 use Leysco100\Shared\Models\Banking\Services\BankingDocumentService;
 use Leysco100\Shared\Models\MarketingDocuments\Services\GeneralDocumentService;
 
@@ -62,9 +60,9 @@ class ITransactionController extends Controller
             $ObjType = 205;
         }
 
-        // if ($ObjType == 1250000001) {
-        //     $ObjType = 66;
-        // }
+        if ($ObjType == 1250000001) {
+            $ObjType = 66;
+        }
 
         $isDraft = 0;
         $DocumentTables = APDI::with('pdi1')
@@ -83,17 +81,11 @@ class ITransactionController extends Controller
             $documents = $DocumentTables->ObjectHeaderTable::whereNull('ExtRef')
                 ->where('ObjType', $ObjType)
                 //  ->where('Transfered', 'N')
-                ->where(function ($q) use ($docEntry, $DocumentTables, $ObjType) {
+                ->where(function ($q) use ($docEntry) {
                     if ($docEntry != null) {
                         $q->where('id', $docEntry);
                     }
-                    if ($ObjType == 13) {
-                        $q->whereHas('ofscs', function ($q) {
-                            $q->where('Status', 1);
-                        });
-                    }
                 })
-
                 ->take(5)
                 ->get();
 
@@ -101,9 +93,9 @@ class ITransactionController extends Controller
                 $ObjType = 1470000113;
             }
 
-            // if ($ObjType == 66) {
-            //     $ObjType = 1250000001;
-            // }
+            if ($ObjType == 66) {
+                $ObjType = 1250000001;
+            }
             foreach ($documents as $key => $headerVal) {
                 /**
                  * Mark The document not transferred
@@ -236,7 +228,7 @@ class ITransactionController extends Controller
                 }
                 $headerVal->document_lines = $rowData;
 
-                //$headerVal->deals = $rowData;
+                $headerVal->deals = $rowData;
 
                 if ($headerVal->ObjType == 13) {
                     $headerVal->payments = [(new BankingDocumentService())->getInvoicePayment($headerVal->id)];
@@ -339,9 +331,7 @@ class ITransactionController extends Controller
                 foreach ($request["UserFields"] as $key => $field) {
                     $userFields[$key] = $field;
                 }
-                if ($userFields) {
-                    $record->update($userFields);
-                }
+                $record->update($userFields);
             }
 
             if ($ObjType == 205) {
@@ -606,26 +596,18 @@ class ITransactionController extends Controller
 
     public function createOpeningBalanceTransaction(Request $request)
     {
-
         $user = Auth::user();
         $ObjType = $request['ObjType'];
 
         if ($ObjType == 1470000113) {
             $ObjType = 205;
         }
-
-        // if ($ObjType == 1250000001) {
-        //     $ObjType = 66;
-        // }
         $DocumentTables = APDI::with('pdi1')
-            ->where('ObjectID', $ObjType)
+            ->where('ObjectID', $request['ObjType'])
             ->first();
-        $defaulted_data = (new MarketingDocumentService())->fieldsDefaulting($request->all());
-        $request =  $defaulted_data;
-        Log::info(["defaulted_data" =>  $defaulted_data]);
-        Log::info("CREATING OBJECT: " . $ObjType);
+        Log::info("CREATING OBJECT: " . $request['ObjType']);
         if (!$DocumentTables) {
-            Log::info("Document object does not exist: " . $ObjType);
+            Log::info("Document object does not exist: " . $request['ObjType']);
 
             abort(500, 'Document object does not exist.');
         }
@@ -656,7 +638,7 @@ class ITransactionController extends Controller
                     ], 422);
             }
         }
-        Log::info(['ObjType' => $ObjType]);
+
         // $nnm1 = NNM1::where('ExtRef', $request['Series'])->first();
         // if (!$nnm1) {
         //     return response()
@@ -670,7 +652,7 @@ class ITransactionController extends Controller
         // $DocNum = (new DocumentsService())
         //     ->gettingNumberingSeries($request['ObjType']);
         $Numbering = (new DocumentsService())
-            ->getNumSerieByObjectId($ObjType);
+            ->getNumSerieByObjectId($request['ObjType']);
 
         DB::connection("tenant")->beginTransaction();
         try {
@@ -687,11 +669,11 @@ class ITransactionController extends Controller
                 'CANCELED' => $request['CANCELED'] ?? null,
                 'CardName' => $businessPartner ? $businessPartner->CardName : null,
                 'SlpCode' => $request['SlpCode'] ?? null, // Sales Employee
-                //   'U_SalePipe' => $request['U_SalePipe'] ?? null, // Sales Pipe Line
+                'U_SalePipe' => $request['U_SalePipe'] ?? null, // Sales Pipe Line
                 'OwnerCode' => $request['OwnerCode'] ?? null, //Owner Code
-                // 'U_CashName' => $request['U_CashName'] ?? null, //Cash Customer  Name
-                //'U_CashNo' => $request['U_CashNo'] ?? null, // Cash Customer No
-                //'U_IDNo' => $request['U_IDNo'] ?? null, // Id no
+                'U_CashName' => $request['U_CashName'] ?? null, //Cash Customer  Name
+                'U_CashNo' => $request['U_CashNo'] ?? null, // Cash Customer No
+                'U_IDNo' => $request['U_IDNo'] ?? null, // Id no
                 'NumAtCard' => $request['NumAtCard'] ?? null,
                 'CurSource' => $request['CurSource'] ?? null,
                 'DocTotal' => $request['DocTotal'] ?? null,
@@ -702,33 +684,33 @@ class ITransactionController extends Controller
                 'ReqDate' => $request['ReqDate'],
                 'CntctCode' => $request['CntctCode'] ?? null, //Contact Person
                 'LicTradNum' => $request['LicTradNum'],
-                'BaseEntry' => $request['BaseEntry'] ?? null, //BaseKey
-                'BaseType' => $request['BaseType'] ??  null, //BaseKey
+                'BaseEntry' => $request['BaseEntry'] ? $request['BaseEntry'] : null, //BaseKey
+                'BaseType' => $request['BaseType'] ? $request['BaseType'] : null, //BaseKey
 
                 //Inventory Transaction Values
-                'Ref2' => $request['Ref2'] ?? null, // Ref2
-                'GroupNum' => $request['GroupNum'] ?? null, //[Price List]
-                'ToWhsCode' => $request['ToWhsCode'] ?? null, //To Warehouse Code
+                'Ref2' => $request['Ref2'] ? $request['Ref2'] : null, // Ref2
+                'GroupNum' => $request['GroupNum'] ? $request['GroupNum'] : null, //[Price List]
+                'ToWhsCode' => $request['ToWhsCode'] ? $request['ToWhsCode'] : null, //To Warehouse Code
                 //SeriesDocument
                 'DiscPrcnt' => $request['DiscPrcnt'] ?? 0, //Discount Percentages
                 'DiscSum' => $request['DiscSum'] ?? null, // Discount Sum
                 'BPLId' => $request['Branch'] ?? null,
-                //'U_SaleType' => $request['U_SaleType'] ?? null, // Sale Type
+                'U_SaleType' => $request['U_SaleType'] ?? null, // Sale Type
                 'Comments' => $request['Comments'] ?? null, //comments
                 'NumAtCard2' => $request['NumAtCard2'] ?? null,
                 'JrnlMemo' => $request['JrnlMemo'] ?? null, // Journal Remarks
                 'UseShpdGd' => $request['UseShpdGd'] ?? "N",
-                //'U_ServiceCall' => $request['U_ServiceCall'] ?? null,
-                //'U_DemoLocation' => $request['U_DemoLocation'] ?? null,
-                //'U_Technician' => $request['U_Technician'] ?? null,
-                //'U_Location' => $request['U_Location'] ?? null,
-                //'U_MpesaRefNo' => $request['U_MpesaRefNo'] ?? null,
-                //'U_PCash' => $request['U_PCash'] ?? null,
-                //'U_transferType' => $request['U_transferType'] ?? null,
-                //'U_SSerialNo' => $request['U_SSerialNo'] ?? null,
-                //'U_TypePur' => $request['U_TypePur'] ?? null,
-                //'U_NegativeMargin' => $request['U_NegativeMargin'] ?? null,
-                //'U_BaseDoc' => $request['U_BaseDoc'] ?? null,
+                'U_ServiceCall' => $request['U_ServiceCall'] ?? null,
+                'U_DemoLocation' => $request['U_DemoLocation'] ?? null,
+                'U_Technician' => $request['U_Technician'] ?? null,
+                'U_Location' => $request['U_Location'] ?? null,
+                'U_MpesaRefNo' => $request['U_MpesaRefNo'] ?? null,
+                'U_PCash' => $request['U_PCash'] ?? null,
+                'U_transferType' => $request['U_transferType'] ?? null,
+                'U_SSerialNo' => $request['U_SSerialNo'] ?? null,
+                'U_TypePur' => $request['U_TypePur'] ?? null,
+                'U_NegativeMargin' => $request['U_NegativeMargin'] ?? null,
+                'U_BaseDoc' => $request['U_BaseDoc'] ?? null,
                 'ExtRef' => $request['ExtRef'] ?? null,
                 'ExtRefDocNum' => $request['ExtRefDocNum'] ?? null,
                 'ExtDocTotal' => $request['ExtDocTotal'] ?? null,
@@ -739,13 +721,9 @@ class ITransactionController extends Controller
 
             $newDoc = new $DocumentTables->ObjectHeaderTable(array_filter($NewDocDetails));
             $newDoc->save();
-            if (!empty($defaulted_data['UserFields'])) {
-                $newDoc->update($defaulted_data['UserFields']);
-            }
 
             $rowData = [];
             foreach ($request['document_lines'] as $key => $value) {
-
                 $Dscription = $value['Dscription'];
                 $UomCode = null;
                 $unitMsr = null;
@@ -773,14 +751,12 @@ class ITransactionController extends Controller
                 $quantity = $value['Quantity'];
                 $PriceAfVAT = $value['PriceAfVAT'];
                 $price = $value['Price'];
-                $vatSum = 0;
 
-                if (is_numeric($quantity) || is_numeric($PriceAfVAT) || is_numeric($price)) {
-                    $vatSum = $quantity * ($PriceAfVAT - $price);
-                }
+                $vatSum = $quantity * ($PriceAfVAT - $price);
 
                 $rowdetails = [
                     'DocEntry' => $newDoc->id,
+                    'OwnerCode' => $request['OwnerCode'],
                     'LineNum' => $request['LineNum'] ?? $key,
                     'ItemCode' => $value['ItemCode'],
                     'Dscription' => $Dscription,
@@ -807,24 +783,25 @@ class ITransactionController extends Controller
                     'OpenQty' => $value['Quantity'] ?? 0, //    Open Inv. Qty
 
                     'BaseType' => $request['BaseType'] ?? $request['BaseType'], //    Base Type
-                    'BaseRef' => $request['BaseRef'] ?? null, //    Base Ref.
-                    'BaseEntry' => $request['BaseEntry'] ?? null, //    Base Key
-                    'BaseLine' => $request['BaseLine'] ?? null, //    Base Row
+                    'BaseRef' => $request['BaseRef'] ? $request['BaseRef'] : null, //    Base Ref.
+                    'BaseEntry' => $request['BaseEntry'] ? $request['BaseEntry'] : null, //    Base Key
+                    'BaseLine' => $request['BaseLine'], //    Base Row
 
+                    'UomCode' => $value['UomCode'] ?? null, //    UoM Code
                     'unitMsr' => $unitMsr, //    UoM Name
                     'NumPerMsr' => array_key_exists('NumPerMsr', $value) ? $value['NumPerMsr'] : null, //    Items per Unit
                     'Text' => array_key_exists('Text', $value) ? $value['Text'] : null, //    Item Details
                     'OwnerCode' => $value['OwnerCode'] ?? null, //    Owner
                     'GTotal' => array_key_exists('GTotal', $value) ? $value['GTotal'] : null, //    Gross Total
 
-                    'CogsOcrCod' => $value['OcrCode'] ?? null,
-                    'CogsOcrCo2' => $value['OcrCode2'] ?? null,
-                    'CogsOcrCo3' => $value['OcrCode3'] ?? null,
+                    'CogsOcrCod' => $value['OcrCode'],
+                    'CogsOcrCo2' => $value['OcrCode2'],
+                    'CogsOcrCo3' => $value['OcrCode3'],
                     'CogsOcrCo4' => $value['OcrCode4'] ?? null,
                     'CogsOcrCo5' => $value['OcrCode5'] ?? null,
                     'PQTReqDate' => $request['ReqDate'],
 
-                    'BPLId' => $request['Branch'] ?? null,
+                    'BPLId' => $request['Branch'],
                     'WhsName' => isset($value['WhsName']) ? $value['WhsName'] : null,
                     'StockPrice' => $value['StockPrice'] ?? 0,
                     'LineStatus' => $value['LineStatus'],
@@ -832,29 +809,6 @@ class ITransactionController extends Controller
                 ];
                 $rowItems = new $DocumentTables->pdi1[0]['ChildTable']($rowdetails);
                 $rowItems->save();
-                Log::info(["BIN-ALLOC" => $value]);
-                //bin allocations
-                if (array_key_exists('bin_allocation', $value)) {
-                    LOG::info('array_key_exists');
-                    $result = array_filter($DocumentTables->pdi1->toArray(), function ($item) {
-                        return $item['ChildType'] === 'bin_allocations';
-                    });
-                    $lineModel = collect($result)->first();
-
-                    $FromBinCod =    $value['FromBinCod'] ?? null;
-
-                    if (isset($defaulted_data['ToWhsCode']) && $defaulted_data['ToWhsCode'] !== null) {
-                        $WhsCode = $defaulted_data['ToWhsCode'];
-                    } elseif (isset($defaulted_data['WhsCode']) && $defaulted_data['WhsCode'] !== null) {
-                        $WhsCode = $defaulted_data['WhsCode'];
-                    } else {
-                        $WhsCode = null;
-                    }
-                    $LineNum = $request['LineNum'] ?? $key;
-                    $ItemCode = $value['ItemCode'];
-
-                    (new InventoryService())->binQuantities($value, $lineModel, $newDoc->id, $LineNum, $ItemCode, $WhsCode, $ObjType, $FromBinCod, $newDoc->toarray());
-                }
 
                 array_push($rowData, $rowItems);
             }
