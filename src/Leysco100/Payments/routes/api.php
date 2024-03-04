@@ -19,11 +19,14 @@ Route::post('payments/incoming/third-party/eqb/query', [PaymentsProcessingContro
 
 Route::post('/payments/incoming/third-party-lines', [PaymentsController::class, 'incPayLineStore']);
 
-
+Route::get('payments/incoming/third-party/payments-methods', [PaymentsController::class, 'ActivePayMethods']);
 Route::apiResources(['payments/incoming/third-party' => PaymentsController::class]);
 
+
+
+
 //ARI PAYMENTS
-Route::post('mpesa-callback', [AriPaymentsController::class, "mpesa_callback"])->withoutMiddleware(['auth:sanctum']);
+Route::post('payments/incoming/third-party/ari/mpesa-callback', [AriPaymentsController::class, "mpesa_callback"])->withoutMiddleware(['auth:sanctum']);
 Route::get('mpesa/transaction/data', [AriPaymentsController::class, "getTransData"])->withoutMiddleware(['auth:sanctum']);
 Route::post('payments/incoming/third-party/ari/stkpush', [AriPaymentsController::class, 'PromptStkPush']);
 Route::post('payments/incoming/third-party/ari/trans-query', [AriPaymentsController::class, 'transQuery']);

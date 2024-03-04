@@ -108,6 +108,13 @@
                         "link": "/inventory/report/serial-numbers-report",
                         "Visible": "Y",
                         "children": []
+                    },
+                    {
+                        "icon": "mdi-con",
+                        "Label": "Bin Locations Reports",
+                        "link": "/bin-locations/reports",
+                        "Visible": "Y",
+                        "children": []
                     }
                 ]
             },

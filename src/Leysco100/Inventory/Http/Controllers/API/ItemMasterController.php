@@ -15,6 +15,7 @@ use Leysco100\MarketingDocuments\Jobs\NumberingSeries;
 use Leysco100\Shared\Models\Administration\Models\ITG1;
 use Leysco100\Shared\Models\Administration\Models\NNM1;
 use Leysco100\Shared\Models\Administration\Models\OADM;
+use Leysco100\Shared\Models\InventoryAndProduction\Models\OIBQ;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITG;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITM;
 use Leysco100\Shared\Models\InventoryAndProduction\Models\OITW;
@@ -504,6 +505,49 @@ class ItemMasterController extends Controller
             //get default price
             $data = PriceCalculationController::fetchItemDefaultPrice($request->all());
             return (new ApiResponseService())->apiSuccessResponseService($data);
+        } catch (\Throwable $th) {
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+        }
+    }
+    public function bins_report(Request $request)
+    {
+        $WhsCode = $request->has('WhsCode') &&  !empty($request->get('WhsCode')) ? explode(",", $request->get('WhsCode')) : [];
+        $BinCode = $request->has('BinCode')  && !empty($request->get('BinCode')) ? explode(",", $request->get('BinCode')) : [];
+        $ItemCode = $request->has('ItemCode') && !empty($request->get('ItemCode')) ? explode(",", $request->get('ItemCode')) : [];
+        $page = $request->input('page', 1);
+        $perPage = $request->input('per_page', 50);
+
+        try {
+            $report = OIBQ::query()
+                ->when(!empty($WhsCode), function ($query) use ($WhsCode) {
+                    return $query->whereHas('bin_location', function ($query) use ($WhsCode) {
+                        $query->whereIn('WhsCode', $WhsCode);
+                    });
+                })
+                ->when(!empty($BinCode), function ($query) use ($BinCode) {
+                    return $query->whereHas('bin_location', function ($query) use ($BinCode) {
+                        $query->whereIn('BinCode', $BinCode);
+                    });
+                })
+                ->when(!empty($ItemCode), function ($query) use ($ItemCode) {
+                    return $query->whereIn('ItemCode', $ItemCode);
+                })
+                ->with([
+                    'bin_location' => function ($query) {
+                        $query->select("id", "AbsEntry", "BinCode", "WhsCode");
+                    },
+                    'bin_location.warehouse' => function ($query) {
+                        $query->select("id", "WhsCode", "WhsName");
+                    },
+                    'item:id,ItemCode,ItemName'
+                ])
+               
+                ->select("id", "AbsEntry", "ItemCode", "BinAbs", "OnHandQty","Freezed")
+                ->paginate($perPage, ['*'], 'page', $page);
+
+
+
+            return (new ApiResponseService())->apiSuccessResponseService($report);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
         }

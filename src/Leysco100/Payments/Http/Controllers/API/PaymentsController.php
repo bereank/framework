@@ -7,6 +7,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Leysco100\Shared\Models\Payments\Models\CRP1;
 use Leysco100\Shared\Models\Payments\Models\OCRP;
+use Leysco100\Shared\Models\Payments\Models\OTPP;
 use Leysco100\Shared\Services\ApiResponseService;
 use Leysco100\Payments\Http\Controllers\Controller;
 
@@ -117,6 +118,16 @@ class PaymentsController extends Controller
                     ]
                 );
             }
+            return (new ApiResponseService())->apiSuccessResponseService($data);
+        } catch (\Throwable $th) {
+            Log::info($th);
+            return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
+        }
+    }
+    public function ActivePayMethods(Request $request)
+    {
+        try {
+            $data = OTPP::with('tpp1.tpp2')->where('Active',1)->get();
             return (new ApiResponseService())->apiSuccessResponseService($data);
         } catch (\Throwable $th) {
             Log::info($th);

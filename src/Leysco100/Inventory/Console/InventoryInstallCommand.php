@@ -17,7 +17,7 @@ class InventoryInstallCommand extends Command
     use TenantAware;
     protected $signature = 'leysco100:inventory:install {--tenant=*}';
 
-    protected $description = 'Installing Business Partner Package';
+    protected $description = 'Installing Inventory Package';
 
     public function handle()
     {

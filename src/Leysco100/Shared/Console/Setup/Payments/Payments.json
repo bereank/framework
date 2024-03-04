@@ -115,5 +115,39 @@
                 }
             ]
         }
+    },
+    {
+        "OTPP": {
+            "Name": "ARI Payments",
+            "Description": "ARI Payments services",
+            "Code": "ARI01",
+            "ObjCode": 320,
+            "Active": true,
+            "children": [
+                {
+                    "DocEntry": null,
+                    "Name": "ARI Mpesa StkPush",
+                    "Code": "ARI01",
+                    "AuthMth": 0,
+                    "HasStkPush": true,
+                    "StkPushURL": "/payments/incoming/third-party/ari/stkpush",
+                    "QueryUrl": "/payments/incoming/third-party/ari/trans-query",
+                    "CallBackUrl": null,
+                    "ValidationUrl": null,
+                    "ConfirmUrl": null,
+                    "Active": true,
+                    "PassKey": null,
+                    "PublicKeyPath": null,
+                    "TPP2": {
+                        "Code": "ARI01",
+                        "MobileActive": true,
+                        "Status": 1,
+                        "Shortcode": "554554",
+                        "Username": null,
+                        "Password": null
+                    }
+                }
+            ]
+        }
     }
 ]
