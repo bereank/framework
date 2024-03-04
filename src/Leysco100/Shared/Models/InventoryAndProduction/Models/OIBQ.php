@@ -19,10 +19,4 @@ class OIBQ extends Model
     {
         return $this->belongsTo(OITM::class, 'ItemCode','ItemCode');
     }
-
-
-    public function warehouse()
-    {
-        return $this->belongsTo(OWHS::class, 'WhsCode', 'WhsCode');
-    }
 }

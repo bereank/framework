@@ -48,6 +48,17 @@ class ApiResponseService
             ], 422));
     }
 
+    public function apiValidationFailedResponse($message)
+    {
+        abort(response()
+            ->json([
+                'ResultState' => false,
+                'ResultCode' => 1500,
+                'ValidationError' => "Validation error",
+                'ResultDesc' => $message,
+            ], 422));
+    }
+
     /**
      * Not Found Response
      */

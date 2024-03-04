@@ -51,6 +51,7 @@ class CreateThirdPartyPayments extends Command
 
             foreach ($otppData['children'] as $childData) {
                 $child = TPP1::create([
+                    "DocEntry"=>$otpp->id,
                     'Name' => $childData['Name'] ?? null,
                     'Code' => $childData['Code'] ?? null,
                     'AuthMth' => $childData['AuthMth'] ?? null,
@@ -58,6 +59,8 @@ class CreateThirdPartyPayments extends Command
                     'CallBackUrl' => $childData['CallBackUrl'] ?? null,
                     'ValidationUrl' => $childData['ValidationUrl'] ?? null,
                     'ConfirmUrl' => $childData['ConfirmUrl'] ?? null,
+                    'StkPushURL' => $childData['StkPushURL'] ?? null,
+                    'QueryUrl' => $childData['QueryUrl'] ?? null,
                     'Active' => $childData['Active'] ?? null,
                     'PassKey' => $childData['PassKey'] ?? null,
                     'PublicKeyPath' => $childData['PublicKeyPath'] ?? null,
@@ -65,7 +68,7 @@ class CreateThirdPartyPayments extends Command
 
                 if (isset($childData['TPP2'])) {
                     TPP2::create([
-                        'child_id' => $child->id,
+                        'DocEntry' => $child->id,
                         'Code' => $childData['TPP2']['Code'] ?? null,
                         'MobileActive' => $childData['TPP2']['MobileActive'] ?? null,
                         'Status' => $childData['TPP2']['Status'] ?? null,

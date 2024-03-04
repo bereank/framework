@@ -44,6 +44,7 @@ Route::apiResources(['discounts-group' => DiscountGroupController::class]);
 //Inventory Reports
 Route::get('inventory/report', [ItemMasterController::class, "inventory_report"]);
 Route::get('inventory/serial-numbers/reports', [ItemMasterController::class, "serials_report"]);
+Route::get('bin-locations/reports', [ItemMasterController::class, "bins_report"]);
 //Route::apiResources(['item_properties' => ItemPropertiesController::class]);
 
 Route::get('get-my-stock', [MInventoryController::class, 'getMyStock']);
