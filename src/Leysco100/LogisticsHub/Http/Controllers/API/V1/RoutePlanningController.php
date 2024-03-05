@@ -155,7 +155,7 @@ class RoutePlanningController extends Controller
     public function show($id)
     {
         try {
-            $record =   ORPS::with('calls.outlet', 'calls.employees', 'outlets')->find($id);
+            $record =   ORPS::with('calls.outlet', 'calls.employees', 'outlets','territory')->find($id);
             return (new ApiResponseService())->apiSuccessResponseService($record);
         } catch (\Throwable $th) {
             return (new ApiResponseService())->apiFailedResponseService($th->getMessage());
