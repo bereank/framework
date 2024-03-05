@@ -772,7 +772,7 @@ class ITransactionController extends Controller
 
                 $quantity = $value['Quantity'];
                 $PriceAfVAT = $value['PriceAfVAT'];
-                $price = $value['Price'];
+                $price =  str_replace(',', '', $value['Price']);
                 $vatSum = 0;
 
                 if (is_numeric($quantity) && is_numeric($PriceAfVAT) && is_numeric($price)) {
@@ -787,7 +787,7 @@ class ITransactionController extends Controller
                     'DocDate' => $request['DocDate'],
                     'Quantity' => $value['Quantity'],
                     'UomCode' => $UomCode, //
-                    'Price' => $value['Price'], //
+                    'Price' => str_replace(',', '', $value['Price']), //
                     'DiscPrcnt' => $value['DiscPrcnt'] ?? 0,
                     'Rate' => $value['Rate'] ?? 0,
                     'TaxCode' => $value['VatGroup'] ?? null,
