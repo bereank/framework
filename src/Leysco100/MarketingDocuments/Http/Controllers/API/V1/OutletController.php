@@ -43,18 +43,18 @@ class OutletController extends Controller
         $outletIds = [];
 
         if ($RouteActive) {
-            $assignments = ORAS::where("Date",$date)->with("route.outlets")->where("SlpCode",$user->oudg->SalePerson)->get();
-            foreach ($assignments as $assignment){
+            $assignments = ORAS::where("Date", $date)->with("route.outlets")
+                ->where("SlpCode", $user->oudg->SalePerson)->get();
+            foreach ($assignments as $assignment) {
                 $outletIds =  $assignment->route->outlets->pluck("id");
             }
         }
+       
 
         $data = OCRD::select('id', 'CardCode', 'CardName', 'Address', 'PriceListNum', 'Longitude', 'Latitude')
             ->with('contacts')
-            ->where(function ($q) use ($outletIds){
-                if (count($outletIds)>0){
-                    $q->whereIn("id",$outletIds);
-                }
+            ->when(!empty($outletIds), function ($query) use ($outletIds) {
+                $query->whereIn("id", $outletIds);
             })
             ->orderBy('CardName', 'asc')
             ->where('CardName', '!=', null)
@@ -95,7 +95,7 @@ class OutletController extends Controller
             'UserSign' => $user->id,
         ]);
 
-//        NumberingSeries::dispatchSync($onmm->DfltSeries);
+        //        NumberingSeries::dispatchSync($onmm->DfltSeries);
         return response()
             ->json(
                 [
@@ -189,7 +189,7 @@ class OutletController extends Controller
             'Longitude' => $request['Longitude'],
             'Latitude' => $request['Latitude'],
             'Address' => $request['Address'],
-            'Phone1'=>$request['Phone1'] ?? null
+            'Phone1' => $request['Phone1'] ?? null
         ]);
 
         return $customer;
