@@ -853,7 +853,7 @@ class ITransactionController extends Controller
                     $LineNum = $request['LineNum'] ?? $key;
                     $ItemCode = $value['ItemCode'];
 
-                    (new InventoryService())->binQuantities($value, $lineModel, $newDoc->id, $LineNum, $ItemCode, $WhsCode, $ObjType, $FromBinCod, $newDoc->toarray());
+                    (new InventoryService())->binQuantities($value, $lineModel, $newDoc->id, $LineNum, $ItemCode, $WhsCode, $ObjType, $FromBinCod, $newDoc->toarray(), $rowItems);
                 }
 
                 array_push($rowData, $rowItems);

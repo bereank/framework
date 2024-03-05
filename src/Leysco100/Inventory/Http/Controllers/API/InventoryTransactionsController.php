@@ -465,7 +465,8 @@ class InventoryTransactionsController extends Controller
                             $WhsCode,
                             $ObjType,
                             $FromBinCod,
-                            $newDoc
+                            $newDoc,
+                            $rowItems
                         );
                     }
                 }
