@@ -793,7 +793,7 @@ class ITransactionController extends Controller
                     'TaxCode' => $value['VatGroup'] ?? null,
                     'PriceAfVAT' => $value['PriceAfVAT'],
                     'PriceBefDi' => $value['UnitPrice'],
-                    'LineTotal' => $value['LineTotal'],
+                    'LineTotal' => str_replace(',', '',$value['LineTotal']) ,
                     'VatSum' => $vatSum,
                     'WhsCode' => $value['WhsCode'] ?? null,
                     'SlpCode' => $request['SlpCode'] ?? null, //    Sales Employee
