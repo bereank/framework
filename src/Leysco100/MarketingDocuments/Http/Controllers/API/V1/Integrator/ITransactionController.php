@@ -775,7 +775,7 @@ class ITransactionController extends Controller
                 $price = $value['Price'];
                 $vatSum = 0;
 
-                if (is_numeric($quantity) || is_numeric($PriceAfVAT) || is_numeric($price)) {
+                if (is_numeric($quantity) && is_numeric($PriceAfVAT) && is_numeric($price)) {
                     $vatSum = $quantity * ($PriceAfVAT - $price);
                 }
 
