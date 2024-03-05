@@ -27,9 +27,7 @@ class ORPS extends Model
 
     public function outlets()
     {
-       // return $this->hasMany(CRD16::class,  'RouteID')->withPivot('bpartner');
-          return $this->belongsToMany(OCRD::class, CRD16::class, 'RouteID', 'CardCode');
-     
+        return $this->belongsToMany(OCRD::class, CRD16::class, 'RouteID', 'CardCode');
     }
 
     public function calls()
