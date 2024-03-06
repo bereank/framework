@@ -77,6 +77,7 @@ class CreateOUDGSTable extends Migration
             $table->boolean('AddToFavourites')->default(0);
             $table->string('EtstCode', 1)->nullable();
             $table->boolean('ClockIn')->default(0)->nullable();
+            $table->boolean('MultiLogin')->default(0)->nullable();
             $table->timestamps();
         });
     }
