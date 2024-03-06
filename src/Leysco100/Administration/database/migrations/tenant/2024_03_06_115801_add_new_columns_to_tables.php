@@ -39,6 +39,10 @@ return new class extends Migration
             if (!Schema::hasColumn('o_u_d_g_s', 'EdtItmPrc')) {
                 $table->boolean('EdtItmPrc')->default(0)->nullable()->after('GpsSetUpID');
             }
+            if (!Schema::hasColumn('o_u_d_g_s', 'MultiLogin')) {
+                $table->boolean('MultiLogin')->default(0)->nullable()->after('EdtItmPrc');
+            }
+           
         });
     }
     
@@ -54,6 +58,7 @@ return new class extends Migration
             $table->dropColumn('RouteID');
             $table->dropColumn('RouteActive');
             $table->dropColumn('SellFromBin');
+            $table->dropColumn('MultiLogin');
         });
     }
 };
